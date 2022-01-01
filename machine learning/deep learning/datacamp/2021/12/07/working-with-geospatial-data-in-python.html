@@ -1,0 +1,1788 @@
+<h1 id="working-with-geospatial-data-in-python">Working with Geospatial Data in Python</h1>
+
+<p>This is the memo of
+ <strong>Working with Geospatial Data in Python from DataCamp</strong>
+ .</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/working-with-geospatial-data-in-python">HERE</a></strong>
+ .</p>
+
+<p>###
+ Course Description</p>
+
+<p>A good proportion of the data out there in the real world is inherently spatial. From the population recorded in the national census, to every shop in your neighborhood, the majority of datasets have a location aspect that you can exploit to make the most of what they have to offer. This course will show you how to integrate spatial data into your Python Data Science workflow. You will learn how to interact with, manipulate and augment real-world data using their geographic dimension. You will learn to read tabular spatial data in the most common formats (e.g. GeoJSON, shapefile, geopackage) and visualize them in maps. You will then combine different sources using their location as the bridge that puts them in relation to each other. And, by the end of the course, you will be able to understand what makes geographic data unique, allowing you to transform and repurpose them in different contexts.</p>
+
+<p>###
+<strong>Table of contents</strong></p>
+
+<ol>
+  <li>Introduction to geospatial vector data</li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/11/25/working-with-geospatial-data-in-python-from-datacamp/2/">Spatial relationships</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/11/25/working-with-geospatial-data-in-python-from-datacamp/3/">Projecting and transforming geometries</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/11/25/working-with-geospatial-data-in-python-from-datacamp/4/">Putting it all together – Artisanal mining sites case study</a></li>
+</ol>
+
+<h1 id="1-introduction-to-geospatial-vector-data"><strong>1. Introduction to geospatial vector data</strong></h1>
+<hr />
+
+<p>In this chapter, you will be introduced to the concepts of geospatial data, and more specifically of vector data. You will then learn how to represent such data in Python using the GeoPandas library, and the basics to read, explore and visualize such data. And you will exercise all this with some datasets about the city of Paris.</p>
+
+<h2 id="11-geospatial-data"><strong>1.1 Geospatial data</strong></h2>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/1-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/2-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/3-5.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="111-restaurants-in-paris"><strong>1.1.1 Restaurants in Paris</strong></h3>
+
+<p>Throughout the exercises in this course, we will work with several datasets about the city of Paris.</p>
+
+<p>In this exercise, we will start with exploring a dataset about the restaurants in the center of Paris (compiled from a
+ <a href="https://opendata.paris.fr/explore/dataset/commercesparis/">Paris Data open dataset</a>
+ ). The data contains the coordinates of the point locations of the restaurants and a description of the type of restaurant.</p>
+
+<p>We expect that you are familiar with the basics of the pandas library to work with tabular data (
+ <code class="language-plaintext highlighter-rouge">DataFrame</code>
+ objects) in Python. Here, we will use pandas to read the provided csv file, and then use matplotlib to make a visualization of the points. With matplotlib, we first create a figure and axes object with
+ <code class="language-plaintext highlighter-rouge">fig, ax = plt.subplots()</code>
+ , and then use this axes object
+ <code class="language-plaintext highlighter-rouge">ax</code>
+ to create the plot.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pandas and matplotlib
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Read the restaurants csv file
+</span><span class="n">restaurants</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">"paris_restaurants.csv"</span><span class="p">)</span>
+
+<span class="c1"># Inspect the first rows of restaurants
+</span><span class="k">print</span><span class="p">(</span><span class="n">restaurants</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Make a plot of all points
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">restaurants</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">restaurants</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="s">'o'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                                             type              x             y
+0                             Restaurant européen  259641.691646  6.251867e+06
+1                Restaurant traditionnel français  259572.339603  6.252030e+06
+2                Restaurant traditionnel français  259657.276374  6.252143e+06
+3  Restaurant indien, pakistanais et Moyen Orient  259684.438330  6.252203e+06
+4                Restaurant traditionnel français  259597.943086  6.252230e+06
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/4-4.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="112-adding-a-background-map"><strong>1.1.2 Adding a background map</strong></h3>
+
+<p>A plot with just some points can be hard to interpret without any spatial context. Therefore, in this exercise we will learn how to add a background map.</p>
+
+<p>We are going to make use of the
+ <code class="language-plaintext highlighter-rouge">contextily</code>
+ package. The
+ <code class="language-plaintext highlighter-rouge">add_basemap()</code>
+ function of this package makes it easy to add a background web map to our plot. We begin by plotting our data first, and then pass the matplotlib axes object to the
+ <code class="language-plaintext highlighter-rouge">add_basemap()</code>
+ function.
+ <code class="language-plaintext highlighter-rouge">contextily</code>
+ will then download the web tiles needed for the geographical extent of your plot.</p>
+
+<p>To set the size of the plotted points, we can use the
+ <code class="language-plaintext highlighter-rouge">markersize</code>
+ keyword of the
+ <code class="language-plaintext highlighter-rouge">plot()</code>
+ method.</p>
+
+<p>Pandas has been imported as
+ <code class="language-plaintext highlighter-rouge">pd</code>
+ and matplotlib’s pyplot functionality as
+ <code class="language-plaintext highlighter-rouge">plt</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Read the restaurants csv file
+</span><span class="n">restaurants</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">"paris_restaurants.csv"</span><span class="p">)</span>
+
+<span class="c1"># Import contextily
+</span><span class="kn">import</span> <span class="nn">contextily</span>
+
+<span class="c1"># A figure of all restaurants with background
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">restaurants</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">restaurants</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="s">'o'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">contextily</span><span class="p">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/5-4.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="12-introduction-to-geopandas"><strong>1.2 Introduction to GeoPandas</strong></h2>
+
+<h3 id="121-explore-the-paris-districts-i"><strong>1.2.1 Explore the Paris districts (I)</strong></h3>
+
+<p>In this exercise, we introduce a next dataset about Paris: the administrative districts of Paris (compiled from a
+ <a href="https://opendata.paris.fr/explore/dataset/quartier_paris/">Paris Data open dataset</a>
+ ).</p>
+
+<p>The dataset is available as a GeoPackage file, a specialised format to store geospatial vector data, and such a file can be read by GeoPandas using the
+ <code class="language-plaintext highlighter-rouge">geopandas.read_file()</code>
+ function.</p>
+
+<p>To get a first idea of the dataset, we can inspect the first rows with
+ <code class="language-plaintext highlighter-rouge">head()</code>
+ and do a quick visualization with `plot(). The attribute information about the districts included in the dataset is the district name and the population (total number of inhabitants of each district).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import GeoPandas
+</span><span class="kn">import</span> <span class="nn">geopandas</span>
+
+<span class="c1"># Read the Paris districts dataset
+</span><span class="n">districts</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">'paris_districts.gpkg'</span><span class="p">)</span>
+
+<span class="c1"># Inspect the first rows
+</span><span class="k">print</span><span class="p">(</span><span class="n">districts</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Make a quick visualization of the districts
+</span><span class="n">districts</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+   id           district_name  population                                           geometry
+0   1  St-Germain-l'Auxerrois        1672  POLYGON ((451922.1333912524 5411438.484355546,...
+1   2                  Halles        8984  POLYGON ((452278.4194036503 5412160.89282334, ...
+2   3            Palais-Royal        3195  POLYGON ((451553.8057660239 5412340.522224233,...
+3   4           Place-Vendôme        3044  POLYGON ((451004.907944323 5412654.094913081, ...
+4   5                 Gaillon        1345  POLYGON ((451328.7522686935 5412991.278156867,...
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/6-2.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="122-explore-the-paris-districts-ii"><strong>1.2.2 Explore the Paris districts (II)</strong></h3>
+
+<p>In the previous exercise, we used the customized
+ <code class="language-plaintext highlighter-rouge">plot()</code>
+ method of the GeoDataFrame, which produces a simple visualization of the geometries in the dataset. The GeoDataFrame and GeoSeries objects can be seen as “spatial-aware” DataFrame and Series objects, and compared to their pandas counterparts, they expose additional spatial-specific methods and attributes.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">.geometry</code>
+ attribute of a GeoDataFrame always returns the column with the geometry objects as a
+ <code class="language-plaintext highlighter-rouge">GeoSeries</code>
+ , whichever the actual name of the column (in the default case it will also be called ‘geometry’).</p>
+
+<p>Another example of extra spatial functionality is the
+ <code class="language-plaintext highlighter-rouge">area</code>
+ attribute, giving the area of the polygons.</p>
+
+<p>GeoPandas has been imported as
+ <code class="language-plaintext highlighter-rouge">geopandas</code>
+ and the districts dataset is available as the
+ <code class="language-plaintext highlighter-rouge">districts</code>
+ variable.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Check what kind of object districts is
+</span><span class="k">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">districts</span><span class="p">))</span>
+
+<span class="c1"># Check the type of the geometry attribute
+</span><span class="k">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">districts</span><span class="p">.</span><span class="n">geometry</span><span class="p">))</span>
+
+<span class="c1"># Inspect the first rows of the geometry
+</span><span class="k">print</span><span class="p">(</span><span class="n">districts</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Inspect the area of the districts
+</span><span class="k">print</span><span class="p">(</span><span class="n">districts</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="n">area</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+&lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
+&lt;class 'geopandas.geoseries.GeoSeries'&gt;
+
+0    POLYGON ((451922.1333912524 5411438.484355546,...
+1    POLYGON ((452278.4194036503 5412160.89282334, ...
+2    POLYGON ((451553.8057660239 5412340.522224233,...
+3    POLYGON ((451004.907944323 5412654.094913081, ...
+4    POLYGON ((451328.7522686935 5412991.278156867,...
+Name: geometry, dtype: object
+
+
+0     8.685379e+05
+1     4.122371e+05
+2     2.735494e+05
+          ...
+78    1.598127e+06
+79    2.089783e+06
+Length: 80, dtype: float64
+
+</code></pre></div></div>
+
+<h3 id="123-the-paris-restaurants-as-a-geodataframe"><strong>1.2.3 The Paris restaurants as a GeoDataFrame</strong></h3>
+
+<p>In the first coding exercise of this chapter, we imported the locations of the restaurants in Paris from a csv file. To enable the geospatial functionality of GeoPandas, we want to convert the pandas DataFrame to a GeoDataFrame. This can be done with the
+ <code class="language-plaintext highlighter-rouge">GeoDataFrame()</code>
+ constructor and the
+ <code class="language-plaintext highlighter-rouge">geopandas.points_from_xy()</code>
+ function, and is done for you.</p>
+
+<p>Now we have a GeoDataFrame, all spatial functionality becomes available, such as plotting the geometries. In this exercise we will make the same figure as in the first exercise with the restaurants dataset, but now using the GeoDataFrame’s
+ <code class="language-plaintext highlighter-rouge">plot()</code>
+ method.</p>
+
+<p>Pandas has been imported as
+ <code class="language-plaintext highlighter-rouge">pd</code>
+ , GeoPandas as
+ <code class="language-plaintext highlighter-rouge">geopandas</code>
+ and matplotlib’s pyplot functionality as
+ <code class="language-plaintext highlighter-rouge">plt</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Read the restaurants csv file into a DataFrame
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">"paris_restaurants.csv"</span><span class="p">)</span>
+
+<span class="c1"># Convert it to a GeoDataFrame
+</span><span class="n">restaurants</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geopandas</span><span class="p">.</span><span class="n">points_from_xy</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">x</span><span class="p">,</span> <span class="n">df</span><span class="p">.</span><span class="n">y</span><span class="p">))</span>
+
+<span class="c1"># Inspect the first rows of the restaurants GeoDataFrame
+</span><span class="k">print</span><span class="p">(</span><span class="n">restaurants</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Make a plot of the restaurants
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">restaurants</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">contextily</span>
+<span class="n">contextily</span><span class="p">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                                 type              x             y  \
+0                 European restuarant  259641.691646  6.251867e+06
+1       Traditional French restaurant  259572.339603  6.252030e+06
+2       Traditional French restaurant  259657.276374  6.252143e+06
+3  Indian / Middle Eastern restaurant  259684.438330  6.252203e+06
+4       Traditional French restaurant  259597.943086  6.252230e+06
+
+                                      geometry
+0  POINT (259641.6916457232 6251867.062617987)
+1  POINT (259572.3396029567 6252029.683163137)
+2  POINT (259657.2763744336 6252143.400946028)
+3  POINT (259684.4383301869 6252203.137238394)
+4  POINT (259597.9430858413 6252230.044091299)
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/7-2.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="13-exploring-and-visualizing-spatial-data"><strong>1.3 Exploring and visualizing spatial data</strong></h2>
+
+<h3 id="131-visualizing-the-population-density"><strong>1.3.1 Visualizing the population density</strong></h3>
+
+<p>Let’s get back to the districts dataset. In a previous exercise we visualized the districts with a uniform column. But often we want to show the spatial variation of a variable, and color the polygons accordingly.</p>
+
+<p>In this exercise we will visualize the spatial variation of the population density within the center of Paris. For this, we will first calculate the population density by dividing the population number with the area, and add it as a new column to the dataframe.</p>
+
+<p>The districts dataset is already loaded as
+ <code class="language-plaintext highlighter-rouge">districts</code>
+ , GeoPandas has been imported as
+ <code class="language-plaintext highlighter-rouge">geopandas</code>
+ and matplotlib.pyplot as
+ <code class="language-plaintext highlighter-rouge">plt</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Inspect the first rows of the districts dataset
+</span><span class="k">print</span><span class="p">(</span><span class="n">districts</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Inspect the area of the districts
+</span><span class="k">print</span><span class="p">(</span><span class="n">districts</span><span class="p">.</span><span class="n">area</span><span class="p">)</span>
+
+<span class="c1"># Add a population density column
+</span><span class="n">districts</span><span class="p">[</span><span class="s">'population_density'</span><span class="p">]</span> <span class="o">=</span> <span class="n">districts</span><span class="p">.</span><span class="n">population</span> <span class="o">/</span> <span class="n">districts</span><span class="p">.</span><span class="n">area</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">6</span>
+
+<span class="c1"># Make a plot of the districts colored by the population density
+</span><span class="n">districts</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'population_density'</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/1-6.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+   id           district_name  population                                           geometry
+0   1  St-Germain-l'Auxerrois        1672  POLYGON ((451922.1333912524 5411438.484355546,...
+1   2                  Halles        8984  POLYGON ((452278.4194036503 5412160.89282334, ...
+2   3            Palais-Royal        3195  POLYGON ((451553.8057660239 5412340.522224233,...
+3   4           Place-Vendôme        3044  POLYGON ((451004.907944323 5412654.094913081, ...
+4   5                 Gaillon        1345  POLYGON ((451328.7522686935 5412991.278156867,...
+
+
+0     8.685379e+05
+1     4.122371e+05
+2     2.735494e+05
+3     2.693111e+05
+          ...
+78    1.598127e+06
+79    2.089783e+06
+Length: 80, dtype: float64
+
+</code></pre></div></div>
+
+<h3 id="132-using-pandas-functionality-groupby"><strong>1.3.2 Using pandas functionality: groupby</strong></h3>
+
+<p>This course will focus on the spatial functionality of GeoPandas, but don’t forget that we still have a dataframe, and all functionality you know from Pandas is still applicable.</p>
+
+<p>In this exercise, we will recap a common functionality: the groupby operation. You may want to use this operation when you have a column containing groups, and you want to calculate a statistic for each group. In the
+ <code class="language-plaintext highlighter-rouge">groupby()</code>
+ method, you pass the column that contains the groups. On the resulting object, you can then call the method you want to calculate for each group. In this exercise, we want to know the size of each group of type of restaurants.</p>
+
+<p>We refer to the course on Manipulating DataFrames with pandas for more information and exercises on this groupby operation.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Load the restaurants data
+</span><span class="n">restaurants</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">"paris_restaurants.geosjon"</span><span class="p">)</span>
+
+<span class="c1"># Calculate the number of restaurants of each type
+</span><span class="n">type_counts</span> <span class="o">=</span> <span class="n">restaurants</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'type'</span><span class="p">).</span><span class="n">size</span><span class="p">()</span>
+
+<span class="c1"># Print the result
+</span><span class="k">print</span><span class="p">(</span><span class="n">type_counts</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+type
+African restaurant                        138
+Asian restaurant                         1642
+Caribbean restaurant                       27
+Central and South American restuarant      97
+European restuarant                      1178
+Indian / Middle Eastern restaurant        394
+Maghrebian restaurant                     207
+Other world restaurant                    107
+Traditional French restaurant            1945
+dtype: int64
+
+</code></pre></div></div>
+
+<h3 id="133-plotting-multiple-layers"><strong>1.3.3 Plotting multiple layers</strong></h3>
+
+<p>Another typical pandas functionality is filtering a dataframe: taking a subset of the rows based on a condition (which generates a boolean mask).</p>
+
+<p>In this exercise, we will take the subset of all African restaurants, and then make a multi-layered plot. In such a plot, we combine the visualization of several GeoDataFrames on a single figure. To add one layer, we can use the
+ <code class="language-plaintext highlighter-rouge">ax</code>
+ keyword of the
+ <code class="language-plaintext highlighter-rouge">plot()</code>
+ method of a GeoDataFrame to pass it a matplotlib axes object.</p>
+
+<p>The restaurants data is already loaded as the
+ <code class="language-plaintext highlighter-rouge">restaurants</code>
+ GeoDataFrame. GeoPandas is imported as
+ <code class="language-plaintext highlighter-rouge">geopandas</code>
+ and matplotlib.pyplot as
+ <code class="language-plaintext highlighter-rouge">plt</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Load the restaurants dataset
+</span><span class="n">restaurants</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">"paris_restaurants.geosjon"</span><span class="p">)</span>
+
+<span class="c1"># Take a subset of the African restaurants
+</span><span class="n">african_restaurants</span> <span class="o">=</span> <span class="n">restaurants</span><span class="p">[</span><span class="n">restaurants</span><span class="p">[</span><span class="s">'type'</span><span class="p">]</span><span class="o">==</span><span class="s">'African restaurant'</span><span class="p">]</span>
+
+<span class="c1"># Make a multi-layered plot
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">restaurants</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'grey'</span><span class="p">)</span>
+<span class="n">african_restaurants</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">)</span>
+<span class="c1"># Remove the box, ticks and labels
+</span><span class="n">ax</span><span class="p">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/2-6.png?w=1024" alt="Desktop View" /></p>
+
+<h1 id="2-spatial-relationships"><strong>2. Spatial relationships</strong></h1>
+<hr />
+
+<h2 id="21-shapely-geometries-and-spatial-relationships"><strong>2.1 Shapely geometries and spatial relationships</strong></h2>
+
+<h3 id="211-creating-a-point-geometry"><strong>2.1.1 Creating a Point geometry</strong></h3>
+
+<p>The Eiffel Tower is an iron lattice tower built in the 19th century, and is probably the most iconic view of Paris.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/2561/datasets/699329ee5cda7c70a745a4fb150b3e7e136e6e3c/Eiffel_Tower.png" alt="Eiffel Tower" /></p>
+
+<p>(By couscouschocolat [
+ <a href="https://creativecommons.org/licenses/by/2.0">CC BY 2.0</a>
+ ], via Wikimedia Commons)</p>
+
+<p>The location of the Eiffel Tower is: x of 255422.6 and y of 6250868.9.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the Point geometry
+</span><span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+
+<span class="c1"># Construct a point object for the Eiffel Tower
+</span><span class="n">eiffel_tower</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">255422.6</span><span class="p">,</span> <span class="mf">6250868.9</span><span class="p">)</span>
+
+<span class="c1"># Print the result
+</span><span class="k">print</span><span class="p">(</span><span class="n">eiffel_tower</span><span class="p">)</span>
+<span class="c1"># POINT (255422.6 6250868.9)
+</span>
+</code></pre></div></div>
+
+<h3 id="212-shapelys-spatial-methods"><strong>2.1.2 Shapely’s spatial methods</strong></h3>
+
+<p>Now we have a shapely
+ <code class="language-plaintext highlighter-rouge">Point</code>
+ object for the Eiffel Tower, we can use the different methods available on such a geometry object to perform spatial operations, such as calculating a distance or checking a spatial relationship.</p>
+
+<p>We repeated the construction of
+ <code class="language-plaintext highlighter-rouge">eiffel_tower</code>
+ , and also provide the code that extracts one of the neighbourhoods (the Montparnasse district), as well as one of the restaurants located within Paris.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Construct a point object for the Eiffel Tower
+</span><span class="n">eiffel_tower</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">255422.6</span><span class="p">,</span> <span class="mf">6250868.9</span><span class="p">)</span>
+
+<span class="c1"># Accessing the Montparnasse geometry (Polygon) and restaurant
+</span><span class="n">district_montparnasse</span> <span class="o">=</span> <span class="n">districts</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">52</span><span class="p">,</span> <span class="s">'geometry'</span><span class="p">]</span>
+<span class="n">resto</span> <span class="o">=</span> <span class="n">restaurants</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">956</span><span class="p">,</span> <span class="s">'geometry'</span><span class="p">]</span>
+
+<span class="c1"># Is the Eiffel Tower located within the Montparnasse district?
+</span><span class="k">print</span><span class="p">(</span><span class="n">eiffel_tower</span><span class="p">.</span><span class="n">within</span><span class="p">(</span><span class="n">district_montparnasse</span><span class="p">))</span>
+<span class="c1"># False
+</span>
+<span class="c1"># Does the Montparnasse district contains the restaurant?
+</span><span class="k">print</span><span class="p">(</span><span class="n">district_montparnasse</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="n">resto</span><span class="p">))</span>
+<span class="c1"># True
+</span>
+<span class="c1"># The distance between the Eiffel Tower and the restaurant?
+</span><span class="k">print</span><span class="p">(</span><span class="n">eiffel_tower</span><span class="p">.</span><span class="n">distance</span><span class="p">(</span><span class="n">resto</span><span class="p">))</span>
+<span class="c1"># 4431.459825587039
+</span>
+</code></pre></div></div>
+
+<p>Note that the
+ <code class="language-plaintext highlighter-rouge">contains()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">within()</code>
+ methods are the opposite of each other: if
+ <code class="language-plaintext highlighter-rouge">geom1.contains(geom2)</code>
+ is
+ <code class="language-plaintext highlighter-rouge">True</code>
+ , then also
+ <code class="language-plaintext highlighter-rouge">geom2.within(geom1)</code>
+ will be
+ <code class="language-plaintext highlighter-rouge">True</code>
+ .</p>
+
+<hr />
+
+<h2 id="22-spatial-relationships-with-geopandas"><strong>2.2 Spatial relationships with GeoPandas</strong></h2>
+
+<h3 id="221-in-which-district-in-the-eiffel-tower-located"><strong>2.2.1 In which district in the Eiffel Tower located?</strong></h3>
+
+<p>Let’s return to the Eiffel Tower example. In previous exercises, we constructed a
+ <code class="language-plaintext highlighter-rouge">Point</code>
+ geometry for its location, and we checked that it was not located in the Montparnasse district. Let’s now determine in which of the districts of Paris it
+ <em>is</em>
+ located.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">districts</code>
+ GeoDataFrame has been loaded, and the Shapely and GeoPandas libraries are imported.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Construct a point object for the Eiffel Tower
+</span><span class="n">eiffel_tower</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">255422.6</span><span class="p">,</span> <span class="mf">6250868.9</span><span class="p">)</span>
+
+<span class="c1"># Create a boolean Series
+</span><span class="n">mask</span> <span class="o">=</span> <span class="n">districts</span><span class="p">.</span><span class="n">contains</span><span class="p">(</span><span class="n">eiffel_tower</span><span class="p">)</span>
+
+<span class="c1"># Print the boolean Series
+</span><span class="k">print</span><span class="p">(</span><span class="n">mask</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Filter the districts with the boolean mask
+</span><span class="k">print</span><span class="p">(</span><span class="n">districts</span><span class="p">[</span><span class="n">mask</span><span class="p">])</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+0    False
+1    False
+2    False
+3    False
+4    False
+dtype: bool
+
+    id district_name  population                                           geometry
+27  28  Gros-Caillou       25156  POLYGON ((257097.2898896902 6250116.967139574,...
+
+
+</code></pre></div></div>
+
+<h3 id="222-how-far-is-the-closest-restaurant"><strong>2.2.2 How far is the closest restaurant?</strong></h3>
+
+<p>Now, we might be interested in the restaurants nearby the Eiffel Tower. To explore them, let’s visualize the Eiffel Tower itself as well as the restaurants within 1km.</p>
+
+<p>To do this, we can calculate the distance to the Eiffel Tower for each of the restaurants. Based on this result, we can then create a mask that takes
+ <code class="language-plaintext highlighter-rouge">True</code>
+ if the restaurant is within 1km, and
+ <code class="language-plaintext highlighter-rouge">False</code>
+ otherwise, and use it to filter the restaurants GeoDataFrame. Finally, we make a visualization of this subset.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">restaurants</code>
+ GeoDataFrame has been loaded, and the
+ <code class="language-plaintext highlighter-rouge">eiffel_tower</code>
+ object created. Further, matplotlib, GeoPandas and contextily have been imported.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># The distance from each restaurant to the Eiffel Tower
+</span><span class="n">dist_eiffel</span> <span class="o">=</span> <span class="n">restaurants</span><span class="p">.</span><span class="n">distance</span><span class="p">(</span><span class="n">eiffel_tower</span><span class="p">)</span>
+
+<span class="c1"># The distance to the closest restaurant
+</span><span class="k">print</span><span class="p">(</span><span class="n">dist_eiffel</span><span class="p">.</span><span class="nb">min</span><span class="p">())</span>
+<span class="c1"># 460.6976028277898
+</span>
+<span class="c1"># Filter the restaurants for closer than 1 km
+</span><span class="n">restaurants_eiffel</span> <span class="o">=</span> <span class="n">restaurants</span><span class="p">[</span><span class="n">dist_eiffel</span><span class="o">&lt;</span><span class="mi">1000</span><span class="p">]</span>
+
+<span class="c1"># Make a plot of the close-by restaurants
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">restaurants_eiffel</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">geopandas</span><span class="p">.</span><span class="n">GeoSeries</span><span class="p">([</span><span class="n">eiffel_tower</span><span class="p">]).</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">)</span>
+<span class="n">contextily</span><span class="p">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/1-7.png?w=1022" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="23-the-spatial-join-operation"><strong>2.3 The spatial join operation</strong></h2>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/2-7.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="231-paris-spatial-join-of-districts-and-bike-stations"><strong>2.3.1 Paris: spatial join of districts and bike stations</strong></h3>
+
+<p>Let’s return to the Paris data on districts and bike stations. We will now use the spatial join operation to identify the district in which each station is located.</p>
+
+<p>The districts and bike sharing stations datasets are already pre-loaded for you as the
+ <code class="language-plaintext highlighter-rouge">districts</code>
+ and
+ <code class="language-plaintext highlighter-rouge">stations</code>
+ GeoDataFrames, and GeoPandas has been imported as
+ <code class="language-plaintext highlighter-rouge">geopandas</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Join the districts and stations datasets
+</span><span class="n">joined</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">stations</span><span class="p">,</span> <span class="n">districts</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s">'within'</span><span class="p">)</span>
+
+<span class="c1"># Inspect the first five rows of the result
+</span><span class="k">print</span><span class="p">(</span><span class="n">joined</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                                       name  bike_stands  available_bikes  \
+0                    14002 - RASPAIL QUINET           44                4
+143  14112 - FAUBOURG SAINT JACQUES CASSINI           16                0
+293               14033 - DAGUERRE GASSENDI           38                1
+346     14006 - SAINT JACQUES TOMBE ISSOIRE           22                0
+429       14111 - DENFERT-ROCHEREAU CASSINI           24                8
+
+                                        geometry  index_right  id district_name
+0     POINT (450804.448740735 5409797.268203795)           52  53  Montparnasse
+143   POINT (451419.446715647 5409421.528587255)           52  53  Montparnasse
+293  POINT (450708.2275807534 5409406.941172979)           52  53  Montparnasse
+346  POINT (451340.0264470892 5409124.574548723)           52  53  Montparnasse
+429  POINT (451274.5111513372 5409609.730783217)           52  53  Montparnasse
+
+</code></pre></div></div>
+
+<h3 id="232-map-of-tree-density-by-district-1"><strong>2.3.2 Map of tree density by district (1)</strong></h3>
+
+<p>Using a dataset of all trees in public spaces in Paris, the goal is to make a map of the tree density by district. For this, we first need to find out how many trees each district contains, which we will do in this exercise. In the following exercise, we will then use this result to calculate the density and create a map.</p>
+
+<p>To obtain the tree count by district, we first need to know in which district each tree is located, which we can do with a spatial join. Then, using the result of the spatial join, we will calculate the number of trees located in each district using the pandas ‘group-by’ functionality.</p>
+
+<p>GeoPandas has been imported as
+ <code class="language-plaintext highlighter-rouge">geopandas</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># trees
+</span>      <span class="n">species</span> <span class="n">location_type</span>                                     <span class="n">geometry</span>
+<span class="mi">0</span>  <span class="n">Marronnier</span>    <span class="n">Alignement</span>  <span class="n">POINT</span> <span class="p">(</span><span class="mf">455834.1224756146</span> <span class="mf">5410780.605718749</span><span class="p">)</span>
+<span class="mi">1</span>  <span class="n">Marronnier</span>    <span class="n">Alignement</span>  <span class="n">POINT</span> <span class="p">(</span><span class="mf">446546.2841757428</span> <span class="mf">5412574.696813397</span><span class="p">)</span>
+<span class="mi">2</span>  <span class="n">Marronnier</span>    <span class="n">Alignement</span>    <span class="n">POINT</span> <span class="p">(</span><span class="mf">449768.283096671</span> <span class="mf">5409876.55691999</span><span class="p">)</span>
+<span class="mi">3</span>  <span class="n">Marronnier</span>    <span class="n">Alignement</span>   <span class="n">POINT</span> <span class="p">(</span><span class="mf">451779.7079508423</span> <span class="mf">5409292.07146508</span><span class="p">)</span>
+<span class="mi">4</span>     <span class="n">Sophora</span>    <span class="n">Alignement</span>  <span class="n">POINT</span> <span class="p">(</span><span class="mf">447041.3613609616</span> <span class="mf">5409756.711514045</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Read the trees and districts data
+</span><span class="n">trees</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">"paris_trees.gpkg"</span><span class="p">)</span>
+<span class="n">districts</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">"paris_districts_utm.geojson"</span><span class="p">)</span>
+
+<span class="c1"># Spatial join of the trees and districts datasets
+</span><span class="n">joined</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">trees</span><span class="p">,</span> <span class="n">districts</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s">'within'</span><span class="p">)</span>
+
+<span class="c1"># Calculate the number of trees in each district
+</span><span class="n">trees_by_district</span> <span class="o">=</span> <span class="n">joined</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'district_name'</span><span class="p">).</span><span class="n">size</span><span class="p">()</span>
+
+<span class="c1"># Convert the series to a DataFrame and specify column name
+</span><span class="n">trees_by_district</span> <span class="o">=</span> <span class="n">trees_by_district</span><span class="p">.</span><span class="n">to_frame</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'n_trees'</span><span class="p">)</span>
+
+<span class="c1"># Inspect the result
+</span><span class="k">print</span><span class="p">(</span><span class="n">trees_by_district</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                 n_trees
+district_name
+Amérique             183
+Archives               8
+Arsenal               60
+Arts-et-Metiers       20
+Auteuil              392
+
+</code></pre></div></div>
+
+<h3 id="233-map-of-tree-density-by-district-2"><strong>2.3.3 Map of tree density by district (2)</strong></h3>
+
+<p>Now we have obtained the number of trees by district, we can make the map of the districts colored by the tree density.</p>
+
+<p>For this, we first need to merge the number of trees in each district we calculated in the previous step (
+ <code class="language-plaintext highlighter-rouge">trees_by_district</code>
+ ) back to the districts dataset. We will use the
+ <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.merge.html"><code class="language-plaintext highlighter-rouge">pd.merge()</code></a>
+ function to join two dataframes based on a common column.</p>
+
+<p>Since not all districts have the same size, it is a fairer comparison to visualize the tree density: the number of trees relative to the area.</p>
+
+<p>The district dataset has been pre-loaded as
+ <code class="language-plaintext highlighter-rouge">districts</code>
+ , and the final result of the previous exercise (a DataFrame with the number of trees for each district) is available as
+ <code class="language-plaintext highlighter-rouge">trees_by_district</code>
+ . GeoPandas has been imported as
+ <code class="language-plaintext highlighter-rouge">geopandas</code>
+ and Pandas as
+ <code class="language-plaintext highlighter-rouge">pd</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the first rows of the result of the previous exercise
+</span><span class="k">print</span><span class="p">(</span><span class="n">trees_by_district</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Merge the 'districts' and 'trees_by_district' dataframes
+</span><span class="n">districts_trees</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">merge</span><span class="p">(</span><span class="n">districts</span><span class="p">,</span> <span class="n">trees_by_district</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">'district_name'</span><span class="p">)</span>
+
+<span class="c1"># Inspect the result
+</span><span class="k">print</span><span class="p">(</span><span class="n">districts_trees</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+     district_name  n_trees
+0         Amérique      728
+1         Archives       34
+2          Arsenal      213
+3  Arts-et-Metiers       79
+4          Auteuil     1474
+
+
+   id           district_name                                           geometry  n_trees
+0   1  St-Germain-l'Auxerrois  POLYGON ((451922.1333912524 5411438.484355546,...      152
+1   2                  Halles  POLYGON ((452278.4194036503 5412160.89282334, ...      149
+2   3            Palais-Royal  POLYGON ((451553.8057660239 5412340.522224233,...        6
+3   4           Place-Vendôme  POLYGON ((451004.907944323 5412654.094913081, ...       17
+4   5                 Gaillon  POLYGON ((451328.7522686935 5412991.278156867,...       18
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Merge the 'districts' and 'trees_by_district' dataframes
+</span><span class="n">districts_trees</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">merge</span><span class="p">(</span><span class="n">districts</span><span class="p">,</span> <span class="n">trees_by_district</span><span class="p">,</span> <span class="n">on</span><span class="o">=</span><span class="s">'district_name'</span><span class="p">)</span>
+
+<span class="c1"># Add a column with the tree density
+</span><span class="n">districts_trees</span><span class="p">[</span><span class="s">'n_trees_per_area'</span><span class="p">]</span> <span class="o">=</span> <span class="n">districts_trees</span><span class="p">[</span><span class="s">'n_trees'</span><span class="p">]</span> <span class="o">/</span> <span class="n">districts_trees</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="n">area</span>
+
+<span class="c1"># Make of map of the districts colored by 'n_trees_per_area'
+</span><span class="n">districts_trees</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'n_trees_per_area'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/3-6.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="24-choropleths"><strong>2.4 Choropleths</strong></h2>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/4-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/5-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/6-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/7-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/8-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/9-2.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="241-equal-interval-choropleth"><strong>2.4.1 Equal interval choropleth</strong></h3>
+
+<p>In the last exercise, we created a map of the tree density. Now we know more about choropleths, we will explore this visualisation in more detail.</p>
+
+<p>First, let’s visualize the effect of just using the number of trees versus the number of trees normalized by the area of the district (the tree density). Second, we will create an equal interval version of this map instead of using a continuous color scale. This classification algorithm will split the value space in equal bins and assign a color to each.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">district_trees</code>
+ GeoDataFrame, the final result of the previous exercise is already loaded. It includes the variable
+ <code class="language-plaintext highlighter-rouge">n_trees_per_area</code>
+ , measuring tree density by district (note the variable has been multiplied by 10,000).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the first rows of the tree density dataset
+</span><span class="k">print</span><span class="p">(</span><span class="n">districts_trees</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Make a choropleth of the number of trees
+</span><span class="n">districts_trees</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'n_trees'</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Make a choropleth of the number of trees per area
+</span><span class="n">districts_trees</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'n_trees_per_area'</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Make a choropleth of the number of trees
+</span><span class="n">districts_trees</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'n_trees_per_area'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'equal_interval'</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/10-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/11-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/12-2.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="242-quantiles-choropleth"><strong>2.4.2 Quantiles choropleth</strong></h3>
+
+<p>In this exercise we will create a quantile version of the tree density map. Remember that the quantile algorithm will rank and split the values into groups with the same number of elements to assign a color to each. This time, we will create seven groups that allocate the colors of the
+ <code class="language-plaintext highlighter-rouge">YlGn</code>
+ colormap across the entire set of values.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">district_trees</code>
+ GeoDataFrame is again already loaded. It includes the variable
+ <code class="language-plaintext highlighter-rouge">n_trees_per_area</code>
+ , measuring tree density by district (note the variable has been multiplied by 10,000).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Generate the choropleth and store the axis
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">districts_trees</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'n_trees_per_area'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'quantiles'</span><span class="p">,</span>
+                          <span class="n">k</span><span class="o">=</span><span class="mi">7</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'YlGn'</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Remove frames, ticks and tick labels from the axis
+</span><span class="n">ax</span><span class="p">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/13-2.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="243-compare-classification-algorithms"><strong>2.4.3 Compare classification algorithms</strong></h3>
+
+<p>In this final exercise, you will build a multi map figure that will allow you to compare the two approaches to map variables we have seen.</p>
+
+<p>You will rely on standard
+ <code class="language-plaintext highlighter-rouge">matplotlib</code>
+ patterns to build a figure with two subplots (Axes
+ <code class="language-plaintext highlighter-rouge">axes[0]</code>
+ and
+ <code class="language-plaintext highlighter-rouge">axes[1]</code>
+ ) and display in each of them, respectively, an equal interval and quantile based choropleth. Once created, compare them visually to explore the differences that the classification algorithm can have on the final result.</p>
+
+<p>This exercise comes with a GeoDataFrame object loaded under the name
+ <code class="language-plaintext highlighter-rouge">district_trees</code>
+ that includes the variable
+ <code class="language-plaintext highlighter-rouge">n_trees_per_area</code>
+ , measuring tree density by district.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Set up figure and subplots
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Plot equal interval map
+</span><span class="n">districts_trees</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="s">'n_trees_per_area'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'equal_interval'</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">set_title</span><span class="p">(</span><span class="s">'Equal Interval'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+<span class="c1"># Plot quantiles map
+</span><span class="n">districts_trees</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="s">'n_trees_per_area'</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s">'quantiles'</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">set_title</span><span class="p">(</span><span class="s">'Quantiles'</span><span class="p">)</span>
+<span class="n">axes</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+<span class="c1"># Display maps
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/1-8.png?w=811" alt="Desktop View" /></p>
+
+<h1 id="3-projecting-and-transforming-geometries"><strong>3. Projecting and transforming geometries</strong></h1>
+<hr />
+
+<h2 id="31-coordinate-reference-systems"><strong>3.1 Coordinate Reference Systems</strong></h2>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/2-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/3-7.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/4-6.png?w=965" alt="Desktop View" /></p>
+
+<h2 id="311-geographic-vs-projected-coordinates"><strong>3.1.1 Geographic vs projected coordinates</strong></h2>
+
+<p>The CRS attribute stores the information about the Coordinate Reference System in which the data is represented. In this exercises, we will explore the CRS and the coordinates of the
+ <code class="language-plaintext highlighter-rouge">districts</code>
+ dataset about the districts of Paris.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the districts dataset
+</span><span class="n">districts</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">"paris_districts.geojson"</span><span class="p">)</span>
+
+<span class="c1"># Print the CRS information
+</span><span class="k">print</span><span class="p">(</span><span class="n">districts</span><span class="p">.</span><span class="n">crs</span><span class="p">)</span>
+<span class="c1"># {'init': 'epsg:4326'}
+</span>
+<span class="c1"># Print the first rows of the GeoDataFrame
+</span><span class="k">print</span><span class="p">(</span><span class="n">districts</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+   id           district_name  population                                           geometry
+0   1  St-Germain-l'Auxerrois        1672  POLYGON ((2.344593389828428 48.85404991486192,...
+1   2                  Halles        8984  POLYGON ((2.349365804803003 48.86057567227663,...
+2   3            Palais-Royal        3195  POLYGON ((2.339465868602756 48.86213531210705,...
+3   4           Place-Vendôme        3044  POLYGON ((2.331944969393234 48.86491285292422,...
+4   5                 Gaillon        1345  POLYGON ((2.336320212305949 48.8679713890312, ...
+
+
+</code></pre></div></div>
+
+<p>Indeed, this dataset is using geographic coordinates: longitude and latitude in degrees. We could see that the
+ <code class="language-plaintext highlighter-rouge">crs</code>
+ attribute referenced the EPSG:4326 (the code for WGS84, the most common used geographic coordinate system). A further rule of thumb is that the coordinates were in a small range (&lt;180) and cannot be expressing meters.</p>
+
+<hr />
+
+<h2 id="32-working-with-coordinate-systems-in-geopandas"><strong>3.2 Working with coordinate systems in GeoPandas</strong></h2>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/5-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/6-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/7-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/8-3.png?w=755" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/9-3.png?w=978" alt="Desktop View" /></p>
+
+<h3 id="321-projecting-a-geodataframe"><strong>3.2.1 Projecting a GeoDataFrame</strong></h3>
+
+<p>The Paris districts dataset is provided in geographical coordinates (longitude/latitude in WGS84). To see the result of naively using the data as is for plotting or doing calculations, we will first plot the data as is, and then plot a projected version.</p>
+
+<p>The standard projected CRS for France is the RGF93 / Lambert-93 reference system (referenced by the
+ <code class="language-plaintext highlighter-rouge">EPSG:2154</code>
+ number).</p>
+
+<p>GeoPandas and matplotlib have already been imported, and the districts dataset is read and assigned to the
+ <code class="language-plaintext highlighter-rouge">districts</code>
+ variable.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the CRS information
+</span><span class="k">print</span><span class="p">(</span><span class="n">districts</span><span class="p">.</span><span class="n">crs</span><span class="p">)</span>
+<span class="c1"># {'init': 'epsg:4326'}
+</span>
+<span class="c1"># Plot the districts dataset
+</span><span class="n">districts</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Convert the districts to the RGF93 reference system
+</span><span class="n">districts_RGF93</span> <span class="o">=</span> <span class="n">districts</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">2154</span><span class="p">)</span>
+
+<span class="c1"># Plot the districts dataset again
+</span><span class="n">districts_RGF93</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/10-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/11-4.png?w=1024" alt="Desktop View" /></p>
+
+<p>The plot using longitude/latitude degrees distorted the shape of Paris quite a bit.</p>
+
+<h3 id="322-projecting-a-point"><strong>3.2.2 Projecting a Point</strong></h3>
+
+<p>In the previous chapter, we worked with the Eiffel Tower location. Again, we provided you the coordinates in a projected coordinate system, so you could, for example, calculate distances. Let’s return to this iconic landmark, and express its location in geographical coordinates: 48°51′29.6″N, 2°17′40.2″E. Or, in decimals: latitude of 48.8584 and longitude of 2.2945.</p>
+
+<p>Shapely geometry objects have no notion of a CRS, and thus cannot be directly converted to another CRS. Therefore, we are going to use the GeoPandas to transform the Eiffel Tower point location to an alternative CRS. We will put the single point in a GeoSeries, use the
+ <code class="language-plaintext highlighter-rouge">to_crs()</code>
+ method, and extract the point again.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Construct a Point object for the Eiffel Tower
+</span><span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+<span class="n">eiffel_tower</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">2.2945</span><span class="p">,</span> <span class="mf">48.8584</span><span class="p">)</span>
+
+<span class="c1"># Put the point in a GeoSeries with the correct CRS
+</span><span class="n">s_eiffel_tower</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">GeoSeries</span><span class="p">([</span><span class="n">eiffel_tower</span><span class="p">],</span> <span class="n">crs</span><span class="o">=</span><span class="p">{</span><span class="s">'init'</span><span class="p">:</span> <span class="s">'EPSG:4326'</span><span class="p">})</span>
+
+<span class="c1"># Convert to other CRS
+</span><span class="n">s_eiffel_tower_projected</span> <span class="o">=</span> <span class="n">s_eiffel_tower</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">2154</span><span class="p">)</span>
+
+<span class="c1"># Print the projected point
+</span><span class="k">print</span><span class="p">(</span><span class="n">s_eiffel_tower_projected</span><span class="p">)</span>
+
+<span class="mi">0</span>    <span class="n">POINT</span> <span class="p">(</span><span class="mf">648237.3015492002</span> <span class="mf">6862271.681553576</span><span class="p">)</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="nb">object</span>
+
+</code></pre></div></div>
+
+<p>####
+ 3.2.3
+ <strong>Calculating distance in a projected CRS</strong></p>
+
+<p>Now we have the Eiffel Tower location in a projected coordinate system, we can calculate the distance to other points.</p>
+
+<p>The final
+ <code class="language-plaintext highlighter-rouge">s_eiffel_tower_projected</code>
+ of the previous exercise containing the projected Point is already provided, and we extract the single point into the
+ <code class="language-plaintext highlighter-rouge">eiffel_tower</code>
+ variable. Further, the
+ <code class="language-plaintext highlighter-rouge">restaurants</code>
+ dataframe (using WGS84 coordinates) is also loaded.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Extract the single Point
+</span><span class="n">eiffel_tower</span> <span class="o">=</span> <span class="n">s_eiffel_tower_projected</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Ensure the restaurants use the same CRS
+</span><span class="n">restaurants</span> <span class="o">=</span> <span class="n">restaurants</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">s_eiffel_tower_projected</span><span class="p">.</span><span class="n">crs</span><span class="p">)</span>
+
+<span class="c1"># The distance from each restaurant to the Eiffel Tower
+</span><span class="n">dist_eiffel</span> <span class="o">=</span> <span class="n">restaurants</span><span class="p">.</span><span class="n">distance</span><span class="p">(</span><span class="n">eiffel_tower</span><span class="p">)</span>
+
+<span class="c1"># The distance to the closest restaurant
+</span><span class="k">print</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">dist_eiffel</span><span class="p">))</span>
+<span class="c1"># 303.56255387894674
+</span>
+</code></pre></div></div>
+
+<p>Because our data was now in a projected coordinate reference system that used meters as unit, we know that the result of 303 is actually 303 meter.</p>
+
+<h3 id="324-projecting-to-web-mercator-for-using-web-tiles"><strong>3.2.4 Projecting to Web Mercator for using web tiles</strong></h3>
+
+<p>In the first chapter, we did an exercise on plotting the restaurant locations in Paris and adding a background map to it using the
+ <code class="language-plaintext highlighter-rouge">contextily</code>
+ package.</p>
+
+<p>Currently,
+ <code class="language-plaintext highlighter-rouge">contextily</code>
+ assumes that your data is in the Web Mercator projection, the system used by most web tile services. And in that first exercise, we provided the data in the appropriate CRS so you didn’t need to care about this aspect.</p>
+
+<p>However, typically, your data will not come in Web Mercator (
+ <code class="language-plaintext highlighter-rouge">EPSG:3857</code>
+ ) and you will have to align them with web tiles on your own.</p>
+
+<p>GeoPandas, matplotlib and contextily are already imported.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Convert to the Web Mercator projection
+</span><span class="n">restaurants_webmercator</span> <span class="o">=</span> <span class="n">restaurants</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">3857</span><span class="p">)</span>
+
+<span class="c1"># Plot the restaurants with a background map
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">restaurants_webmercator</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">contextily</span><span class="p">.</span><span class="n">add_basemap</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/1-9.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="33-spatial-operations-creating-new-geometries"><strong>3.3 Spatial operations: creating new geometries</strong></h2>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/1-10.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/2-9.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/3-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/4-7.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="331-exploring-a-land-use-dataset"><strong>3.3.1 Exploring a Land Use dataset</strong></h3>
+
+<p>For the following exercises, we first introduce a new dataset: a dataset about the land use of Paris (a simplified version based on the open European
+ <a href="https://land.copernicus.eu/local/urban-atlas">Urban Atlas</a>
+ ). The land use indicates for what kind of activity a certain area is used, such as residential area or for recreation. It is a polygon dataset, with a label representing the land use class for different areas in Paris.</p>
+
+<p>In this exercise, we will read the data, explore it visually, and calculate the total area of the different classes of land use in the area of Paris.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the land use dataset
+</span><span class="n">land_use</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">'paris_land_use.shp'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">land_use</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Make a plot of the land use with 'class' as the color
+</span><span class="n">land_use</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'class'</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Add the area as a new column
+</span><span class="n">land_use</span><span class="p">[</span><span class="s">'area'</span><span class="p">]</span> <span class="o">=</span> <span class="n">land_use</span><span class="p">.</span><span class="n">area</span>
+
+<span class="c1"># Calculate the total area for each land use class
+</span><span class="n">total_area</span> <span class="o">=</span> <span class="n">land_use</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'class'</span><span class="p">)[</span><span class="s">'area'</span><span class="p">].</span><span class="nb">sum</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1000</span><span class="o">**</span><span class="mi">2</span>
+<span class="k">print</span><span class="p">(</span><span class="n">total_area</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                       class                                           geometry
+0               Water bodies  POLYGON ((3751386.280643055 2890064.32259039, ...
+1  Roads and associated land  POLYGON ((3751390.345445618 2886000, 3751390.3...
+2  Roads and associated land  POLYGON ((3751390.345445618 2886898.191588611,...
+3  Roads and associated land  POLYGON ((3751390.345445618 2887500, 3751390.3...
+4  Roads and associated land  POLYGON ((3751390.345445618 2888647.356784857,...
+
+class
+Continuous Urban Fabric             45.943090
+Discontinuous Dense Urban Fabric     3.657343
+Green urban areas                    9.858438
+Industrial, commercial, public      13.295042
+Railways and associated land         1.935793
+Roads and associated land            7.401574
+Sports and leisure facilities        3.578509
+Water bodies                         3.189706
+Name: area, dtype: float64
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/5-7.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="332-intersection-of-two-polygons"><strong>3.3.2 Intersection of two polygons</strong></h3>
+
+<p>For this exercise, we are going to use 2 individual polygons: the district of Muette extracted from the
+ <code class="language-plaintext highlighter-rouge">districts</code>
+ dataset, and the green urban area of Boulogne, a large public park in the west of Paris, extracted from the
+ <code class="language-plaintext highlighter-rouge">land_use</code>
+ dataset. The two polygons have already been assigned to the
+ <code class="language-plaintext highlighter-rouge">muette</code>
+ and
+ <code class="language-plaintext highlighter-rouge">park_boulogne</code>
+ variables.</p>
+
+<p>We first visualize the two polygons. You will see that they overlap, but the park is not fully located in the district of Muette. Let’s determine the overlapping part.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the two polygons
+</span><span class="n">geopandas</span><span class="p">.</span><span class="n">GeoSeries</span><span class="p">([</span><span class="n">park_boulogne</span><span class="p">,</span> <span class="n">muette</span><span class="p">]).</span><span class="n">plot</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="p">[</span><span class="s">'green'</span><span class="p">,</span> <span class="s">'blue'</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Calculate the intersection of both polygons
+</span><span class="n">intersection</span> <span class="o">=</span> <span class="n">park_boulogne</span><span class="p">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">muette</span><span class="p">)</span>
+
+<span class="c1"># Plot the intersection
+</span><span class="n">geopandas</span><span class="p">.</span><span class="n">GeoSeries</span><span class="p">([</span><span class="n">intersection</span><span class="p">]).</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Print proportion of district area that occupied park
+</span><span class="k">print</span><span class="p">(</span><span class="n">intersection</span><span class="p">.</span><span class="n">area</span> <span class="o">/</span> <span class="n">muette</span><span class="p">.</span><span class="n">area</span><span class="p">)</span>
+<span class="c1"># 0.4352082235641065
+</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/6-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/7-5.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="333-intersecting-a-geodataframe-with-a-polygon"><strong>3.3.3 Intersecting a GeoDataFrame with a Polygon</strong></h3>
+
+<p>Combining the land use dataset and the districts dataset, we can now investigate what the land use is in a certain district.</p>
+
+<p>For that, we first need to determine the intersection of the land use dataset with a given district. Let’s take again the
+ <em>Muette</em>
+ district as example case.</p>
+
+<p>The land use and districts datasets have already been imported as
+ <code class="language-plaintext highlighter-rouge">land_use</code>
+ and
+ <code class="language-plaintext highlighter-rouge">districts</code>
+ , and the Muette district has been extracted into the
+ <code class="language-plaintext highlighter-rouge">muette</code>
+ shapely polygon. Further, GeoPandas and matplotlib are imported.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the land use datset and Notre-Dame district polygon
+</span><span class="k">print</span><span class="p">(</span><span class="n">land_use</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">muette</span><span class="p">))</span>
+
+<span class="c1"># Calculate the intersection of the land use polygons with Notre Dame
+</span><span class="n">land_use_muette</span> <span class="o">=</span> <span class="n">land_use</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">muette</span><span class="p">)</span>
+
+<span class="c1"># Plot the intersection
+</span><span class="n">land_use_muette</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">edgecolor</span><span class="o">=</span><span class="s">'black'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Print the first five rows of the intersection
+</span><span class="k">print</span><span class="p">(</span><span class="n">land_use_muette</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/8-4.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                            class                                           geometry
+0  Industrial, commercial, public  POLYGON ((3751385.614444552 2895114.54542058, ...
+1                    Water bodies  POLYGON ((3751386.280643055 2890064.32259039, ...
+2       Roads and associated land  POLYGON ((3751390.345445618 2886000, 3751390.3...
+3       Roads and associated land  POLYGON ((3751390.345445618 2886898.191588611,...
+4       Roads and associated land  POLYGON ((3751390.345445618 2887500, 3751390.3...
+
+&lt;class 'shapely.geometry.polygon.Polygon'&gt;
+
+0    ()
+1    ()
+2    ()
+3    ()
+4    ()
+dtype: object
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="34-overlaying-spatial-datasets"><strong>3.4 Overlaying spatial datasets</strong></h2>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/9-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/10-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/11-5.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="341-overlay-of-two-polygon-layers"><strong>3.4.1 Overlay of two polygon layers</strong></h3>
+
+<p>Going back to the land use and districts datasets, we will now combine both datasets in an overlay operation. Create a new
+ <code class="language-plaintext highlighter-rouge">GeoDataFrame</code>
+ consisting of the intersection of the land use polygons wich each of the districts, but make sure to bring the attribute data from both source layers.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the first five rows of both datasets
+</span><span class="k">print</span><span class="p">(</span><span class="n">land_use</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">districts</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Overlay both datasets based on the intersection
+</span><span class="n">combined</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">overlay</span><span class="p">(</span><span class="n">land_use</span><span class="p">,</span> <span class="n">districts</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">'intersection'</span><span class="p">)</span>
+
+<span class="c1"># Print the first five rows of the result
+</span><span class="k">print</span><span class="p">(</span><span class="n">combined</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                            class                                           geometry
+0  Industrial, commercial, public  POLYGON ((3751385.614444552 2895114.54542058, ...
+1                    Water bodies  POLYGON ((3751386.280643055 2890064.32259039, ...
+2       Roads and associated land  POLYGON ((3751390.345445618 2886000, 3751390.3...
+3       Roads and associated land  POLYGON ((3751390.345445618 2886898.191588611,...
+4       Roads and associated land  POLYGON ((3751390.345445618 2887500, 3751390.3...
+
+
+   id           district_name  population                                           geometry
+0   1  St-Germain-l'Auxerrois        1672  POLYGON ((3760188.134760949 2889260.456597198,...
+1   2                  Halles        8984  POLYGON ((3760610.022313007 2889946.421907361,...
+2   3            Palais-Royal        3195  POLYGON ((3759905.524344832 2890194.453753149,...
+3   4           Place-Vendôme        3044  POLYGON ((3759388.396359455 2890559.229067303,...
+4   5                 Gaillon        1345  POLYGON ((3759742.125111854 2890864.393745991,...
+
+
+
+                       class  id district_name  population  \
+0               Water bodies  61       Auteuil       67967
+1    Continuous Urban Fabric  61       Auteuil       67967
+2  Roads and associated land  61       Auteuil       67967
+3          Green urban areas  61       Auteuil       67967
+4  Roads and associated land  61       Auteuil       67967
+
+                                            geometry
+0  POLYGON ((3751395.345451574 2890118.001377039,...
+1  (POLYGON ((3753253.104067317 2888254.529208081...
+2  POLYGON ((3751519.830145844 2890061.508628568,...
+3  (POLYGON ((3754314.716711559 2890283.121013219...
+4  POLYGON ((3751619.112743544 2890500, 3751626.6...
+
+
+</code></pre></div></div>
+
+<h3 id="342-inspecting-the-overlay-result"><strong>3.4.2 Inspecting the overlay result</strong></h3>
+
+<p>Now that we created the overlay of the land use and districts datasets, we can more easily inspect the land use for the different districts. Let’s get back to the example district of Muette, and inspect the land use of that district.</p>
+
+<p>GeoPandas and Matplotlib are already imported. The result of the
+ <code class="language-plaintext highlighter-rouge">overlay()</code>
+ function from the previous exercises is available as
+ <code class="language-plaintext highlighter-rouge">combined</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the first rows of the overlay result
+</span><span class="k">print</span><span class="p">(</span><span class="n">combined</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Add the area as a column
+</span><span class="n">combined</span><span class="p">[</span><span class="s">'area'</span><span class="p">]</span> <span class="o">=</span> <span class="n">combined</span><span class="p">.</span><span class="n">area</span>
+
+<span class="c1"># Take a subset for the Muette district
+</span><span class="n">land_use_muette</span> <span class="o">=</span> <span class="n">combined</span><span class="p">[</span><span class="n">combined</span><span class="p">.</span><span class="n">district_name</span><span class="o">==</span><span class="s">'Muette'</span><span class="p">]</span>
+
+<span class="c1"># Visualize the land use of the Muette district
+</span><span class="n">land_use_muette</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'class'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Calculate the total area for each land use class
+</span><span class="k">print</span><span class="p">(</span><span class="n">land_use_muette</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'class'</span><span class="p">)[</span><span class="s">'area'</span><span class="p">].</span><span class="nb">sum</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1000</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                       class  id district_name  population  \
+0               Water bodies  61       Auteuil       67967
+1    Continuous Urban Fabric  61       Auteuil       67967
+2  Roads and associated land  61       Auteuil       67967
+3          Green urban areas  61       Auteuil       67967
+4  Roads and associated land  61       Auteuil       67967
+
+                                            geometry
+0  POLYGON ((3751395.345451574 2890118.001377039,...
+1  (POLYGON ((3753253.104067317 2888254.529208081...
+2  POLYGON ((3751519.830145844 2890061.508628568,...
+3  (POLYGON ((3754314.716711559 2890283.121013219...
+4  POLYGON ((3751619.112743544 2890500, 3751626.6...
+
+
+class
+Continuous Urban Fabric             1.275297
+Discontinuous Dense Urban Fabric    0.088289
+Green urban areas                   2.624229
+Industrial, commercial, public      0.362990
+Railways and associated land        0.005424
+Roads and associated land           0.226271
+Sports and leisure facilities       0.603989
+Water bodies                        0.292194
+Name: area, dtype: float64
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/12-3.png?w=1024" alt="Desktop View" /></p>
+
+<h1 id="4-putting-it-all-together--artisanal-mining-sites-case-study"><strong>4. Putting it all together – Artisanal mining sites case study</strong></h1>
+<hr />
+
+<h2 id="41-introduction-to-the-dataset"><strong>4.1 Introduction to the dataset</strong></h2>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/13-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/14-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/15-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/16-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/17-1.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="411-import-and-explore-the-data"><strong>4.1.1 Import and explore the data</strong></h3>
+
+<p>In this exercise, we will start with reading and exploring two new datasets:</p>
+
+<ul>
+  <li>First, a dataset on artisanal mining sites in Eastern Congo (adapted from
+ <a href="http://ipisresearch.be/home/conflict-mapping/maps/open-data/">IPIS open data</a>
+ ).</li>
+  <li>Second, a dataset on the national parks in Congo (adapted from the
+ <a href="https://www.wri.org/">World Resources Institute</a>
+ ).</li>
+</ul>
+
+<p>For each of those datasets, the exercise consists of importing the necessary packages, reading the data with
+ <code class="language-plaintext highlighter-rouge">geopandas.read_file()</code>
+ , inspecting the first 5 rows and the Coordinate Reference System (CRS) of the data, and making a quick visualization.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import GeoPandas and Matplotlib
+</span><span class="kn">import</span> <span class="nn">geopandas</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Read the mining site data
+</span><span class="n">mining_sites</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">'ipis_cod_mines.geojson'</span><span class="p">)</span>
+
+<span class="c1"># Print the first rows and the CRS information
+</span><span class="k">print</span><span class="p">(</span><span class="n">mining_sites</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mining_sites</span><span class="p">.</span><span class="n">crs</span><span class="p">)</span>
+
+<span class="c1"># Make a quick visualisation
+</span><span class="n">mining_sites</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+   visit_date                                name  n_workers mineral                  geometry
+0  2013-03-27                           Mayi-Tatu      150.0    Gold  POINT (29.66033 1.01089)
+1  2013-03-27                             Mabanga      115.0    Gold  POINT (29.65862 1.00308)
+2  2013-03-27                             Molende      130.0    Gold  POINT (29.65629 0.98563)
+3  2013-03-27                          Embouchure      135.0    Gold  POINT (29.64494 0.99976)
+4  2013-03-27  Apumu-Atandele-Jerusalem-Luka Yayo      270.0    Gold       POINT (29.66 0.956)
+{'init': 'epsg:4326'}
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/18-1.png?w=444" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import GeoPandas and Matplotlib
+</span><span class="kn">import</span> <span class="nn">geopandas</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Read the mining site data
+</span><span class="n">national_parks</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">"cod_conservation.shp"</span><span class="p">)</span>
+
+<span class="c1"># Print the first rows and the CRS information
+</span><span class="k">print</span><span class="p">(</span><span class="n">national_parks</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">national_parks</span><span class="p">.</span><span class="n">crs</span><span class="p">)</span>
+
+<span class="c1"># Make a quick visualisation
+</span><span class="n">national_parks</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+             Type                    Name                                           geometry
+0  Nature Reserve  Luki Biosphere Reserve  POLYGON ((1469015.469222862 -605537.8418950802...
+1  Nature Reserve  Itombwe Nature Reserve  POLYGON ((3132067.8539 -408115.0111999996, 313...
+2  Nature Reserve    Okapi Faunal Reserve  POLYGON ((3197982.926399998 148235.506099999, ...
+3   National park   Salonga National park  POLYGON ((2384337.1864 -280729.9739000015, 238...
+4   National park   Salonga National park  POLYGON ((2399938.984200001 -152211.4943000004...
+{'no_defs': True, 'y_0': 0, 'x_0': 0, 'proj': 'merc', 'units': 'm', 'datum': 'WGS84', 'lon_0': 0, 'lat_ts': 5}
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/1-11.png?w=1024" alt="Desktop View" /></p>
+
+<p>For the mining sites, it indicated EPSG:4326, so the dataset is expressed in geographical longitude/latitude. The last dataset, the national parks, is in projected coordinates. So we will need to make sure both datasets are in the same CRS to be able to use them together.</p>
+
+<h3 id="412-convert-to-common-crs-and-save-to-a-file"><strong>4.1.2 Convert to common CRS and save to a file</strong></h3>
+
+<p>As we have seen in the previous exercises, both datasets are using a different Coordinate Reference System (CRS). This is also illustrated by the first plot in this exercise (for which the code is already provided in the script): both datasets are about the same region, so they should normally overlap in their coordinates; but they don’t.</p>
+
+<p>For further analyses in the rest of this chapter, we will convert both datasets to the same CRS, and save both to a new file. To ensure we can do distance-based calculations, we will convert them to a projected CRS: the local UTM zone 35, which is identified by EPSG:32735 (
+ <a href="https://epsg.io/32735">https://epsg.io/32735</a>
+ ).</p>
+
+<p>The mining sites (
+ <code class="language-plaintext highlighter-rouge">mining_sites</code>
+ ) and national parks (
+ <code class="language-plaintext highlighter-rouge">national_parks</code>
+ ) datasets are already loaded, and GeoPandas and matplotlib are imported.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the natural parks and mining site data
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">national_parks</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">mining_sites</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Convert both datasets to UTM projection
+</span><span class="n">mining_sites_utm</span> <span class="o">=</span> <span class="n">mining_sites</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">32735</span><span class="p">)</span>
+<span class="n">national_parks_utm</span> <span class="o">=</span> <span class="n">national_parks</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">32735</span><span class="p">)</span>
+
+<span class="c1"># Plot the converted data again
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">national_parks_utm</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">mining_sites_utm</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/2-10.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/1-12.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Read the mining site data
+</span><span class="n">mining_sites</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">"ipis_cod_mines.geojson"</span><span class="p">)</span>
+<span class="n">national_parks</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="s">"cod_conservation.shp"</span><span class="p">)</span>
+
+<span class="c1"># Convert both datasets to UTM projection
+</span><span class="n">mining_sites_utm</span> <span class="o">=</span> <span class="n">mining_sites</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">32735</span><span class="p">)</span>
+<span class="n">national_parks_utm</span> <span class="o">=</span> <span class="n">national_parks</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span><span class="o">=</span><span class="mi">32735</span><span class="p">)</span>
+
+<span class="c1"># Write converted data to a file
+</span><span class="n">mining_sites_utm</span><span class="p">.</span><span class="n">to_file</span><span class="p">(</span><span class="s">'ipis_cod_mines_utm.gpkg'</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s">'GPKG'</span><span class="p">)</span>
+<span class="n">national_parks_utm</span><span class="p">.</span><span class="n">to_file</span><span class="p">(</span><span class="s">"cod_conservation_utm.shp"</span><span class="p">,</span> <span class="n">driver</span><span class="o">=</span><span class="s">'ESRI Shapefile'</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<h3 id="413-styling-a-multi-layered-plot"><strong>4.1.3 Styling a multi-layered plot</strong></h3>
+
+<p>Now we have converted both datasets to the same Coordinate Reference System, let’s make a nicer plot combining the two.</p>
+
+<p>The datasets in UTM coordinates as we saved them to files in the last exercise are read back in and made available as the
+ <code class="language-plaintext highlighter-rouge">mining_sites</code>
+ and
+ <code class="language-plaintext highlighter-rouge">national_parks</code>
+ variables. GeoPandas and matplotlib are already imported.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot of the parks and mining sites
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">national_parks</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">'green'</span><span class="p">)</span>
+<span class="n">mining_sites</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/3-9.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot of the parks and mining sites
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">national_parks</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">'green'</span><span class="p">)</span>
+<span class="n">mining_sites</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/4-8.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot of the parks and mining sites
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">national_parks</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">'green'</span><span class="p">)</span>
+<span class="n">mining_sites</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="s">'mineral'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/5-8.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="42-additional-spatial-operations"><strong>4.2 Additional spatial operations</strong></h2>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/6-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/7-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/8-5.png?w=979" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/9-5.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="421-buffer-around-a-point"><strong>4.2.1 Buffer around a point</strong></h3>
+
+<p>Consider the city of Goma, the capital of the North Kivu province of Congo, close to the border with Rwanda. Its coordinates are 1.66°S 29.22°E (the
+ <code class="language-plaintext highlighter-rouge">Point</code>
+ is already provided in UTM coordinates as the
+ <code class="language-plaintext highlighter-rouge">goma</code>
+ variable).</p>
+
+<p><em>How many mining sites are located within 50 km of Goma? And how much area of national park?</em>
+ Let’s determine that using the buffer operation. Remember that distances should be expressed in the unit of the CRS (i.e. in meter in this case).</p>
+
+<p>Note: if you have a boolean Series (for example as result of a spatial relationship method), then you can calculate how many
+ <code class="language-plaintext highlighter-rouge">True</code>
+ values (ie. how many geometries passed the check) by taking the sum of those booleans because in that case the
+ <code class="language-plaintext highlighter-rouge">True</code>
+ and
+ <code class="language-plaintext highlighter-rouge">False</code>
+ values will be seen as ones and zeros.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># goma is a Point
+</span><span class="k">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">goma</span><span class="p">))</span>
+
+<span class="c1"># Create a buffer of 50km around Goma
+</span><span class="n">goma_buffer</span> <span class="o">=</span> <span class="n">goma</span><span class="p">.</span><span class="nb">buffer</span><span class="p">(</span><span class="mi">50000</span><span class="p">)</span>
+
+<span class="c1"># The buffer is a polygon
+</span><span class="k">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">goma_buffer</span><span class="p">))</span>
+
+<span class="c1"># Check how many sites are located within the buffer
+</span><span class="n">mask</span> <span class="o">=</span> <span class="n">mining_sites</span><span class="p">.</span><span class="n">within</span><span class="p">(</span><span class="n">goma_buffer</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mask</span><span class="p">.</span><span class="nb">sum</span><span class="p">())</span>
+
+<span class="c1"># Calculate the area of national park within the buffer
+</span><span class="k">print</span><span class="p">(</span><span class="n">national_parks</span><span class="p">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">goma_buffer</span><span class="p">).</span><span class="n">area</span><span class="p">.</span><span class="nb">sum</span><span class="p">()</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1000</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<h3 id="422-mining-sites-within-national-parks"><strong>4.2.2 Mining sites within national parks</strong></h3>
+
+<p>For this exercise, let’s start with one of the national parks, the Kahuzi-Biega National park (which was extracted from the
+ <code class="language-plaintext highlighter-rouge">national_parks</code>
+ dataset and is provided as the
+ <code class="language-plaintext highlighter-rouge">kahuzi</code>
+ variable).</p>
+
+<p><em>Which of the mining sites are located within this national park?</em></p>
+
+<p>And as a second step:
+ <em>can we determine all mining sites that are located within one of the national parks and in which park?</em></p>
+
+<p>The mining sites (
+ <code class="language-plaintext highlighter-rouge">mining_sites</code>
+ ) and national parks (
+ <code class="language-plaintext highlighter-rouge">national_parks</code>
+ ) datasets are already loaded, and GeoPandas is already imported.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Extract the single polygon for the Kahuzi-Biega National park
+</span><span class="n">kahuzi</span> <span class="o">=</span> <span class="n">national_parks</span><span class="p">[</span><span class="n">national_parks</span><span class="p">[</span><span class="s">'Name'</span><span class="p">]</span> <span class="o">==</span> <span class="s">"Kahuzi-Biega National park"</span><span class="p">].</span><span class="n">geometry</span><span class="p">.</span><span class="n">squeeze</span><span class="p">()</span>
+
+<span class="c1"># Take a subset of the mining sites located within Kahuzi
+</span><span class="n">sites_kahuzi</span> <span class="o">=</span> <span class="n">mining_sites</span><span class="p">[</span><span class="n">mining_sites</span><span class="p">.</span><span class="n">within</span><span class="p">(</span><span class="n">kahuzi</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sites_kahuzi</span><span class="p">)</span>
+
+<span class="c1"># Determine in which national park a mining site is located
+</span><span class="n">sites_within_park</span> <span class="o">=</span> <span class="n">geopandas</span><span class="p">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">mining_sites</span><span class="p">,</span> <span class="n">national_parks</span><span class="p">,</span> <span class="n">op</span><span class="o">=</span><span class="s">'within'</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s">'inner'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sites_within_park</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># The number of mining sites in each national park
+</span><span class="k">print</span><span class="p">(</span><span class="n">sites_within_park</span><span class="p">[</span><span class="s">'name'</span><span class="p">].</span><span class="n">value_counts</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+       visit_date                   name  n_workers      mineral  \
+661   2013-08-28Z          Ibozia/Kalumé       80.0  Cassiterite
+662   2013-08-26Z                Matamba      150.0  Cassiterite
+663   2013-08-27Z          Mutete/Mukina      170.0  Cassiterite
+664   2013-08-28Z                 Mutete      100.0  Cassiterite
+760   2014-02-25Z              Mazankala      120.0  Cassiterite
+813   2015-07-28Z             Kitendebwa       50.0         Gold
+869   2013-09-28Z           Sebwa-Lukoma      130.0  Cassiterite
+870   2013-10-30Z              Rwamakaza      160.0  Cassiterite
+1481  2009-01-01Z               Mugaba I       50.0         Gold
+1482  2009-01-01Z           Mugaba Ouest       46.0         Gold
+1676  2015-08-02Z  Nguba(Nkuba) kamisoke      122.0  Cassiterite
+
+                                         geometry
+661   POINT (567832.7086093378 9759143.339360647)
+662   POINT (598323.5389475008 9758688.142411157)
+663   POINT (570733.4369126211 9761871.114227083)
+664   POINT (569881.0930415759 9762219.110778008)
+760   POINT (613075.5326777868 9722956.979837928)
+813   POINT (693078.9282059025 9770107.517721133)
+869   POINT (660406.3452248175 9715261.717041001)
+870    POINT (661266.834456568 9716072.198784607)
+1481  POINT (685167.3714990132 9744069.967416598)
+1482  POINT (683156.6865782175 9746324.416321497)
+1676  POINT (622151.3489110788 9808363.111073116)
+
+
+      visit_date          name  n_workers mineral                                     geometry  \
+253  2013-09-05Z  Kiviri/Tayna      244.0    Gold   POINT (709734.912568812 9961013.720415946)
+578  2015-09-02Z   Lubondozi 3       30.0    Gold  POINT (578464.3150203574 9555456.293453641)
+579  2015-09-02Z        Katamu      180.0    Gold  POINT (576249.9033853477 9554313.725408439)
+580  2015-09-02Z     Kimabwe 1      120.0    Gold  POINT (576425.7766608761 9556329.633628448)
+581  2015-09-02Z   Lubondozi 1      300.0    Gold   POINT (579164.711161439 9554722.924142597)
+
+     index_right            Type                       Name
+253           23  Nature Reserve       Tayna Nature Reserve
+578           15  Hunting Domain  Luama-Kivu Hunting Domain
+579           15  Hunting Domain  Luama-Kivu Hunting Domain
+580           15  Hunting Domain  Luama-Kivu Hunting Domain
+581           15  Hunting Domain  Luama-Kivu Hunting Domain
+
+Colline 7           1
+Mutete              1
+                   ..
+Kimabwe 1           1
+Muchacha            1
+Name: name, Length: 64, dtype: int64
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="43-applying-custom-spatial-operations"><strong>4.3 Applying custom spatial operations</strong></h2>
+
+<p>####
+ 4.3.1
+ <strong>Finding the name of the closest National Park</strong></p>
+
+<p>Let’s start with a custom query for a single mining site. Here, we will determine the name of the national park that is the closest to the specific mining site.</p>
+
+<p>The datasets on the mining sites (
+ <code class="language-plaintext highlighter-rouge">mining_sites</code>
+ ) and national parks (
+ <code class="language-plaintext highlighter-rouge">national_parks</code>
+ ) are already loaded.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+mining_sites.head(1)
+    visit_date       name  n_workers mineral                                     geometry
+0  2013-03-27Z  Mayi-Tatu      150.0    Gold  POINT (796089.4159891906 10111855.17426374)
+
+
+national_parks.head(1)
+             Type                    Name                                           geometry
+0  Nature Reserve  Luki Biosphere Reserve  POLYGON ((-1038121.47250213 9375412.18990065, ...
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Get the geometry of the first row
+</span><span class="n">single_mine</span> <span class="o">=</span> <span class="n">mining_sites</span><span class="p">.</span><span class="n">geometry</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Calculate the distance from each national park to this mine
+</span><span class="n">dist</span> <span class="o">=</span> <span class="n">national_parks</span><span class="p">.</span><span class="n">distance</span><span class="p">(</span><span class="n">single_mine</span><span class="p">)</span>
+
+<span class="c1"># The index of the minimal distance
+</span><span class="n">idx</span> <span class="o">=</span> <span class="n">dist</span><span class="p">.</span><span class="n">idxmin</span><span class="p">()</span>
+
+<span class="c1"># Access the name of the corresponding national park
+</span><span class="n">closest_park</span> <span class="o">=</span> <span class="n">national_parks</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s">'Name'</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">closest_park</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<h3 id="432-applying-a-custom-operation-to-each-geometry"><strong>4.3.2 Applying a custom operation to each geometry</strong></h3>
+
+<p>Now we know how to get the closest national park for a single point, let’s do this for all points. For this, we are first going to write a function, taking a single point as argument and returning the desired result. Then we can use this function to apply it to all points.</p>
+
+<p>The datasets on the mining sites (
+ <code class="language-plaintext highlighter-rouge">mining_sites</code>
+ ) and national parks (
+ <code class="language-plaintext highlighter-rouge">national_parks</code>
+ ) are already loaded. The single mining site from the previous exercises is already defined as
+ <code class="language-plaintext highlighter-rouge">single_mine</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define a function that returns the closest national park
+</span><span class="k">def</span> <span class="nf">closest_national_park</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">national_parks</span><span class="p">):</span>
+    <span class="n">dist</span> <span class="o">=</span> <span class="n">national_parks</span><span class="p">.</span><span class="n">distance</span><span class="p">(</span><span class="n">geom</span><span class="p">)</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">dist</span><span class="p">.</span><span class="n">idxmin</span><span class="p">()</span>
+    <span class="n">closest_park</span> <span class="o">=</span> <span class="n">national_parks</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s">'Name'</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">closest_park</span>
+
+<span class="c1"># Call the function on single_mine
+</span><span class="k">print</span><span class="p">(</span><span class="n">closest_national_park</span><span class="p">(</span><span class="n">single_mine</span><span class="p">,</span> <span class="n">national_parks</span><span class="p">))</span>
+
+<span class="c1"># Apply the function to all mining sites
+</span><span class="n">mining_sites</span><span class="p">[</span><span class="s">'closest_park'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mining_sites</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="nb">apply</span><span class="p">(</span><span class="n">closest_national_park</span><span class="p">,</span> <span class="n">national_parks</span><span class="o">=</span><span class="n">national_parks</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mining_sites</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Virunga National park
+
+
+    visit_date                                name  n_workers mineral  \
+0  2013-03-27Z                           Mayi-Tatu      150.0    Gold
+1  2013-03-27Z                             Mabanga      115.0    Gold
+2  2013-03-27Z                             Molende      130.0    Gold
+3  2013-03-27Z                          Embouchure      135.0    Gold
+4  2013-03-27Z  Apumu-Atandele-Jerusalem-Luka Yayo      270.0    Gold
+
+                                      geometry           closest_park
+0  POINT (796089.4159891906 10111855.17426374)  Virunga National park
+1  POINT (795899.6640655082 10110990.83998195)  Virunga National park
+2  POINT (795641.7066578076 10109059.78659637)  Virunga National park
+3  POINT (794376.3093052682 10110622.24995522)  Virunga National park
+4  POINT (796057.5042468573 10105781.54751797)  Virunga National park
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="44-working-with-raster-data"><strong>4.4 Working with raster data</strong></h2>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/4.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="441-import-and-plot-raster-data"><strong>4.4.1 Import and plot raster data</strong></h3>
+
+<p>In this exercise, we are going to use a raster dataset of the vegetation types map (available from
+ <a href="http://www.wri.org/">http://www.wri.org</a>
+ ). The raster values take a set of discrete values indicating the type of vegetation. Let’s start with reading the data and plotting it together with the mining site data.</p>
+
+<p>The mining sites dataset (
+ <code class="language-plaintext highlighter-rouge">mining_sites</code>
+ ) is already loaded, and GeoPandas and matplotlib are already imported.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the rasterio package
+</span><span class="kn">import</span> <span class="nn">rasterio</span>
+
+<span class="c1"># Open the raster dataset
+</span><span class="n">src</span> <span class="o">=</span> <span class="n">rasterio</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="s">"central_africa_vegetation_map_foraf.tif"</span><span class="p">)</span>
+
+<span class="c1"># Import the plotting functionality of rasterio
+</span><span class="kn">import</span> <span class="nn">rasterio.plot</span>
+
+<span class="c1"># Plot the raster layer with the mining sites
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">rasterio</span><span class="p">.</span><span class="n">plot</span><span class="p">.</span><span class="n">show</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+<span class="n">mining_sites</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/5.png?w=877" alt="Desktop View" /></p>
+
+<h3 id="442-extract-information-from-raster-layer"><strong>4.4.2 Extract information from raster layer</strong></h3>
+
+<p>Let’s now extract information from the raster layer, based on a vector file. This functionality is provided by the
+ <a href="https://github.com/perrygeo/python-rasterstats"><code class="language-plaintext highlighter-rouge">rasterstats</code></a>
+ package. Specifically for this exercise, we will determine the vegetation type at all mining sites, by getting the nearest raster pixel value at each point of the mining site dataset.</p>
+
+<p>A subset of the mining sites dataset (
+ <code class="language-plaintext highlighter-rouge">mining_sites</code>
+ ) is already loaded, and GeoPandas and matplotlib are already imported.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the rasterstats package
+</span><span class="kn">import</span> <span class="nn">rasterstats</span>
+
+<span class="c1"># Extract the nearest value in the raster for all mining sites
+</span><span class="n">vegetation_raster</span> <span class="o">=</span> <span class="s">"central_africa_vegetation_map_foraf.tif"</span>
+<span class="n">mining_sites</span><span class="p">[</span><span class="s">'vegetation'</span><span class="p">]</span> <span class="o">=</span> <span class="n">rasterstats</span><span class="p">.</span><span class="n">point_query</span><span class="p">(</span><span class="n">mining_sites</span><span class="p">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">vegetation_raster</span><span class="p">,</span> <span class="n">interpolate</span><span class="o">=</span><span class="s">'nearest'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mining_sites</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Replace numeric vegation types codes with description
+</span><span class="n">mining_sites</span><span class="p">[</span><span class="s">'vegetation'</span><span class="p">]</span> <span class="o">=</span> <span class="n">mining_sites</span><span class="p">[</span><span class="s">'vegetation'</span><span class="p">].</span><span class="n">replace</span><span class="p">(</span><span class="n">vegetation_types</span><span class="p">)</span>
+
+<span class="c1"># Make a plot indicating the vegetation type
+</span><span class="n">mining_sites</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'vegetation'</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+          visit_date         name  n_workers      mineral                     geometry  vegetation
+    350   2013-05-30       Kunguo      154.0         Gold      POINT (28.274 -1.00941)           1
+    2056  2017-08-10      Masange        4.0   Wolframite   POINT (27.329875 -1.08929)           1
+    686   2013-09-09  Kabusangala      120.0         Gold  POINT (27.136147 -3.425685)           1
+    602   2013-12-23     Simunofu      120.0  Cassiterite  POINT (26.541903 -1.540585)           1
+    571   2013-09-07       Kigali       26.0  Cassiterite  POINT (26.601226 -1.398051)           7
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/6.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="443-further-reference"><strong>4.4.3 Further reference</strong></h3>
+
+<p><img src="/blog/assets/datacamp/working-with-geospatial-data-in-python/7.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

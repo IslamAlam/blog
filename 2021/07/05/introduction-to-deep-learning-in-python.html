@@ -1,0 +1,1317 @@
+<h1 id="introduction-to-deep-learning-in-python">Introduction to Deep Learning in Python</h1>
+
+<p>This is the memo of the 25th course of ‘Data Scientist with Python’ track.</p>
+
+<p><strong>You can find the original course</strong> <a href="https://www.datacamp.com/courses/deep-learning-in-python"><strong>HERE</strong></a> .</p>
+
+<h2 id="1-basics-of-deep-learning-and-neural-networks"><strong>1. Basics of deep learning and neural networks</strong></h2>
+
+<h3 id="11-introduction-to-deep-learning"><strong>1.1 Introduction to deep learning</strong></h3>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture1-2.png?w=1024" alt="" /></p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture2-3.png?w=1024" alt="" /></p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture3-4.png?w=1024" alt="" /></p>
+
+<h3 id="12-forward-propagation"><strong>1.2 Forward propagation</strong></h3>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture4-4.png?w=1004" alt="" /></p>
+
+<p><strong>Coding the forward propagation algorithm</strong></p>
+
+<p>In this exercise, you’ll write code to do forward propagation (prediction) for your first neural network:</p>
+
+<p><img src="https://s3.amazonaws.com/assets.datacamp.com/production/course_3524/datasets/1_4.png" alt="Ch1Ex4" /></p>
+
+<p>Each data point is a customer. The first input is how many accounts they have, and the second input is how many children they have. The model will predict how many transactions the user makes in the next year.</p>
+
+<p>You will use this data throughout the first 2 chapters of this course.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">input_data</span>
+<span class="c1"># array([3, 5])
+</span>
+<span class="n">weights</span>
+ <span class="c1"># {'node_0': array([2, 4]), 'node_1': array([ 4, -5]), 'output': array([2, 7])}
+</span></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">input_data</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'node_0'</span><span class="p">]</span>
+<span class="c1"># array([ 6, 20])
+</span>
+<span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="c1"># array([ 6, 20])
+</span>
+<span class="p">(</span><span class="n">input_data</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'node_0'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+<span class="c1"># 26
+</span></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Calculate node 0 value: node_0_value
+</span><span class="n">node_0_value</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_data</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'node_0'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+
+<span class="c1"># Calculate node 1 value: node_1_value
+</span><span class="n">node_1_value</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_data</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'node_1'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+
+<span class="c1"># Put node values into array: hidden_layer_outputs
+</span><span class="n">hidden_layer_outputs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="n">node_0_value</span><span class="p">,</span> <span class="n">node_1_value</span><span class="p">])</span>
+
+<span class="c1"># Calculate output: output
+</span><span class="n">output</span> <span class="o">=</span> <span class="p">(</span><span class="n">hidden_layer_outputs</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'output'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+
+<span class="c1"># Print output
+</span><span class="k">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+<span class="c1">#    -39
+</span></code></pre></div></div>
+
+<p>It looks like the network generated a prediction of <code class="language-plaintext highlighter-rouge">-39</code> .</p>
+
+<h3 id="13-activation-functions"><strong>1.3 Activation functions</strong></h3>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture5-4.png?w=972" alt="" /></p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture6-4.png?w=1024" alt="" /></p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture7-2.png?w=1024" alt="" /></p>
+
+<p><strong>The Rectified Linear Activation Function</strong></p>
+
+<p>An “activation function” is a function applied at each node. It converts the node’s input into some output.</p>
+
+<p>The rectified linear activation function (called <em>ReLU</em> ) has been shown to lead to very high-performance networks. This function takes a single number as an input, returning 0 if the input is negative, and the input if the input is positive.</p>
+
+<p>Here are some examples:</p>
+
+<p><strong>relu(3) = 3</strong></p>
+
+<p><strong>relu(-3) = 0</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">relu</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="s">'''Define your relu activation function here'''</span>
+    <span class="c1"># Calculate the value for the output of the relu function: output
+</span>    <span class="n">output</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Return the value just calculated
+</span>    <span class="k">return</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+<span class="c1"># Calculate node 0 value: node_0_output
+</span><span class="n">node_0_input</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_data</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'node_0'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+<span class="n">node_0_output</span> <span class="o">=</span> <span class="n">relu</span><span class="p">(</span><span class="n">node_0_input</span><span class="p">)</span>
+
+<span class="c1"># Calculate node 1 value: node_1_output
+</span><span class="n">node_1_input</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_data</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'node_1'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+<span class="n">node_1_output</span> <span class="o">=</span> <span class="n">relu</span><span class="p">(</span><span class="n">node_1_input</span><span class="p">)</span>
+
+<span class="c1"># Put node values into array: hidden_layer_outputs
+</span><span class="n">hidden_layer_outputs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="n">node_0_output</span><span class="p">,</span> <span class="n">node_1_output</span><span class="p">])</span>
+
+<span class="c1"># Calculate model output (do not apply relu)
+</span><span class="n">model_output</span> <span class="o">=</span> <span class="p">(</span><span class="n">hidden_layer_outputs</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'output'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+
+<span class="c1"># Print model output
+</span><span class="k">print</span><span class="p">(</span><span class="n">model_output</span><span class="p">)</span>
+
+<span class="c1"># 52
+</span></code></pre></div></div>
+
+<p>You predicted 52 transactions. Without this activation function, you would have predicted a negative number!</p>
+
+<p>The real power of activation functions will come soon when you start tuning model weights.</p>
+
+<p><strong>Applying the network to many observations/rows of data</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">input_data</span>
+<span class="p">[</span><span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span> <span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">])]</span>
+
+<span class="n">weights</span>
+<span class="p">{</span><span class="s">'node_0'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]),</span> <span class="s">'node_1'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span> <span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">]),</span> <span class="s">'output'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">])}</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">relu</span><span class="p">(</span><span class="nb">input</span><span class="p">):</span>
+    <span class="s">'''Define relu activation function'''</span>
+    <span class="k">return</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="nb">input</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+
+<span class="c1"># Define predict_with_network()
+</span><span class="k">def</span> <span class="nf">predict_with_network</span><span class="p">(</span><span class="n">input_data_row</span><span class="p">,</span> <span class="n">weights</span><span class="p">):</span>
+
+    <span class="c1"># Calculate node 0 value
+</span>    <span class="n">node_0_input</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_data_row</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'node_0'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+    <span class="n">node_0_output</span> <span class="o">=</span> <span class="n">relu</span><span class="p">(</span><span class="n">node_0_input</span><span class="p">)</span>
+
+    <span class="c1"># Calculate node 1 value
+</span>    <span class="n">node_1_input</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_data_row</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'node_1'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+    <span class="n">node_1_output</span> <span class="o">=</span> <span class="n">relu</span><span class="p">(</span><span class="n">node_1_input</span><span class="p">)</span>
+
+    <span class="c1"># Put node values into array: hidden_layer_outputs
+</span>    <span class="n">hidden_layer_outputs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="n">node_0_output</span><span class="p">,</span> <span class="n">node_1_output</span><span class="p">])</span>
+
+    <span class="c1"># Calculate model output
+</span>    <span class="n">input_to_final_layer</span> <span class="o">=</span> <span class="p">(</span><span class="n">hidden_layer_outputs</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'output'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+    <span class="n">model_output</span> <span class="o">=</span> <span class="n">relu</span><span class="p">(</span><span class="n">input_to_final_layer</span><span class="p">)</span>
+
+    <span class="c1"># Return model output
+</span>    <span class="k">return</span><span class="p">(</span><span class="n">model_output</span><span class="p">)</span>
+
+
+<span class="c1"># Create empty list to store prediction results
+</span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">input_data_row</span> <span class="ow">in</span> <span class="n">input_data</span><span class="p">:</span>
+    <span class="c1"># Append prediction to results
+</span>    <span class="n">results</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">predict_with_network</span><span class="p">(</span><span class="n">input_data_row</span><span class="p">,</span> <span class="n">weights</span><span class="p">))</span>
+
+<span class="c1"># Print results
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<span class="c1"># [52, 63, 0, 148]
+</span></code></pre></div></div>
+
+<h3 id="14-deeper-networks"><strong>1.4 Deeper networks</strong></h3>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture8-1.png?w=988" alt="" /></p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture9.png?w=919" alt="" /></p>
+
+<p><strong>Forward propagation in a deeper network</strong></p>
+
+<p>You now have a model with 2 hidden layers. The values for an input data point are shown inside the input nodes. The weights are shown on the edges/lines. What prediction would this model make on this data point?</p>
+
+<p>Assume the activation function at each node is the <em>identity function</em> . That is, each node’s output will be the same as its input. So the value of the bottom node in the first hidden layer is -1, and not 0, as it would be if the ReLU activation function was used.</p>
+
+<p><img src="https://s3.amazonaws.com/assets.datacamp.com/production/course_3524/datasets/ch1ex9.png" alt="Ch1Ex9" /></p>
+
+<p>| Hidden Layer 1 | Hidden Layer 2 | Prediction | | 6 | -1 | | | | | 0 | | -1 | 5 | |</p>
+
+<p><strong>Multi-layer neural networks</strong></p>
+
+<p>In this exercise, you’ll write code to do forward propagation for a neural network with 2 hidden layers. Each hidden layer has two nodes.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">input_data</span>
+<span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+
+<span class="n">weights</span>
+<span class="p">{</span><span class="s">'node_0_0'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]),</span>
+ <span class="s">'node_0_1'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span> <span class="mi">4</span><span class="p">,</span> <span class="o">-</span><span class="mi">5</span><span class="p">]),</span>
+ <span class="s">'node_1_0'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">]),</span>
+ <span class="s">'node_1_1'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span>
+ <span class="s">'output'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">])}</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">predict_with_network</span><span class="p">(</span><span class="n">input_data</span><span class="p">):</span>
+    <span class="c1"># Calculate node 0 in the first hidden layer
+</span>    <span class="n">node_0_0_input</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_data</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'node_0_0'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+    <span class="n">node_0_0_output</span> <span class="o">=</span> <span class="n">relu</span><span class="p">(</span><span class="n">node_0_0_input</span><span class="p">)</span>
+
+    <span class="c1"># Calculate node 1 in the first hidden layer
+</span>    <span class="n">node_0_1_input</span> <span class="o">=</span> <span class="p">(</span><span class="n">input_data</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'node_0_1'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+    <span class="n">node_0_1_output</span> <span class="o">=</span> <span class="n">relu</span><span class="p">(</span><span class="n">node_0_1_input</span><span class="p">)</span>
+
+    <span class="c1"># Put node values into array: hidden_0_outputs
+</span>    <span class="n">hidden_0_outputs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="n">node_0_0_output</span><span class="p">,</span> <span class="n">node_0_1_output</span><span class="p">])</span>
+
+    <span class="c1"># Calculate node 0 in the second hidden layer
+</span>    <span class="n">node_1_0_input</span> <span class="o">=</span> <span class="p">(</span><span class="n">hidden_0_outputs</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'node_1_0'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+    <span class="n">node_1_0_output</span> <span class="o">=</span> <span class="n">relu</span><span class="p">(</span><span class="n">node_1_0_input</span><span class="p">)</span>
+
+    <span class="c1"># Calculate node 1 in the second hidden layer
+</span>    <span class="n">node_1_1_input</span> <span class="o">=</span> <span class="p">(</span><span class="n">hidden_0_outputs</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'node_1_1'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+    <span class="n">node_1_1_output</span> <span class="o">=</span> <span class="n">relu</span><span class="p">(</span><span class="n">node_1_1_input</span><span class="p">)</span>
+
+    <span class="c1"># Put node values into array: hidden_1_outputs
+</span>    <span class="n">hidden_1_outputs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="n">node_1_0_output</span><span class="p">,</span> <span class="n">node_1_1_output</span><span class="p">])</span>
+
+    <span class="c1"># Calculate model output: model_output
+</span>    <span class="n">model_output</span> <span class="o">=</span> <span class="p">(</span><span class="n">hidden_1_outputs</span> <span class="o">*</span> <span class="n">weights</span><span class="p">[</span><span class="s">'output'</span><span class="p">]).</span><span class="nb">sum</span><span class="p">()</span>
+
+    <span class="c1"># Return model_output
+</span>    <span class="k">return</span><span class="p">(</span><span class="n">model_output</span><span class="p">)</span>
+
+<span class="n">output</span> <span class="o">=</span> <span class="n">predict_with_network</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+<span class="c1"># 182
+</span></code></pre></div></div>
+
+<p><strong>Representations are learned</strong></p>
+
+<p>How are the weights that determine the features/interactions in Neural Networks created?</p>
+
+<p>The model training process sets them to optimize predictive accuracy.</p>
+
+<p><strong>Levels of representation</strong></p>
+
+<p>Which layers of a model capture more complex or “higher level” interactions?</p>
+
+<p>The last layers capture the most complex interactions.</p>
+
+<h2 id="2-optimizing-a-neural-network-with-backward-propagation"><strong>2. Optimizing a neural network with backward propagation</strong></h2>
+
+<h3 id="21-the-need-for-optimization"><strong>2.1 The need for optimization</strong></h3>
+
+<p><strong>Calculating model errors</strong></p>
+
+<p>What is the error (predicted – actual) for the following network when the input data is [3, 2] and the actual value of the target (what you are trying to predict) is 5?</p>
+
+<p><img src="https://s3.amazonaws.com/assets.datacamp.com/production/course_3524/datasets/ch2_ex2_3.png" alt="Ch2Ex2" /></p>
+
+<p>prediction = (3_2 + 2_1)  _2 + (3_0 + 2_0)_2</p>
+
+<p>=16</p>
+
+<p>error = 16 – 5 = 11</p>
+
+<p><strong>Understanding how weights change model accuracy</strong></p>
+
+<p>Imagine you have to make a prediction for a single data point. The actual value of the target is 7. The weight going from <code class="language-plaintext highlighter-rouge">node_0</code> to the output is 2, as shown below.</p>
+
+<p>If you increased it slightly, changing it to 2.01, would the predictions become more accurate, less accurate, or stay the same?</p>
+
+<p><img src="https://s3.amazonaws.com/assets.datacamp.com/production/course_3524/datasets/ch2_ex2_3.png" alt="Ch2Ex3" /></p>
+
+<p>prediction_before = 16</p>
+
+<p>error_before = 16 – 7 = 9</p>
+
+<p>prediction_after = (3_2.01 + 2_1)  _2 + (3_0 + 2_0)_2</p>
+
+<p>=16.x</p>
+
+<p>error_after = 9.x</p>
+
+<p>Increasing the weight to <code class="language-plaintext highlighter-rouge">2.01</code> would increase the resulting error from <code class="language-plaintext highlighter-rouge">9</code> to <code class="language-plaintext highlighter-rouge">9.08</code> , making the predictions <em>less</em> accurate.</p>
+
+<p><strong>Coding how weight changes affect accuracy</strong></p>
+
+<p>Now you’ll get to change weights in a real network and see how they affect model accuracy!</p>
+
+<p><img src="https://s3.amazonaws.com/assets.datacamp.com/production/course_3524/datasets/ch2ex4.png" alt="Ch2Ex4" /></p>
+
+<p>Have a look at the following neural network:</p>
+
+<p>Its weights have been pre-loaded as <code class="language-plaintext highlighter-rouge">weights_0</code> . Your task in this exercise is to update a <strong>single</strong> weight in <code class="language-plaintext highlighter-rouge">weights_0</code> to create <code class="language-plaintext highlighter-rouge">weights_1</code> , which gives a perfect prediction (in which the predicted value is equal to <code class="language-plaintext highlighter-rouge">target_actual</code> : 3).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># The data point you will make a prediction for
+</span><span class="n">input_data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+<span class="c1"># Sample weights
+</span><span class="n">weights_0</span> <span class="o">=</span> <span class="p">{</span><span class="s">'node_0'</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+             <span class="s">'node_1'</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+             <span class="s">'output'</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="p">}</span>
+
+<span class="c1"># The actual target value, used to calculate the error
+</span><span class="n">target_actual</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="c1"># Make prediction using original weights
+</span><span class="n">model_output_0</span> <span class="o">=</span> <span class="n">predict_with_network</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">weights_0</span><span class="p">)</span>
+
+<span class="c1"># Calculate error: error_0
+</span><span class="n">error_0</span> <span class="o">=</span> <span class="n">model_output_0</span> <span class="o">-</span> <span class="n">target_actual</span>
+
+<span class="c1"># Create weights that cause the network to make perfect prediction (3): weights_1
+</span><span class="n">weights_1</span> <span class="o">=</span> <span class="p">{</span><span class="s">'node_0'</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+             <span class="s">'node_1'</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+             <span class="s">'output'</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+            <span class="p">}</span>
+
+<span class="c1"># Make prediction using new weights: model_output_1
+</span><span class="n">model_output_1</span> <span class="o">=</span> <span class="n">predict_with_network</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">weights_1</span><span class="p">)</span>
+
+<span class="c1"># Calculate error: error_1
+</span><span class="n">error_1</span> <span class="o">=</span> <span class="n">model_output_1</span> <span class="o">-</span> <span class="n">target_actual</span>
+
+<span class="c1"># Print error_0 and error_1
+</span><span class="k">print</span><span class="p">(</span><span class="n">error_0</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">error_1</span><span class="p">)</span>
+
+<span class="c1"># 6
+# 0
+</span></code></pre></div></div>
+
+<p><strong>Scaling up to multiple data points</strong></p>
+
+<p>You’ve seen how different weights will have different accuracies on a single prediction. But usually, you’ll want to measure model accuracy on many points.</p>
+
+<p>You’ll now write code to compare model accuracies for two different sets of weights, which have been stored as <code class="language-plaintext highlighter-rouge">weights_0</code> and <code class="language-plaintext highlighter-rouge">weights_1</code> .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">input_data</span>
+<span class="p">[</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]),</span> <span class="n">array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">])]</span>
+
+<span class="n">target_actuals</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">]</span>
+
+<span class="n">weights_0</span>
+<span class="p">{</span><span class="s">'node_0'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span> <span class="s">'node_1'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]),</span> <span class="s">'output'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])}</span>
+
+<span class="n">weights_1</span>
+<span class="p">{</span><span class="s">'node_0'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">]),</span>
+ <span class="s">'node_1'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">1.</span> <span class="p">,</span> <span class="mf">1.5</span><span class="p">]),</span>
+ <span class="s">'output'</span><span class="p">:</span> <span class="n">array</span><span class="p">([</span><span class="mf">1.</span> <span class="p">,</span> <span class="mf">1.5</span><span class="p">])}</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span>
+
+<span class="c1"># Create model_output_0
+</span><span class="n">model_output_0</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="c1"># Create model_output_1
+</span><span class="n">model_output_1</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Loop over input_data
+</span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">input_data</span><span class="p">:</span>
+    <span class="c1"># Append prediction to model_output_0
+</span>    <span class="n">model_output_0</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">predict_with_network</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">weights_0</span><span class="p">))</span>
+
+    <span class="c1"># Append prediction to model_output_1
+</span>    <span class="n">model_output_1</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">predict_with_network</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="n">weights_1</span><span class="p">))</span>
+
+<span class="c1"># Calculate the mean squared error for model_output_0: mse_0
+</span><span class="n">mse_0</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">target_actuals</span><span class="p">,</span> <span class="n">model_output_0</span><span class="p">)</span>
+
+<span class="c1"># Calculate the mean squared error for model_output_1: mse_1
+</span><span class="n">mse_1</span> <span class="o">=</span> <span class="n">mean_squared_error</span><span class="p">(</span><span class="n">target_actuals</span><span class="p">,</span> <span class="n">model_output_1</span><span class="p">)</span>
+
+<span class="c1"># Print mse_0 and mse_1
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Mean squared error with weights_0: %f"</span> <span class="o">%</span><span class="n">mse_0</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Mean squared error with weights_1: %f"</span> <span class="o">%</span><span class="n">mse_1</span><span class="p">)</span>
+
+<span class="c1"># Mean squared error with weights_0: 37.500000
+# Mean squared error with weights_1: 49.890625
+</span></code></pre></div></div>
+
+<p>It looks like <code class="language-plaintext highlighter-rouge">model_output_1</code> has a higher mean squared error.</p>
+
+<h3 id="22-gradient-descent"><strong>2.2 Gradient descent</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/09/capture1-3.png?w=837" alt="" /></li>
+  <li>
+    <p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture2-4.png?w=996" alt="" /></p>
+
+    <p>ex. learning rate = 0.01</p>
+  </li>
+  <li>
+    <p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture-3.png?w=1024" alt="" /></p>
+
+    <p>w.r.t. = with respect to</p>
+  </li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/09/capture3-5.png?w=1024" alt="" /></li>
+  <li>
+    <p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture5-5.png?w=1024" alt="" /></p>
+
+    <p>new weight = 2 – -24 * 0.01 = 2.24</p>
+  </li>
+</ul>
+
+<p><strong>Calculating slopes</strong></p>
+
+<p>You’re now going to practice calculating slopes.</p>
+
+<p>When plotting the mean-squared error loss function against predictions, the slope is <code class="language-plaintext highlighter-rouge">2 * x * (y-xb)</code> , or <code class="language-plaintext highlighter-rouge">2 * input_data * error</code> .</p>
+
+<p>Note that <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">b</code> may have multiple numbers ( <code class="language-plaintext highlighter-rouge">x</code> is a vector for each data point, and <code class="language-plaintext highlighter-rouge">b</code> is a vector). In this case, the output will also be a vector, which is exactly what you want.</p>
+
+<p>You’re ready to write the code to calculate this slope while using a single data point.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">input_data</span>
+<span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+<span class="n">weights</span>
+<span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="n">target</span>
+<span class="mi">0</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Calculate the predictions: preds
+</span><span class="n">preds</span> <span class="o">=</span> <span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">input_data</span><span class="p">).</span><span class="nb">sum</span><span class="p">()</span>
+
+<span class="c1"># Calculate the error: error
+</span><span class="n">error</span> <span class="o">=</span> <span class="n">target</span> <span class="o">-</span> <span class="n">preds</span>
+
+<span class="c1"># Calculate the slope: slope
+</span><span class="n">slope</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">input_data</span> <span class="o">*</span> <span class="n">error</span>
+
+<span class="c1"># Print the slope
+</span><span class="k">print</span><span class="p">(</span><span class="n">slope</span><span class="p">)</span>
+<span class="c1"># [-14 -28 -42]
+</span></code></pre></div></div>
+
+<p>You can now use this slope to improve the weights of the model!</p>
+
+<p><strong>Improving model weights</strong></p>
+
+<p>You’ve just calculated the slopes you need. Now it’s time to use those slopes to improve your model.</p>
+
+<p>If you add the slopes to your weights, you will move in the right direction. However, it’s possible to move too far in that direction.</p>
+
+<p>So you will want to take a small step in that direction first, using a lower learning rate, and verify that the model is improving.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Set the learning rate: learning_rate
+</span><span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.01</span>
+
+<span class="c1"># Calculate the predictions: preds
+</span><span class="n">preds</span> <span class="o">=</span> <span class="p">(</span><span class="n">weights</span> <span class="o">*</span> <span class="n">input_data</span><span class="p">).</span><span class="nb">sum</span><span class="p">()</span>
+<span class="c1"># weights
+# array([0, 2, 1])
+</span>
+<span class="c1"># Calculate the error: error
+</span><span class="n">error</span> <span class="o">=</span> <span class="n">preds</span> <span class="o">-</span> <span class="n">target</span>
+
+<span class="c1"># Calculate the slope: slope
+</span><span class="n">slope</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">input_data</span> <span class="o">*</span> <span class="n">error</span>
+<span class="c1"># slope
+# array([14, 28, 42])
+</span>
+<span class="c1"># Update the weights: weights_updated
+</span><span class="n">weights_updated</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">-</span> <span class="n">learning_rate</span> <span class="o">*</span> <span class="n">slope</span>
+<span class="c1"># weights_updated
+# array([-0.14,  1.72,  0.58])
+</span>
+<span class="c1"># Get updated predictions: preds_updated
+</span><span class="n">preds_updated</span> <span class="o">=</span> <span class="p">(</span><span class="n">weights_updated</span> <span class="o">*</span> <span class="n">input_data</span><span class="p">).</span><span class="nb">sum</span><span class="p">()</span>
+
+<span class="c1"># Calculate updated error: error_updated
+</span><span class="n">error_updated</span> <span class="o">=</span> <span class="n">preds_updated</span> <span class="o">-</span> <span class="n">target</span>
+
+<span class="c1"># Print the original error
+</span><span class="k">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+<span class="c1"># Print the updated error
+</span><span class="k">print</span><span class="p">(</span><span class="n">error_updated</span><span class="p">)</span>
+
+<span class="c1"># 7
+# 5.04
+</span></code></pre></div></div>
+
+<p>Updating the model weights did indeed decrease the error!</p>
+
+<p><strong>Making multiple updates to weights</strong></p>
+
+<p>You’re now going to make multiple updates so you can dramatically improve your model weights, and see how the predictions improve with each update.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">get_slope</span><span class="err">?</span>
+<span class="n">Signature</span><span class="p">:</span> <span class="n">get_slope</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+<span class="n">Docstring</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">no</span> <span class="n">docstring</span><span class="o">&gt;</span>
+<span class="n">File</span><span class="p">:</span>      <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">tmpt3wthzls</span><span class="o">/&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mi">7</span><span class="n">b11d278e306</span><span class="o">&gt;</span>
+<span class="n">Type</span><span class="p">:</span>      <span class="n">function</span>
+
+<span class="n">get_mse</span><span class="err">?</span>
+<span class="n">Signature</span><span class="p">:</span> <span class="n">get_mse</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+<span class="n">Docstring</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">no</span> <span class="n">docstring</span><span class="o">&gt;</span>
+<span class="n">File</span><span class="p">:</span>      <span class="o">/</span><span class="n">tmp</span><span class="o">/</span><span class="n">tmpt3wthzls</span><span class="o">/&lt;</span><span class="n">ipython</span><span class="o">-</span><span class="nb">input</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="mi">7</span><span class="n">b11d278e306</span><span class="o">&gt;</span>
+<span class="n">Type</span><span class="p">:</span>      <span class="n">function</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">n_updates</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">mse_hist</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Iterate over the number of updates
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_updates</span><span class="p">):</span>
+    <span class="c1"># Calculate the slope: slope
+</span>    <span class="n">slope</span> <span class="o">=</span> <span class="n">get_slope</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+
+    <span class="c1"># Update the weights: weights
+</span>    <span class="n">weights</span> <span class="o">=</span> <span class="n">weights</span> <span class="o">-</span> <span class="n">slope</span> <span class="o">*</span> <span class="mf">0.01</span>
+
+    <span class="c1"># Calculate mse with new weights: mse
+</span>    <span class="n">mse</span> <span class="o">=</span> <span class="n">get_mse</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">weights</span><span class="p">)</span>
+
+    <span class="c1"># Append the mse to mse_hist
+</span>    <span class="n">mse_hist</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">mse</span><span class="p">)</span>
+
+<span class="c1"># Plot the mse history
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mse_hist</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Iterations'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Mean Squared Error'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture6-5.png?w=1024" alt="" /></p>
+
+<p>As you can see, the mean squared error decreases as the number of iterations go up.</p>
+
+<h3 id="23-back-propagation"><strong>2.3 Back propagation</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/09/capture7-3.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/09/capture8-2.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/09/capture9-1.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/09/capture10-3.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/09/capture11-2.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>The relationship between forward and backward propagation</strong></p>
+
+<p>If you have gone through 4 iterations of calculating slopes (using backward propagation) and then updated weights.</p>
+
+<p>How many times must you have done forward propagation?</p>
+
+<p>4</p>
+
+<p>Each time you generate predictions using forward propagation, you update the weights using backward propagation.</p>
+
+<p><strong>Thinking about backward propagation</strong></p>
+
+<p>If your predictions were all exactly right, and your errors were all exactly 0, the slope of the loss function with respect to your predictions would also be 0.</p>
+
+<p>In that circumstance, the updates to all weights in the network would also be 0.</p>
+
+<h3 id="24-backpropagation-in-practice"><strong>2.4 Backpropagation in practice</strong></h3>
+
+<ul>
+  <li>
+    <p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture12-2.png?w=1024" alt="" /></p>
+
+    <p>slope = 2  <em>imput</em>  error</p>
+  </li>
+  <li>
+    <p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture13-2.png?w=829" alt="" /></p>
+
+    <p>6 and 18 are slopes just calculated in the above graph</p>
+  </li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/09/capture14-2.png?w=1024" alt="" /></li>
+  <li>
+    <p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture18.png?w=925" alt="" /></p>
+
+    <p>x &lt;= 0: slope = 0</p>
+  </li>
+</ul>
+
+<p>x &gt; 0: slope = 1</p>
+
+<ul>
+  <li>
+    <p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture15-2.png?w=1024" alt="" /></p>
+
+    <p>gradient = input(white)  <em>slope(red)</em>  ReLU_slope(=1 here)</p>
+  </li>
+</ul>
+
+<p>gradient_0 = 0_6_1 = 0</p>
+
+<p>gradient_3 = 1_18_1 = 18</p>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/09/capture16-2.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/09/capture17.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>A round of backpropagation</strong></p>
+
+<p>In the network shown below, we have done forward propagation, and node values calculated as part of forward propagation are shown in white.</p>
+
+<p>The weights are shown in black.</p>
+
+<p>Layers after the question mark show the slopes calculated as part of back-prop, rather than the forward-prop values. Those slope values are shown in purple.</p>
+
+<p>This network again uses the ReLU activation function, so the slope of the activation function is 1 for any node receiving a positive value as input.</p>
+
+<p>Assume the node being examined had a positive value (so the activation function’s slope is 1).</p>
+
+<p><img src="https://s3.amazonaws.com/assets.datacamp.com/production/course_3524/datasets/ch2ex14_1.png" alt="Ch2Ex14_1" /></p>
+
+<p>What is the slope needed to update the weight with the question mark?</p>
+
+<p><img src="https://s3.amazonaws.com/assets.datacamp.com/production/course_3524/datasets/ch2ex14_2.png" alt="Ch2Ex14_2" /></p>
+
+<p>gradient = input(white)  <em>slope(purple)</em>  ReLU_slope(=1 here)</p>
+
+<p>= 2_3_1 = 6</p>
+
+<h2 id="3-building-deep-learning-models-with-keras"><strong>3. Building deep learning models with keras</strong></h2>
+
+<h3 id="31-creating-a-keras-model"><strong>3.1 Creating a keras model</strong></h3>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture19.png?w=760" alt="" /></p>
+
+<p><strong>Understanding your data</strong></p>
+
+<p>You will soon start building models in Keras to predict wages based on various professional and demographic factors.</p>
+
+<p>Before you start building a model, it’s good to understand your data by performing some exploratory analysis.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+   <span class="n">wage_per_hour</span>  <span class="n">union</span>  <span class="n">education_yrs</span>  <span class="n">experience_yrs</span>  <span class="n">age</span>  <span class="n">female</span>  <span class="n">marr</span>  \
+<span class="mi">0</span>           <span class="mf">5.10</span>      <span class="mi">0</span>              <span class="mi">8</span>              <span class="mi">21</span>   <span class="mi">35</span>       <span class="mi">1</span>     <span class="mi">1</span>
+<span class="mi">1</span>           <span class="mf">4.95</span>      <span class="mi">0</span>              <span class="mi">9</span>              <span class="mi">42</span>   <span class="mi">57</span>       <span class="mi">1</span>     <span class="mi">1</span>
+<span class="mi">2</span>           <span class="mf">6.67</span>      <span class="mi">0</span>             <span class="mi">12</span>               <span class="mi">1</span>   <span class="mi">19</span>       <span class="mi">0</span>     <span class="mi">0</span>
+<span class="mi">3</span>           <span class="mf">4.00</span>      <span class="mi">0</span>             <span class="mi">12</span>               <span class="mi">4</span>   <span class="mi">22</span>       <span class="mi">0</span>     <span class="mi">0</span>
+<span class="mi">4</span>           <span class="mf">7.50</span>      <span class="mi">0</span>             <span class="mi">12</span>              <span class="mi">17</span>   <span class="mi">35</span>       <span class="mi">0</span>     <span class="mi">1</span>
+
+   <span class="n">south</span>  <span class="n">manufacturing</span>  <span class="n">construction</span>
+<span class="mi">0</span>      <span class="mi">0</span>              <span class="mi">1</span>             <span class="mi">0</span>
+<span class="mi">1</span>      <span class="mi">0</span>              <span class="mi">1</span>             <span class="mi">0</span>
+<span class="mi">2</span>      <span class="mi">0</span>              <span class="mi">1</span>             <span class="mi">0</span>
+<span class="mi">3</span>      <span class="mi">0</span>              <span class="mi">0</span>             <span class="mi">0</span>
+<span class="mi">4</span>      <span class="mi">0</span>              <span class="mi">0</span>             <span class="mi">0</span>
+</code></pre></div></div>
+
+<p><strong>Specifying a model</strong></p>
+
+<p>Now you’ll get to work with your first model in Keras, and will immediately be able to run more complex neural network models on larger datasets compared to the first two chapters.</p>
+
+<p>To start, you’ll take the skeleton of a neural network and add a hidden layer and an output layer. You’ll then fit that model and see Keras do the optimization so your model continually gets better.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">predictors</span><span class="p">[:</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">array</span><span class="p">([[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span> <span class="mi">21</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span> <span class="mi">42</span><span class="p">,</span> <span class="mi">57</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span>  <span class="mi">1</span><span class="p">,</span>  <span class="mi">0</span><span class="p">]])</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import necessary modules
+</span><span class="kn">import</span> <span class="nn">keras</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+<span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+
+<span class="c1"># Save the number of columns in predictors: n_cols
+</span><span class="n">n_cols</span> <span class="o">=</span> <span class="n">predictors</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Set up the model: model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add the first layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">n_cols</span><span class="p">,)))</span>
+
+<span class="c1"># Add the second layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+
+<span class="c1"># Add the output layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Now that you’ve specified the model, the next step is to compile it.</p>
+
+<h3 id="32-compiling-and-fitting-a-model"><strong>3.2 Compiling and fitting a model</strong></h3>
+
+<p><strong>Compiling the model</strong></p>
+
+<p>You’re now going to compile the model you specified earlier. To compile the model, you need to specify the optimizer and loss function to use.</p>
+
+<p>The Adam optimizer is an excellent choice. You can read more about it as well as other keras optimizers <a href="https://keras.io/optimizers/#adam">here</a> , and if you are really curious to learn more, you can read the <a href="https://arxiv.org/abs/1412.6980v8">original paper</a> that introduced the Adam optimizer.</p>
+
+<p>In this exercise, you’ll use the Adam optimizer and the mean squared error loss function. Go for it!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import necessary modules
+</span><span class="kn">import</span> <span class="nn">keras</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+<span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+
+<span class="c1"># Specify the model
+</span><span class="n">n_cols</span> <span class="o">=</span> <span class="n">predictors</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_cols</span><span class="p">,)))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Compile the model
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'mean_squared_error'</span><span class="p">)</span>
+
+<span class="c1"># Verify that model contains information from compiling
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Loss function: "</span> <span class="o">+</span> <span class="n">model</span><span class="p">.</span><span class="n">loss</span><span class="p">)</span>
+
+<span class="c1"># Loss function: mean_squared_error
+</span></code></pre></div></div>
+
+<p><strong>Fitting the model</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import necessary modules
+</span><span class="kn">import</span> <span class="nn">keras</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+<span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+
+<span class="c1"># Specify the model
+</span><span class="n">n_cols</span> <span class="o">=</span> <span class="n">predictors</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_cols</span><span class="p">,)))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Compile the model
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'mean_squared_error'</span><span class="p">)</span>
+
+<span class="c1"># Fit the model
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">predictors</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Epoch</span> <span class="mi">1</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">1</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">146.0927</span>
+<span class="mi">534</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">78.1405</span>
+<span class="n">Epoch</span> <span class="mi">2</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">85.0537</span>
+<span class="mi">534</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">30.3265</span>
+<span class="n">Epoch</span> <span class="mi">3</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">21.0463</span>
+<span class="mi">534</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">27.0886</span>
+<span class="n">Epoch</span> <span class="mi">4</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">16.8466</span>
+<span class="mi">534</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">25.1240</span>
+<span class="n">Epoch</span> <span class="mi">5</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">23.2123</span>
+<span class="mi">534</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">24.0247</span>
+<span class="n">Epoch</span> <span class="mi">6</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">13.3941</span>
+<span class="mi">534</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">23.2055</span>
+<span class="n">Epoch</span> <span class="mi">7</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">28.1707</span>
+<span class="mi">534</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">22.4556</span>
+<span class="n">Epoch</span> <span class="mi">8</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">11.3898</span>
+<span class="mi">534</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">22.0805</span>
+<span class="n">Epoch</span> <span class="mi">9</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">21.9370</span>
+<span class="mi">480</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">=========================&gt;</span><span class="p">....]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">21.9982</span>
+<span class="mi">534</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">21.7470</span>
+<span class="n">Epoch</span> <span class="mi">10</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">5.4697</span>
+<span class="mi">534</span><span class="o">/</span><span class="mi">534</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">21.5538</span>
+<span class="o">&lt;</span><span class="n">keras</span><span class="p">.</span><span class="n">callbacks</span><span class="p">.</span><span class="n">History</span> <span class="n">at</span> <span class="mh">0x7f0fc2b49390</span><span class="o">&gt;</span>
+</code></pre></div></div>
+
+<p>You now know how to specify, compile, and fit a deep learning model using keras!</p>
+
+<h3 id="33-classification-models"><strong>3.3 Classification models</strong></h3>
+
+<p><strong>Understanding your classification data</strong></p>
+
+<p>Now you will start modeling with a new dataset for a classification problem. This data includes information about passengers on the Titanic.</p>
+
+<p>You will use predictors such as <code class="language-plaintext highlighter-rouge">age</code> , <code class="language-plaintext highlighter-rouge">fare</code> and where each passenger embarked from to predict who will survive. This data is from <a href="https://www.kaggle.com/c/titanic">a tutorial on data science competitions</a> . Look <a href="https://www.kaggle.com/c/titanic/data">here</a> for descriptions of the features.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+   <span class="n">survived</span>  <span class="n">pclass</span>            <span class="p">...</span>              <span class="n">embarked_from_queenstown</span>  <span class="n">embarked_from_southampton</span>
+<span class="mi">0</span>         <span class="mi">0</span>       <span class="mi">3</span>            <span class="p">...</span>                                     <span class="mi">0</span>                          <span class="mi">1</span>
+<span class="mi">1</span>         <span class="mi">1</span>       <span class="mi">1</span>            <span class="p">...</span>                                     <span class="mi">0</span>                          <span class="mi">0</span>
+<span class="mi">2</span>         <span class="mi">1</span>       <span class="mi">3</span>            <span class="p">...</span>                                     <span class="mi">0</span>                          <span class="mi">1</span>
+
+<span class="p">[</span><span class="mi">3</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">11</span> <span class="n">columns</span><span class="p">]</span>
+
+
+<span class="n">df</span><span class="p">.</span><span class="n">columns</span>
+<span class="n">Index</span><span class="p">([</span><span class="s">'survived'</span><span class="p">,</span> <span class="s">'pclass'</span><span class="p">,</span> <span class="s">'age'</span><span class="p">,</span> <span class="s">'sibsp'</span><span class="p">,</span> <span class="s">'parch'</span><span class="p">,</span> <span class="s">'fare'</span><span class="p">,</span> <span class="s">'male'</span><span class="p">,</span>
+       <span class="s">'age_was_missing'</span><span class="p">,</span> <span class="s">'embarked_from_cherbourg'</span><span class="p">,</span>
+       <span class="s">'embarked_from_queenstown'</span><span class="p">,</span> <span class="s">'embarked_from_southampton'</span><span class="p">],</span>
+      <span class="n">dtype</span><span class="o">=</span><span class="s">'object'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>Last steps in classification models</strong></p>
+
+<p>You’ll now create a classification model using the titanic dataset.</p>
+
+<p>Here, you’ll use the <code class="language-plaintext highlighter-rouge">'sgd'</code> optimizer, which stands for <a href="https://en.wikipedia.org/wiki/Stochastic_gradient_descent">Stochastic Gradient Descent</a> . You’ll now create a classification model using the titanic dataset.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import necessary modules
+</span><span class="kn">import</span> <span class="nn">keras</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+<span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+<span class="kn">from</span> <span class="nn">keras.utils</span> <span class="kn">import</span> <span class="n">to_categorical</span>
+
+<span class="c1"># Convert the target to categorical: target
+</span><span class="n">target</span> <span class="o">=</span> <span class="n">to_categorical</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">survived</span><span class="p">)</span>
+
+<span class="c1"># Set up the model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add the first layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">n_cols</span><span class="p">,)))</span>
+
+<span class="c1"># Add the output layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Compile the model
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'sgd'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># Fit the model
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">predictors</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">Epoch</span> <span class="mi">1</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">7.6250</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.2188</span>
+<span class="mi">576</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">==================&gt;</span><span class="p">...........]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">2.6143</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.6024</span>
+<span class="mi">891</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">2.5170</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.5948</span>
+
+<span class="p">...</span>
+
+    <span class="n">Epoch</span> <span class="mi">10</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.4892</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.7500</span>
+<span class="mi">736</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">=======================&gt;</span><span class="p">......]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.6318</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.6807</span>
+<span class="mi">891</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.6444</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.6779</span>
+</code></pre></div></div>
+
+<p>This simple model is generating an accuracy of 68!</p>
+
+<h3 id="34-using-models"><strong>3.4 Using models</strong></h3>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture20-1.png?w=1024" alt="" /></p>
+
+<p><strong>Making predictions</strong></p>
+
+<p>In this exercise, your predictions will be probabilities, which is the most common way for data scientists to communicate their predictions to colleagues.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Specify, compile, and fit the model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_cols</span><span class="p">,)))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'sgd'</span><span class="p">,</span>
+              <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span>
+              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+<span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">predictors</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+
+<span class="c1"># Calculate predictions: predictions
+</span><span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">pred_data</span><span class="p">)</span>
+
+<span class="c1"># Calculate predicted probability of survival: predicted_prob_true
+</span><span class="n">predicted_prob_true</span> <span class="o">=</span> <span class="n">predictions</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># print predicted_prob_true
+</span><span class="k">print</span><span class="p">(</span><span class="n">predicted_prob_true</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">predicted_prob_true</span>
+<span class="n">array</span><span class="p">([</span><span class="mf">0.20054096</span><span class="p">,</span> <span class="mf">0.3806974</span> <span class="p">,</span> <span class="mf">0.6795431</span> <span class="p">,</span> <span class="mf">0.45789802</span><span class="p">,</span> <span class="mf">0.16493829</span><span class="p">,</span>
+<span class="p">...</span>
+       <span class="mf">0.12394663</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>You’re now ready to begin learning how to fine-tune your models.</p>
+
+<h2 id="4-fine-tuning-keras-models"><strong>4. Fine-tuning keras models</strong></h2>
+
+<h3 id="41-understanding-model-optimization"><strong>4.1 Understanding model optimization</strong></h3>
+
+<p><strong>Diagnosing optimization problems</strong></p>
+
+<p>All of the following could prevent a model from showing an improved loss in its first few epochs.</p>
+
+<ul>
+  <li>Learning rate too low.</li>
+  <li>Learning rate too high.</li>
+  <li>Poor choice of activation function.</li>
+</ul>
+
+<p><strong>Changing optimization parameters</strong></p>
+
+<p>It’s time to get your hands dirty with optimization. You’ll now try optimizing a model at a very low learning rate, a very high learning rate, and a “just right” learning rate.</p>
+
+<p>You’ll want to look at the results after running this exercise, remembering that a low value for the loss function is good.</p>
+
+<p>For these exercises, we’ve pre-loaded the predictors and target values from your previous classification models (predicting who would survive on the Titanic).</p>
+
+<p>You’ll want the optimization to start from scratch every time you change the learning rate, to give a fair comparison of how each learning rate did in your results. So we have created a function <code class="language-plaintext highlighter-rouge">get_new_model()</code> that creates an unoptimized model to optimize.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import the SGD optimizer
+</span><span class="kn">from</span> <span class="nn">keras.optimizers</span> <span class="kn">import</span> <span class="n">SGD</span>
+
+<span class="c1"># Create list of learning rates: lr_to_test
+</span><span class="n">lr_to_test</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.000001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Loop over learning rates
+</span><span class="k">for</span> <span class="n">lr</span> <span class="ow">in</span> <span class="n">lr_to_test</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n\n</span><span class="s">Testing model with learning rate: %f</span><span class="se">\n</span><span class="s">'</span><span class="o">%</span><span class="n">lr</span> <span class="p">)</span>
+
+    <span class="c1"># Build new model to test, unaffected by previous models
+</span>    <span class="n">model</span> <span class="o">=</span> <span class="n">get_new_model</span><span class="p">()</span>
+
+    <span class="c1"># Create SGD optimizer with specified learning rate: my_optimizer
+</span>    <span class="n">my_optimizer</span> <span class="o">=</span> <span class="n">SGD</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">)</span>
+
+    <span class="c1"># Compile the model
+</span>    <span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">my_optimizer</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">)</span>
+
+    <span class="c1"># Fit the model
+</span>    <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">predictors</span><span class="p">,</span> <span class="n">target</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">Testing</span> <span class="n">model</span> <span class="k">with</span> <span class="n">learning</span> <span class="n">rate</span><span class="p">:</span> <span class="mf">0.000001</span>
+
+    <span class="n">Epoch</span> <span class="mi">1</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">1</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">3.6053</span>
+<span class="mi">640</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">====================&gt;</span><span class="p">.........]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.9211</span>
+<span class="mi">891</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.6579</span>
+
+<span class="p">...</span>
+
+    <span class="n">Epoch</span> <span class="mi">10</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.5917</span>
+<span class="mi">672</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">=====================&gt;</span><span class="p">........]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.5966</span>
+<span class="mi">891</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.6034</span>
+
+
+    <span class="n">Testing</span> <span class="n">model</span> <span class="k">with</span> <span class="n">learning</span> <span class="n">rate</span><span class="p">:</span> <span class="mf">0.010000</span>
+
+    <span class="n">Epoch</span> <span class="mi">1</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">1</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.0910</span>
+<span class="mi">576</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">==================&gt;</span><span class="p">...........]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.8064</span>
+<span class="mi">891</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.4091</span>
+
+<span class="p">...</span>
+
+    <span class="n">Epoch</span> <span class="mi">10</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.6419</span>
+<span class="mi">672</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">=====================&gt;</span><span class="p">........]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.5787</span>
+<span class="mi">891</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.5823</span>
+
+
+    <span class="n">Testing</span> <span class="n">model</span> <span class="k">with</span> <span class="n">learning</span> <span class="n">rate</span><span class="p">:</span> <span class="mf">1.000000</span>
+
+    <span class="n">Epoch</span> <span class="mi">1</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">1</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.0273</span>
+<span class="mi">608</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">===================&gt;</span><span class="p">..........]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.9649</span>
+<span class="mi">891</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.8966</span>
+
+<span class="p">...</span>
+
+    <span class="n">Epoch</span> <span class="mi">10</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.7226</span>
+<span class="mi">672</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">=====================&gt;</span><span class="p">........]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.6031</span>
+<span class="mi">891</span><span class="o">/</span><span class="mi">891</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.6060</span>
+</code></pre></div></div>
+
+<h3 id="42-model-validation"><strong>4.2 Model validation</strong></h3>
+
+<p><strong>Evaluating model accuracy on validation dataset</strong></p>
+
+<p>Now it’s your turn to monitor model accuracy with a validation data set. A model definition has been provided as <code class="language-plaintext highlighter-rouge">model</code> . Your job is to add the code to compile it and then fit it. You’ll check the validation score in each epoch.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Save the number of columns in predictors: n_cols
+</span><span class="n">n_cols</span> <span class="o">=</span> <span class="n">predictors</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_cols</span><span class="p">,)</span>
+
+<span class="c1"># Specify the model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Compile the model
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># Fit the model
+</span><span class="n">hist</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">predictors</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">Train</span> <span class="n">on</span> <span class="mi">623</span> <span class="n">samples</span><span class="p">,</span> <span class="n">validate</span> <span class="n">on</span> <span class="mi">268</span> <span class="n">samples</span>
+    <span class="n">Epoch</span> <span class="mi">1</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">3.3028</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.4062</span>
+<span class="mi">608</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">============================&gt;</span><span class="p">.]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.3320</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.5938</span>
+<span class="mi">623</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.3096</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.6003</span> <span class="o">-</span> <span class="n">val_loss</span><span class="p">:</span> <span class="mf">0.6805</span> <span class="o">-</span> <span class="n">val_acc</span><span class="p">:</span> <span class="mf">0.7201</span>
+
+<span class="p">...</span>
+
+
+    <span class="n">Epoch</span> <span class="mi">10</span><span class="o">/</span><span class="mi">10</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.4873</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.7812</span>
+<span class="mi">320</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">==============&gt;</span><span class="p">...............]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.5953</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.7063</span>
+<span class="mi">623</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.6169</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.6870</span> <span class="o">-</span> <span class="n">val_loss</span><span class="p">:</span> <span class="mf">0.5339</span> <span class="o">-</span> <span class="n">val_acc</span><span class="p">:</span> <span class="mf">0.7351</span>
+</code></pre></div></div>
+
+<p><strong>Early stopping: Optimizing the optimization</strong></p>
+
+<p>Now that you know how to monitor your model performance throughout optimization, you can use early stopping to stop optimization when it isn’t helping any more. Since the optimization stops automatically when it isn’t helping, you can also set a high value for <code class="language-plaintext highlighter-rouge">epochs</code> in your call to <code class="language-plaintext highlighter-rouge">.fit()</code> .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import EarlyStopping
+</span><span class="kn">from</span> <span class="nn">keras.callbacks</span> <span class="kn">import</span> <span class="n">EarlyStopping</span>
+
+<span class="c1"># Save the number of columns in predictors: n_cols
+</span><span class="n">n_cols</span> <span class="o">=</span> <span class="n">predictors</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_cols</span><span class="p">,)</span>
+
+<span class="c1"># Specify the model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span> <span class="o">=</span> <span class="n">input_shape</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Compile the model
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># Define early_stopping_monitor
+</span><span class="n">early_stopping_monitor</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Fit the model
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">predictors</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">early_stopping_monitor</span><span class="p">])</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">Train</span> <span class="n">on</span> <span class="mi">623</span> <span class="n">samples</span><span class="p">,</span> <span class="n">validate</span> <span class="n">on</span> <span class="mi">268</span> <span class="n">samples</span>
+    <span class="n">Epoch</span> <span class="mi">1</span><span class="o">/</span><span class="mi">30</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">5.6563</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.4688</span>
+<span class="mi">608</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">============================&gt;</span><span class="p">.]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.6536</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.5609</span>
+<span class="mi">623</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.6406</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.5650</span> <span class="o">-</span> <span class="n">val_loss</span><span class="p">:</span> <span class="mf">1.0856</span> <span class="o">-</span> <span class="n">val_acc</span><span class="p">:</span> <span class="mf">0.6567</span>
+
+<span class="p">...</span>
+
+    <span class="n">Epoch</span> <span class="mi">6</span><span class="o">/</span><span class="mi">30</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.4607</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.7812</span>
+<span class="mi">608</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">============================&gt;</span><span class="p">.]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.6208</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.7007</span>
+<span class="mi">623</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.6231</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.6982</span> <span class="o">-</span> <span class="n">val_loss</span><span class="p">:</span> <span class="mf">0.6149</span> <span class="o">-</span> <span class="n">val_acc</span><span class="p">:</span> <span class="mf">0.6828</span>
+    <span class="n">Epoch</span> <span class="mi">7</span><span class="o">/</span><span class="mi">30</span>
+
+ <span class="mi">32</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">&gt;</span><span class="p">.............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.6697</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.6875</span>
+<span class="mi">608</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">============================&gt;</span><span class="p">.]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.6483</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.7072</span>
+<span class="mi">623</span><span class="o">/</span><span class="mi">623</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.6488</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.7063</span> <span class="o">-</span> <span class="n">val_loss</span><span class="p">:</span> <span class="mf">0.7276</span> <span class="o">-</span> <span class="n">val_acc</span><span class="p">:</span> <span class="mf">0.6493</span>
+</code></pre></div></div>
+
+<p>Because optimization will automatically stop when it is no longer helpful, it is okay to specify the maximum number of epochs as 30 rather than using the default of 10 that you’ve used so far. Here, it seems like the optimization stopped after 7 epochs.</p>
+
+<p><strong>Experimenting with wider networks</strong></p>
+
+<p>Now you know everything you need to begin experimenting with different models!</p>
+
+<p>A model called <code class="language-plaintext highlighter-rouge">model_1</code> has been pre-loaded. You can see a summary of this model printed in the IPython Shell. This is a relatively small network, with only 10 units in each hidden layer.</p>
+
+<p>In this exercise you’ll create a new model called <code class="language-plaintext highlighter-rouge">model_2</code> which is similar to <code class="language-plaintext highlighter-rouge">model_1</code> , except it has 100 units in each hidden layer.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Define early_stopping_monitor
+</span><span class="n">early_stopping_monitor</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">patience</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Create the new model: model_2
+</span><span class="n">model_2</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add the first and second layers
+</span><span class="n">model_2</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">))</span>
+<span class="n">model_2</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+
+<span class="c1"># Add the output layer
+</span><span class="n">model_2</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Compile model_2
+</span><span class="n">model_2</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># Fit model_1
+</span><span class="n">model_1_training</span> <span class="o">=</span> <span class="n">model_1</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">predictors</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">early_stopping_monitor</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># Fit model_2
+</span><span class="n">model_2_training</span> <span class="o">=</span> <span class="n">model_2</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">predictors</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">early_stopping_monitor</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># Create the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_1_training</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_loss'</span><span class="p">],</span> <span class="s">'r'</span><span class="p">,</span> <span class="n">model_2_training</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_loss'</span><span class="p">],</span> <span class="s">'b'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Epochs'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Validation score'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model_1</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="n">_________________________________________________________________</span>
+<span class="n">Layer</span> <span class="p">(</span><span class="nb">type</span><span class="p">)</span>                 <span class="n">Output</span> <span class="n">Shape</span>              <span class="n">Param</span> <span class="c1">#
+</span><span class="o">=================================================================</span>
+<span class="n">dense_1</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>              <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>                <span class="mi">110</span>
+<span class="n">_________________________________________________________________</span>
+<span class="n">dense_2</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>              <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>                <span class="mi">110</span>
+<span class="n">_________________________________________________________________</span>
+<span class="n">dense_3</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>              <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>                 <span class="mi">22</span>
+<span class="o">=================================================================</span>
+<span class="n">Total</span> <span class="n">params</span><span class="p">:</span> <span class="mf">242.0</span>
+<span class="n">Trainable</span> <span class="n">params</span><span class="p">:</span> <span class="mi">242</span>
+<span class="n">Non</span><span class="o">-</span><span class="n">trainable</span> <span class="n">params</span><span class="p">:</span> <span class="mf">0.0</span>
+<span class="n">_________________________________________________________________</span>
+
+<span class="n">model_2</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="n">_________________________________________________________________</span>
+<span class="n">Layer</span> <span class="p">(</span><span class="nb">type</span><span class="p">)</span>                 <span class="n">Output</span> <span class="n">Shape</span>              <span class="n">Param</span> <span class="c1">#
+</span><span class="o">=================================================================</span>
+<span class="n">dense_4</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>              <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>               <span class="mi">1100</span>
+<span class="n">_________________________________________________________________</span>
+<span class="n">dense_5</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>              <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>               <span class="mi">10100</span>
+<span class="n">_________________________________________________________________</span>
+<span class="n">dense_6</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>              <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>                 <span class="mi">202</span>
+<span class="o">=================================================================</span>
+<span class="n">Total</span> <span class="n">params</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span><span class="mf">402.0</span>
+<span class="n">Trainable</span> <span class="n">params</span><span class="p">:</span> <span class="mi">11</span><span class="p">,</span><span class="mi">402</span>
+<span class="n">Non</span><span class="o">-</span><span class="n">trainable</span> <span class="n">params</span><span class="p">:</span> <span class="mf">0.0</span>
+<span class="n">_________________________________________________________________</span>
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture-5.png?w=1024" alt="" /></p>
+
+<p>The blue model is the one you made, the red is the original model. Your model had a lower loss value, so it is the better model.</p>
+
+<p><strong>Adding layers to a network</strong></p>
+
+<p>You’ve seen how to experiment with wider networks. In this exercise, you’ll try a deeper network (more hidden layers).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># The input shape to use in the first hidden layer
+</span><span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_cols</span><span class="p">,)</span>
+
+<span class="c1"># Create the new model: model_2
+</span><span class="n">model_2</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add the first, second, and third hidden layers
+</span><span class="n">model_2</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="n">input_shape</span><span class="p">))</span>
+<span class="n">model_2</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+<span class="n">model_2</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+
+<span class="c1"># Add the output layer
+</span><span class="n">model_2</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Compile model_2
+</span><span class="n">model_2</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># Fit model 1
+</span><span class="n">model_1_training</span> <span class="o">=</span> <span class="n">model_1</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">predictors</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">early_stopping_monitor</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># Fit model 2
+</span><span class="n">model_2_training</span> <span class="o">=</span> <span class="n">model_2</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">predictors</span><span class="p">,</span> <span class="n">target</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">early_stopping_monitor</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># Create the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">model_1_training</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_loss'</span><span class="p">],</span> <span class="s">'r'</span><span class="p">,</span> <span class="n">model_2_training</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_loss'</span><span class="p">],</span> <span class="s">'b'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Epochs'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Validation score'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model_1</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="n">_________________________________________________________________</span>
+<span class="n">Layer</span> <span class="p">(</span><span class="nb">type</span><span class="p">)</span>                 <span class="n">Output</span> <span class="n">Shape</span>              <span class="n">Param</span> <span class="c1">#
+</span><span class="o">=================================================================</span>
+<span class="n">dense_1</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>              <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>                <span class="mi">550</span>
+<span class="n">_________________________________________________________________</span>
+<span class="n">dense_2</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>              <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>                 <span class="mi">102</span>
+<span class="o">=================================================================</span>
+<span class="n">Total</span> <span class="n">params</span><span class="p">:</span> <span class="mf">652.0</span>
+<span class="n">Trainable</span> <span class="n">params</span><span class="p">:</span> <span class="mi">652</span>
+<span class="n">Non</span><span class="o">-</span><span class="n">trainable</span> <span class="n">params</span><span class="p">:</span> <span class="mf">0.0</span>
+<span class="n">_________________________________________________________________</span>
+
+<span class="n">model_2</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="n">_________________________________________________________________</span>
+<span class="n">Layer</span> <span class="p">(</span><span class="nb">type</span><span class="p">)</span>                 <span class="n">Output</span> <span class="n">Shape</span>              <span class="n">Param</span> <span class="c1">#
+</span><span class="o">=================================================================</span>
+<span class="n">dense_3</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>              <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>                <span class="mi">550</span>
+<span class="n">_________________________________________________________________</span>
+<span class="n">dense_4</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>              <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>                <span class="mi">2550</span>
+<span class="n">_________________________________________________________________</span>
+<span class="n">dense_5</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>              <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>                <span class="mi">2550</span>
+<span class="n">_________________________________________________________________</span>
+<span class="n">dense_6</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>              <span class="p">(</span><span class="bp">None</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>                 <span class="mi">102</span>
+<span class="o">=================================================================</span>
+<span class="n">Total</span> <span class="n">params</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span><span class="mf">752.0</span>
+<span class="n">Trainable</span> <span class="n">params</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span><span class="mi">752</span>
+<span class="n">Non</span><span class="o">-</span><span class="n">trainable</span> <span class="n">params</span><span class="p">:</span> <span class="mf">0.0</span>
+<span class="n">_________________________________________________________________</span>
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture1-4.png?w=1024" alt="" /></p>
+
+<h3 id="43-thinking-about-model-capacity"><strong>4.3 Thinking about model capacity</strong></h3>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture2-5.png?w=982" alt="" /></p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture3-6.png?w=1024" alt="" /></p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture4-6.png?w=987" alt="" /></p>
+
+<p><strong>Experimenting with model structures</strong></p>
+
+<p>You’ve just run an experiment where you compared two networks that were identical except that the 2nd network had an extra hidden layer.</p>
+
+<p>You see that this 2nd network (the deeper network) had better performance. Given that, How to get an even better performance?</p>
+
+<p>Increasing the number of units in each hidden layer would be a good next step to try achieving even better performance.</p>
+
+<h3 id="44-stepping-up-to-images"><strong>4.4 Stepping up to images</strong></h3>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/09/capture5-6.png?w=1024" alt="" /></p>
+
+<p><strong>Building your own digit recognition model</strong></p>
+
+<p>You’ve reached the final exercise of the course – you now know everything you need to build an accurate model to recognize handwritten digits!</p>
+
+<p>To add an extra challenge, we’ve loaded only 2500 images, rather than 60000 which you will see in some published results. Deep learning models perform better with more data, however, they also take longer to train, especially when they start becoming more complex.</p>
+
+<p>If you have a computer with a CUDA compatible GPU, you can take advantage of it to improve computation time. If you don’t have a GPU, no problem! You can set up a deep learning environment in the cloud that can run your models on a GPU. Here is a <a href="https://www.datacamp.com/community/tutorials/deep-learning-jupyter-aws">blog post</a> by Dan that explains how to do this – check it out after completing this exercise! It is a great next step as you continue your deep learning journey.</p>
+
+<p>Ready to take your deep learning to the next level? Check out <a href="https://www.datacamp.com/courses/advanced-deep-learning-with-keras-in-python">Advanced Deep Learning with Keras in Python</a> to see how the Keras functional API lets you build domain knowledge to solve new types of problems. Once you know how to use the functional API, take a look at <a href="https://www.datacamp.com/courses/convolutional-neural-networks-for-image-processing">“Convolutional Neural Networks for Image Processing”</a> to learn image-specific applications of Keras.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># feature of 28 * 28 = 784 image of a handwriting digit image.
+# each value is a number between 0 ~ 255,  stands for the darkness of that pixel
+</span><span class="n">X</span>
+<span class="n">array</span><span class="p">([[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">...,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">...,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">...,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">...,</span>
+       <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">...,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">...,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">...,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">)</span>
+
+<span class="n">X</span><span class="p">.</span><span class="n">shape</span>
+<span class="p">(</span><span class="mi">2500</span><span class="p">,</span> <span class="mi">784</span><span class="p">)</span>
+
+<span class="c1"># target: 0 ~ 9
+</span><span class="n">y</span>
+<span class="n">array</span><span class="p">([[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">...,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">...,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">...,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">...,</span>
+       <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">...,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">...,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="p">...,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">]])</span>
+
+<span class="n">y</span><span class="p">.</span><span class="n">shape</span>
+<span class="p">(</span><span class="mi">2500</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create the model: model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add the first hidden layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],)))</span>
+
+<span class="c1"># Add the second hidden layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+
+<span class="c1"># Add the output layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">y</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Compile the model
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># Fit the model
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">Train</span> <span class="n">on</span> <span class="mi">1750</span> <span class="n">samples</span><span class="p">,</span> <span class="n">validate</span> <span class="n">on</span> <span class="mi">750</span> <span class="n">samples</span>
+    <span class="n">Epoch</span> <span class="mi">1</span><span class="o">/</span><span class="mi">10</span>
+
+  <span class="mi">32</span><span class="o">/</span><span class="mi">1750</span> <span class="p">[..............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">3</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">2.1979</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.2188</span>
+ <span class="mi">480</span><span class="o">/</span><span class="mi">1750</span> <span class="p">[</span><span class="o">=======&gt;</span><span class="p">......................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">2.1655</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.2333</span>
+ <span class="mi">960</span><span class="o">/</span><span class="mi">1750</span> <span class="p">[</span><span class="o">===============&gt;</span><span class="p">..............]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.9699</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.3354</span>
+<span class="mi">1440</span><span class="o">/</span><span class="mi">1750</span> <span class="p">[</span><span class="o">=======================&gt;</span><span class="p">......]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.7895</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.4153</span>
+<span class="mi">1750</span><span class="o">/</span><span class="mi">1750</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.6672</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.4737</span> <span class="o">-</span> <span class="n">val_loss</span><span class="p">:</span> <span class="mf">1.0023</span> <span class="o">-</span> <span class="n">val_acc</span><span class="p">:</span> <span class="mf">0.7707</span>
+
+<span class="p">...</span>
+
+    <span class="n">Epoch</span> <span class="mi">10</span><span class="o">/</span><span class="mi">10</span>
+
+  <span class="mi">32</span><span class="o">/</span><span class="mi">1750</span> <span class="p">[..............................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.1482</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">1.0000</span>
+ <span class="mi">480</span><span class="o">/</span><span class="mi">1750</span> <span class="p">[</span><span class="o">=======&gt;</span><span class="p">......................]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.1109</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.9792</span>
+ <span class="mi">960</span><span class="o">/</span><span class="mi">1750</span> <span class="p">[</span><span class="o">===============&gt;</span><span class="p">..............]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.1046</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.9812</span>
+<span class="mi">1440</span><span class="o">/</span><span class="mi">1750</span> <span class="p">[</span><span class="o">=======================&gt;</span><span class="p">......]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.1028</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.9812</span>
+<span class="mi">1696</span><span class="o">/</span><span class="mi">1750</span> <span class="p">[</span><span class="o">============================&gt;</span><span class="p">.]</span> <span class="o">-</span> <span class="n">ETA</span><span class="p">:</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.1014</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.9817</span>
+<span class="mi">1750</span><span class="o">/</span><span class="mi">1750</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.0999</span> <span class="o">-</span> <span class="n">acc</span><span class="p">:</span> <span class="mf">0.9823</span> <span class="o">-</span> <span class="n">val_loss</span><span class="p">:</span> <span class="mf">0.3186</span> <span class="o">-</span> <span class="n">val_acc</span><span class="p">:</span> <span class="mf">0.9053</span>
+</code></pre></div></div>
+
+<p>You’ve done something pretty amazing. You should see better than 90% accuracy recognizing handwritten digits, even while using a small training set of only 1750 images!</p>
+
+<p>The End.</p>
+
+<p>Thank you for reading.</p>
+

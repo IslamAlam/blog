@@ -1,0 +1,1242 @@
+<h1 id="feature-engineering-for-machine-learning-in-python">Feature Engineering for Machine Learning in Python</h1>
+
+<p>This is the memo of the 10th course (23 courses in all) of ‘Machine Learning Scientist with Python’ skill track.<br />
+<strong>You can find the original course</strong> <a href="https://www.datacamp.com/courses/feature-engineering-for-machine-learning-in-python"><strong>HERE</strong></a>.</p>
+
+<h4 id="course-description"><strong>Course Description</strong></h4>
+
+<p>Every day you read about the amazing breakthroughs in how the newest applications of machine learning are changing the world. Often this reporting glosses over the fact that a huge amount of data munging and feature engineering must be done before any of these fancy models can be used. In this course, you will learn how to do just that. You will work with Stack Overflow Developers survey, and historic US presidential inauguration addresses, to understand how best to preprocess and engineer features from categorical, continuous, and unstructured data. This course will give you hands-on experience on how to prepare any data for your own machine learning models.</p>
+
+<h4 id="table-of-contents"><strong>Table of contents</strong></h4>
+
+<ol>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/03/feature-engineering-for-machine-learning-in-python-from-datacamp/">Creating Features</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/03/feature-engineering-for-machine-learning-in-python-from-datacamp/2/">Dealing with Messy Data</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/03/feature-engineering-for-machine-learning-in-python-from-datacamp/3/">Conforming to Statistical Assumptions</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/03/feature-engineering-for-machine-learning-in-python-from-datacamp/4/">Dealing with Text Data</a></li>
+</ol>
+
+<h3 id="1-creating-features"><strong>1. Creating Features</strong></h3>
+
+<h4 id="11-why-generate-features"><strong>1.1 Why generate features?</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/1-19.png?w=971" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/2-20.png?w=671" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/3-20.png?w=922" alt="" /></li>
+</ul>
+
+<p><strong>1.1.1 Getting to know your data</strong></p>
+
+<p>Pandas is one the most popular packages used to work with tabular data in Python. It is generally imported using the alias <code class="language-plaintext highlighter-rouge">pd</code> and can be used to load a CSV (or other delimited files) using <code class="language-plaintext highlighter-rouge">read_csv()</code>.</p>
+
+<p>You will be working with a modified subset of the <a href="https://insights.stackoverflow.com/survey/2018/#overview">Stackoverflow survey response data</a> in the first three chapters of this course. This data set records the details, and preferences of thousands of users of the StackOverflow website.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import pandas
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># Import so_survey_csv into so_survey_df
+</span><span class="n">so_survey_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">so_survey_csv</span><span class="p">)</span>
+
+<span class="c1"># Print the first five rows of the DataFrame
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Print the data type of each column
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">.</span><span class="n">dtypes</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>      <span class="n">SurveyDate</span>                                    <span class="n">FormalEducation</span>  <span class="n">ConvertedSalary</span> <span class="n">Hobby</span>       <span class="n">Country</span>  <span class="p">...</span>     <span class="n">VersionControl</span> <span class="n">Age</span>  <span class="n">Years</span> <span class="n">Experience</span>  <span class="n">Gender</span>   <span class="n">RawSalary</span>
+<span class="mi">0</span>  <span class="mi">2</span><span class="o">/</span><span class="mi">28</span><span class="o">/</span><span class="mi">18</span> <span class="mi">20</span><span class="p">:</span><span class="mi">20</span>           <span class="n">Bachelor</span><span class="s">'s degree (BA. BS. B.Eng.. etc.)              NaN   Yes  South Africa  ...                Git  21                13    Male         NaN
+1  6/28/18 13:26           Bachelor'</span><span class="n">s</span> <span class="n">degree</span> <span class="p">(</span><span class="n">BA</span><span class="p">.</span> <span class="n">BS</span><span class="p">.</span> <span class="n">B</span><span class="p">.</span><span class="n">Eng</span><span class="p">..</span> <span class="n">etc</span><span class="p">.)</span>          <span class="mf">70841.0</span>   <span class="n">Yes</span>       <span class="n">Sweeden</span>  <span class="p">...</span>     <span class="n">Git</span><span class="p">;</span><span class="n">Subversion</span>  <span class="mi">38</span>                 <span class="mi">9</span>    <span class="n">Male</span>   <span class="mi">70</span><span class="p">,</span><span class="mf">841.00</span>
+<span class="mi">2</span>    <span class="mi">6</span><span class="o">/</span><span class="mi">6</span><span class="o">/</span><span class="mi">18</span> <span class="mi">3</span><span class="p">:</span><span class="mi">37</span>           <span class="n">Bachelor</span><span class="s">'s degree (BA. BS. B.Eng.. etc.)              NaN    No       Sweeden  ...                Git  45                11     NaN         NaN
+3    5/9/18 1:06  Some college/university study without earning ...          21426.0   Yes       Sweeden  ...  Zip file back-ups  46                12    Male   21,426.00
+4  4/12/18 22:41           Bachelor'</span><span class="n">s</span> <span class="n">degree</span> <span class="p">(</span><span class="n">BA</span><span class="p">.</span> <span class="n">BS</span><span class="p">.</span> <span class="n">B</span><span class="p">.</span><span class="n">Eng</span><span class="p">..</span> <span class="n">etc</span><span class="p">.)</span>          <span class="mf">41671.0</span>   <span class="n">Yes</span>            <span class="n">UK</span>  <span class="p">...</span>                <span class="n">Git</span>  <span class="mi">39</span>                 <span class="mi">7</span>    <span class="n">Male</span>  <span class="err">£</span><span class="mi">41</span><span class="p">,</span><span class="mf">671.00</span>
+
+<span class="p">[</span><span class="mi">5</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">11</span> <span class="n">columns</span><span class="p">]</span>
+<span class="n">SurveyDate</span>                     <span class="nb">object</span>
+<span class="n">FormalEducation</span>                <span class="nb">object</span>
+<span class="n">ConvertedSalary</span>               <span class="n">float64</span>
+<span class="n">Hobby</span>                          <span class="nb">object</span>
+<span class="n">Country</span>                        <span class="nb">object</span>
+<span class="n">StackOverflowJobsRecommend</span>    <span class="n">float64</span>
+<span class="n">VersionControl</span>                 <span class="nb">object</span>
+<span class="n">Age</span>                             <span class="n">int64</span>
+<span class="n">Years</span> <span class="n">Experience</span>                <span class="n">int64</span>
+<span class="n">Gender</span>                         <span class="nb">object</span>
+<span class="n">RawSalary</span>                      <span class="nb">object</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="nb">object</span>
+</code></pre></div></div>
+
+<p><strong>1.1.2 Selecting specific data types</strong></p>
+
+<p>Often a data set will contain columns with several different data types (like the one you are working with). The majority of machine learning models require you to have a consistent data type across features. Similarly, most feature engineering techniques are applicable to only one type of data at a time. For these reasons among others, you will often want to be able to access just the columns of certain types when working with a DataFrame.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create subset of only the numeric columns
+</span><span class="n">so_numeric_df</span> <span class="o">=</span> <span class="n">so_survey_df</span><span class="p">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="n">include</span><span class="o">=</span><span class="p">[</span><span class="s">'int'</span><span class="p">,</span> <span class="s">'float'</span><span class="p">])</span>
+
+<span class="c1"># Print the column names contained in so_survey_df_num
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_numeric_df</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="c1"># Index(['ConvertedSalary', 'StackOverflowJobsRecommend', 'Age', 'Years Experience'], dtype='object')
+</span></code></pre></div></div>
+
+<h4 id="12-dealing-with-categorical-features"><strong>1.2 Dealing with categorical features</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/4-20.png?w=987" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/5-20.png?w=770" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/6-20.png?w=766" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/7-20.png?w=959" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/8-19.png?w=725" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/9-19.png?w=682" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/10-19.png?w=902" alt="" /></li>
+</ul>
+
+<p><strong>1.2.1 One-hot encoding and dummy variables</strong></p>
+
+<p>To use categorical variables in a machine learning model, you first need to represent them in a quantitative way. The two most common approaches are to one-hot encode the variables using or to use dummy variables. In this exercise, you will create both types of encoding, and compare the created column sets. We will continue using the same DataFrame from previous lesson loaded as <code class="language-plaintext highlighter-rouge">so_survey_df</code> and focusing on its <code class="language-plaintext highlighter-rouge">Country</code> column.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Convert the Country column to a one hot encoded Data Frame
+</span><span class="n">one_hot_encoded</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'Country'</span><span class="p">],</span> <span class="n">prefix</span><span class="o">=</span><span class="s">'OH'</span><span class="p">)</span>
+
+<span class="c1"># Print the columns names
+</span><span class="k">print</span><span class="p">(</span><span class="n">one_hot_encoded</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Index</span><span class="p">([</span><span class="s">'SurveyDate'</span><span class="p">,</span> <span class="s">'FormalEducation'</span><span class="p">,</span> <span class="s">'ConvertedSalary'</span><span class="p">,</span> <span class="s">'Hobby'</span><span class="p">,</span> <span class="s">'StackOverflowJobsRecommend'</span><span class="p">,</span> <span class="s">'VersionControl'</span><span class="p">,</span> <span class="s">'Age'</span><span class="p">,</span> <span class="s">'Years Experience'</span><span class="p">,</span> <span class="s">'Gender'</span><span class="p">,</span> <span class="s">'RawSalary'</span><span class="p">,</span> <span class="s">'OH_France'</span><span class="p">,</span> <span class="s">'OH_India'</span><span class="p">,</span>
+       <span class="s">'OH_Ireland'</span><span class="p">,</span> <span class="s">'OH_Russia'</span><span class="p">,</span> <span class="s">'OH_South Africa'</span><span class="p">,</span> <span class="s">'OH_Spain'</span><span class="p">,</span> <span class="s">'OH_Sweeden'</span><span class="p">,</span> <span class="s">'OH_UK'</span><span class="p">,</span> <span class="s">'OH_USA'</span><span class="p">,</span> <span class="s">'OH_Ukraine'</span><span class="p">],</span>
+      <span class="n">dtype</span><span class="o">=</span><span class="s">'object'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create dummy variables for the Country column
+</span><span class="n">dummy</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'Country'</span><span class="p">],</span> <span class="n">drop_first</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s">'DM'</span><span class="p">)</span>
+
+<span class="c1"># Print the columns names
+</span><span class="k">print</span><span class="p">(</span><span class="n">dummy</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Index</span><span class="p">([</span><span class="s">'SurveyDate'</span><span class="p">,</span> <span class="s">'FormalEducation'</span><span class="p">,</span> <span class="s">'ConvertedSalary'</span><span class="p">,</span> <span class="s">'Hobby'</span><span class="p">,</span> <span class="s">'StackOverflowJobsRecommend'</span><span class="p">,</span> <span class="s">'VersionControl'</span><span class="p">,</span> <span class="s">'Age'</span><span class="p">,</span> <span class="s">'Years Experience'</span><span class="p">,</span> <span class="s">'Gender'</span><span class="p">,</span> <span class="s">'RawSalary'</span><span class="p">,</span> <span class="s">'DM_India'</span><span class="p">,</span> <span class="s">'DM_Ireland'</span><span class="p">,</span>
+       <span class="s">'DM_Russia'</span><span class="p">,</span> <span class="s">'DM_South Africa'</span><span class="p">,</span> <span class="s">'DM_Spain'</span><span class="p">,</span> <span class="s">'DM_Sweeden'</span><span class="p">,</span> <span class="s">'DM_UK'</span><span class="p">,</span> <span class="s">'DM_USA'</span><span class="p">,</span> <span class="s">'DM_Ukraine'</span><span class="p">],</span>
+      <span class="n">dtype</span><span class="o">=</span><span class="s">'object'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Did you notice that the column for France was missing when you created dummy variables? Now you can choose to use one-hot encoding or dummy variables where appropriate.</p>
+
+<p><strong>1.2.2 Dealing with uncommon categories</strong></p>
+
+<p>Some features can have many different categories but a very uneven distribution of their occurrences. Take for example Data Science’s favorite languages to code in, some common choices are Python, R, and Julia, but there can be individuals with bespoke choices, like FORTRAN, C etc. In these cases, you may not want to create a feature for each value, but only the more common occurrences.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">countries</span><span class="p">.</span><span class="n">value_counts</span><span class="p">()</span>
+<span class="n">South</span> <span class="n">Africa</span>    <span class="mi">166</span>
+<span class="n">USA</span>             <span class="mi">164</span>
+<span class="n">Spain</span>           <span class="mi">134</span>
+<span class="n">Sweeden</span>         <span class="mi">119</span>
+<span class="n">France</span>          <span class="mi">115</span>
+<span class="n">Russia</span>           <span class="mi">97</span>
+<span class="n">India</span>            <span class="mi">95</span>
+<span class="n">UK</span>               <span class="mi">95</span>
+<span class="n">Ukraine</span>           <span class="mi">9</span>
+<span class="n">Ireland</span>           <span class="mi">5</span>
+<span class="n">Name</span><span class="p">:</span> <span class="n">Country</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a series out of the Country column
+</span><span class="n">countries</span> <span class="o">=</span> <span class="n">so_survey_df</span><span class="p">[</span><span class="s">'Country'</span><span class="p">]</span>
+
+<span class="c1"># Get the counts of each category
+</span><span class="n">country_counts</span> <span class="o">=</span> <span class="n">countries</span><span class="p">.</span><span class="n">value_counts</span><span class="p">()</span>
+
+<span class="c1"># Create a mask for only categories that occur less than 10 times
+</span><span class="n">mask</span> <span class="o">=</span> <span class="n">countries</span><span class="p">.</span><span class="n">isin</span><span class="p">(</span><span class="n">country_counts</span><span class="p">[</span><span class="n">country_counts</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">].</span><span class="n">index</span><span class="p">)</span>
+
+<span class="c1"># Label all other categories as Other
+</span><span class="n">countries</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span> <span class="o">=</span> <span class="s">'Other'</span>
+
+<span class="c1"># Print the updated category counts
+</span><span class="k">print</span><span class="p">(</span><span class="n">countries</span><span class="p">.</span><span class="n">value_counts</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">South</span> <span class="n">Africa</span>    <span class="mi">166</span>
+<span class="n">USA</span>             <span class="mi">164</span>
+<span class="n">Spain</span>           <span class="mi">134</span>
+<span class="n">Sweeden</span>         <span class="mi">119</span>
+<span class="n">France</span>          <span class="mi">115</span>
+<span class="n">Russia</span>           <span class="mi">97</span>
+<span class="n">India</span>            <span class="mi">95</span>
+<span class="n">UK</span>               <span class="mi">95</span>
+<span class="n">Other</span>            <span class="mi">14</span>
+<span class="n">Name</span><span class="p">:</span> <span class="n">Country</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</code></pre></div></div>
+
+<p>Good work, now you can work with large data sets while grouping low frequency categories.</p>
+
+<h4 id="13-numeric-variables"><strong>1.3 Numeric variables</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/11-18.png?w=784" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/12-19.png?w=844" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/13-17.png?w=875" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/14-15.png?w=778" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/15-14.png?w=876" alt="" /></li>
+</ul>
+
+<p><strong>1.3.1 Binarizing columns</strong></p>
+
+<p>While numeric values can often be used without any feature engineering, there will be cases when some form of manipulation can be useful. For example on some occasions, you might not care about the magnitude of a value but only care about its direction, or if it exists at all. In these situations, you will want to binarize a column. In the <code class="language-plaintext highlighter-rouge">so_survey_df</code> data, you have a large number of survey respondents that are working voluntarily (without pay). You will create a new column titled <code class="language-plaintext highlighter-rouge">Paid_Job</code> indicating whether each person is paid (their salary is greater than zero).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create the Paid_Job column filled with zeros
+</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'Paid_Job'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1"># Replace all the Paid_Job values where ConvertedSalary is &gt; 0
+</span><span class="n">so_survey_df</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">]</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">,</span> <span class="s">'Paid_Job'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># Print the first five rows of the columns
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[[</span><span class="s">'Paid_Job'</span><span class="p">,</span> <span class="s">'ConvertedSalary'</span><span class="p">]].</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   <span class="n">Paid_Job</span>  <span class="n">ConvertedSalary</span>
+<span class="mi">0</span>         <span class="mi">0</span>              <span class="mf">0.0</span>
+<span class="mi">1</span>         <span class="mi">1</span>          <span class="mf">70841.0</span>
+<span class="mi">2</span>         <span class="mi">0</span>              <span class="mf">0.0</span>
+<span class="mi">3</span>         <span class="mi">1</span>          <span class="mf">21426.0</span>
+<span class="mi">4</span>         <span class="mi">1</span>          <span class="mf">41671.0</span>
+</code></pre></div></div>
+
+<p>Good work, binarizing columns can also be useful for your target variables.</p>
+
+<p><strong>1.3.2 Binning values</strong></p>
+
+<p>For many continuous values you will care less about the exact value of a numeric column, but instead care about the bucket it falls into. This can be useful when plotting values, or simplifying your machine learning models. It is mostly used on continuous variables where accuracy is not the biggest concern e.g. age, height, wages.</p>
+
+<p>Bins are created using <code class="language-plaintext highlighter-rouge">pd.cut(df['column_name'], bins)</code> where <code class="language-plaintext highlighter-rouge">bins</code> can be an integer specifying the number of evenly spaced bins, or a list of bin boundaries.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Bin the continuous variable ConvertedSalary into 5 bins
+</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'equal_binned'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">cut</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">],</span> <span class="n">bins</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># Print the first 5 rows of the equal_binned column
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[[</span><span class="s">'equal_binned'</span><span class="p">,</span> <span class="s">'ConvertedSalary'</span><span class="p">]].</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>          <span class="n">equal_binned</span>  <span class="n">ConvertedSalary</span>
+<span class="mi">0</span>  <span class="p">(</span><span class="o">-</span><span class="mf">2000.0</span><span class="p">,</span> <span class="mf">400000.0</span><span class="p">]</span>              <span class="mf">0.0</span>
+<span class="mi">1</span>  <span class="p">(</span><span class="o">-</span><span class="mf">2000.0</span><span class="p">,</span> <span class="mf">400000.0</span><span class="p">]</span>          <span class="mf">70841.0</span>
+<span class="mi">2</span>  <span class="p">(</span><span class="o">-</span><span class="mf">2000.0</span><span class="p">,</span> <span class="mf">400000.0</span><span class="p">]</span>              <span class="mf">0.0</span>
+<span class="mi">3</span>  <span class="p">(</span><span class="o">-</span><span class="mf">2000.0</span><span class="p">,</span> <span class="mf">400000.0</span><span class="p">]</span>          <span class="mf">21426.0</span>
+<span class="mi">4</span>  <span class="p">(</span><span class="o">-</span><span class="mf">2000.0</span><span class="p">,</span> <span class="mf">400000.0</span><span class="p">]</span>          <span class="mf">41671.0</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import numpy
+</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="c1"># Specify the boundaries of the bins
+</span><span class="n">bins</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">np</span><span class="p">.</span><span class="n">inf</span><span class="p">,</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">50000</span><span class="p">,</span> <span class="mi">100000</span><span class="p">,</span> <span class="mi">150000</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">inf</span><span class="p">]</span>
+
+<span class="c1"># Bin labels
+</span><span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Very low'</span><span class="p">,</span> <span class="s">'Low'</span><span class="p">,</span> <span class="s">'Medium'</span><span class="p">,</span> <span class="s">'High'</span><span class="p">,</span> <span class="s">'Very high'</span><span class="p">]</span>
+
+<span class="c1"># Bin the continuous variable ConvertedSalary using these boundaries
+</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'boundary_binned'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">cut</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">],</span>
+                                         <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+
+<span class="c1"># Print the first 5 rows of the boundary_binned column
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[[</span><span class="s">'boundary_binned'</span><span class="p">,</span> <span class="s">'ConvertedSalary'</span><span class="p">]].</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="n">boundary_binned</span>  <span class="n">ConvertedSalary</span>
+<span class="mi">0</span>        <span class="n">Very</span> <span class="n">low</span>              <span class="mf">0.0</span>
+<span class="mi">1</span>          <span class="n">Medium</span>          <span class="mf">70841.0</span>
+<span class="mi">2</span>        <span class="n">Very</span> <span class="n">low</span>              <span class="mf">0.0</span>
+<span class="mi">3</span>             <span class="n">Low</span>          <span class="mf">21426.0</span>
+<span class="mi">4</span>             <span class="n">Low</span>          <span class="mf">41671.0</span>
+</code></pre></div></div>
+
+<p>Now you can bin columns with equal spacing and predefined boundaries.</p>
+
+<h3 id="2-dealing-with-messy-data"><strong>2. Dealing with Messy Data</strong></h3>
+
+<h4 id="21-why-do-missing-values-exist"><strong>2.1 Why do missing values exist?</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/16-12.png?w=789" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/17-10.png?w=872" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/18-11.png?w=800" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/19-11.png?w=746" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/20-11.png?w=953" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/21-11.png?w=788" alt="" /></li>
+</ul>
+
+<p><strong>2.1.1 How sparse is my data?</strong></p>
+
+<p>Most data sets contain missing values, often represented as NaN (Not a Number). If you are working with Pandas you can easily check how many missing values exist in each column.</p>
+
+<p>Let’s find out how many of the developers taking the survey chose to enter their age (found in the <code class="language-plaintext highlighter-rouge">Age</code> column of <code class="language-plaintext highlighter-rouge">so_survey_df</code>) and their gender (<code class="language-plaintext highlighter-rouge">Gender</code> column of <code class="language-plaintext highlighter-rouge">so_survey_df</code>).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Subset the DataFrame
+</span><span class="n">sub_df</span> <span class="o">=</span> <span class="n">so_survey_df</span><span class="p">[[</span><span class="s">'Age'</span><span class="p">,</span><span class="s">'Gender'</span><span class="p">]]</span>
+
+<span class="c1"># Print the number of non-missing values
+</span><span class="k">print</span><span class="p">(</span><span class="n">sub_df</span><span class="p">.</span><span class="n">notnull</span><span class="p">().</span><span class="nb">sum</span><span class="p">())</span>
+
+<span class="n">Age</span>       <span class="mi">999</span>
+<span class="n">Gender</span>    <span class="mi">693</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</code></pre></div></div>
+
+<p><strong>2.1.2 Finding the missing values</strong></p>
+
+<p>While having a summary of how much of your data is missing can be useful, often you will need to find the exact locations of these missing values. Using the same subset of the StackOverflow data from the last exercise (<code class="language-plaintext highlighter-rouge">sub_df</code>), you will show how a value can be flagged as missing.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Print the locations of the missing values
+</span><span class="k">print</span><span class="p">(</span><span class="n">sub_df</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">).</span><span class="n">isnull</span><span class="p">())</span>
+
+     <span class="n">Age</span>  <span class="n">Gender</span>
+<span class="mi">0</span>  <span class="bp">False</span>   <span class="bp">False</span>
+<span class="mi">1</span>  <span class="bp">False</span>   <span class="bp">False</span>
+<span class="mi">2</span>  <span class="bp">False</span>    <span class="bp">True</span>
+<span class="mi">3</span>  <span class="bp">False</span>   <span class="bp">False</span>
+<span class="mi">4</span>  <span class="bp">False</span>   <span class="bp">False</span>
+<span class="mi">5</span>  <span class="bp">False</span>   <span class="bp">False</span>
+<span class="mi">6</span>  <span class="bp">False</span>   <span class="bp">False</span>
+<span class="mi">7</span>  <span class="bp">False</span>   <span class="bp">False</span>
+<span class="mi">8</span>  <span class="bp">False</span>   <span class="bp">False</span>
+<span class="mi">9</span>  <span class="bp">False</span>    <span class="bp">True</span>
+
+<span class="c1"># Print the locations of the non-missing values
+</span><span class="k">print</span><span class="p">(</span><span class="n">sub_df</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">).</span><span class="n">notnull</span><span class="p">())</span>
+
+    <span class="n">Age</span>  <span class="n">Gender</span>
+<span class="mi">0</span>  <span class="bp">True</span>    <span class="bp">True</span>
+<span class="mi">1</span>  <span class="bp">True</span>    <span class="bp">True</span>
+<span class="mi">2</span>  <span class="bp">True</span>   <span class="bp">False</span>
+<span class="mi">3</span>  <span class="bp">True</span>    <span class="bp">True</span>
+<span class="mi">4</span>  <span class="bp">True</span>    <span class="bp">True</span>
+<span class="mi">5</span>  <span class="bp">True</span>    <span class="bp">True</span>
+<span class="mi">6</span>  <span class="bp">True</span>    <span class="bp">True</span>
+<span class="mi">7</span>  <span class="bp">True</span>    <span class="bp">True</span>
+<span class="mi">8</span>  <span class="bp">True</span>    <span class="bp">True</span>
+<span class="mi">9</span>  <span class="bp">True</span>   <span class="bp">False</span>
+</code></pre></div></div>
+
+<h4 id="22-dealing-with-missing-values-i"><strong>2.2 Dealing with missing values (I)</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/20-12.png?w=953" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/21-12.png?w=788" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/22-10.png?w=992" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/23-10.png?w=862" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/24-10.png?w=939" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/25-9.png?w=593" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/26-9.png?w=823" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/27-9.png?w=910" alt="" /></li>
+</ul>
+
+<p><strong>2.2.1 Listwise deletion</strong></p>
+
+<p>The simplest way to deal with missing values in your dataset when they are occurring entirely at random is to remove those rows, also called ‘listwise deletion’.</p>
+
+<p>Depending on the use case, you will sometimes want to remove all missing values in your data while other times you may want to only remove a particular column if too many values are missing in that column.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Print the number of rows and columns
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (999, 11)
+</span>
+<span class="c1"># Create a new DataFrame dropping all incomplete rows
+</span><span class="n">no_missing_values_rows</span> <span class="o">=</span> <span class="n">so_survey_df</span><span class="p">.</span><span class="n">dropna</span><span class="p">()</span>
+
+<span class="c1"># Print the shape of the new DataFrame
+</span><span class="k">print</span><span class="p">(</span><span class="n">no_missing_values_rows</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (264, 11)
+</span>
+<span class="c1"># Create a new DataFrame dropping all columns with incomplete rows
+</span><span class="n">no_missing_values_cols</span> <span class="o">=</span> <span class="n">so_survey_df</span><span class="p">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">how</span><span class="o">=</span><span class="s">'any'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Print the shape of the new DataFrame
+</span><span class="k">print</span><span class="p">(</span><span class="n">no_missing_values_cols</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (999, 7)
+</span>
+<span class="c1"># Drop all rows where Gender is missing
+</span><span class="n">no_gender</span> <span class="o">=</span> <span class="n">so_survey_df</span><span class="p">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s">'Gender'</span><span class="p">])</span>
+
+<span class="c1"># Print the shape of the new DataFrame
+</span><span class="k">print</span><span class="p">(</span><span class="n">no_gender</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (693, 11)
+</span></code></pre></div></div>
+
+<p>Correct, as you can see dropping all rows that contain any missing values may greatly reduce the size of your dataset. So you need to think carefully and consider several trade-offs when deleting missing values.</p>
+
+<p><strong>2.2.2 Replacing missing values with constants</strong></p>
+
+<p>While removing missing data entirely maybe a correct approach in many situations, this may result in a lot of information being omitted from your models.</p>
+
+<p>You may find categorical columns where the missing value is a valid piece of information in itself, such as someone refusing to answer a question in a survey. In these cases, you can fill all missing values with a new category entirely, for example ‘No response given’.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Print the count of occurrences
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'Gender'</span><span class="p">].</span><span class="n">value_counts</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Male</span>                                                                         <span class="mi">632</span>
+<span class="n">Female</span>                                                                        <span class="mi">53</span>
+<span class="n">Transgender</span>                                                                    <span class="mi">2</span>
+<span class="n">Female</span><span class="p">;</span><span class="n">Male</span>                                                                    <span class="mi">2</span>
+<span class="n">Female</span><span class="p">;</span><span class="n">Transgender</span>                                                             <span class="mi">1</span>
+<span class="n">Male</span><span class="p">;</span><span class="n">Non</span><span class="o">-</span><span class="n">binary</span><span class="p">.</span> <span class="n">genderqueer</span><span class="p">.</span> <span class="ow">or</span> <span class="n">gender</span> <span class="n">non</span><span class="o">-</span><span class="n">conforming</span>                         <span class="mi">1</span>
+<span class="n">Female</span><span class="p">;</span><span class="n">Male</span><span class="p">;</span><span class="n">Transgender</span><span class="p">;</span><span class="n">Non</span><span class="o">-</span><span class="n">binary</span><span class="p">.</span> <span class="n">genderqueer</span><span class="p">.</span> <span class="ow">or</span> <span class="n">gender</span> <span class="n">non</span><span class="o">-</span><span class="n">conforming</span>      <span class="mi">1</span>
+<span class="n">Non</span><span class="o">-</span><span class="n">binary</span><span class="p">.</span> <span class="n">genderqueer</span><span class="p">.</span> <span class="ow">or</span> <span class="n">gender</span> <span class="n">non</span><span class="o">-</span><span class="n">conforming</span>                              <span class="mi">1</span>
+<span class="n">Name</span><span class="p">:</span> <span class="n">Gender</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Replace missing values
+</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'Gender'</span><span class="p">].</span><span class="n">fillna</span><span class="p">(</span><span class="s">'Not Given'</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Print the count of each value
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'Gender'</span><span class="p">].</span><span class="n">value_counts</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Male</span>                                                                         <span class="mi">632</span>
+<span class="n">Not</span> <span class="n">Given</span>                                                                    <span class="mi">306</span>
+<span class="n">Female</span>                                                                        <span class="mi">53</span>
+<span class="n">Transgender</span>                                                                    <span class="mi">2</span>
+<span class="n">Female</span><span class="p">;</span><span class="n">Male</span>                                                                    <span class="mi">2</span>
+<span class="n">Female</span><span class="p">;</span><span class="n">Transgender</span>                                                             <span class="mi">1</span>
+<span class="n">Male</span><span class="p">;</span><span class="n">Non</span><span class="o">-</span><span class="n">binary</span><span class="p">.</span> <span class="n">genderqueer</span><span class="p">.</span> <span class="ow">or</span> <span class="n">gender</span> <span class="n">non</span><span class="o">-</span><span class="n">conforming</span>                         <span class="mi">1</span>
+<span class="n">Female</span><span class="p">;</span><span class="n">Male</span><span class="p">;</span><span class="n">Transgender</span><span class="p">;</span><span class="n">Non</span><span class="o">-</span><span class="n">binary</span><span class="p">.</span> <span class="n">genderqueer</span><span class="p">.</span> <span class="ow">or</span> <span class="n">gender</span> <span class="n">non</span><span class="o">-</span><span class="n">conforming</span>      <span class="mi">1</span>
+<span class="n">Non</span><span class="o">-</span><span class="n">binary</span><span class="p">.</span> <span class="n">genderqueer</span><span class="p">.</span> <span class="ow">or</span> <span class="n">gender</span> <span class="n">non</span><span class="o">-</span><span class="n">conforming</span>                              <span class="mi">1</span>
+<span class="n">Name</span><span class="p">:</span> <span class="n">Gender</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</code></pre></div></div>
+
+<h4 id="23-dealing-with-missing-values-ii"><strong>2.3 Dealing with missing values (II)</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/1-20.png?w=790" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/2-21.png?w=946" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/3-21.png?w=874" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/4-21.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/5-21.png?w=1007" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/6-21.png?w=999" alt="" /></li>
+</ul>
+
+<p><strong>2.3.1 Filling continuous missing values</strong></p>
+
+<p>In the last lesson, you dealt with different methods of removing data missing values and filling in missing values with a fixed string. These approaches are valid in many cases, particularly when dealing with categorical columns but have limited use when working with continuous values. In these cases, it may be most valid to fill the missing values in the column with a value calculated from the entries present in the column.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1"># Print the first five rows of StackOverflowJobsRecommend column
+</span> <span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'StackOverflowJobsRecommend'</span><span class="p">].</span><span class="n">head</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+
+<span class="c1"># Fill missing values with the mean
+</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'StackOverflowJobsRecommend'</span><span class="p">].</span><span class="n">fillna</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'StackOverflowJobsRecommend'</span><span class="p">].</span><span class="n">mean</span><span class="p">(),</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Round the StackOverflowJobsRecommend values
+</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'StackOverflowJobsRecommend'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'StackOverflowJobsRecommend'</span><span class="p">])</span>
+
+<span class="c1"># Print the top 5 rows
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'StackOverflowJobsRecommend'</span><span class="p">].</span><span class="n">head</span><span class="p">())</span>
+
+<span class="mi">0</span>    <span class="mf">7.0</span>
+<span class="mi">1</span>    <span class="mf">7.0</span>
+<span class="mi">2</span>    <span class="mf">8.0</span>
+<span class="mi">3</span>    <span class="mf">7.0</span>
+<span class="mi">4</span>    <span class="mf">8.0</span>
+<span class="n">Name</span><span class="p">:</span> <span class="n">StackOverflowJobsRecommend</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</code></pre></div></div>
+
+<p>Nicely done, remember you should only round your values if you are certain it is applicable.</p>
+
+<p><strong>2.3.2 Imputing values in predictive models</strong></p>
+
+<p>When working with predictive models you will often have a separate train and test DataFrames. In these cases you want to ensure no information from your test set leaks into your train set. When filling missing values in data to be used in these situations how should approach the two data sets?</p>
+
+<p><strong>Apply the measures of central tendency (mean/median etc.) calculated on the train set to both the train and test sets.</strong></p>
+
+<p>Values calculated on the train test should be applied to both DataFrames.</p>
+
+<h4 id="24-dealing-with-other-data-issues"><strong>2.4 Dealing with other data issues</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/7-21.png?w=606" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/8-20.png?w=1008" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/9-20.png?w=907" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/10-20.png?w=917" alt="" /></li>
+</ul>
+
+<p><strong>2.4.1 Dealing with stray characters (I)</strong></p>
+
+<p>In this exercise, you will work with the <code class="language-plaintext highlighter-rouge">RawSalary</code> column of <code class="language-plaintext highlighter-rouge">so_survey_df</code> which contains the wages of the respondents along with the currency symbols and commas, such as <em>$42,000</em>. When importing data from Microsoft Excel, more often that not you will come across data in this form.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">]</span>
+<span class="mi">0</span>               <span class="n">NaN</span>
+<span class="mi">1</span>         <span class="mi">70</span><span class="p">,</span><span class="mf">841.00</span>
+<span class="mi">2</span>               <span class="n">NaN</span>
+<span class="mi">3</span>         <span class="mi">21</span><span class="p">,</span><span class="mf">426.00</span>
+<span class="mi">4</span>        <span class="err">£</span><span class="mi">41</span><span class="p">,</span><span class="mf">671.00</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Remove the commas in the column
+</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">].</span><span class="nb">str</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">','</span><span class="p">,</span> <span class="s">''</span><span class="p">)</span>
+
+<span class="c1"># Remove the dollar signs in the column
+</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">].</span><span class="nb">str</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'$'</span><span class="p">,</span><span class="s">''</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><strong>2.4.2 Dealing with stray characters (II)</strong></p>
+
+<p>In the last exercise, you could tell quickly based off of the <code class="language-plaintext highlighter-rouge">df.head()</code> call which characters were causing an issue. In many cases this will not be so apparent. There will often be values deep within a column that are preventing you from casting a column as a numeric type so that it can be used in a model or further feature engineering.</p>
+
+<p>One approach to finding these values is to force the column to the data type desired using <code class="language-plaintext highlighter-rouge">pd.to_numeric()</code>, coercing any values causing issues to NaN, Then filtering the DataFrame by just the rows containing the NaN values.</p>
+
+<p>Try to cast the <code class="language-plaintext highlighter-rouge">RawSalary</code> column as a float and it will fail as an additional character can now be found in it. Find the character and remove it so the column can be cast as a float.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Attempt to convert the column to numeric values
+</span><span class="n">numeric_vals</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">to_numeric</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="s">'coerce'</span><span class="p">)</span>
+
+<span class="c1"># Find the indexes of missing values
+</span><span class="n">idx</span> <span class="o">=</span> <span class="n">numeric_vals</span><span class="p">.</span><span class="n">isna</span><span class="p">()</span>
+
+<span class="c1"># Print the relevant rows
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">][</span><span class="n">idx</span><span class="p">])</span>
+
+<span class="mi">0</span>             <span class="n">NaN</span>
+<span class="mi">2</span>             <span class="n">NaN</span>
+<span class="mi">4</span>       <span class="err">£</span><span class="mf">41671.00</span>
+<span class="mi">6</span>             <span class="n">NaN</span>
+<span class="mi">8</span>             <span class="n">NaN</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Replace the offending characters
+</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">].</span><span class="nb">str</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'£'</span><span class="p">,</span><span class="s">''</span><span class="p">)</span>
+
+<span class="c1"># Convert the column to float
+</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">].</span><span class="n">astype</span><span class="p">(</span><span class="s">'float'</span><span class="p">)</span>
+
+<span class="c1"># Print the column
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>Remember that even after removing all the relevant characters, you still need to change the type of the column to numeric if you want to plot these continuous values.</p>
+
+<p><strong>2.4.3 Method chaining</strong></p>
+
+<p>When applying multiple operations on the same column (like in the previous exercises), you made the changes in several steps, assigning the results back in each step. However, when applying multiple successive operations on the same column, you can “chain” these operations together for clarity and ease of management. This can be achieved by calling multiple methods sequentially:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Method chaining
+</span><span class="n">df</span><span class="p">[</span><span class="s">'column'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'column'</span><span class="p">].</span><span class="n">method1</span><span class="p">().</span><span class="n">method2</span><span class="p">().</span><span class="n">method3</span><span class="p">()</span>
+
+<span class="c1"># Same as
+</span><span class="n">df</span><span class="p">[</span><span class="s">'column'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'column'</span><span class="p">].</span><span class="n">method1</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'column'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'column'</span><span class="p">].</span><span class="n">method2</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'column'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'column'</span><span class="p">].</span><span class="n">method3</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>In this exercise you will repeat the steps you performed in the last two exercises, but do so using method chaining.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Use method chaining
+</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">]</span> <span class="o">=</span> <span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">]</span>\
+                              <span class="p">.</span><span class="nb">str</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">','</span><span class="p">,</span><span class="s">''</span><span class="p">)</span>\
+                              <span class="p">.</span><span class="nb">str</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'$'</span><span class="p">,</span><span class="s">''</span><span class="p">)</span>\
+                              <span class="p">.</span><span class="nb">str</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'£'</span><span class="p">,</span><span class="s">''</span><span class="p">)</span>\
+                              <span class="p">.</span><span class="n">astype</span><span class="p">(</span><span class="s">'float'</span><span class="p">)</span>
+
+<span class="c1"># Print the RawSalary column
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_survey_df</span><span class="p">[</span><span class="s">'RawSalary'</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>Custom functions can be also used when method chaining using the .apply() method.</p>
+
+<h3 id="3-conforming-to-statistical-assumptions"><strong>3. Conforming to Statistical Assumptions</strong></h3>
+
+<h4 id="31-data-distributions"><strong>3.1 Data distributions</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/1-21.png?w=992" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/2-22.png?w=763" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/3-22.png?w=952" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/4-22.png?w=765" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/5-22.png?w=750" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/6-22.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>3.1.1 What does your data look like? (I)</strong></p>
+
+<p>Up until now you have focused on creating new features and dealing with issues in your data. Feature engineering can also be used to make the most out of the data that you already have and use it more effectively when creating machine learning models.<br />
+Many algorithms may assume that your data is normally distributed, or at least that all your columns are on the same scale. This will often not be the case, e.g. one feature may be measured in thousands of dollars while another would be number of years. In this exercise, you will create plots to examine the distributions of some numeric columns in the <code class="language-plaintext highlighter-rouge">so_survey_df</code> DataFrame, stored in <code class="language-plaintext highlighter-rouge">so_numeric_df</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a histogram
+</span><span class="n">so_numeric_df</span><span class="p">.</span><span class="n">hist</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/7-22.png?w=1024" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a boxplot of two columns
+</span><span class="n">so_numeric_df</span><span class="p">[[</span><span class="s">'Age'</span><span class="p">,</span> <span class="s">'Years Experience'</span><span class="p">]].</span><span class="n">boxplot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/8-21.png?w=1024" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a boxplot of ConvertedSalary
+</span><span class="n">so_numeric_df</span><span class="p">[[</span><span class="s">'ConvertedSalary'</span><span class="p">]].</span><span class="n">boxplot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/9-21.png?w=1024" alt="" /></p>
+
+<p><strong>3.1.2 What does your data look like? (II)</strong></p>
+
+<p>In the previous exercise you looked at the distribution of individual columns. While this is a good start, a more detailed view of how different features interact with each other may be useful as this can impact your decision on what to transform and how.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import packages
+</span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+
+<span class="c1"># Plot pairwise relationships
+</span><span class="n">sns</span><span class="p">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">so_numeric_df</span><span class="p">)</span>
+
+<span class="c1"># Show plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/10-21.png?w=1024" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Print summary statistics
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_numeric_df</span><span class="p">.</span><span class="n">describe</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>       <span class="n">ConvertedSalary</span>         <span class="n">Age</span>  <span class="n">Years</span> <span class="n">Experience</span>
+<span class="n">count</span>     <span class="mf">9.990000e+02</span>  <span class="mf">999.000000</span>        <span class="mf">999.000000</span>
+<span class="n">mean</span>      <span class="mf">6.161746e+04</span>   <span class="mf">36.003003</span>          <span class="mf">9.961962</span>
+<span class="n">std</span>       <span class="mf">1.760924e+05</span>   <span class="mf">13.255127</span>          <span class="mf">4.878129</span>
+<span class="nb">min</span>       <span class="mf">0.000000e+00</span>   <span class="mf">18.000000</span>          <span class="mf">0.000000</span>
+<span class="mi">25</span><span class="o">%</span>       <span class="mf">0.000000e+00</span>   <span class="mf">25.000000</span>          <span class="mf">7.000000</span>
+<span class="mi">50</span><span class="o">%</span>       <span class="mf">2.712000e+04</span>   <span class="mf">35.000000</span>         <span class="mf">10.000000</span>
+<span class="mi">75</span><span class="o">%</span>       <span class="mf">7.000000e+04</span>   <span class="mf">45.000000</span>         <span class="mf">13.000000</span>
+<span class="nb">max</span>       <span class="mf">2.000000e+06</span>   <span class="mf">83.000000</span>         <span class="mf">27.000000</span>
+</code></pre></div></div>
+
+<p>Good work, understanding these summary statistics of a column can be very valuable when deciding what transformations are necessary.</p>
+
+<p><strong>3.1.3 When don’t you have to transform your data?</strong></p>
+
+<p>While making sure that all of your data is on the same scale is advisable for most analyses, for which of the following machine learning models is normalizing data not always necessary?</p>
+
+<p><strong>Decision Trees</strong></p>
+
+<p>As decision trees split along a singular point, they do not require all the columns to be on the same scale.</p>
+
+<h4 id="32-scaling-and-transformations"><strong>3.2 Scaling and transformations</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/11-19.png?w=923" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/12-20.png?w=868" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/13-18.png?w=865" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/14-16.png?w=937" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/15-15.png?w=877" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/16-13.png?w=860" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/17-11.png?w=873" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/18-12.png?w=902" alt="" /></li>
+</ul>
+
+<p><strong>3.2.1 Normalization</strong></p>
+
+<p>As discussed in the video, in normalization you linearly scale the entire column between 0 and 1, with 0 corresponding with the lowest value in the column, and 1 with the largest.<br />
+When using scikit-learn (the most commonly used machine learning library in Python) you can use a <code class="language-plaintext highlighter-rouge">MinMaxScaler</code> to apply normalization. <em>(It is called this as it scales your values between a minimum and maximum value.)</em></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import MinMaxScaler
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MinMaxScaler</span>
+
+<span class="c1"># Instantiate MinMaxScaler
+</span><span class="n">MM_scaler</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span>
+
+<span class="c1"># Fit MM_scaler to the data
+</span><span class="n">MM_scaler</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">so_numeric_df</span><span class="p">[[</span><span class="s">'Age'</span><span class="p">]])</span>
+
+<span class="c1"># Transform the data using the fitted scaler
+</span><span class="n">so_numeric_df</span><span class="p">[</span><span class="s">'Age_MM'</span><span class="p">]</span> <span class="o">=</span> <span class="n">MM_scaler</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">so_numeric_df</span><span class="p">[[</span><span class="s">'Age'</span><span class="p">]])</span>
+
+<span class="c1"># Compare the origional and transformed column
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_numeric_df</span><span class="p">[[</span><span class="s">'Age_MM'</span><span class="p">,</span> <span class="s">'Age'</span><span class="p">]].</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     <span class="n">Age_MM</span>  <span class="n">Age</span>
+<span class="mi">0</span>  <span class="mf">0.046154</span>   <span class="mi">21</span>
+<span class="mi">1</span>  <span class="mf">0.307692</span>   <span class="mi">38</span>
+<span class="mi">2</span>  <span class="mf">0.415385</span>   <span class="mi">45</span>
+<span class="mi">3</span>  <span class="mf">0.430769</span>   <span class="mi">46</span>
+<span class="mi">4</span>  <span class="mf">0.323077</span>   <span class="mi">39</span>
+</code></pre></div></div>
+
+<p>Did you notice that all values have been scaled between 0 and 1?</p>
+
+<p><strong>3.2.2 Standardization</strong></p>
+
+<p>While normalization can be useful for scaling a column between two data points, it is hard to compare two scaled columns if even one of them is overly affected by outliers. One commonly used solution to this is called standardization, where instead of having a strict upper and lower bound, you center the data around its mean, and calculate the number of standard deviations away from mean each data point is.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import StandardScaler
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+
+<span class="c1"># Instantiate StandardScaler
+</span><span class="n">SS_scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+
+<span class="c1"># Fit SS_scaler to the data
+</span><span class="n">SS_scaler</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">so_numeric_df</span><span class="p">[[</span><span class="s">'Age'</span><span class="p">]])</span>
+
+<span class="c1"># Transform the data using the fitted scaler
+</span><span class="n">so_numeric_df</span><span class="p">[</span><span class="s">'Age_SS'</span><span class="p">]</span> <span class="o">=</span> <span class="n">SS_scaler</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">so_numeric_df</span><span class="p">[[</span><span class="s">'Age'</span><span class="p">]])</span>
+
+<span class="c1"># Compare the origional and transformed column
+</span><span class="k">print</span><span class="p">(</span><span class="n">so_numeric_df</span><span class="p">[[</span><span class="s">'Age_SS'</span><span class="p">,</span> <span class="s">'Age'</span><span class="p">]].</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     <span class="n">Age_SS</span>  <span class="n">Age</span>
+<span class="mi">0</span> <span class="o">-</span><span class="mf">1.132431</span>   <span class="mi">21</span>
+<span class="mi">1</span>  <span class="mf">0.150734</span>   <span class="mi">38</span>
+<span class="mi">2</span>  <span class="mf">0.679096</span>   <span class="mi">45</span>
+<span class="mi">3</span>  <span class="mf">0.754576</span>   <span class="mi">46</span>
+<span class="mi">4</span>  <span class="mf">0.226214</span>   <span class="mi">39</span>
+</code></pre></div></div>
+
+<p>you can see that the values have been scaled linearly, but not between set values.</p>
+
+<p><strong>3.2.3 Log transformation</strong></p>
+
+<p>In the previous exercises you scaled the data linearly, which will not affect the data’s shape. This works great if your data is normally distributed (or closely normally distributed), an assumption that a lot of machine learning models make. Sometimes you will work with data that closely conforms to normality, e.g the height or weight of a population. On the other hand, many variables in the real world do not follow this pattern e.g, wages or age of a population. In this exercise you will use a log transform on the <code class="language-plaintext highlighter-rouge">ConvertedSalary</code> column in the <code class="language-plaintext highlighter-rouge">so_numeric_df</code> DataFrame as it has a large amount of its data centered around the lower values, but contains very high values also. These distributions are said to have a long right tail.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import PowerTransformer
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">PowerTransformer</span>
+
+<span class="c1"># Instantiate PowerTransformer
+</span><span class="n">pow_trans</span> <span class="o">=</span> <span class="n">PowerTransformer</span><span class="p">()</span>
+
+<span class="c1"># Train the transform on the data
+</span><span class="n">pow_trans</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">so_numeric_df</span><span class="p">[[</span><span class="s">'ConvertedSalary'</span><span class="p">]])</span>
+
+<span class="c1"># Apply the power transform to the data
+</span><span class="n">so_numeric_df</span><span class="p">[</span><span class="s">'ConvertedSalary_LG'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pow_trans</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">so_numeric_df</span><span class="p">[[</span><span class="s">'ConvertedSalary'</span><span class="p">]])</span>
+
+<span class="c1"># Plot the data before and after the transformation
+</span><span class="n">so_numeric_df</span><span class="p">[[</span><span class="s">'ConvertedSalary'</span><span class="p">,</span> <span class="s">'ConvertedSalary_LG'</span><span class="p">]].</span><span class="n">hist</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">so_numeric_df</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+   <span class="n">ConvertedSalary</span>  <span class="n">Age</span>  <span class="n">Years</span> <span class="n">Experience</span>  <span class="n">ConvertedSalary_LG</span>
+<span class="mi">0</span>              <span class="n">NaN</span>   <span class="mi">21</span>                <span class="mi">13</span>                 <span class="n">NaN</span>
+<span class="mi">1</span>          <span class="mf">70841.0</span>   <span class="mi">38</span>                 <span class="mi">9</span>            <span class="mf">0.312939</span>
+<span class="mi">2</span>              <span class="n">NaN</span>   <span class="mi">45</span>                <span class="mi">11</span>                 <span class="n">NaN</span>
+<span class="mi">3</span>          <span class="mf">21426.0</span>   <span class="mi">46</span>                <span class="mi">12</span>           <span class="o">-</span><span class="mf">0.652182</span>
+<span class="mi">4</span>          <span class="mf">41671.0</span>   <span class="mi">39</span>                 <span class="mi">7</span>           <span class="o">-</span><span class="mf">0.135589</span>
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/19-12.png?w=1024" alt="" /></p>
+
+<p>Did you notice the change in the shape of the distribution? <code class="language-plaintext highlighter-rouge">ConvertedSalary_LG</code> column looks much more normal than the original <code class="language-plaintext highlighter-rouge">ConvertedSalary</code> column.</p>
+
+<p><strong>3.2.4 When can you use normalization?</strong></p>
+
+<p>When could you use normalization (<code class="language-plaintext highlighter-rouge">MinMaxScaler</code>) when working with a dataset?</p>
+
+<p><strong>When you know the the data has a strict upper and lower bound.</strong></p>
+
+<p>Normalization scales all points linearly between the upper and lower bound.</p>
+
+<h4 id="33-removing-outliers"><strong>3.3 Removing outliers</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/20-13.png?w=889" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/21-13.png?w=839" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/22-11.png?w=722" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/23-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/24-11.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>3.3.1 Percentage based outlier removal</strong></p>
+
+<p>One way to ensure a small portion of data is not having an overly adverse effect is by removing a certain percentage of the largest and/or smallest values in the column. This can be achieved by finding the relevant quantile and trimming the data using it with a mask. This approach is particularly useful if you are concerned that the highest values in your dataset should be avoided. When using this approach, you must remember that even if there are no outliers, this will still remove the same top N percentage from the dataset.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Find the 95th quantile
+</span><span class="n">quantile</span> <span class="o">=</span> <span class="n">so_numeric_df</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">].</span><span class="n">quantile</span><span class="p">(</span><span class="mf">0.95</span><span class="p">)</span>
+
+<span class="c1"># Trim the outliers
+</span><span class="n">trimmed_df</span> <span class="o">=</span> <span class="n">so_numeric_df</span><span class="p">[</span><span class="n">so_numeric_df</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">quantile</span><span class="p">]</span>
+
+<span class="c1"># The original histogram
+</span><span class="n">so_numeric_df</span><span class="p">[[</span><span class="s">'ConvertedSalary'</span><span class="p">]].</span><span class="n">hist</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">clf</span><span class="p">()</span>
+
+<span class="c1"># The trimmed histogram
+</span><span class="n">trimmed_df</span><span class="p">[[</span><span class="s">'ConvertedSalary'</span><span class="p">]].</span><span class="n">hist</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/25-10.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/26-10.png?w=1024" alt="" /></li>
+</ul>
+
+<p>In the next exercise, you will work with a more statistically sound approach in removing outliers.</p>
+
+<p><strong>3.3.2 Statistical outlier removal</strong></p>
+
+<p>While removing the top N% of your data is useful for ensuring that very spurious points are removed, it does have the disadvantage of always removing the same proportion of points, even if the data is correct. A commonly used alternative approach is to remove data that sits further than three standard deviations from the mean. You can implement this by first calculating the mean and standard deviation of the relevant column to find upper and lower bounds, and applying these bounds as a mask to the DataFrame. This method ensures that only data that is genuinely different from the rest is removed, and will remove fewer points if the data is close together.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Find the mean and standard dev
+</span><span class="n">std</span> <span class="o">=</span> <span class="n">so_numeric_df</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">].</span><span class="n">std</span><span class="p">()</span>
+<span class="n">mean</span> <span class="o">=</span> <span class="n">so_numeric_df</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">].</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># Calculate the cutoff
+</span><span class="n">cut_off</span> <span class="o">=</span> <span class="n">std</span> <span class="o">*</span> <span class="mi">3</span>
+<span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">mean</span> <span class="o">-</span> <span class="n">cut_off</span><span class="p">,</span> <span class="n">mean</span> <span class="o">+</span> <span class="n">cut_off</span>
+
+<span class="c1"># Trim the outliers
+</span><span class="n">trimmed_df</span> <span class="o">=</span> <span class="n">so_numeric_df</span><span class="p">[(</span><span class="n">so_numeric_df</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">upper</span><span class="p">)</span>
+<span class="o">&amp;</span> <span class="p">(</span><span class="n">so_numeric_df</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">lower</span><span class="p">)]</span>
+
+<span class="c1"># The trimmed box plot
+</span><span class="n">trimmed_df</span><span class="p">[[</span><span class="s">'ConvertedSalary'</span><span class="p">]].</span><span class="n">boxplot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/27-10.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/28-9.png?w=1024" alt="" /></li>
+</ul>
+
+<p>Did you notice the scale change on the y-axis?</p>
+
+<h4 id="34-scaling-and-transforming-new-data"><strong>3.4 Scaling and transforming new data</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/29-8.png?w=875" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/30-6.png?w=1011" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/31-4.png?w=867" alt="" /></li>
+</ul>
+
+<p><strong>3.4.1 Train and testing transformations (I)</strong></p>
+
+<p>So far you have created scalers based on a column, and then applied the scaler to the same data that it was trained on. When creating machine learning models you will generally build your models on historic data (train set) and apply your model to new unseen data (test set). In these cases you will need to ensure that the same scaling is being applied to both the training and test data.<br />
+<em>To do this in practice you train the scaler on the train set, and keep the trained scaler to apply it to the test set. You should never retrain a scaler on the test set.</em></p>
+
+<p>For this exercise and the next, we split the <code class="language-plaintext highlighter-rouge">so_numeric_df</code> DataFrame into train (<code class="language-plaintext highlighter-rouge">so_train_numeric</code>) and test (<code class="language-plaintext highlighter-rouge">so_test_numeric</code>) sets.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import StandardScaler
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+
+<span class="c1"># Apply a standard scaler to the data
+</span><span class="n">SS_scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+
+<span class="c1"># Fit the standard scaler to the data
+</span><span class="n">SS_scaler</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">so_train_numeric</span><span class="p">[[</span><span class="s">'Age'</span><span class="p">]])</span>
+
+<span class="c1"># Transform the test data using the fitted scaler
+</span><span class="n">so_test_numeric</span><span class="p">[</span><span class="s">'Age_ss'</span><span class="p">]</span> <span class="o">=</span> <span class="n">SS_scaler</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">so_test_numeric</span><span class="p">[[</span><span class="s">'Age'</span><span class="p">]])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">so_test_numeric</span><span class="p">[[</span><span class="s">'Age'</span><span class="p">,</span> <span class="s">'Age_ss'</span><span class="p">]].</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     <span class="n">Age</span>    <span class="n">Age_ss</span>
+<span class="mi">700</span>   <span class="mi">35</span> <span class="o">-</span><span class="mf">0.069265</span>
+<span class="mi">701</span>   <span class="mi">18</span> <span class="o">-</span><span class="mf">1.343218</span>
+<span class="mi">702</span>   <span class="mi">47</span>  <span class="mf">0.829997</span>
+<span class="mi">703</span>   <span class="mi">57</span>  <span class="mf">1.579381</span>
+<span class="mi">704</span>   <span class="mi">41</span>  <span class="mf">0.380366</span>
+</code></pre></div></div>
+
+<p><strong>Data leakage</strong> is one of the most common mistakes data scientists tend to make, and I hope that you won’t!</p>
+
+<p><strong>3.4.2 Train and testing transformations (II)</strong></p>
+
+<p>Similar to applying the same scaler to both your training and test sets, if you have removed outliers from the train set, you probably want to do the same on the test set as well. Once again you should ensure that you use the <em>thresholds calculated only from the train set</em> to remove outliers from the test set.</p>
+
+<p>Similar to the last exercise, we split the <code class="language-plaintext highlighter-rouge">so_numeric_df</code> DataFrame into train (<code class="language-plaintext highlighter-rouge">so_train_numeric</code>) and test (<code class="language-plaintext highlighter-rouge">so_test_numeric</code>) sets.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_std</span> <span class="o">=</span> <span class="n">so_train_numeric</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">].</span><span class="n">std</span><span class="p">()</span>
+<span class="n">train_mean</span> <span class="o">=</span> <span class="n">so_train_numeric</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">].</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="n">cut_off</span> <span class="o">=</span> <span class="n">train_std</span> <span class="o">*</span> <span class="mi">3</span>
+<span class="n">train_lower</span><span class="p">,</span> <span class="n">train_upper</span> <span class="o">=</span> <span class="n">train_mean</span> <span class="o">-</span> <span class="n">cut_off</span><span class="p">,</span> <span class="n">train_mean</span> <span class="o">+</span> <span class="n">cut_off</span>
+
+<span class="c1"># Trim the test DataFrame
+</span><span class="n">trimmed_df</span> <span class="o">=</span> <span class="n">so_test_numeric</span><span class="p">[(</span><span class="n">so_test_numeric</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">train_upper</span><span class="p">)</span> \
+                             <span class="o">&amp;</span> <span class="p">(</span><span class="n">so_test_numeric</span><span class="p">[</span><span class="s">'ConvertedSalary'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">train_lower</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<p>Very well done. In the next chapter, you will deal with unstructured (text) data.</p>
+
+<h3 id="4-dealing-with-text-data"><strong>4. Dealing with Text Data</strong></h3>
+
+<h4 id="41-encoding-text"><strong>4.1 Encoding text</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/1.png?w=999" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/2.png?w=999" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/3.png?w=942" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/4.png?w=995" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/5.png?w=995" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/6.png?w=1001" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/7.png?w=922" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/8.png?w=990" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/9.png?w=1001" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/10.png?w=986" alt="" /></li>
+</ul>
+
+<p><strong>4.1.1 Cleaning up your text</strong></p>
+
+<p>Unstructured text data cannot be directly used in most analyses. Multiple steps need to be taken to go from a long free form string to a set of numeric columns in the right format that can be ingested by a machine learning model. The first step of this process is to standardize the data and eliminate any characters that could cause problems later on in your analytic pipeline.</p>
+
+<p>In this chapter you will be working with a new dataset containing the inaugural speeches of the presidents of the United States loaded as <code class="language-plaintext highlighter-rouge">speech_df</code>, with the speeches stored in the <code class="language-plaintext highlighter-rouge">text</code> column.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Print the first 5 rows of the text column
+</span><span class="k">print</span><span class="p">(</span><span class="n">speech_df</span><span class="p">.</span><span class="n">text</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">0</span>    <span class="n">Fellow</span><span class="o">-</span><span class="n">Citizens</span> <span class="n">of</span> <span class="n">the</span> <span class="n">Senate</span> <span class="ow">and</span> <span class="n">of</span> <span class="n">the</span> <span class="n">House</span><span class="p">...</span>
+<span class="mi">1</span>    <span class="n">Fellow</span> <span class="n">Citizens</span><span class="p">:</span>  <span class="n">I</span> <span class="n">AM</span> <span class="n">again</span> <span class="n">called</span> <span class="n">upon</span> <span class="n">by</span> <span class="n">th</span><span class="p">...</span>
+<span class="mi">2</span>    <span class="n">WHEN</span> <span class="n">it</span> <span class="n">was</span> <span class="n">first</span> <span class="n">perceived</span><span class="p">,</span> <span class="ow">in</span> <span class="n">early</span> <span class="n">times</span><span class="p">,</span> <span class="n">t</span><span class="p">...</span>
+<span class="mi">3</span>    <span class="n">Friends</span> <span class="ow">and</span> <span class="n">Fellow</span><span class="o">-</span><span class="n">Citizens</span><span class="p">:</span>  <span class="n">CALLED</span> <span class="n">upon</span> <span class="n">to</span> <span class="n">u</span><span class="p">...</span>
+<span class="mi">4</span>    <span class="n">PROCEEDING</span><span class="p">,</span> <span class="n">fellow</span><span class="o">-</span><span class="n">citizens</span><span class="p">,</span> <span class="n">to</span> <span class="n">that</span> <span class="n">qualifica</span><span class="p">...</span>
+<span class="n">Name</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">object</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Replace all non letter characters with a whitespace
+</span><span class="n">speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">]</span> <span class="o">=</span> <span class="n">speech_df</span><span class="p">[</span><span class="s">'text'</span><span class="p">].</span><span class="nb">str</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'[^a-zA-Z]'</span><span class="p">,</span> <span class="s">' '</span><span class="p">)</span>
+
+<span class="c1"># Change to lower case
+</span><span class="n">speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">]</span> <span class="o">=</span> <span class="n">speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">].</span><span class="nb">str</span><span class="p">.</span><span class="n">lower</span><span class="p">()</span>
+
+<span class="c1"># Print the first 5 rows of the text_clean column
+</span><span class="k">print</span><span class="p">(</span><span class="n">speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">].</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">0</span>    <span class="n">fellow</span> <span class="n">citizens</span> <span class="n">of</span> <span class="n">the</span> <span class="n">senate</span> <span class="ow">and</span> <span class="n">of</span> <span class="n">the</span> <span class="n">house</span><span class="p">...</span>
+<span class="mi">1</span>    <span class="n">fellow</span> <span class="n">citizens</span>   <span class="n">i</span> <span class="n">am</span> <span class="n">again</span> <span class="n">called</span> <span class="n">upon</span> <span class="n">by</span> <span class="n">th</span><span class="p">...</span>
+<span class="mi">2</span>    <span class="n">when</span> <span class="n">it</span> <span class="n">was</span> <span class="n">first</span> <span class="n">perceived</span>  <span class="ow">in</span> <span class="n">early</span> <span class="n">times</span>  <span class="n">t</span><span class="p">...</span>
+<span class="mi">3</span>    <span class="n">friends</span> <span class="ow">and</span> <span class="n">fellow</span> <span class="n">citizens</span>   <span class="n">called</span> <span class="n">upon</span> <span class="n">to</span> <span class="n">u</span><span class="p">...</span>
+<span class="mi">4</span>    <span class="n">proceeding</span>  <span class="n">fellow</span> <span class="n">citizens</span>  <span class="n">to</span> <span class="n">that</span> <span class="n">qualifica</span><span class="p">...</span>
+<span class="n">Name</span><span class="p">:</span> <span class="n">text_clean</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">object</span>
+</code></pre></div></div>
+
+<p>Great, now your text strings have been standardized and cleaned up. You can now use this new column (<code class="language-plaintext highlighter-rouge">text_clean</code>) to extract information about the speeches.</p>
+
+<p><strong>4.1.2 High level text features</strong></p>
+
+<p>Once the text has been cleaned and standardized you can begin creating features from the data. The most fundamental information you can calculate about free form text is its size, such as its length and number of words. In this exercise (and the rest of this chapter), you will focus on the cleaned/transformed text column (<code class="language-plaintext highlighter-rouge">text_clean</code>) you created in the last exercise.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Find the length of each text
+</span><span class="n">speech_df</span><span class="p">[</span><span class="s">'char_cnt'</span><span class="p">]</span> <span class="o">=</span> <span class="n">speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">].</span><span class="nb">str</span><span class="p">.</span><span class="nb">len</span><span class="p">()</span>
+
+<span class="c1"># Count the number of words in each text
+</span><span class="n">speech_df</span><span class="p">[</span><span class="s">'word_cnt'</span><span class="p">]</span> <span class="o">=</span> <span class="n">speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">].</span><span class="nb">str</span><span class="p">.</span><span class="n">split</span><span class="p">().</span><span class="nb">str</span><span class="p">.</span><span class="nb">len</span><span class="p">()</span>
+
+<span class="c1"># Find the average length of word
+</span><span class="n">speech_df</span><span class="p">[</span><span class="s">'avg_word_length'</span><span class="p">]</span> <span class="o">=</span> <span class="n">speech_df</span><span class="p">[</span><span class="s">'char_cnt'</span><span class="p">]</span> <span class="o">/</span> <span class="n">speech_df</span><span class="p">[</span><span class="s">'word_cnt'</span><span class="p">]</span>
+
+<span class="c1"># Print the first 5 rows of these columns
+</span><span class="k">print</span><span class="p">(</span><span class="n">speech_df</span><span class="p">[[</span><span class="s">'text_clean'</span><span class="p">,</span> <span class="s">'char_cnt'</span><span class="p">,</span> <span class="s">'word_cnt'</span><span class="p">,</span> <span class="s">'avg_word_length'</span><span class="p">]])</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                                           <span class="n">text_clean</span>  <span class="n">char_cnt</span>  <span class="n">word_cnt</span>  <span class="n">avg_word_length</span>
+<span class="mi">0</span>   <span class="n">fellow</span> <span class="n">citizens</span> <span class="n">of</span> <span class="n">the</span> <span class="n">senate</span> <span class="ow">and</span> <span class="n">of</span> <span class="n">the</span> <span class="n">house</span><span class="p">...</span>      <span class="mi">8616</span>      <span class="mi">1432</span>         <span class="mf">6.016760</span>
+<span class="mi">1</span>   <span class="n">fellow</span> <span class="n">citizens</span>   <span class="n">i</span> <span class="n">am</span> <span class="n">again</span> <span class="n">called</span> <span class="n">upon</span> <span class="n">by</span> <span class="n">th</span><span class="p">...</span>       <span class="mi">787</span>       <span class="mi">135</span>         <span class="mf">5.829630</span>
+<span class="mi">2</span>   <span class="n">when</span> <span class="n">it</span> <span class="n">was</span> <span class="n">first</span> <span class="n">perceived</span>  <span class="ow">in</span> <span class="n">early</span> <span class="n">times</span>  <span class="n">t</span><span class="p">...</span>     <span class="mi">13871</span>      <span class="mi">2323</span>         <span class="mf">5.971158</span>
+</code></pre></div></div>
+
+<p>These features may appear basic but can be quite useful in ML models.</p>
+
+<h4 id="42-word-counts"><strong>4.2 Word counts</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/11.png?w=1012" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/12.png?w=993" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/13.png?w=986" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/14.png?w=594" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/15.png?w=995" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/16.png?w=685" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/17.png?w=1023" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/18.png?w=992" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/19.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/20.png?w=791" alt="" /></li>
+</ul>
+
+<p><strong>4.2.1 Counting words (I)</strong></p>
+
+<p>Once high level information has been recorded you can begin creating features based on the actual content of each text. One way to do this is to approach it in a similar way to how you worked with categorical variables in the earlier lessons.</p>
+
+<ul>
+  <li>For each unique word in the dataset a column is created.</li>
+  <li>For each entry, the number of times this word occurs is counted and the count value is entered into the respective column.</li>
+</ul>
+
+<p>These “count” columns can then be used to train machine learning models.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import CountVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+
+<span class="c1"># Instantiate CountVectorizer
+</span><span class="n">cv</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">()</span>
+
+<span class="c1"># Fit the vectorizer
+</span><span class="n">cv</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">])</span>
+
+<span class="c1"># Print feature names
+</span><span class="k">print</span><span class="p">(</span><span class="n">cv</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s">'abandon'</span><span class="p">,</span> <span class="s">'abandoned'</span><span class="p">,</span> <span class="s">'abandonment'</span><span class="p">,</span> <span class="s">'abate'</span><span class="p">,</span> <span class="s">'abdicated'</span><span class="p">,</span> <span class="s">'abeyance'</span><span class="p">,</span> <span class="s">'abhorring'</span><span class="p">,</span> <span class="s">'abide'</span><span class="p">,</span> <span class="s">'abiding'</span><span class="p">,</span> <span class="s">'abilities'</span><span class="p">,</span> <span class="s">'ability'</span><span class="p">,</span> <span class="s">'abject'</span><span class="p">,</span> <span class="s">'able'</span><span class="p">,</span> <span class="p">...]</span>
+</code></pre></div></div>
+
+<p><strong>4.2.2 Counting words (II)</strong></p>
+
+<p>Once the vectorizer has been fit to the data, it can be used to transform the text to an array representing the word counts. This array will have a row per block of text and a column for each of the features generated by the vectorizer that you observed in the last exercise.</p>
+
+<p>The vectorizer to you fit in the last exercise (<code class="language-plaintext highlighter-rouge">cv</code>) is available in your workspace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Apply the vectorizer
+</span><span class="n">cv_transformed</span> <span class="o">=</span> <span class="n">cv</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">])</span>
+
+<span class="c1"># Print the full array
+</span><span class="n">cv_array</span> <span class="o">=</span> <span class="n">cv_transformed</span><span class="p">.</span><span class="n">toarray</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">cv_array</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">cv_array</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (58, 9043)
+</span></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[[</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">...</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">...</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="p">...</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]</span>
+ <span class="p">...</span>
+ <span class="p">[</span><span class="mi">0</span> <span class="mi">1</span> <span class="mi">0</span> <span class="p">...</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">...</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]</span>
+ <span class="p">[</span><span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span> <span class="p">...</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">0</span><span class="p">]]</span>
+</code></pre></div></div>
+
+<p>The speeches have 9043 unique words, which is a lot! In the next exercise, you will see how to create a limited set of features.</p>
+
+<p><strong>4.2.3 Limiting your features</strong></p>
+
+<p>As you have seen, using the <code class="language-plaintext highlighter-rouge">CountVectorizer</code> with its default settings creates a feature for every single word in your corpus. This can create far too many features, often including ones that will provide very little analytical value.</p>
+
+<p>For this purpose <code class="language-plaintext highlighter-rouge">CountVectorizer</code> has parameters that you can set to reduce the number of features:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">min_df</code> : Use only words that occur in more than this percentage of documents. This can be used to remove outlier words that will not generalize across texts.</li>
+  <li><code class="language-plaintext highlighter-rouge">max_df</code> : Use only words that occur in less than this percentage of documents. This is useful to eliminate very common words that occur in every corpus without adding value such as “and” or “the”.</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import CountVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+
+<span class="c1"># Specify arguements to limit the number of features generated
+</span><span class="n">cv</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">min_df</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">max_df</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+
+<span class="c1"># Fit, transform, and convert into array
+</span><span class="n">cv_transformed</span> <span class="o">=</span> <span class="n">cv</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">])</span>
+<span class="n">cv_array</span> <span class="o">=</span> <span class="n">cv_transformed</span><span class="p">.</span><span class="n">toarray</span><span class="p">()</span>
+
+<span class="c1"># Print the array shape
+</span><span class="k">print</span><span class="p">(</span><span class="n">cv_array</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (58, 818)
+</span></code></pre></div></div>
+
+<p><strong>4.2.4 Text to DataFrame</strong></p>
+
+<p>Now that you have generated these count based features in an array you will need to reformat them so that they can be combined with the rest of the dataset. This can be achieved by converting the array into a pandas DataFrame, with the feature names you found earlier as the column names, and then concatenate it with the original DataFrame.</p>
+
+<p>The numpy array (<code class="language-plaintext highlighter-rouge">cv_array</code>) and the vectorizer (<code class="language-plaintext highlighter-rouge">cv</code>) you fit in the last exercise are available in your workspace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a DataFrame with these features
+</span><span class="n">cv_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cv_array</span><span class="p">,</span>
+                     <span class="n">columns</span><span class="o">=</span><span class="n">cv</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">()).</span><span class="n">add_prefix</span><span class="p">(</span><span class="s">'Counts_'</span><span class="p">)</span>
+
+<span class="c1"># Add the new columns to the original DataFrame
+</span><span class="n">speech_df_new</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">speech_df</span><span class="p">,</span> <span class="n">cv_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">speech_df_new</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>                <span class="n">Name</span>         <span class="n">Inaugural</span> <span class="n">Address</span>                      <span class="n">Date</span>                                               <span class="n">text</span>                                         <span class="n">text_clean</span>  <span class="p">...</span>  <span class="n">Counts_years</span>  \
+<span class="mi">0</span>  <span class="n">George</span> <span class="n">Washington</span>   <span class="n">First</span> <span class="n">Inaugural</span> <span class="n">Address</span>  <span class="n">Thursday</span><span class="p">,</span> <span class="n">April</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">1789</span>  <span class="n">Fellow</span><span class="o">-</span><span class="n">Citizens</span> <span class="n">of</span> <span class="n">the</span> <span class="n">Senate</span> <span class="ow">and</span> <span class="n">of</span> <span class="n">the</span> <span class="n">House</span><span class="p">...</span>  <span class="n">fellow</span> <span class="n">citizens</span> <span class="n">of</span> <span class="n">the</span> <span class="n">senate</span> <span class="ow">and</span> <span class="n">of</span> <span class="n">the</span> <span class="n">house</span><span class="p">...</span>  <span class="p">...</span>             <span class="mi">1</span>
+<span class="mi">1</span>  <span class="n">George</span> <span class="n">Washington</span>  <span class="n">Second</span> <span class="n">Inaugural</span> <span class="n">Address</span>     <span class="n">Monday</span><span class="p">,</span> <span class="n">March</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1793</span>  <span class="n">Fellow</span> <span class="n">Citizens</span><span class="p">:</span>  <span class="n">I</span> <span class="n">AM</span> <span class="n">again</span> <span class="n">called</span> <span class="n">upon</span> <span class="n">by</span> <span class="n">th</span><span class="p">...</span>  <span class="n">fellow</span> <span class="n">citizens</span>   <span class="n">i</span> <span class="n">am</span> <span class="n">again</span> <span class="n">called</span> <span class="n">upon</span> <span class="n">by</span> <span class="n">th</span><span class="p">...</span>  <span class="p">...</span>             <span class="mi">0</span>
+<span class="mi">2</span>         <span class="n">John</span> <span class="n">Adams</span>         <span class="n">Inaugural</span> <span class="n">Address</span>   <span class="n">Saturday</span><span class="p">,</span> <span class="n">March</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1797</span>  <span class="n">WHEN</span> <span class="n">it</span> <span class="n">was</span> <span class="n">first</span> <span class="n">perceived</span><span class="p">,</span> <span class="ow">in</span> <span class="n">early</span> <span class="n">times</span><span class="p">,</span> <span class="n">t</span><span class="p">...</span>  <span class="n">when</span> <span class="n">it</span> <span class="n">was</span> <span class="n">first</span> <span class="n">perceived</span>  <span class="ow">in</span> <span class="n">early</span> <span class="n">times</span>  <span class="n">t</span><span class="p">...</span>  <span class="p">...</span>             <span class="mi">3</span>
+<span class="mi">3</span>   <span class="n">Thomas</span> <span class="n">Jefferson</span>   <span class="n">First</span> <span class="n">Inaugural</span> <span class="n">Address</span>  <span class="n">Wednesday</span><span class="p">,</span> <span class="n">March</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1801</span>  <span class="n">Friends</span> <span class="ow">and</span> <span class="n">Fellow</span><span class="o">-</span><span class="n">Citizens</span><span class="p">:</span>  <span class="n">CALLED</span> <span class="n">upon</span> <span class="n">to</span> <span class="n">u</span><span class="p">...</span>  <span class="n">friends</span> <span class="ow">and</span> <span class="n">fellow</span> <span class="n">citizens</span>   <span class="n">called</span> <span class="n">upon</span> <span class="n">to</span> <span class="n">u</span><span class="p">...</span>  <span class="p">...</span>             <span class="mi">0</span>
+<span class="mi">4</span>   <span class="n">Thomas</span> <span class="n">Jefferson</span>  <span class="n">Second</span> <span class="n">Inaugural</span> <span class="n">Address</span>     <span class="n">Monday</span><span class="p">,</span> <span class="n">March</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1805</span>  <span class="n">PROCEEDING</span><span class="p">,</span> <span class="n">fellow</span><span class="o">-</span><span class="n">citizens</span><span class="p">,</span> <span class="n">to</span> <span class="n">that</span> <span class="n">qualifica</span><span class="p">...</span>  <span class="n">proceeding</span>  <span class="n">fellow</span> <span class="n">citizens</span>  <span class="n">to</span> <span class="n">that</span> <span class="n">qualifica</span><span class="p">...</span>  <span class="p">...</span>             <span class="mi">2</span>
+
+   <span class="n">Counts_yet</span>  <span class="n">Counts_you</span>  <span class="n">Counts_young</span>  <span class="n">Counts_your</span>
+<span class="mi">0</span>           <span class="mi">0</span>           <span class="mi">5</span>             <span class="mi">0</span>            <span class="mi">9</span>
+<span class="mi">1</span>           <span class="mi">0</span>           <span class="mi">0</span>             <span class="mi">0</span>            <span class="mi">1</span>
+<span class="mi">2</span>           <span class="mi">0</span>           <span class="mi">0</span>             <span class="mi">0</span>            <span class="mi">1</span>
+<span class="mi">3</span>           <span class="mi">2</span>           <span class="mi">7</span>             <span class="mi">0</span>            <span class="mi">7</span>
+<span class="mi">4</span>           <span class="mi">2</span>           <span class="mi">4</span>             <span class="mi">0</span>            <span class="mi">4</span>
+
+<span class="p">[</span><span class="mi">5</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">826</span> <span class="n">columns</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>With the new features combined with the orginial DataFrame they can be now used for ML models or analysis.</p>
+
+<h4 id="43-term-frequency-inverse-document-frequency"><strong>4.3 Term frequency-inverse document frequency</strong></h4>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/1-1.png?w=689" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/2-1.png?w=980" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/3-1.png?w=991" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/4-1.png?w=996" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/5-1.png?w=996" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/6-1.png?w=987" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/7-1.png?w=842" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/8-1.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>4.3.1 Tf-idf</strong></p>
+
+<p>While counts of occurrences of words can be useful to build models, words that occur many times may skew the results undesirably. To limit these common words from overpowering your model a form of normalization can be used. In this lesson you will be using Term frequency-inverse document frequency (Tf-idf) as was discussed in the video. Tf-idf has the effect of reducing the value of common words, while increasing the weight of words that do not occur in many documents.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import TfidfVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">TfidfVectorizer</span>
+
+<span class="c1"># Instantiate TfidfVectorizer
+</span><span class="n">tv</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="n">max_features</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">stop_words</span><span class="o">=</span><span class="s">'english'</span><span class="p">)</span>
+
+<span class="c1"># Fit the vectroizer and transform the data
+</span><span class="n">tv_transformed</span> <span class="o">=</span> <span class="n">tv</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">])</span>
+
+<span class="c1"># Create a DataFrame with these features
+</span><span class="n">tv_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tv_transformed</span><span class="p">.</span><span class="n">toarray</span><span class="p">(),</span>
+                     <span class="n">columns</span><span class="o">=</span><span class="n">tv</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">()).</span><span class="n">add_prefix</span><span class="p">(</span><span class="s">'TFIDF_'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">tv_df</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   <span class="n">TFIDF_action</span>  <span class="n">TFIDF_administration</span>  <span class="n">TFIDF_america</span>  <span class="n">TFIDF_american</span>  <span class="n">TFIDF_americans</span>  <span class="p">...</span>  <span class="n">TFIDF_war</span>  <span class="n">TFIDF_way</span>  <span class="n">TFIDF_work</span>  <span class="n">TFIDF_world</span>  <span class="n">TFIDF_years</span>
+<span class="mi">0</span>      <span class="mf">0.000000</span>              <span class="mf">0.133415</span>       <span class="mf">0.000000</span>        <span class="mf">0.105388</span>              <span class="mf">0.0</span>  <span class="p">...</span>   <span class="mf">0.000000</span>   <span class="mf">0.060755</span>    <span class="mf">0.000000</span>     <span class="mf">0.045929</span>     <span class="mf">0.052694</span>
+<span class="mi">1</span>      <span class="mf">0.000000</span>              <span class="mf">0.261016</span>       <span class="mf">0.266097</span>        <span class="mf">0.000000</span>              <span class="mf">0.0</span>  <span class="p">...</span>   <span class="mf">0.000000</span>   <span class="mf">0.000000</span>    <span class="mf">0.000000</span>     <span class="mf">0.000000</span>     <span class="mf">0.000000</span>
+<span class="mi">2</span>      <span class="mf">0.000000</span>              <span class="mf">0.092436</span>       <span class="mf">0.157058</span>        <span class="mf">0.073018</span>              <span class="mf">0.0</span>  <span class="p">...</span>   <span class="mf">0.024339</span>   <span class="mf">0.000000</span>    <span class="mf">0.000000</span>     <span class="mf">0.063643</span>     <span class="mf">0.073018</span>
+<span class="mi">3</span>      <span class="mf">0.000000</span>              <span class="mf">0.092693</span>       <span class="mf">0.000000</span>        <span class="mf">0.000000</span>              <span class="mf">0.0</span>  <span class="p">...</span>   <span class="mf">0.036610</span>   <span class="mf">0.000000</span>    <span class="mf">0.039277</span>     <span class="mf">0.095729</span>     <span class="mf">0.000000</span>
+<span class="mi">4</span>      <span class="mf">0.041334</span>              <span class="mf">0.039761</span>       <span class="mf">0.000000</span>        <span class="mf">0.031408</span>              <span class="mf">0.0</span>  <span class="p">...</span>   <span class="mf">0.094225</span>   <span class="mf">0.000000</span>    <span class="mf">0.000000</span>     <span class="mf">0.054752</span>     <span class="mf">0.062817</span>
+
+<span class="p">[</span><span class="mi">5</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">100</span> <span class="n">columns</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>Did you notice that counting the word occurences and calculating the Tf-idf weights are very similar? This is one of the reasons scikit-learn is very popular, a consistent API.</p>
+
+<p><strong>4.3.2 Inspecting Tf-idf values</strong></p>
+
+<p>After creating Tf-idf features you will often want to understand what are the most highest scored words for each corpus. This can be achieved by isolating the row you want to examine and then sorting the the scores from high to low.</p>
+
+<p>The DataFrame from the last exercise (<code class="language-plaintext highlighter-rouge">tv_df</code>) is available in your workspace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Isolate the row to be examined
+</span><span class="n">sample_row</span> <span class="o">=</span> <span class="n">tv_df</span><span class="p">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Print the top 5 words of the sorted output
+</span><span class="k">print</span><span class="p">(</span><span class="n">sample_row</span><span class="p">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">).</span><span class="n">head</span><span class="p">())</span>
+
+<span class="n">TFIDF_government</span>    <span class="mf">0.367430</span>
+<span class="n">TFIDF_public</span>        <span class="mf">0.333237</span>
+<span class="n">TFIDF_present</span>       <span class="mf">0.315182</span>
+<span class="n">TFIDF_duty</span>          <span class="mf">0.238637</span>
+<span class="n">TFIDF_citizens</span>      <span class="mf">0.229644</span>
+<span class="n">Name</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+</code></pre></div></div>
+
+<p>When creating vectors from text, any transformations that you perform before training a machine learning model, you also need to apply on the new unseen (test) data. To achieve this follow the same approach from the last chapter: <em>fit the vectorizer only on the training data, and apply it to the test data.</em></p>
+
+<p>For this exercise the <code class="language-plaintext highlighter-rouge">speech_df</code> DataFrame has been split in two:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">train_speech_df</code>: The training set consisting of the first 45 speeches.</li>
+  <li><code class="language-plaintext highlighter-rouge">test_speech_df</code>: The test set consisting of the remaining speeches.</li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Instantiate TfidfVectorizer
+</span><span class="n">tv</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="n">max_features</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">stop_words</span><span class="o">=</span><span class="s">'english'</span><span class="p">)</span>
+
+<span class="c1"># Fit the vectroizer and transform the data
+</span><span class="n">tv_transformed</span> <span class="o">=</span> <span class="n">tv</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">train_speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">])</span>
+
+<span class="c1"># Transform test data
+</span><span class="n">test_tv_transformed</span> <span class="o">=</span> <span class="n">tv</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">])</span>
+
+<span class="c1"># Create new features for the test set
+</span><span class="n">test_tv_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">test_tv_transformed</span><span class="p">.</span><span class="n">toarray</span><span class="p">(),</span>
+                          <span class="n">columns</span><span class="o">=</span><span class="n">tv</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">()).</span><span class="n">add_prefix</span><span class="p">(</span><span class="s">'TFIDF_'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">test_tv_df</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   <span class="n">TFIDF_action</span>  <span class="n">TFIDF_administration</span>  <span class="n">TFIDF_america</span>  <span class="n">TFIDF_american</span>  <span class="n">TFIDF_authority</span>  <span class="p">...</span>  <span class="n">TFIDF_war</span>  <span class="n">TFIDF_way</span>  <span class="n">TFIDF_work</span>  <span class="n">TFIDF_world</span>  <span class="n">TFIDF_years</span>
+<span class="mi">0</span>      <span class="mf">0.000000</span>              <span class="mf">0.029540</span>       <span class="mf">0.233954</span>        <span class="mf">0.082703</span>         <span class="mf">0.000000</span>  <span class="p">...</span>   <span class="mf">0.079050</span>   <span class="mf">0.033313</span>    <span class="mf">0.000000</span>     <span class="mf">0.299983</span>     <span class="mf">0.134749</span>
+<span class="mi">1</span>      <span class="mf">0.000000</span>              <span class="mf">0.000000</span>       <span class="mf">0.547457</span>        <span class="mf">0.036862</span>         <span class="mf">0.000000</span>  <span class="p">...</span>   <span class="mf">0.052851</span>   <span class="mf">0.066817</span>    <span class="mf">0.078999</span>     <span class="mf">0.277701</span>     <span class="mf">0.126126</span>
+<span class="mi">2</span>      <span class="mf">0.000000</span>              <span class="mf">0.000000</span>       <span class="mf">0.126987</span>        <span class="mf">0.134669</span>         <span class="mf">0.000000</span>  <span class="p">...</span>   <span class="mf">0.042907</span>   <span class="mf">0.054245</span>    <span class="mf">0.096203</span>     <span class="mf">0.225452</span>     <span class="mf">0.043884</span>
+<span class="mi">3</span>      <span class="mf">0.037094</span>              <span class="mf">0.067428</span>       <span class="mf">0.267012</span>        <span class="mf">0.031463</span>         <span class="mf">0.039990</span>  <span class="p">...</span>   <span class="mf">0.030073</span>   <span class="mf">0.038020</span>    <span class="mf">0.235998</span>     <span class="mf">0.237026</span>     <span class="mf">0.061516</span>
+<span class="mi">4</span>      <span class="mf">0.000000</span>              <span class="mf">0.000000</span>       <span class="mf">0.221561</span>        <span class="mf">0.156644</span>         <span class="mf">0.028442</span>  <span class="p">...</span>   <span class="mf">0.021389</span>   <span class="mf">0.081124</span>    <span class="mf">0.119894</span>     <span class="mf">0.299701</span>     <span class="mf">0.153133</span>
+
+<span class="p">[</span><span class="mi">5</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">100</span> <span class="n">columns</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p><strong>4.4 N-grams</strong></p>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/9-1.png?w=722" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/10-1.png?w=1003" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/11-1.png?w=1000" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/12-1.png?w=897" alt="" /></li>
+</ul>
+
+<p><strong>4.4.1 Using longer n-grams</strong></p>
+
+<p>So far you have created features based on individual words in each of the texts. This can be quite powerful when used in a machine learning model but you may be concerned that by looking at words individually a lot of the context is being ignored. To deal with this when creating models you can use n-grams which are sequence of n words grouped together. For example:</p>
+
+<ul>
+  <li>bigrams: Sequences of two consecutive words</li>
+  <li>trigrams: Sequences of three consecutive words</li>
+</ul>
+
+<p>These can be automatically created in your dataset by specifying the <code class="language-plaintext highlighter-rouge">ngram_range</code> argument as a tuple <code class="language-plaintext highlighter-rouge">(n1, n2)</code> where all n-grams in the <code class="language-plaintext highlighter-rouge">n1</code> to <code class="language-plaintext highlighter-rouge">n2</code> range are included.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import CountVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+
+<span class="c1"># Instantiate a trigram vectorizer
+</span><span class="n">cv_trigram_vec</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">max_features</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                                 <span class="n">stop_words</span><span class="o">=</span><span class="s">'english'</span><span class="p">,</span>
+                                 <span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="c1"># Fit and apply trigram vectorizer
+</span><span class="n">cv_trigram</span> <span class="o">=</span> <span class="n">cv_trigram_vec</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">speech_df</span><span class="p">[</span><span class="s">'text_clean'</span><span class="p">])</span>
+
+<span class="c1"># Print the trigram features
+</span><span class="k">print</span><span class="p">(</span><span class="n">cv_trigram_vec</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s">'ability preserve protect'</span><span class="p">,</span> <span class="s">'agriculture commerce manufactures'</span><span class="p">,</span> <span class="s">'america ideal freedom'</span><span class="p">,</span> <span class="s">'amity mutual concession'</span><span class="p">,</span> <span class="s">'anchor peace home'</span><span class="p">,</span> <span class="s">'ask bow heads'</span><span class="p">,</span> <span class="p">...]</span>
+</code></pre></div></div>
+
+<p><strong>4.4.2 Finding the most common words</strong></p>
+
+<p>Its always advisable once you have created your features to inspect them to ensure that they are as you would expect. This will allow you to catch errors early, and perhaps influence what further feature engineering you will need to do.</p>
+
+<p>The vectorizer (<code class="language-plaintext highlighter-rouge">cv</code>) you fit in the last exercise and the sparse array consisting of word counts (<code class="language-plaintext highlighter-rouge">cv_trigram</code>) is available in your workspace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a DataFrame of the features
+</span><span class="n">cv_tri_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">cv_trigram</span><span class="p">.</span><span class="n">toarray</span><span class="p">(),</span>
+                 <span class="n">columns</span><span class="o">=</span><span class="n">cv_trigram_vec</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">()).</span><span class="n">add_prefix</span><span class="p">(</span><span class="s">'Counts_'</span><span class="p">)</span>
+
+<span class="c1"># Print the top 5 words in the sorted output
+</span><span class="k">print</span><span class="p">(</span><span class="n">cv_tri_df</span><span class="p">.</span><span class="nb">sum</span><span class="p">().</span><span class="n">sort_values</span><span class="p">(</span><span class="n">ascending</span><span class="o">=</span><span class="bp">False</span><span class="p">).</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Counts_constitution</span> <span class="n">united</span> <span class="n">states</span>    <span class="mi">20</span>
+<span class="n">Counts_people</span> <span class="n">united</span> <span class="n">states</span>          <span class="mi">13</span>
+<span class="n">Counts_preserve</span> <span class="n">protect</span> <span class="n">defend</span>       <span class="mi">10</span>
+<span class="n">Counts_mr</span> <span class="n">chief</span> <span class="n">justice</span>              <span class="mi">10</span>
+<span class="n">Counts_president</span> <span class="n">united</span> <span class="n">states</span>        <span class="mi">8</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+</code></pre></div></div>
+
+<p><strong>4.5 Wrap-up</strong></p>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/13-1.png?w=761" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/14-1.png?w=804" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/15-1.png?w=778" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/16-1.png?w=946" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/17-1.png?w=425" alt="" /></li>
+</ul>
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>

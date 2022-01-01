@@ -1,0 +1,1202 @@
+<h1 id="machine-learning-with-tree-based-models-in-python">Machine Learning with Tree-Based Models in Python</h1>
+
+<p>This is the memo of the 24th course of ‘Data Scientist with Python’ track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/machine-learning-with-tree-based-models-in-python">HERE</a></strong>
+ .</p>
+
+<hr />
+
+<h1 id="1-classification-and-regression-treescart"><strong>1. Classification and Regression Trees(CART)</strong></h1>
+<hr />
+
+<h2 id="11-decision-tree-for-classification"><strong>1.1 Decision tree for classification</strong></h2>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Train your first classification tree</strong></p>
+
+<p>In this exercise you’ll work with the
+ <a href="https://www.kaggle.com/uciml/breast-cancer-wisconsin-data">Wisconsin Breast Cancer Dataset</a>
+ from the UCI machine learning repository. You’ll predict whether a tumor is malignant or benign based on two features: the mean radius of the tumor (
+ <code class="language-plaintext highlighter-rouge">radius_mean</code>
+ ) and its mean number of concave points (
+ <code class="language-plaintext highlighter-rouge">concave points_mean</code>
+ ).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import DecisionTreeClassifier from sklearn.tree
+</span><span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+
+<span class="c1"># Instantiate a DecisionTreeClassifier 'dt' with a maximum depth of 6
+</span><span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">SEED</span><span class="p">)</span>
+
+<span class="c1"># Fit dt to the training set
+</span><span class="n">dt</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Predict test set labels
+</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">dt</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">y_pred</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
+
+<span class="c1"># [0 0 0 1 0]
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Evaluate the classification tree</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import accuracy_score
+</span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+
+<span class="c1"># Predict test set labels
+</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">dt</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Compute test set accuracy
+</span><span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Test set accuracy: {:.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">acc</span><span class="p">))</span>
+
+<span class="c1"># Test set accuracy: 0.89
+</span>
+</code></pre></div></div>
+
+<p>Using only two features, your tree was able to achieve an accuracy of 89%!</p>
+
+<p>####
+<strong>Logistic regression vs classification tree</strong></p>
+
+<p>A classification tree divides the feature space into
+ <strong>rectangular regions</strong>
+ . In contrast, a linear model such as logistic regression produces only a single linear decision boundary dividing the feature space into two decision regions.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+help(plot_labeled_decision_regions)
+
+Signature: plot_labeled_decision_regions(X, y, models)
+Docstring:
+Function producing a scatter plot of the instances contained
+in the 2D dataset (X,y) along with the decision
+regions of two trained classification models contained in the
+list 'models'.
+
+Parameters
+----------
+X: pandas DataFrame corresponding to two numerical features
+y: pandas Series corresponding the class labels
+models: list containing two trained classifiers
+File:      /tmp/tmpzto071yc/&lt;ipython-input-1-9e70bec83095&gt;
+Type:      function
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import LogisticRegression from sklearn.linear_model
+</span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span>  <span class="n">LogisticRegression</span>
+
+<span class="c1"># Instatiate logreg
+</span><span class="n">logreg</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Fit logreg to the training set
+</span><span class="n">logreg</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Define a list called clfs containing the two classifiers logreg and dt
+</span><span class="n">clfs</span> <span class="o">=</span> <span class="p">[</span><span class="n">logreg</span><span class="p">,</span> <span class="n">dt</span><span class="p">]</span>
+
+<span class="c1"># Review the decision regions of the two classifiers
+</span><span class="n">plot_labeled_decision_regions</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">clfs</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture1-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>Notice how the decision boundary produced by logistic regression is linear while the boundaries produced by the classification tree divide the feature space into rectangular regions.</p>
+
+<hr />
+
+<h2 id="12-classification-tree-learning"><strong>1.2 Classification tree Learning</strong></h2>
+
+<p><strong>Terms</strong></p>
+
+<ul>
+  <li><strong>Decision Tree:</strong>
+ data structure consisting of a hierarchy of nodes</li>
+  <li><strong>Node:</strong>
+ question or prediction</li>
+</ul>
+
+<p><strong>Node</strong></p>
+
+<ul>
+  <li><strong>Root:</strong>
+ no parent node, question giving rise to two children nodes</li>
+  <li><strong>Internal node:</strong>
+ one parent node, question giving rise to two children nodes</li>
+  <li><strong>Leaf:</strong>
+ one parent node, no children nodes –&gt; prediction</li>
+</ul>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture2-1.png?w=1024" alt="Desktop View" /></p>
+
+<p><strong><a href="https://en.wikipedia.org/wiki/Information_gain_in_decision_trees">Information gain in decision trees</a></strong></p>
+
+<p><a href="https://en.wikipedia.org/wiki/Decision_tree_learning#Gini_impurity">Gini impurity</a></p>
+
+<p>####
+<strong>Growing a classification tree</strong></p>
+
+<ul>
+  <li>The existence of a node depends on the state of its predecessors.</li>
+  <li>The impurity of a node can be determined using different criteria such as entropy and the gini-index.</li>
+  <li>When the information gain resulting from splitting a node is null, the node is declared as a leaf.</li>
+  <li>When an internal node is split, the split is performed in such a way so that information gain is maximized.</li>
+</ul>
+
+<p>####
+<strong>Using entropy as a criterion</strong></p>
+
+<p>In this exercise, you’ll train a classification tree on the Wisconsin Breast Cancer dataset using entropy as an information criterion.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import DecisionTreeClassifier from sklearn.tree
+</span><span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+
+<span class="c1"># Instantiate dt_entropy, set 'entropy' as the information criterion
+</span><span class="n">dt_entropy</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="s">'entropy'</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Fit dt_entropy to the training set
+</span><span class="n">dt_entropy</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Entropy vs Gini index</strong></p>
+
+<p>In this exercise you’ll compare the test set accuracy of
+ <code class="language-plaintext highlighter-rouge">dt_entropy</code>
+ to the accuracy of another tree named
+ <code class="language-plaintext highlighter-rouge">dt_gini</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import accuracy_score from sklearn.metrics
+</span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+
+<span class="c1"># Use dt_entropy to predict test set labels
+</span><span class="n">y_pred</span><span class="o">=</span> <span class="n">dt_entropy</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Evaluate accuracy_entropy
+</span><span class="n">accuracy_entropy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+<span class="c1"># Print accuracy_entropy
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Accuracy achieved by using entropy: '</span><span class="p">,</span> <span class="n">accuracy_entropy</span><span class="p">)</span>
+
+<span class="c1"># Print accuracy_gini
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Accuracy achieved by using the gini index: '</span><span class="p">,</span> <span class="n">accuracy_gini</span><span class="p">)</span>
+
+<span class="c1"># Accuracy achieved by using entropy:  0.929824561404
+# Accuracy achieved by using the gini index:  0.929824561404
+</span>
+</code></pre></div></div>
+
+<p>Notice how the two models achieve exactly the same accuracy. Most of the time, the gini index and entropy lead to the same results. The gini index is slightly faster to compute and is the default criterion used in the
+ <code class="language-plaintext highlighter-rouge">DecisionTreeClassifier</code>
+ model of scikit-learn.</p>
+
+<hr />
+
+<h2 id="13-decision-tree-for-regression"><strong>1.3 Decision tree for regression</strong></h2>
+
+<p>####
+<strong>Train your first regression tree</strong></p>
+
+<p>In this exercise, you’ll train a regression tree to predict the
+ <code class="language-plaintext highlighter-rouge">mpg</code>
+ (miles per gallon) consumption of cars in the
+ <a href="https://www.kaggle.com/uciml/autompg-dataset">auto-mpg dataset</a>
+ using all the six available features.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import DecisionTreeRegressor from sklearn.tree
+</span><span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeRegressor</span>
+
+<span class="c1"># Instantiate dt
+</span><span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeRegressor</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+             <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mf">0.13</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># Fit dt to the training set
+</span><span class="n">dt</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Evaluate the regression tree</strong></p>
+
+<p>In this exercise, you will evaluate the test set performance of
+ <code class="language-plaintext highlighter-rouge">dt</code>
+ using the Root Mean Squared Error (RMSE) metric. The RMSE of a model measures, on average, how much the model’s predictions differ from the actual labels.</p>
+
+<p>The RMSE of a model can be obtained by computing the square root of the model’s Mean Squared Error (MSE).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import mean_squared_error from sklearn.metrics as MSE
+</span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span> <span class="k">as</span> <span class="n">MSE</span>
+
+<span class="c1"># Compute y_pred
+</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">dt</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Compute mse_dt
+</span><span class="n">mse_dt</span> <span class="o">=</span> <span class="n">MSE</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+<span class="c1"># Compute rmse_dt
+</span><span class="n">rmse_dt</span> <span class="o">=</span> <span class="n">mse_dt</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+<span class="c1"># Print rmse_dt
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Test set RMSE of dt: {:.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">rmse_dt</span><span class="p">))</span>
+
+<span class="c1"># Test set RMSE of dt: 4.37
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Linear regression vs regression tree</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Predict test set labels
+</span><span class="n">y_pred_lr</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Compute mse_lr
+</span><span class="n">mse_lr</span> <span class="o">=</span> <span class="n">MSE</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_lr</span><span class="p">)</span>
+
+<span class="c1"># Compute rmse_lr
+</span><span class="n">rmse_lr</span> <span class="o">=</span> <span class="n">mse_lr</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+<span class="c1"># Print rmse_lr
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Linear Regression test set RMSE: {:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">rmse_lr</span><span class="p">))</span>
+
+<span class="c1"># Print rmse_dt
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Regression Tree test set RMSE: {:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">rmse_dt</span><span class="p">))</span>
+
+<span class="c1"># Linear Regression test set RMSE: 5.10
+# Regression Tree test set RMSE: 4.37
+</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture3-2.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h1 id="2-the-bias-variance-tradeoff"><strong>2. The Bias-Variance Tradeoff</strong></h1>
+<hr />
+
+<h2 id="21-generalization-error"><strong>2.1 Generalization Error</strong></h2>
+
+<p><strong><a href="https://en.wikipedia.org/wiki/Bias%E2%80%93variance_tradeoff">Bias–variance tradeoff</a></strong></p>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture4-2.png?w=908" alt="Desktop View" /></p>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture5-2.png?w=809" alt="Desktop View" /></p>
+
+<p>####
+<strong>Overfitting and underfitting</strong></p>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture6-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>A: complex = overfit = low bias = high variance</p>
+
+<p>B: simple = underfit = high bias = low variance</p>
+
+<hr />
+
+<h2 id="22-diagnose-bias-and-variance-problems"><strong>2.2 Diagnose bias and variance problems</strong></h2>
+
+<p>####
+<strong>Instantiate the model</strong></p>
+
+<p>In the following set of exercises, you’ll diagnose the bias and variance problems of a regression tree.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import train_test_split from sklearn.model_selection
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="c1"># Set SEED for reproducibility
+</span><span class="n">SEED</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># Split the data into 70% train and 30% test
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">SEED</span><span class="p">)</span>
+
+<span class="c1"># Instantiate a DecisionTreeRegressor dt
+</span><span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeRegressor</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">min_samples_leaf</span><span class="o">=</span><span class="mf">0.26</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">SEED</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Evaluate the 10-fold CV error</strong></p>
+
+<p>In this exercise, you’ll evaluate the 10-fold CV Root Mean Squared Error (RMSE) achieved by the regression tree
+ <code class="language-plaintext highlighter-rouge">dt</code>
+ that you instantiated in the previous exercise.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the array containing the 10-folds CV MSEs
+</span><span class="n">MSE_CV_scores</span> <span class="o">=</span> <span class="o">-</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                       <span class="n">scoring</span><span class="o">=</span><span class="s">'neg_mean_squared_error'</span><span class="p">,</span>
+                       <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Compute the 10-folds CV RMSE
+</span><span class="n">RMSE_CV</span> <span class="o">=</span> <span class="p">(</span><span class="n">MSE_CV_scores</span><span class="p">.</span><span class="n">mean</span><span class="p">())</span><span class="o">**</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># Print RMSE_CV
+</span><span class="k">print</span><span class="p">(</span><span class="s">'CV RMSE: {:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">RMSE_CV</span><span class="p">))</span>
+
+<span class="c1"># CV RMSE: 5.14
+</span>
+</code></pre></div></div>
+
+<p>A very good practice is to keep the test set untouched until you are confident about your model’s performance.</p>
+
+<p>CV is a great technique to get an estimate of a model’s performance without affecting the test set.</p>
+
+<p>####
+<strong>Evaluate the training error</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import mean_squared_error from sklearn.metrics as MSE
+</span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span> <span class="k">as</span> <span class="n">MSE</span>
+
+<span class="c1"># Fit dt to the training set
+</span><span class="n">dt</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Predict the labels of the training set
+</span><span class="n">y_pred_train</span> <span class="o">=</span> <span class="n">dt</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+<span class="c1"># Evaluate the training set RMSE of dt
+</span><span class="n">RMSE_train</span> <span class="o">=</span> <span class="p">(</span><span class="n">MSE</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_pred_train</span><span class="p">))</span><span class="o">**</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># Print RMSE_train
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Train RMSE: {:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">RMSE_train</span><span class="p">))</span>
+
+<span class="c1"># Train RMSE: 5.15
+</span>
+</code></pre></div></div>
+
+<p>Notice how the training error is roughly equal to the 10-folds CV error you obtained in the previous exercice.</p>
+
+<p>####
+<strong>High bias or high variance?</strong></p>
+
+<p>In this exercise you’ll diagnose whether the regression tree
+ <code class="language-plaintext highlighter-rouge">dt</code>
+ you trained in the previous exercise suffers from a bias or a variance problem.</p>
+
+<p>The training set RMSE (
+ <code class="language-plaintext highlighter-rouge">RMSE_train</code>
+ ) and the CV RMSE (
+ <code class="language-plaintext highlighter-rouge">RMSE_CV</code>
+ ) achieved by
+ <code class="language-plaintext highlighter-rouge">dt</code>
+ are available in your workspace. In addition, we have also loaded a variable called
+ <code class="language-plaintext highlighter-rouge">baseline_RMSE</code>
+ which corresponds to the root mean-squared error achieved by the regression-tree trained with the
+ <code class="language-plaintext highlighter-rouge">disp</code>
+ feature only (it is the RMSE achieved by the regression tree trained in chapter 1, lesson 3).</p>
+
+<p>Here
+ <code class="language-plaintext highlighter-rouge">baseline_RMSE</code>
+ serves as the baseline RMSE.</p>
+
+<p>When above baseline, the model is considered to be underfitting.</p>
+
+<p>When below baseline, the model is considered ‘good enough’.</p>
+
+<p>Does
+ <code class="language-plaintext highlighter-rouge">dt</code>
+ suffer from a high bias or a high variance problem?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+RMSE_train = 5.15
+RMSE_CV = 5.14
+baseline_RMSE = 5.1
+
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">dt</code>
+ suffers from high bias because
+ <code class="language-plaintext highlighter-rouge">RMSE_CV</code>
+ ≈
+ <code class="language-plaintext highlighter-rouge">RMSE_train</code>
+ and both scores are greater than
+ <code class="language-plaintext highlighter-rouge">baseline_RMSE</code>
+ .</p>
+
+<p><code class="language-plaintext highlighter-rouge">dt</code>
+ is indeed underfitting the training set as the model is too constrained to capture the nonlinear dependencies between features and labels.</p>
+
+<hr />
+
+<h2 id="23-ensemble-learning"><strong>2.3 Ensemble Learning</strong></h2>
+
+<p>####
+<strong>Define the ensemble</strong></p>
+
+<p>In the following set of exercises, you’ll work with the
+ <a href="https://www.kaggle.com/jeevannagaraj/indian-liver-patient-dataset">Indian Liver Patient Dataset</a>
+ from the UCI Machine learning repository.</p>
+
+<p>In this exercise, you’ll instantiate three classifiers to predict whether a patient suffers from a liver disease using all the features present in the dataset.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier as KNN
+from sklearn.tree import DecisionTreeClassifier
+
+# Set seed for reproducibility
+SEED=1
+
+# Instantiate lr
+lr = LogisticRegression(random_state=SEED)
+
+# Instantiate knn
+knn = KNN(n_neighbors=27)
+
+# Instantiate dt
+dt = DecisionTreeClassifier(min_samples_leaf=0.13, random_state=SEED)
+
+# Define the list classifiers
+classifiers = [('Logistic Regression', lr), ('K Nearest Neighbours', knn), ('Classification Tree', dt)]
+
+</code></pre></div></div>
+
+<p>####
+<strong>Evaluate individual classifiers</strong></p>
+
+<p>In this exercise you’ll evaluate the performance of the models in the list
+ <code class="language-plaintext highlighter-rouge">classifiers</code>
+ that we defined in the previous exercise. You’ll do so by fitting each classifier on the training set and evaluating its test set accuracy.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.metrics import accuracy_score
+
+# Iterate over the pre-defined list of classifiers
+for clf_name, clf in classifiers:
+
+    # Fit clf to the training set
+    clf.fit(X_train, y_train)
+
+    # Predict y_pred
+    y_pred = clf.predict(X_test)
+
+    # Calculate accuracy
+    accuracy = accuracy_score(y_test, y_pred)
+
+    # Evaluate clf's accuracy on the test set
+    print('{:s} : {:.3f}'.format(clf_name, accuracy))
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Logistic Regression : 0.747
+K Nearest Neighbours : 0.724
+Classification Tree : 0.730
+
+</code></pre></div></div>
+
+<p>####
+<strong>Better performance with a Voting Classifier</strong></p>
+
+<p>Finally, you’ll evaluate the performance of a voting classifier that takes the outputs of the models defined in the list
+ <code class="language-plaintext highlighter-rouge">classifiers</code>
+ and assigns labels by majority voting.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+classifiers
+
+[('Logistic Regression',
+  LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+            intercept_scaling=1, max_iter=100, multi_class='ovr', n_jobs=1,
+            penalty='l2', random_state=1, solver='liblinear', tol=0.0001,
+            verbose=0, warm_start=False)),
+ ('K Nearest Neighbours',
+  KNeighborsClassifier(algorithm='auto', leaf_size=30, metric='minkowski',
+             metric_params=None, n_jobs=1, n_neighbors=27, p=2,
+             weights='uniform')),
+ ('Classification Tree',
+  DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
+              max_features=None, max_leaf_nodes=None,
+              min_impurity_decrease=0.0, min_impurity_split=None,
+              min_samples_leaf=0.13, min_samples_split=2,
+              min_weight_fraction_leaf=0.0, presort=False, random_state=1,
+              splitter='best'))]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import VotingClassifier from sklearn.ensemble
+</span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">VotingClassifier</span>
+
+<span class="c1"># Instantiate a VotingClassifier vc
+</span><span class="n">vc</span> <span class="o">=</span> <span class="n">VotingClassifier</span><span class="p">(</span><span class="n">estimators</span><span class="o">=</span><span class="n">classifiers</span><span class="p">)</span>
+
+<span class="c1"># Fit vc to the training set
+</span><span class="n">vc</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Evaluate the test set predictions
+</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">vc</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Calculate accuracy score
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Voting Classifier: {:.3f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">accuracy</span><span class="p">))</span>
+
+<span class="c1"># Voting Classifier: 0.753
+</span>
+</code></pre></div></div>
+
+<p>Notice how the voting classifier achieves a test set accuracy of 75.3%. This value is greater than that achieved by
+ <code class="language-plaintext highlighter-rouge">LogisticRegression</code>
+ .</p>
+
+<hr />
+
+<h1 id="3-bagging-and-random-forests"><strong>3. Bagging and Random Forests</strong></h1>
+<hr />
+
+<h2 id="31-baggingbootstrap"><strong>3.1 Bagging(bootstrap)</strong></h2>
+
+<p>boostrap = sample with replacement</p>
+
+<p>####
+<strong>Define the bagging classifier</strong></p>
+
+<p>In the following exercises you’ll work with the
+ <a href="https://www.kaggle.com/uciml/indian-liver-patient-records">Indian Liver Patient</a>
+ dataset from the UCI machine learning repository. Your task is to predict whether a patient suffers from a liver disease using 10 features including Albumin, age and gender. You’ll do so using a Bagging Classifier.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import DecisionTreeClassifier
+</span><span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+
+<span class="c1"># Import BaggingClassifier
+</span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">BaggingClassifier</span>
+
+<span class="c1"># Instantiate dt
+</span><span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Instantiate bc
+</span><span class="n">bc</span> <span class="o">=</span> <span class="n">BaggingClassifier</span><span class="p">(</span><span class="n">base_estimator</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">n_estimators</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Evaluate Bagging performance</strong></p>
+
+<p>Now that you instantiated the bagging classifier, it’s time to train it and evaluate its test set accuracy.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Fit bc to the training set
+</span><span class="n">bc</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Predict test set labels
+</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">bc</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Evaluate acc_test
+</span><span class="n">acc_test</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Test set accuracy of bc: {:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">acc_test</span><span class="p">))</span>
+
+<span class="c1"># Test set accuracy of bc: 0.71
+</span>
+</code></pre></div></div>
+
+<p>A single tree
+ <code class="language-plaintext highlighter-rouge">dt</code>
+ would have achieved an accuracy of 63% which is 8% lower than
+ <code class="language-plaintext highlighter-rouge">bc</code>
+ ‘s accuracy!</p>
+
+<hr />
+
+<h2 id="32-out-of-bagoob-evaluation"><strong>3.2 Out of Bag(OOB) Evaluation</strong></h2>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>What is OOB evaluation? = similar to Cross Validation</p>
+
+<p>How OOB evaluation works = use OOB samples to evaluate the model</p>
+
+<p>OOB sample = training data which are NOT selected by boostrap</p>
+
+<p>####
+<strong>Prepare the ground</strong></p>
+
+<p>In the following exercises, you’ll compare the OOB accuracy to the test set accuracy of a bagging classifier trained on the Indian Liver Patient dataset.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import DecisionTreeClassifier
+</span><span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+
+<span class="c1"># Import BaggingClassifier
+</span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">BaggingClassifier</span>
+
+<span class="c1"># Instantiate dt
+</span><span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">min_samples_leaf</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Instantiate bc
+</span><span class="n">bc</span> <span class="o">=</span> <span class="n">BaggingClassifier</span><span class="p">(</span><span class="n">base_estimator</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+            <span class="n">n_estimators</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+            <span class="n">oob_score</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>OOB Score vs Test Set Score</strong></p>
+
+<p>Now that you instantiated
+ <code class="language-plaintext highlighter-rouge">bc</code>
+ , you will fit it to the training set and evaluate its test set and OOB accuracies.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Fit bc to the training set
+</span><span class="n">bc</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Predict test set labels
+</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">bc</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Evaluate test set accuracy
+</span><span class="n">acc_test</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+<span class="c1"># Evaluate OOB accuracy
+</span><span class="n">acc_oob</span> <span class="o">=</span> <span class="n">bc</span><span class="p">.</span><span class="n">oob_score_</span>
+
+<span class="c1"># Print acc_test and acc_oob
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Test set accuracy: {:.3f}, OOB accuracy: {:.3f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">acc_test</span><span class="p">,</span> <span class="n">acc_oob</span><span class="p">))</span>
+
+<span class="c1"># Test set accuracy: 0.698, OOB accuracy: 0.704
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="33-random-forests-rf"><strong>3.3 Random Forests (RF)</strong></h2>
+
+<p>####
+<strong>Train an RF regressor</strong></p>
+
+<p>In the following exercises you’ll predict bike rental demand in the Capital Bikeshare program in Washington, D.C using historical weather data from the
+ <a href="https://www.kaggle.com/c/bike-sharing-demand">Bike Sharing Demand</a>
+ dataset available through Kaggle.</p>
+
+<p>As a first step, you’ll define a random forests regressor and fit it to the training set.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X_train.head(3)
+      hr  holiday  workingday  temp   hum  windspeed  instant  mnth  yr  \
+1236  12        0           1  0.72  0.45     0.0000    14240     8   1
+1349   5        0           0  0.64  0.89     0.1940    14353     8   1
+327   15        0           0  0.80  0.55     0.1642    13331     7   1
+
+      Clear to partly cloudy  Light Precipitation  Misty
+1236                       1                    0      0
+1349                       1                    0      0
+327                        1                    0      0
+
+
+y_train.head(3)
+1236    305
+1349     16
+327     560
+Name: cnt, dtype: int64
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import RandomForestRegressor
+</span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+
+<span class="c1"># Instantiate rf
+</span><span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Fit rf to the training set
+</span><span class="n">rf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Evaluate the RF regressor</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import mean_squared_error as MSE
+</span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span> <span class="k">as</span> <span class="n">MSE</span>
+
+<span class="c1"># Predict the test set labels
+</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">rf</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Evaluate the test set RMSE
+</span><span class="n">rmse_test</span> <span class="o">=</span> <span class="n">MSE</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+<span class="c1"># Print rmse_test
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Test set RMSE of rf: {:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">rmse_test</span><span class="p">))</span>
+
+<span class="c1"># Test set RMSE of rf: 51.97
+</span>
+</code></pre></div></div>
+
+<p>The test set RMSE achieved by
+ <code class="language-plaintext highlighter-rouge">rf</code>
+ is significantly smaller than that achieved by a single CART!</p>
+
+<p>####
+<strong>Visualizing features importances</strong></p>
+
+<p>In this exercise, you’ll determine which features were the most predictive according to the random forests regressor
+ <code class="language-plaintext highlighter-rouge">rf</code>
+ that you trained in a previous exercise.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a pd.Series of features importances
+</span><span class="n">importances</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">Series</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">rf</span><span class="p">.</span><span class="n">feature_importances_</span><span class="p">,</span>
+                        <span class="n">index</span><span class="o">=</span> <span class="n">X_train</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+
+<span class="c1"># Sort importances
+</span><span class="n">importances_sorted</span> <span class="o">=</span> <span class="n">importances</span><span class="p">.</span><span class="n">sort_values</span><span class="p">()</span>
+
+<span class="c1"># Draw a horizontal barplot of importances_sorted
+</span><span class="n">importances_sorted</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'barh'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'lightgreen'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Features Importances'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture2-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>Apparently,
+ <code class="language-plaintext highlighter-rouge">hr</code>
+ and
+ <code class="language-plaintext highlighter-rouge">workingday</code>
+ are the most important features according to
+ <code class="language-plaintext highlighter-rouge">rf</code>
+ . The importances of these two features add up to more than 90%!</p>
+
+<hr />
+
+<h1 id="4-boosting"><strong>4. Boosting</strong></h1>
+<hr />
+
+<h2 id="41-adaboostadaptive-boosting"><strong>4.1 Adaboost(Adaptive Boosting)</strong></h2>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture3-3.png?w=1024" alt="Desktop View" /></p>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture4-3.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Define the AdaBoost classifier</strong></p>
+
+<p>In the following exercises you’ll revisit the
+ <a href="https://www.kaggle.com/uciml/indian-liver-patient-records">Indian Liver Patient</a>
+ dataset which was introduced in a previous chapter.</p>
+
+<p>Your task is to predict whether a patient suffers from a liver disease using 10 features including Albumin, age and gender. However, this time, you’ll be training an AdaBoost ensemble to perform the classification task.</p>
+
+<p>In addition, given that this dataset is imbalanced, you’ll be using the ROC AUC score as a metric instead of accuracy.</p>
+
+<p>As a first step, you’ll start by instantiating an AdaBoost classifier.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X_train.head(1)
+     Age  Total_Bilirubin  Direct_Bilirubin  Alkaline_Phosphotase  \
+150   56              1.1               0.5                   180
+
+     Alamine_Aminotransferase  Aspartate_Aminotransferase  Total_Protiens  \
+150                        30                          42             6.9
+
+     Albumin  Albumin_and_Globulin_Ratio  Is_male
+150      3.8                         1.2        1
+
+
+y_train.head(3)
+150    0
+377    0
+473    0
+Name: Liver_disease, dtype: int64
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import DecisionTreeClassifier
+</span><span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+
+<span class="c1"># Import AdaBoostClassifier
+</span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">AdaBoostClassifier</span>
+
+<span class="c1"># Instantiate dt
+</span><span class="n">dt</span> <span class="o">=</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Instantiate ada
+</span><span class="n">ada</span> <span class="o">=</span> <span class="n">AdaBoostClassifier</span><span class="p">(</span><span class="n">base_estimator</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span> <span class="n">n_estimators</span><span class="o">=</span><span class="mi">180</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Train the AdaBoost classifier</strong></p>
+
+<p>Now that you’ve instantiated the AdaBoost classifier
+ <code class="language-plaintext highlighter-rouge">ada</code>
+ , it’s time train it. You will also predict the probabilities of obtaining the positive class in the test set.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Fit ada to the training set
+</span><span class="n">ada</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Compute the probabilities of obtaining the positive class
+</span><span class="n">y_pred_proba</span> <span class="o">=</span> <span class="n">ada</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[:,</span><span class="mi">1</span><span class="p">]</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+ada.predict_proba(X_test)
+array([[ 0.57664817,  0.42335183],
+       [ 0.48575393,  0.51424607],
+       [ 0.34361394,  0.65638606],
+       [ 0.50742464,  0.49257536],
+
+</code></pre></div></div>
+
+<p>####
+<strong>Evaluate the AdaBoost classifier</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import roc_auc_score
+</span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span>
+
+<span class="c1"># Evaluate test-set roc_auc_score
+</span><span class="n">ada_roc_auc</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_proba</span><span class="p">)</span>
+
+<span class="c1"># Print roc_auc_score
+</span><span class="k">print</span><span class="p">(</span><span class="s">'ROC AUC score: {:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">ada_roc_auc</span><span class="p">))</span>
+
+<span class="c1"># ROC AUC score: 0.71
+</span>
+</code></pre></div></div>
+
+<p>Not bad! This untuned AdaBoost classifier achieved a ROC AUC score of 0.71!</p>
+
+<hr />
+
+<h2 id="42-gradient-boosting-gb"><strong>4.2 Gradient Boosting (GB)</strong></h2>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture5-3.png?w=1024" alt="Desktop View" /></p>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture6-3.png?w=1024" alt="Desktop View" /></p>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture7-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>###
+<strong>Define the GB regressor</strong></p>
+
+<p>You’ll now revisit the
+ <a href="https://www.kaggle.com/c/bike-sharing-demand">Bike Sharing Demand</a>
+ dataset that was introduced in the previous chapter.</p>
+
+<p>Recall that your task is to predict the bike rental demand using historical weather data from the Capital Bikeshare program in Washington, D.C.. For this purpose, you’ll be using a gradient boosting regressor.</p>
+
+<p>As a first step, you’ll start by instantiating a gradient boosting regressor which you will train in the next exercise.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+ X_train.head()
+      hr  holiday  workingday  temp   hum  windspeed  instant  mnth  yr  \
+1236  12        0           1  0.72  0.45     0.0000    14240     8   1
+1349   5        0           0  0.64  0.89     0.1940    14353     8   1
+327   15        0           0  0.80  0.55     0.1642    13331     7   1
+104    8        0           1  0.80  0.49     0.1343    13108     7   1
+850   10        0           0  0.80  0.59     0.4179    13854     8   1
+
+      Clear to partly cloudy  Light Precipitation  Misty
+1236                       1                    0      0
+1349                       1                    0      0
+327                        1                    0      0
+104                        1                    0      0
+850                        1                    0      0
+
+
+y_train.head()
+1236    305
+1349     16
+327     560
+104     550
+850     364
+Name: cnt, dtype: int64
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import GradientBoostingRegressor
+</span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">GradientBoostingRegressor</span>
+
+<span class="c1"># Instantiate gb
+</span><span class="n">gb</span> <span class="o">=</span> <span class="n">GradientBoostingRegressor</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="n">n_estimators</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Train the GB regressor</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Fit gb to the training set
+</span><span class="n">gb</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Predict test set labels
+</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">gb</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Evaluate the GB regressor</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import mean_squared_error as MSE
+</span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span> <span class="k">as</span> <span class="n">MSE</span>
+
+<span class="c1"># Compute MSE
+</span><span class="n">mse_test</span> <span class="o">=</span> <span class="n">MSE</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+<span class="c1"># Compute RMSE
+</span><span class="n">rmse_test</span> <span class="o">=</span> <span class="n">mse_test</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+<span class="c1"># Print RMSE
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Test set RMSE of gb: {:.3f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">rmse_test</span><span class="p">))</span>
+
+<span class="c1"># Test set RMSE of gb: 52.065
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="43-stochastic-gradient-boosting-sgb"><strong>4.3 Stochastic Gradient Boosting (SGB)</strong></h2>
+
+<p>####
+<strong>Regression with SGB</strong></p>
+
+<p>As in the exercises from the previous lesson, you’ll be working with the
+ <a href="https://www.kaggle.com/c/bike-sharing-demand">Bike Sharing Demand</a>
+ dataset. In the following set of exercises, you’ll solve this bike count regression problem using stochastic gradient boosting.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import GradientBoostingRegressor
+</span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">GradientBoostingRegressor</span>
+
+<span class="c1"># Instantiate sgbr
+</span><span class="n">sgbr</span> <span class="o">=</span> <span class="n">GradientBoostingRegressor</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+            <span class="n">subsample</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span>
+            <span class="n">max_features</span><span class="o">=</span><span class="mf">0.75</span><span class="p">,</span>
+            <span class="n">n_estimators</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Train the SGB regressor</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Fit sgbr to the training set
+</span><span class="n">sgbr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Predict test set labels
+</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">sgbr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Evaluate the SGB regressor</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import mean_squared_error as MSE
+</span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span> <span class="k">as</span> <span class="n">MSE</span>
+
+<span class="c1"># Compute test set MSE
+</span><span class="n">mse_test</span> <span class="o">=</span> <span class="n">MSE</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span>
+
+<span class="c1"># Compute test set RMSE
+</span><span class="n">rmse_test</span> <span class="o">=</span> <span class="n">mse_test</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+<span class="c1"># Print rmse_test
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Test set RMSE of sgbr: {:.3f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">rmse_test</span><span class="p">))</span>
+
+<span class="c1"># Test set RMSE of sgbr: 49.979
+</span>
+</code></pre></div></div>
+
+<p>The stochastic gradient boosting regressor achieves a lower test set RMSE than the gradient boosting regressor (which was
+ <code class="language-plaintext highlighter-rouge">52.065</code>
+ )!</p>
+
+<hr />
+
+<h1 id="5-model-tuning"><strong>5. Model Tuning</strong></h1>
+<hr />
+
+<h2 id="51-tuning-a-carts-hyperprameters"><strong>5.1 Tuning a CART’s Hyperprameters</strong></h2>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-tree-based-models-in-python/capture10-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>show hyperparameters</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+print(dt.get_params)
+&lt;bound method BaseEstimator.get_params of DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=None,
+            max_features=None, max_leaf_nodes=None,
+            min_impurity_decrease=0.0, min_impurity_split=None,
+            min_samples_leaf=1, min_samples_split=2,
+            min_weight_fraction_leaf=0.0, presort=False, random_state=1,
+            splitter='best')&gt;
+
+</code></pre></div></div>
+
+<p>####
+<strong>Set the tree’s hyperparameter grid</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define params_dt
+</span><span class="n">params_dt</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'max_depth'</span><span class="p">:[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],</span>
+    <span class="s">'min_samples_leaf'</span><span class="p">:[</span><span class="mf">0.12</span><span class="p">,</span> <span class="mf">0.14</span><span class="p">,</span> <span class="mf">0.16</span><span class="p">,</span> <span class="mf">0.18</span><span class="p">]}</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Search for the optimal tree</strong></p>
+
+<p>In this exercise, you’ll perform grid search using 5-fold cross validation to find
+ <code class="language-plaintext highlighter-rouge">dt</code>
+ ‘s optimal hyperparameters. Note that because grid search is an exhaustive process, it may take a lot time to train the model.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import GridSearchCV
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+
+<span class="c1"># Instantiate grid_dt
+</span><span class="n">grid_dt</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">dt</span><span class="p">,</span>
+                       <span class="n">param_grid</span><span class="o">=</span><span class="n">params_dt</span><span class="p">,</span>
+                       <span class="n">scoring</span><span class="o">=</span><span class="s">'roc_auc'</span><span class="p">,</span>
+                       <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+                       <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Evaluate the optimal tree</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import roc_auc_score from sklearn.metrics
+</span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_auc_score</span>
+
+<span class="c1"># Extract the best estimator
+</span><span class="n">best_model</span> <span class="o">=</span> <span class="n">grid_dt</span><span class="p">.</span><span class="n">best_estimator_</span>
+
+<span class="c1"># Predict the test set probabilities of the positive class
+</span><span class="n">y_pred_proba</span> <span class="o">=</span> <span class="n">best_model</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Compute test_roc_auc
+</span><span class="n">test_roc_auc</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred_proba</span><span class="p">)</span>
+
+<span class="c1"># Print test_roc_auc
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Test set ROC AUC score: {:.3f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">test_roc_auc</span><span class="p">))</span>
+
+<span class="c1">#  Test set ROC AUC score: 0.610
+</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+best_model
+DecisionTreeClassifier(class_weight=None, criterion='gini', max_depth=3,
+            max_features=None, max_leaf_nodes=None,
+            min_impurity_decrease=0.0, min_impurity_split=None,
+            min_samples_leaf=0.12, min_samples_split=2,
+            min_weight_fraction_leaf=0.0, presort=False, random_state=1,
+            splitter='best')
+
+</code></pre></div></div>
+
+<p>An untuned classification-tree would achieve a ROC AUC score of
+ <code class="language-plaintext highlighter-rouge">0.54</code>
+ !</p>
+
+<hr />
+
+<h2 id="52-tuning-a-rfs-hyperparameters"><strong>5.2 Tuning a RF’s Hyperparameters</strong></h2>
+
+<p>####
+<strong>Random forests hyperparameters</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+rf.get_params
+&lt;bound method BaseEstimator.get_params of RandomForestRegressor(bootstrap=True, criterion='mse', max_depth=None,
+           max_features='auto', max_leaf_nodes=None,
+           min_impurity_decrease=0.0, min_impurity_split=None,
+           min_samples_leaf=1, min_samples_split=2,
+           min_weight_fraction_leaf=0.0, n_estimators=10, n_jobs=-1,
+           oob_score=False, random_state=2, verbose=0, warm_start=False)&gt;
+
+
+</code></pre></div></div>
+
+<p>####
+<strong>Set the hyperparameter grid of RF</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define the dictionary 'params_rf'
+</span><span class="n">params_rf</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s">'n_estimators'</span><span class="p">:[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">350</span><span class="p">,</span> <span class="mi">500</span><span class="p">],</span>
+    <span class="s">'max_features'</span><span class="p">:[</span><span class="s">'log2'</span><span class="p">,</span> <span class="s">'auto'</span><span class="p">,</span> <span class="s">'sqrt'</span><span class="p">],</span>
+    <span class="s">'min_samples_leaf'</span><span class="p">:[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">]}</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Search for the optimal forest</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import GridSearchCV
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span>
+
+<span class="c1"># Instantiate grid_rf
+</span><span class="n">grid_rf</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">rf</span><span class="p">,</span>
+                       <span class="n">param_grid</span><span class="o">=</span><span class="n">params_rf</span><span class="p">,</span>
+                       <span class="n">scoring</span><span class="o">=</span><span class="s">'neg_mean_squared_error'</span><span class="p">,</span>
+                       <span class="n">cv</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+                       <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                       <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Evaluate the optimal forest</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import mean_squared_error from sklearn.metrics as MSE
+</span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span> <span class="k">as</span> <span class="n">MSE</span>
+
+<span class="c1"># Extract the best estimator
+</span><span class="n">best_model</span> <span class="o">=</span> <span class="n">grid_rf</span><span class="p">.</span><span class="n">best_estimator_</span>
+
+<span class="c1"># Predict test set labels
+</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">best_model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Compute rmse_test
+</span><span class="n">rmse_test</span> <span class="o">=</span> <span class="n">MSE</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span>
+
+<span class="c1"># Print rmse_test
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Test RMSE of best model: {:.3f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">rmse_test</span><span class="p">))</span>
+
+<span class="c1"># Test RMSE of best model: 50.569
+</span>
+</code></pre></div></div>
+
+<p>The End.</p>
+
+<p>Thank you for reading.</p>
+

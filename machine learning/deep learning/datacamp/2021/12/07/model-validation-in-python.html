@@ -1,0 +1,1306 @@
+<h1 id="model-validation-in-python">Model Validation in Python</h1>
+
+<p>This is the memo of the 11th course (23 courses in all) of ‘Machine Learning Scientist with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/model-validation-in-python">HERE</a></strong>
+ .</p>
+
+<p>###
+<strong>Course Description</strong></p>
+
+<p>Machine learning models are easier to implement now more than ever before. Without proper validation, the results of running new data through a model might not be as accurate as expected. Model validation allows analysts to confidently answer the question, how good is your model? We will answer this question for classification models using the complete set of tic-tac-toe endgame scenarios, and for regression models using fivethirtyeight’s ultimate Halloween candy power ranking dataset. In this course, we will cover the basics of model validation, discuss various validation techniques, and begin to develop tools for creating validated and high performing models.</p>
+
+<p>###
+<strong>Table of contents</strong></p>
+
+<ul>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/06/model-validation-in-python-from-datacamp/">Basic Modeling in scikit-learn</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/06/model-validation-in-python-from-datacamp/2/">Validation Basics</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/06/model-validation-in-python-from-datacamp/3/">Cross Validation</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/06/model-validation-in-python-from-datacamp/4/">Selecting the best model with Hyperparameter tuning</a></li>
+</ul>
+
+<h1 id="1-basic-modeling-in-scikit-learn"><strong>1. Basic Modeling in scikit-learn</strong></h1>
+<hr />
+
+<h2 id="11-introduction-to-model-validation"><strong>1.1 Introduction to model validation</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/1-2.png?w=943" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/2-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/3-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/4-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/5-2.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="111-seen-vs-unseen-data"><strong>1.1.1 Seen vs. unseen data</strong></h3>
+
+<p>Model’s tend to have higher accuracy on observations they have seen before. In the candy dataset, predicting the popularity of Skittles will likely have higher accuracy than predicting the popularity of Andes Mints; Skittles is in the dataset, and Andes Mints is not.</p>
+
+<p>You’ve built a model based on 50 candies using the dataset
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ and need to report how accurate the model is at predicting the popularity of the 50 candies the model was built on, and the 35 candies (
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ ) it has never seen. You will use the mean absolute error,
+ <code class="language-plaintext highlighter-rouge">mae()</code>
+ , as the accuracy metric.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># The model is fit using X_train and y_train
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Create vectors of predictions
+</span><span class="n">train_predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+<span class="n">test_predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Train/Test Errors
+</span><span class="n">train_error</span> <span class="o">=</span> <span class="n">mae</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">train_predictions</span><span class="p">)</span>
+<span class="n">test_error</span> <span class="o">=</span> <span class="n">mae</span><span class="p">(</span><span class="n">y_true</span><span class="o">=</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="o">=</span><span class="n">test_predictions</span><span class="p">)</span>
+
+<span class="c1"># Print the accuracy for seen and unseen data
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Model error on seen data: {0:.2f}."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">train_error</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Model error on unseen data: {0:.2f}."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">test_error</span><span class="p">))</span>
+
+<span class="c1"># Model error on seen data: 3.28.
+# Model error on unseen data: 11.07.
+</span>
+</code></pre></div></div>
+
+<p>When models perform differently on training and testing data, you should look to model validation to ensure you have the best performing model. In the next lesson, you will start building models to validate.</p>
+
+<hr />
+
+<h2 id="12-regression-models"><strong>1.2 Regression models</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/6-2.png?w=907" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/7-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/8-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/9-2.png?w=1014" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/10-2.png?w=960" alt="Desktop View" /></p>
+
+<h3 id="121-set-parameters-and-fit-a-model"><strong>1.2.1 Set parameters and fit a model</strong></h3>
+
+<p>Predictive tasks fall into one of two categories: regression or classification. In the candy dataset, the outcome is a
+ <em>continuous</em>
+ variable describing how often the candy was chosen over another candy in a series of 1-on-1 match-ups. To predict this value (the win-percentage), you will use a
+ <strong>regression</strong>
+ model.</p>
+
+<p>In this exercise, you will specify a few parameters using a random forest regression model
+ <code class="language-plaintext highlighter-rouge">rfr</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Set the number of trees
+</span><span class="n">rfr</span><span class="p">.</span><span class="n">n_estimators</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="c1"># Add a maximum depth
+</span><span class="n">rfr</span><span class="p">.</span><span class="n">max_depth</span> <span class="o">=</span> <span class="mi">6</span>
+
+<span class="c1"># Set the random state
+</span><span class="n">rfr</span><span class="p">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="mi">1111</span>
+
+<span class="c1"># Fit the model
+</span><span class="n">rfr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>You have updated parameters
+ <em>after</em>
+ the model was initialized. This approach is helpful when you need to update parameters. Before making predictions, let’s see which candy characteristics were most important to the model.</p>
+
+<h3 id="122-feature-importances"><strong>1.2.2 Feature importances</strong></h3>
+
+<p>Although some candy attributes, such as chocolate, may be extremely popular, it doesn’t mean they will be
+ <em>important</em>
+ to model prediction. After a random forest model has been fit, you can review the model’s attribute,
+ <code class="language-plaintext highlighter-rouge">.feature_importances_</code>
+ , to see which variables had the biggest impact. You can check how important each variable was in the model by looping over the feature importance array using
+ <code class="language-plaintext highlighter-rouge">enumerate()</code>
+ .</p>
+
+<p>If you are unfamiliar with Python’s
+ <code class="language-plaintext highlighter-rouge">enumerate()</code>
+ function, it can loop over a list while also creating an automatic counter.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Fit the model using X and y
+</span><span class="n">rfr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Print how important each column is to the model
+</span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rfr</span><span class="p">.</span><span class="n">feature_importances_</span><span class="p">):</span>
+      <span class="c1"># Use i and item to print out the feature importance of each column
+</span>    <span class="k">print</span><span class="p">(</span><span class="s">"{0:s}: {1:.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">X_train</span><span class="p">.</span><span class="n">columns</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">item</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+chocolate: 0.44
+fruity: 0.03
+caramel: 0.02
+peanutyalmondy: 0.05
+nougat: 0.01
+crispedricewafer: 0.03
+hard: 0.01
+bar: 0.02
+pluribus: 0.02
+sugarpercent: 0.17
+pricepercent: 0.19
+
+</code></pre></div></div>
+
+<p>No surprise here – chocolate
+ <em>is</em>
+ the most important variable. .feature_importances_ is a great way to see which variables were important to your random forest model.</p>
+
+<hr />
+
+<h2 id="13-classification-models"><strong>1.3 Classification models</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/11-2.png?w=653" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/12-2.png?w=896" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/13-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/14-2.png?w=942" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/15-2.png?w=692" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/16-2.png?w=795" alt="Desktop View" /></p>
+
+<h3 id="131-classification-predictions"><strong>1.3.1 Classification predictions</strong></h3>
+
+<p>In model validation, it is often important to know more about the predictions than just the final classification. When predicting who will win a game, most people are also interested in
+ <em>how likely</em>
+ it is a team will win.</p>
+
+<p>|
+ Probability
+  |
+ Prediction
+  |
+ Meaning
+  |
+| — | — | — |
+|
+ 0 &lt; .50
+  |
+ 0
+  |
+ Team Loses
+  |
+|
+ .50 +
+  |
+ 1
+  |
+ Team Wins
+  |</p>
+
+<p>In this exercise, you look at the methods,
+ <code class="language-plaintext highlighter-rouge">.predict()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">.predict_proba()</code>
+ using the
+ <code class="language-plaintext highlighter-rouge">tic_tac_toe</code>
+ dataset. The first method will give a prediction of whether Player One will win the game, and the second method will provide the probability of Player One winning. Use
+ <code class="language-plaintext highlighter-rouge">rfc</code>
+ as the random forest classification model.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Fit the rfc model.
+</span><span class="n">rfc</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Create arrays of predictions
+</span><span class="n">classification_predictions</span> <span class="o">=</span> <span class="n">rfc</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+<span class="n">probability_predictions</span> <span class="o">=</span> <span class="n">rfc</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Print out count of binary predictions
+</span><span class="k">print</span><span class="p">(</span><span class="n">pd</span><span class="p">.</span><span class="n">Series</span><span class="p">(</span><span class="n">classification_predictions</span><span class="p">).</span><span class="n">value_counts</span><span class="p">())</span>
+
+<span class="c1"># Print the first value from probability_predictions
+</span><span class="k">print</span><span class="p">(</span><span class="s">'The first predicted probabilities are: {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">probability_predictions</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+1    563
+0    204
+dtype: int64
+The first predicted probabilities are: [0.26524423 0.73475577]
+
+</code></pre></div></div>
+
+<p>You can see there were 563 observations where Player One was predicted to win the Tic-Tac-Toe game. Also, note that the
+ <code class="language-plaintext highlighter-rouge">predicted_probabilities</code>
+ array contains lists with only two values because you only have two possible responses (win or lose). Remember these two methods, as you will use them a lot throughout this course.</p>
+
+<h3 id="132-reusing-model-parameters"><strong>1.3.2 Reusing model parameters</strong></h3>
+
+<p>Replicating model performance is vital in model validation. Replication is also important when sharing models with co-workers, reusing models on new data or asking questions on a website such as
+ <a href="https://stackoverflow.com/">Stack Overflow</a>
+ . You might use such a site to ask other coders about model errors, output, or performance. The best way to do this is to replicate your work by reusing model parameters.</p>
+
+<p>In this exercise, you use various methods to recall which parameters were used in a model.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+rfc = RandomForestClassifier(n_estimators=50, max_depth=6, random_state=1111)
+
+# Print the classification model
+print(rfc)
+
+# Print the classification model's random state parameter
+print('The random state is: {}'.format(rfc.random_state))
+
+# Print all parameters
+print('Printing the parameters dictionary: {}'.format(rfc.get_params()))
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+            max_depth=6, max_features='auto', max_leaf_nodes=None,
+            min_impurity_decrease=0.0, min_impurity_split=None,
+            min_samples_leaf=1, min_samples_split=2,
+            min_weight_fraction_leaf=0.0, n_estimators=50, n_jobs=None,
+            oob_score=False, random_state=1111, verbose=0,
+            warm_start=False)
+
+The random state is: 1111
+
+Printing the parameters dictionary: {'bootstrap': True, 'class_weight': None, 'criterion': 'gini', 'max_depth': 6, 'max_features': 'auto', 'max_leaf_nodes': None, 'min_impurity_decrease': 0.0, 'min_impurity_split': None, 'min_samples_leaf': 1, 'min_samples_split': 2, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 50, 'n_jobs': None, 'oob_score': False, 'random_state': 1111, 'verbose': 0, 'warm_start': False}
+
+</code></pre></div></div>
+
+<p>Recalling which parameters were used will be helpful going forward. Model validation and performance rely heavily on which parameters were used, and there is no way to replicate a model without keeping track of the parameters used!</p>
+
+<h3 id="133-random-forest-classifier"><strong>1.3.3 Random forest classifier</strong></h3>
+
+<p>This exercise reviews the four modeling steps discussed throughout this chapter using a random forest classification model. You will:</p>
+
+<ol>
+  <li>Create a random forest classification model.</li>
+  <li>Fit the model using the
+ <code class="language-plaintext highlighter-rouge">tic_tac_toe</code>
+ dataset.</li>
+  <li>Make predictions on whether Player One will win (1) or lose (0) the current game.</li>
+  <li>Finally, you will evaluate the overall accuracy of the model.</li>
+</ol>
+
+<p>Let’s get started!</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.ensemble import RandomForestClassifier
+
+# Create a random forest classifier
+rfc = RandomForestClassifier(n_estimators=50, max_depth=6, random_state=1111)
+
+# Fit rfc using X_train and y_train
+rfc.fit(X_train, y_train)
+
+# Create predictions on X_test
+predictions = rfc.predict(X_test)
+print(predictions[0:5])
+# [1 1 1 1 1]
+
+
+# Print model accuracy using score() and the testing data
+print(rfc.score(X_test, y_test))
+# 0.817470664928292
+
+</code></pre></div></div>
+
+<p>That’s all the steps! Notice the first five predictions were all 1, indicating that Player One is predicted to win all five of those games. You also see the model accuracy was only 82%.</p>
+
+<p>Let’s move on to Chapter 2 and increase our model validation toolbox by learning about splitting datasets, standard accuracy metrics, and the bias-variance tradeoff.</p>
+
+<h1 id="2-validation-basics"><strong>2. Validation Basics</strong></h1>
+<hr />
+
+<h2 id="21-creating-train-test-and-validation-datasets"><strong>2.1 Creating train, test, and validation datasets</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/1-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/2-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/3-3.png?w=804" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/4-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/5-3.png?w=942" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/6-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/7-3.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="211-create-one-holdout-set"><strong>2.1.1 Create one holdout set</strong></h3>
+
+<p>Your boss has asked you to create a simple random forest model on the
+ <code class="language-plaintext highlighter-rouge">tic_tac_toe</code>
+ dataset. She doesn’t want you to spend much time selecting parameters; rather she wants to know how well the model will perform on future data. For future Tic-Tac-Toe games, it would be nice to know if your model can predict which player will win.</p>
+
+<p>The dataset
+ <code class="language-plaintext highlighter-rouge">tic_tac_toe</code>
+ has been loaded for your use.</p>
+
+<p>Note that in Python,
+ <code class="language-plaintext highlighter-rouge">=\</code>
+ indicates the code was too long for one line and has been split across two lines.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create dummy variables using pandas
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">tic_tac_toe</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:,</span><span class="mi">0</span><span class="p">:</span><span class="mi">9</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">tic_tac_toe</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="mi">9</span><span class="p">]</span>
+
+<span class="c1"># Create training and testing datasets. Use 10% for the test set
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span>  <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1111</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Good! Remember, without the holdout set, you cannot truly validate a model. Let’s move on to creating two holdout sets.</p>
+
+<h3 id="212-create-two-holdout-sets"><strong>2.1.2 Create two holdout sets</strong></h3>
+
+<p>You recently created a simple random forest model to predict Tic-Tac-Toe game wins for your boss, and at her request, you did not do any parameter tuning. Unfortunately, the overall model accuracy was too low for her standards. This time around, she has asked you to focus on model performance.</p>
+
+<p>Before you start testing different models and parameter sets, you will need to split the data into training, validation, and testing datasets. Remember that after splitting the data into training and testing datasets, the validation dataset is created by splitting the training dataset.</p>
+
+<p>The datasets
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ have been loaded for your use.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create temporary training and final testing datasets
+</span><span class="n">X_temp</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_temp</span><span class="p">,</span> <span class="n">y_test</span>  <span class="o">=</span>\
+    <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1111</span><span class="p">)</span>
+
+<span class="c1"># Create the final training and validation datasets
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_val</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span> <span class="o">=</span>\
+    <span class="n">train_test_split</span><span class="p">(</span><span class="n">X_temp</span><span class="p">,</span> <span class="n">y_temp</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1111</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Great! You now have training, validation, and testing datasets, but do you know
+ <em>when</em>
+ you need both validation and testing datasets? Keep going! The next exercise will help make sure you understand when to use validation datasets.</p>
+
+<h3 id="213-why-use-holdout-sets"><strong>2.1.3 Why use holdout sets</strong></h3>
+
+<p>It is important to understand when you would use three datasets (training, validation, and testing) instead of two (training and testing). There is no point in creating an additional dataset split if you are not going to use it.</p>
+
+<p>When should you consider using training, validation,
+ <em>and</em>
+ testing datasets?</p>
+
+<p><strong>When testing parameters, tuning hyper-parameters, or anytime you are frequently evaluating model performance.</strong></p>
+
+<p>Correct! Anytime we are evaluating model performance repeatedly we need to create training, validation, and testing datasets.</p>
+
+<hr />
+
+<h2 id="22-accuracy-metrics-regression-models"><strong>2.2 Accuracy metrics: regression models</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/8-3.png?w=932" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/9-3.png?w=1018" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/10-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/11-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/12-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/13-3.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="221-mean-absolute-error"><strong>2.2.1 Mean absolute error</strong></h3>
+
+<p>Communicating modeling results can be difficult. However, most clients understand that on average, a predictive model was off by some number. This makes explaining the mean absolute error easy. For example, when predicting the number of wins for a basketball team, if you predict 42, and they end up with 40, you can easily explain that the error was two wins.</p>
+
+<p>In this exercise, you are interviewing for a new position and are provided with two arrays.
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ , the true number of wins for all 30 NBA teams in 2017 and
+ <code class="language-plaintext highlighter-rouge">predictions</code>
+ , which contains a prediction for each team. To test your understanding, you are asked to both manually calculate the MAE and use
+ <code class="language-plaintext highlighter-rouge">sklearn</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.metrics import mean_absolute_error
+
+# Manually calculate the MAE
+n = len(predictions)
+mae_one = sum(abs(y_test - predictions)) / n
+print('With a manual calculation, the error is {}'.format(mae_one))
+# With a manual calculation, the error is 5.9
+
+
+# Use scikit-learn to calculate the MAE
+mae_two = mean_absolute_error(y_test, predictions)
+print('Using scikit-lean, the error is {}'.format(mae_two))
+# Using scikit-lean, the error is 5.9
+
+</code></pre></div></div>
+
+<p>Well done! These predictions were about six wins off on average. This isn’t too bad considering NBA teams play 82 games a year. Let’s see how these errors would look if you used the mean squared error instead.</p>
+
+<h3 id="222-mean-squared-error"><strong>2.2.2 Mean squared error</strong></h3>
+
+<p>Let’s focus on the 2017 NBA predictions again. Every year, there are at least a couple of NBA teams that win
+ <em>way</em>
+ more games than expected. If you use the MAE, this accuracy metric does not reflect the bad predictions as much as if you use the MSE. Squaring the large errors from bad predictions will make the accuracy look worse.</p>
+
+<p>In this example, NBA executives want to better predict team wins. You will use the mean squared error to calculate the prediction error. The actual wins are loaded as
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ and the predictions as
+ <code class="language-plaintext highlighter-rouge">predictions</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.metrics import mean_squared_error
+
+n = len(predictions)
+# Finish the manual calculation of the MSE
+mse_one = sum((y_test - predictions)**2) / n
+print('With a manual calculation, the error is {}'.format(mse_one))
+# With a manual calculation, the error is 49.1
+
+
+# Use the scikit-learn function to calculate MSE
+mse_two = mean_squared_error(y_test, predictions)
+print('Using scikit-lean, the error is {}'.format(mse_two))
+# Using scikit-lean, the error is 49.1
+
+</code></pre></div></div>
+
+<p>Good job! If you run any additional models, you will try to beat an MSE of 49.1, which is the average squared error of using your model. Although the MSE is not as interpretable as the MAE, it will help us select a model that has fewer ‘large’ errors.</p>
+
+<h3 id="223-performance-on-data-subsets"><strong>2.2.3 Performance on data subsets</strong></h3>
+
+<p>In professional basketball, there are two conferences, the East and the West. Coaches and fans often only care about how teams in their own conference will do this year.</p>
+
+<p>You have been working on an NBA prediction model and would like to determine if the predictions were better for the East or West conference. You added a third array to your data called
+ <code class="language-plaintext highlighter-rouge">labels</code>
+ , which contains an “E” for the East teams, and a “W” for the West.
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ and
+ <code class="language-plaintext highlighter-rouge">predictions</code>
+ have again been loaded for your use.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Find the East conference teams
+</span><span class="n">east_teams</span> <span class="o">=</span> <span class="n">labels</span> <span class="o">==</span> <span class="s">"E"</span>
+
+<span class="c1"># Create arrays for the true and predicted values
+</span><span class="n">true_east</span> <span class="o">=</span> <span class="n">y_test</span><span class="p">[</span><span class="n">east_teams</span><span class="p">]</span>
+<span class="n">preds_east</span> <span class="o">=</span> <span class="n">predictions</span><span class="p">[</span><span class="n">east_teams</span><span class="p">]</span>
+
+<span class="c1"># Print the accuracy metrics
+</span><span class="k">print</span><span class="p">(</span><span class="s">'The MAE for East teams is {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span>
+    <span class="n">mae</span><span class="p">(</span><span class="n">true_east</span><span class="p">,</span> <span class="n">preds_east</span><span class="p">)))</span>
+<span class="c1"># The MAE for East teams is 6.733333333333333
+</span>
+
+<span class="c1"># Print the West accuracy
+</span><span class="k">print</span><span class="p">(</span><span class="s">'The MAE for West conference is {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">west_error</span><span class="p">))</span>
+<span class="c1"># The MAE for West conference is 5.01
+</span>
+</code></pre></div></div>
+
+<p>Great! It looks like the Western conference predictions were about two games better on average. Over the past few seasons, the Western teams have generally won the same number of games as the experts have predicted. Teams in the East are just not as predictable as those in the West.</p>
+
+<hr />
+
+<h2 id="23-classification-metrics"><strong>2.3 Classification metrics</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/14-3.png?w=643" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/15-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/16-3.png?w=933" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/17-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/18-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/19-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/20-1.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="231-confusion-matrices"><strong>2.3.1 Confusion matrices</strong></h3>
+
+<p>Confusion matrices are a great way to start exploring your model’s accuracy. They provide the values needed to calculate a wide range of metrics, including sensitivity, specificity, and the F1-score.</p>
+
+<p>You have built a classification model to predict if a person has a broken arm based on an X-ray image. On the testing set, you have the following confusion matrix:</p>
+
+<p>|  |
+ Prediction: 0
+  |
+ Prediction: 1
+  |
+| — | — | — |
+|
+ Actual: 0
+  |
+ 324 (TN)
+  |
+ 15 (FP)
+  |
+|
+ Actual: 1
+  |
+ 123 (FN)
+  |
+ 491 (TP)
+  |</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate and print the accuracy
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="p">(</span><span class="mi">324</span> <span class="o">+</span> <span class="mi">491</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">953</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The overall accuracy is {0: 0.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">accuracy</span><span class="p">))</span>
+
+<span class="c1"># Calculate and print the precision
+</span><span class="n">precision</span> <span class="o">=</span> <span class="p">(</span><span class="mi">491</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">15</span> <span class="o">+</span> <span class="mi">491</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The precision is {0: 0.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">precision</span><span class="p">))</span>
+
+<span class="c1"># Calculate and print the recall
+</span><span class="n">recall</span> <span class="o">=</span> <span class="p">(</span><span class="mi">491</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">123</span> <span class="o">+</span> <span class="mi">491</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The recall is {0: 0.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">recall</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+The overall accuracy is  0.86
+The precision is  0.97
+The recall is  0.80
+
+</code></pre></div></div>
+
+<p>Well done! In this case, a true positive is a picture of an actual broken arm that was also predicted to be broken. Doctors are okay with a few additional false positives (predicted broken, not actually broken), as long as you don’t miss anyone who needs immediate medical attention.</p>
+
+<h3 id="232-confusion-matrices-again"><strong>2.3.2 Confusion matrices, again</strong></h3>
+
+<p>Creating a confusion matrix in Python is simple. The biggest challenge will be making sure you understand the orientation of the matrix. This exercise makes sure you understand the
+ <code class="language-plaintext highlighter-rouge">sklearn</code>
+ implementation of confusion matrices. Here, you have created a random forest model using the
+ <code class="language-plaintext highlighter-rouge">tic_tac_toe</code>
+ dataset
+ <code class="language-plaintext highlighter-rouge">rfc</code>
+ to predict outcomes of 0 (loss) or 1 (a win) for Player One.</p>
+
+<p><em>Note:</em>
+ If you read about confusion matrices on another website or for another programming language, the values might be reversed.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.metrics import confusion_matrix
+
+# Create predictions
+test_predictions = rfc.predict(X_test)
+
+# Create and print the confusion matrix
+cm = confusion_matrix(y_test, test_predictions)
+print(cm)
+
+# Print the true positives (actual 1s that were predicted 1s)
+print("The number of true positives is: {}".format(cm[1, 1]))
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[[177 123]
+ [ 92 471]]
+
+The number of true positives is: 471
+
+</code></pre></div></div>
+
+<p>Good job! Row 1, column 1 represents the number of actual 1s that were predicted 1s (the true positives). Always make sure you understand the orientation of the confusion matrix before you start using it!</p>
+
+<h3 id="233-precision-vs-recall"><strong>2.3.3 Precision vs. recall</strong></h3>
+
+<p>The accuracy metrics you use to evaluate your model should
+ <em>always</em>
+ be based on the specific application. For this example, let’s assume you are a really sore loser when it comes to playing Tic-Tac-Toe, but only when you are certain that you are going to win.</p>
+
+<p>Choose the most appropriate accuracy metric, either precision or recall, to complete this example. But remember,
+ <em>if you think you are going to win, you better win!</em></p>
+
+<p>Use
+ <code class="language-plaintext highlighter-rouge">rfc</code>
+ , which is a random forest classification model built on the
+ <code class="language-plaintext highlighter-rouge">tic_tac_toe</code>
+ dataset.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.metrics import precision_score
+
+test_predictions = rfc.predict(X_test)
+
+# Create precision or recall score based on the metric you imported
+score = precision_score(y_test, test_predictions)
+
+# Print the final result
+print("The precision value is {0:.2f}".format(score))
+# The precision value is 0.79
+
+</code></pre></div></div>
+
+<p>Great job! Precision is the correct metric here. Sore-losers can’t stand losing when they are certain they will win! For that reason, our model needs to be as precise as possible. With a precision of only 79%, you may need to try some other modeling techniques to improve this score.</p>
+
+<hr />
+
+<h2 id="24-the-bias-variance-tradeoff"><strong>2.4 The bias-variance tradeoff</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/21.png?w=930" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/22.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/23.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/24.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/25.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/26.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/27.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/28.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="241-error-due-to-underover-fitting"><strong>2.4.1 Error due to under/over-fitting</strong></h3>
+
+<p>The candy dataset is prime for overfitting. With only 85 observations, if you use 20% for the testing dataset, you are losing a lot of vital data that could be used for modeling. Imagine the scenario where most of the chocolate candies ended up in the training data and very few in the holdout sample. Our model might
+ <em>only</em>
+ see that chocolate is a vital factor, but fail to find that other attributes are also important. In this exercise, you’ll explore how using too many features (columns) in a random forest model can lead to overfitting.</p>
+
+<p>A
+ <em>feature</em>
+ represents which columns of the data are used in a decision tree. The parameter
+ <code class="language-plaintext highlighter-rouge">max_features</code>
+ limits the number of features available.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Update the rfr model
+</span><span class="n">rfr</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+                            <span class="n">random_state</span><span class="o">=</span><span class="mi">1111</span><span class="p">,</span>
+                            <span class="n">max_features</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">rfr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Print the training and testing accuracies
+</span><span class="k">print</span><span class="p">(</span><span class="s">'The training error is {0:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span>
+  <span class="n">mae</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">rfr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">))))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'The testing error is {0:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span>
+  <span class="n">mae</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">rfr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))))</span>
+
+</code></pre></div></div>
+
+<p>The training error is 3.88</p>
+
+<p>The testing error is 9.15</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Update the rfr model
+</span><span class="n">rfr</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+                            <span class="n">random_state</span><span class="o">=</span><span class="mi">1111</span><span class="p">,</span>
+                            <span class="n">max_features</span><span class="o">=</span><span class="mi">11</span><span class="p">)</span>
+<span class="n">rfr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Print the training and testing accuracies
+</span><span class="k">print</span><span class="p">(</span><span class="s">'The training error is {0:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span>
+  <span class="n">mae</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">rfr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">))))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'The testing error is {0:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span>
+  <span class="n">mae</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">rfr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))))</span>
+
+</code></pre></div></div>
+
+<p>The training error is 3.57</p>
+
+<p>The testing error is 10.05</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Update the rfr model
+</span><span class="n">rfr</span> <span class="o">=</span> <span class="n">RandomForestRegressor</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span>
+                            <span class="n">random_state</span><span class="o">=</span><span class="mi">1111</span><span class="p">,</span>
+                            <span class="n">max_features</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+<span class="n">rfr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Print the training and testing accuracies
+</span><span class="k">print</span><span class="p">(</span><span class="s">'The training error is {0:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span>
+  <span class="n">mae</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">rfr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">))))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'The testing error is {0:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span>
+  <span class="n">mae</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">rfr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))))</span>
+
+</code></pre></div></div>
+
+<p>The training error is 3.60</p>
+
+<p>The testing error is 8.79</p>
+
+<p>Great job! The chart below shows the performance at various max feature values. Sometimes, setting parameter values can make a huge difference in model performance.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/3981/datasets/7e30218261b88cc6e57da1e07b73c5803450ccf6/Screen%20Shot%202019-01-13%20at%205.40.29%20PM.png" alt="" /></p>
+
+<h3 id="242-am-i-underfitting"><strong>2.4.2 Am I underfitting?</strong></h3>
+
+<p>You are creating a random forest model to predict if you will win a future game of Tic-Tac-Toe. Using the
+ <code class="language-plaintext highlighter-rouge">tic_tac_toe</code>
+ dataset, you have created training and testing datasets,
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ .</p>
+
+<p>You have decided to create a bunch of random forest models with varying amounts of trees (1, 2, 3, 4, 5, 10, 20, and 50). The more trees you use, the longer your random forest model will take to run. However, if you don’t use enough trees, you risk underfitting. You have created a for loop to test your model at the different number of trees.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.metrics import accuracy_score
+
+test_scores, train_scores = [], []
+for i in [1, 2, 3, 4, 5, 10, 20, 50]:
+    rfc = RandomForestClassifier(n_estimators=i, random_state=1111)
+    rfc.fit(X_train, y_train)
+    # Create predictions for the X_train and X_test datasets.
+    train_predictions = rfc.predict(X_train)
+    test_predictions = rfc.predict(X_test)
+    # Append the accuracy score for the test and train predictions.
+    train_scores.append(round(accuracy_score(y_train, train_predictions), 2))
+    test_scores.append(round(accuracy_score(y_test, test_predictions), 2))
+# Print the train and test scores.
+print("The training scores were: {}".format(train_scores))
+print("The testing scores were: {}".format(test_scores))
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+The training scores were: [0.94, 0.93, 0.98, 0.97, 0.99, 1.0, 1.0, 1.0]
+The testing scores were: [0.83, 0.79, 0.89, 0.91, 0.91, 0.93, 0.97, 0.98]
+
+</code></pre></div></div>
+
+<p>Excellent! Notice that with only one tree, both the train and test scores are low. As you add more trees, both errors improve. Even at 50 trees, this still might not be enough. Every time you use more trees, you achieve higher accuracy. At some point though, more trees increase training time, but do not decrease testing error.</p>
+
+<h1 id="3-cross-validation"><strong>3. Cross Validation</strong></h1>
+<hr />
+
+<h2 id="31-the-problems-with-holdout-sets"><strong>3.1 The problems with holdout sets</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/1-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/2-4.png?w=880" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/3-4.png?w=735" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/4-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/5-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/6-4.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="312-two-samples"><strong>3.1.2 Two samples</strong></h3>
+
+<p>After building several classification models based on the
+ <code class="language-plaintext highlighter-rouge">tic_tac_toe</code>
+ dataset, you realize that some models do not generalize as well as others. You have created training and testing splits just as you have been taught, so you are curious why your validation process is not working.</p>
+
+<p>After trying a different training, test split, you noticed differing accuracies for your machine learning model. Before getting too frustrated with the varying results, you have decided to see what else could be going on.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create two different samples of 200 observations
+</span><span class="n">sample1</span> <span class="o">=</span> <span class="n">tic_tac_toe</span><span class="p">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1111</span><span class="p">)</span>
+<span class="n">sample2</span> <span class="o">=</span> <span class="n">tic_tac_toe</span><span class="p">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1171</span><span class="p">)</span>
+
+<span class="c1"># Print the number of common observations
+</span><span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">([</span><span class="n">index</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">sample1</span><span class="p">.</span><span class="n">index</span> <span class="k">if</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">sample2</span><span class="p">.</span><span class="n">index</span><span class="p">]))</span>
+<span class="c1"># 40
+</span>
+<span class="c1"># Print the number of observations in the Class column for both samples
+</span><span class="k">print</span><span class="p">(</span><span class="n">sample1</span><span class="p">[</span><span class="s">'Class'</span><span class="p">].</span><span class="n">value_counts</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">sample2</span><span class="p">[</span><span class="s">'Class'</span><span class="p">].</span><span class="n">value_counts</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+positive    134
+negative     66
+Name: Class, dtype: int64
+positive    123
+negative     77
+Name: Class, dtype: int64
+
+</code></pre></div></div>
+
+<p>Well done! Notice that there are a varying number of positive observations for both sample test sets. Sometimes creating a single test holdout sample is not enough to achieve the high levels of model validation you want. You need to use something more robust.</p>
+
+<h3 id="313-potential-problems"><strong>3.1.3 Potential problems</strong></h3>
+
+<ul>
+  <li>Using different data splitting methods may lead to varying data in the final holdout samples.</li>
+  <li>If you have limited data, your holdout accuracy may be misleading.</li>
+</ul>
+
+<p>If our models are not generalizing well or if we have limited data, we should be careful using a single training/validation split. You should use the next lesson’s topic: cross-validation.</p>
+
+<hr />
+
+<h2 id="32-cross-validation"><strong>3.2 Cross-validation</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/7-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/8-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/9-4.png?w=873" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/10-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/11-4.png?w=933" alt="Desktop View" /></p>
+
+<h3 id="321-scikit-learns-kfold"><strong>3.2.1 scikit-learn’s KFold()</strong></h3>
+
+<p>You just finished running a colleagues code that creates a random forest model and calculates an out-of-sample accuracy. You noticed that your colleague’s code did not have a random state, and the errors you found were completely different than the errors your colleague reported.</p>
+
+<p>To get a better estimate for how accurate this random forest model will be on new data, you have decided to generate some indices to use for KFold cross-validation.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.model_selection import KFold
+
+# Use KFold
+kf = KFold(n_splits=5, shuffle=True, random_state=1111)
+
+# Create splits
+splits = kf.split(X)
+
+# Print the number of indices
+for train_index, val_index in splits:
+    print("Number of training indices: %s" % len(train_index))
+    print("Number of validation indices: %s" % len(val_index))
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Number of training indices: 68
+Number of validation indices: 17
+Number of training indices: 68
+Number of validation indices: 17
+Number of training indices: 68
+Number of validation indices: 17
+Number of training indices: 68
+Number of validation indices: 17
+Number of training indices: 68
+Number of validation indices: 17
+
+</code></pre></div></div>
+
+<p>Good job! This dataset has 85 rows. You have created five splits – each containing 68 training and 17 validation indices. You can use these indices to complete 5-fold cross-validation.</p>
+
+<h3 id="322-using-kfold-indices"><strong>3.2.2 Using KFold indices</strong></h3>
+
+<p>You have already created
+ <code class="language-plaintext highlighter-rouge">splits</code>
+ , which contains indices for the candy-data dataset to complete 5-fold cross-validation. To get a better estimate for how well a colleague’s random forest model will perform on a new data, you want to run this model on the five different training and validation indices you just created.</p>
+
+<p>In this exercise, you will use these indices to check the accuracy of this model using the five different splits. A for loop has been provided to assist with this process.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_squared_error
+
+rfc = RandomForestRegressor(n_estimators=25, random_state=1111)
+
+# Access the training and validation indices of splits
+for train_index, val_index in splits:
+    # Setup the training and validation data
+    X_train, y_train = X[train_index], y[train_index]
+    X_val, y_val = X[val_index], y[val_index]
+    # Fit the random forest model
+    rfc.fit(X_train, y_train)
+    # Make predictions, and print the accuracy
+    predictions = rfc.predict(X_val)
+    print("Split accuracy: " + str(mean_squared_error(y_val, predictions)))
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Split accuracy: 178.75586448813047
+Split accuracy: 98.29560208158634
+Split accuracy: 86.2673010849621
+Split accuracy: 217.4185114496197
+Split accuracy: 140.5437661156536
+
+</code></pre></div></div>
+
+<p>Nice work!
+ <code class="language-plaintext highlighter-rouge">KFold()</code>
+ is a great method for accessing individual indices when completing cross-validation. One drawback is needing a for loop to work through the indices though. In the next lesson, you will look at an automated method for cross-validation using
+ <code class="language-plaintext highlighter-rouge">sklearn</code>
+ .</p>
+
+<hr />
+
+<h2 id="33-sklearns-cross_val_score"><strong>3.3 sklearn’s cross_val_score()</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/12-4.png?w=901" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/13-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/14-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/15-4.png?w=765" alt="Desktop View" /></p>
+
+<h3 id="331-scikit-learns-methods"><strong>3.3.1 scikit-learn’s methods</strong></h3>
+
+<p>You have decided to build a regression model to predict the number of new employees your company will successfully hire next month. You open up a new Python script to get started, but you quickly realize that
+ <code class="language-plaintext highlighter-rouge">sklearn</code>
+ has
+ <em>a lot</em>
+ of different modules. Let’s make sure you understand the names of the modules, the methods, and which module contains which method.</p>
+
+<p>Follow the instructions below to load in all of the necessary methods for completing cross-validation using
+ <code class="language-plaintext highlighter-rouge">sklearn</code>
+ . You will use modules:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">metrics</code></li>
+  <li><code class="language-plaintext highlighter-rouge">model_selection</code></li>
+  <li><code class="language-plaintext highlighter-rouge">ensemble</code></li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Instruction 1: Load the cross-validation method
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>
+
+<span class="c1"># Instruction 2: Load the random forest regression model
+</span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
+
+<span class="c1"># Instruction 3: Load the mean squared error method
+# Instruction 4: Load the function for creating a scorer
+</span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">make_scorer</span>
+
+</code></pre></div></div>
+
+<p>Well done! It is easy to see how all of the methods can get mixed up, but it is important to know the names of the methods you need. You can always review the
+ <a href="https://scikit-learn.org/stable/documentation.html">scikit-learn documentation</a>
+ should you need any help.</p>
+
+<h3 id="332-implement-cross_val_score"><strong>3.3.2 Implement cross_val_score()</strong></h3>
+
+<p>Your company has created several new candies to sell, but they are not sure if they should release all five of them. To predict the popularity of these new candies, you have been asked to build a regression model using the candy dataset. Remember that the response value is a head-to-head win-percentage against other candies.</p>
+
+<p>Before you begin trying different regression models, you have decided to run cross-validation on a simple random forest model to get a baseline error to compare with any future results.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+rfc = RandomForestRegressor(n_estimators=25, random_state=1111)
+mse = make_scorer(mean_squared_error)
+
+# Set up cross_val_score
+cv = cross_val_score(estimator=rfc,
+                     X=X_train,
+                     y=y_train,
+                     cv=10,
+                     scoring=mse)
+
+# Print the mean error
+print(cv.mean())
+# 155.55845080026586
+
+</code></pre></div></div>
+
+<p>Nice! You now have a baseline score to build on. If you decide to build additional models or try new techniques, you should try to get an error lower than 155.56. Lower errors indicate that your popularity predictions are improving.</p>
+
+<hr />
+
+<h2 id="34-leave-one-out-cross-validation-loocv"><strong>3.4 Leave-one-out-cross-validation (LOOCV)</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/16-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/17-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/18-2.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="341-when-to-use-loocv"><strong>3.4.1 When to use LOOCV</strong></h3>
+
+<p>Which of the following are reasons you might
+ <strong>NOT</strong>
+ run LOOCV on the provided
+ <code class="language-plaintext highlighter-rouge">X</code>
+ dataset? The
+ <code class="language-plaintext highlighter-rouge">X</code>
+ data has been loaded for you to explore as you see fit.</p>
+
+<ul>
+  <li>
+    <dl>
+      <dt><strong>A</strong></dt>
+      <dd>The
+ <code class="language-plaintext highlighter-rouge">X</code>
+ dataset has 122,624 data points, which might be computationally expensive and slow.</dd>
+    </dl>
+  </li>
+  <li>
+    <dl>
+      <dt><strong>B</strong></dt>
+      <dd>You cannot run LOOCV on classification problems.</dd>
+    </dl>
+  </li>
+  <li>
+    <dl>
+      <dt><strong>C</strong></dt>
+      <dd>You want to test different values for 15 different parameters</dd>
+    </dl>
+  </li>
+</ul>
+
+<p><strong>A&amp;C</strong></p>
+
+<p>Well done! This many observations will definitely slow things down and could be computationally expensive. If you don’t have time to wait while your computer runs through 1,000 models, you might want to use 5 or 10-fold cross-validation.</p>
+
+<h3 id="342-leave-one-out-cross-validation"><strong>3.4.2 Leave-one-out-cross-validation</strong></h3>
+
+<p>Let’s assume your favorite candy is not in the candy dataset, and that you are interested in the popularity of this candy. Using 5-fold cross-validation will train on only 80% of the data at a time. The candy dataset
+ <em>only</em>
+ has 85 rows though, and leaving out 20% of the data could hinder our model. However, using leave-one-out-cross-validation allows us to make the most out of our limited dataset and will give you the best estimate for your favorite candy’s popularity!</p>
+
+<p>In this exercise, you will use
+ <code class="language-plaintext highlighter-rouge">cross_val_score()</code>
+ to perform LOOCV.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.metrics import mean_absolute_error, make_scorer
+
+# Create scorer
+mae_scorer = make_scorer(mean_absolute_error)
+
+rfr = RandomForestRegressor(n_estimators=15, random_state=1111)
+
+# Implement LOOCV
+scores = cross_val_score(rfr, X=X, y=y, cv=X.shape[0], scoring=mae_scorer)
+
+# Print the mean and standard deviation
+print("The mean of the errors is: %s." % np.mean(scores))
+print("The standard deviation of the errors is: %s." % np.std(scores))
+
+# The mean of the errors is: 9.464989603398694.
+# The standard deviation of the errors is: 7.265762094853885.
+
+</code></pre></div></div>
+
+<p>Very good! You have come along way with model validation techniques. The final chapter will wrap up model validation by discussing how to select the best model and give an introduction to parameter tuning.</p>
+
+<h1 id="4-selecting-the-best-model-with-hyperparameter-tuning"><strong>4. Selecting the best model with Hyperparameter tuning</strong></h1>
+<hr />
+
+<h2 id="41-introduction-to-hyperparameter-tuning"><strong>4.1 Introduction to hyperparameter tuning</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/1-5.png?w=635" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/2-5.png?w=871" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/3-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/4-5.png?w=759" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/5-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/6-5.png?w=940" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/7-5.png?w=890" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/8-5.png?w=825" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/9-5.png?w=551" alt="Desktop View" /></p>
+
+<h3 id="411-creating-hyperparameters"><strong>4.1.1 Creating Hyperparameters</strong></h3>
+
+<p>For a school assignment, your professor has asked your class to create a random forest model to predict the average test score for the final exam.</p>
+
+<p>After developing an initial random forest model, you are unsatisfied with the overall accuracy. You realize that there are too many hyperparameters to choose from, and each one has
+ <em>a lot</em>
+ of possible values. You have decided to make a list of possible ranges for the hyperparameters you might use in your next model.</p>
+
+<p>Your professor has provided de-identified data for the last ten quizzes to act as the training data. There are 30 students in your class.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Review the parameters of rfr
+</span><span class="k">print</span><span class="p">(</span><span class="n">rfr</span><span class="p">.</span><span class="n">get_params</span><span class="p">())</span>
+
+<span class="c1"># Maximum Depth
+</span><span class="n">max_depth</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">12</span><span class="p">]</span>
+
+<span class="c1"># Minimum samples for a split
+</span><span class="n">min_samples_split</span> <span class="o">=</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+
+<span class="c1"># Max features
+</span><span class="n">max_features</span> <span class="o">=</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+{'bootstrap': True, 'criterion': 'mse', 'max_depth': None, 'max_features': 'auto', 'max_leaf_nodes': None, 'min_impurity_decrease': 0.0, 'min_impurity_split': None, 'min_samples_leaf': 1, 'min_samples_split': 2, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 'warn', 'n_jobs': None, 'oob_score': False, 'random_state': 1111, 'verbose': 0, 'warm_start': False}
+
+</code></pre></div></div>
+
+<p>Good job! Hyperparameter tuning requires selecting parameters to tune, as well the possible values these parameters can be set to.</p>
+
+<h3 id="412-running-a-model-using-ranges"><strong>4.1.2 Running a model using ranges</strong></h3>
+
+<p>You have just finished creating a list of hyperparameters and ranges to use when tuning a predictive model for an assignment. You have used
+ <code class="language-plaintext highlighter-rouge">max_depth</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">min_samples_split</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">max_features</code>
+ as your range variable names.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.ensemble import RandomForestRegressor
+
+# Fill in rfr using your variables
+rfr = RandomForestRegressor(
+    n_estimators=100,
+    max_depth=random.choice(max_depth),
+    min_samples_split=random.choice(min_samples_split),
+    max_features=random.choice(max_features))
+
+# Print out the parameters
+print(rfr.get_params())
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+{'bootstrap': True, 'criterion': 'mse', 'max_depth': 12, 'max_features': 10, 'max_leaf_nodes': None, 'min_impurity_decrease': 0.0, 'min_impurity_split': None, 'min_samples_leaf': 1, 'min_samples_split': 2, 'min_weight_fraction_leaf': 0.0, 'n_estimators': 100, 'n_jobs': None, 'oob_score': False, 'random_state': None, 'verbose': 0, 'warm_start': False}
+
+</code></pre></div></div>
+
+<p>Good job! Notice that
+ <code class="language-plaintext highlighter-rouge">min_samples_split</code>
+ was randomly set to 2. Since you specified a random state,
+ <code class="language-plaintext highlighter-rouge">min_samples_split</code>
+ will always be set to 2 if you only run this model one time.</p>
+
+<hr />
+
+<h2 id="42-randomizedsearchcv"><strong>4.2 RandomizedSearchCV</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/10-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/11-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/12-5.png?w=482" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/13-5.png?w=953" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/14-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/15-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/16-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/17-4.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="421-preparing-for-randomizedsearch"><strong>4.2.1 Preparing for RandomizedSearch</strong></h3>
+
+<p>Last semester your professor challenged your class to build a predictive model to predict final exam test scores. You tried running a few different models by randomly selecting hyperparameters. However, running each model required you to code it individually.</p>
+
+<p>After learning about
+ <code class="language-plaintext highlighter-rouge">RandomizedSearchCV()</code>
+ , you’re revisiting your professors challenge to build the best model. In this exercise, you will prepare the three necessary inputs for completing a random search.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import make_scorer, mean_squared_error
+
+# Finish the dictionary by adding the max_depth parameter
+param_dist = {"max_depth": [2, 4, 6, 8],
+              "max_features": [2, 4, 6, 8, 10],
+              "min_samples_split": [2, 4, 8, 16]}
+
+# Create a random forest regression model
+rfr = RandomForestRegressor(n_estimators=10, random_state=1111)
+
+# Create a scorer to use (use the mean squared error)
+scorer = make_scorer(mean_squared_error)
+
+</code></pre></div></div>
+
+<p>Well done! To use
+ <code class="language-plaintext highlighter-rouge">RandomizedSearchCV()</code>
+ , you need a distribution dictionary, an estimator, and a scorer—once you’ve got these, you can run a random search to find the best parameters for your model.</p>
+
+<h3 id="422-implementing-randomizedsearchcv"><strong>4.2.2 Implementing RandomizedSearchCV</strong></h3>
+
+<p>You are hoping that using a random search algorithm will help you improve predictions for a class assignment. You professor has challenged your class to predict the overall final exam average score.</p>
+
+<p>In preparation for completing a random search, you have created:</p>
+
+<ul>
+  <li>
+    <dl>
+      <dt><code class="language-plaintext highlighter-rouge">param_dist</code></dt>
+      <dd>the hyperparameter distributions</dd>
+    </dl>
+  </li>
+  <li>
+    <dl>
+      <dt><code class="language-plaintext highlighter-rouge">rfr</code></dt>
+      <dd>a random forest regression model</dd>
+    </dl>
+  </li>
+  <li>
+    <dl>
+      <dt><code class="language-plaintext highlighter-rouge">scorer</code></dt>
+      <dd>a scoring method to use</dd>
+    </dl>
+  </li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the method for random search
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RandomizedSearchCV</span>
+
+<span class="c1"># Build a random search using param_dist, rfr, and scorer
+</span><span class="n">random_search</span> <span class="o">=</span>\
+    <span class="n">RandomizedSearchCV</span><span class="p">(</span>
+        <span class="n">estimator</span><span class="o">=</span><span class="n">rfr</span><span class="p">,</span>
+        <span class="n">param_distributions</span><span class="o">=</span><span class="n">param_dist</span><span class="p">,</span>
+        <span class="n">n_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+        <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">scoring</span><span class="o">=</span><span class="n">scorer</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Nice! Although it takes a lot of steps, hyperparameter tuning with random search is well worth it and can improve the accuracy of your models. Plus, you are already using cross-validation to validate your best model.</p>
+
+<hr />
+
+<h2 id="43-selecting-your-final-model"><strong>4.3 Selecting your final model</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/18-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/19-2.png?w=945" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/20-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/21-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/22-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/23-1.png?w=797" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/24-1.png?w=763" alt="Desktop View" /></p>
+
+<h3 id="431-best-classification-accuracy"><strong>4.3.1 Best classification accuracy</strong></h3>
+
+<p>You are in a competition at work to build the best model for predicting the winner of a Tic-Tac-Toe game. You already ran a random search and saved the results of the most accurate model to
+ <code class="language-plaintext highlighter-rouge">rs</code>
+ .</p>
+
+<p>Which parameter set produces the best classification accuracy?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+rs.best_estimator_
+RandomForestClassifier(bootstrap=True, class_weight=None, criterion='gini',
+            max_depth=12, max_features='auto', max_leaf_nodes=None,
+            min_impurity_decrease=0.0, min_impurity_split=None,
+            min_samples_leaf=1, min_samples_split=4,
+            min_weight_fraction_leaf=0.0, n_estimators=20, n_jobs=None,
+            oob_score=False, random_state=1111, verbose=0,
+            warm_start=False)
+
+</code></pre></div></div>
+
+<p>Perfect! These parameters do produce the best testing accuracy. Good job! Remember, to reuse this model you can use
+ <code class="language-plaintext highlighter-rouge">rs.best_estimator_</code>
+ .</p>
+
+<h3 id="432-selecting-the-best-precision-model"><strong>4.3.2 Selecting the best precision model</strong></h3>
+
+<p>Your boss has offered to pay for you to see three sports games this year. Of the 41 home games your favorite team plays, you want to ensure you go to three home games that they will
+ <em>definitely</em>
+ win. You build a model to decide which games your team will win.</p>
+
+<p>To do this, you will build a random search algorithm and focus on model precision (to ensure your team wins). You also want to keep track of your best model and best parameters, so that you can use them again next year (if the model does well, of course). You have already decided on using the random forest classification model
+ <code class="language-plaintext highlighter-rouge">rfc</code>
+ and generated a parameter distribution
+ <code class="language-plaintext highlighter-rouge">param_dist</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.metrics import precision_score, make_scorer
+
+# Create a precision scorer
+precision = make_scorer(precision_score)
+# Finalize the random search
+rs = RandomizedSearchCV(
+  estimator=rfc, param_distributions=param_dist,
+  scoring = precision,
+  cv=5, n_iter=10, random_state=1111)
+rs.fit(X, y)
+
+# print the mean test scores:
+print('The accuracy for each run was: {}.'.format(rs.cv_results_['mean_test_score']))
+# print the best model score:
+print('The best accuracy for a single model was: {}'.format(rs.best_score_))
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+The accuracy for each run was: [0.86446668 0.75302055 0.67570816 0.88459939 0.88381178 0.86917588
+ 0.68014695 0.81721906 0.87895856 0.92917474].
+The best accuracy for a single model was: 0.9291747446879924
+
+</code></pre></div></div>
+
+<p>Wow – Your model’s precision was 93%! The best model accurately predicts a winning game 93% of the time. If you look at the mean test scores, you can tell some of the other parameter sets did really poorly. Also, since you used cross-validation, you can be confident in your predictions. Well done!</p>
+
+<hr />
+
+<h2 id="44-course-completed"><strong>4.4 Course completed!</strong></h2>
+
+<p><img src="/blog/assets/datacamp/model-validation-in-python/25-1.png?w=786" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/26-1.png?w=346" alt="Desktop View" />
+<img src="/blog/assets/datacamp/model-validation-in-python/27-1.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

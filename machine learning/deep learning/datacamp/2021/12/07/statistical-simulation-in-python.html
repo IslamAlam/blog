@@ -1,0 +1,1520 @@
+<h1 id="statistical-simulation-in-python">Statistical Simulation in Python</h1>
+
+<p>This is the memo of the 4th course (5 courses in all) of ‘Statistics Fundamentals with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/statistical-simulation-in-python">HERE</a></strong>
+ .</p>
+
+<p>###
+<strong>Table of contents</strong></p>
+
+<ol>
+  <li>Basics of randomness &amp; simulation</li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/09/26/statistical-simulation-in-python-from-datacamp/2/">Probability &amp; data generation process</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/09/26/statistical-simulation-in-python-from-datacamp/3/">Resampling methods</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/09/26/statistical-simulation-in-python-from-datacamp/4/">Advanced Applications of Simulation</a></li>
+</ol>
+
+<h1 id="1-basics-of-randomness--simulation"><strong>1. Basics of randomness &amp; simulation</strong></h1>
+<hr />
+
+<h3 id="11-introduction-to-random-variables"><strong>1.1 Introduction to random variables</strong></h3>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/1-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>A probability distribution is a mapping from the set of possible outcomes of a random variable to the probability of observing that outcome.</p>
+
+<p>It tells you how likely you are to observe a given outcome or a set of outcomes.</p>
+
+<p>####
+<strong>np.random.choice()</strong></p>
+
+<p>In this exercise, you will be introduced to the
+ <code class="language-plaintext highlighter-rouge">np.random.choice()</code>
+ function. This is a remarkably useful function for simulations and you will be making extensive use of it later in the course. As a first step, let’s try to understand the basics of this function.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+np.random.choice?
+Docstring:
+choice(a, size=None, replace=True, p=None)
+
+Generates a random sample from a given 1-D array
+
+        .. versionadded:: 1.7.0
+
+Parameters
+-----------
+a : 1-D array-like or int
+    If an ndarray, a random sample is generated from its elements.
+    If an int, the random sample is generated as if a were np.arange(a)
+size : int or tuple of ints, optional
+    Output shape.  If the given shape is, e.g., ``(m, n, k)``, then
+    ``m * n * k`` samples are drawn.  Default is None, in which case a
+    single value is returned.
+replace : boolean, optional
+    Whether the sample is with or without replacement
+p : 1-D array-like, optional
+    The probabilities associated with each entry in a.
+    If not given the sample assumes a uniform distribution over all
+    entries in a.
+
+Returns
+--------
+samples : single item or ndarray
+    The generated random samples
+
+Raises
+-------
+ValueError
+    If a is an int and less than zero, if a or p are not 1-dimensional,
+    if a is an array-like of size 0, if p is not a vector of
+    probabilities, if a and p have different lengths, or if
+    replace=False and the sample size is greater than the population
+    size
+
+See Also
+---------
+randint, shuffle, permutation
+
+</code></pre></div></div>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">np.random.choice()</code>
+ function will work even if you only provide the input array
+ <code class="language-plaintext highlighter-rouge">a</code>
+ . Make sure to make use of the
+ <code class="language-plaintext highlighter-rouge">help()</code>
+ function throughout the course, it will help get you through some tough exercises!</p>
+
+<p>####
+<strong>Poisson random variable</strong></p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">numpy.random</code>
+ module also has a number of useful probability distributions for both discrete and continuous random variables. In this exercise, you will learn how to draw samples from a probability distribution.</p>
+
+<p>In particular, you will draw samples from a very important discrete probability distribution, the Poisson distribution, which is typically used for modeling the average rate at which events occur.</p>
+
+<p>Following the exercise, you should be able to apply these steps to any of the probability distributions found in
+ <code class="language-plaintext highlighter-rouge">numpy.random</code>
+ . In addition, you will also see how the sample mean changes as we draw more samples from a distribution.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize seed and parameters
+</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+<span class="n">lam</span><span class="p">,</span> <span class="n">size_1</span><span class="p">,</span> <span class="n">size_2</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1000</span>
+
+<span class="c1"># Draw samples &amp; calculate absolute difference between lambda and sample mean
+</span><span class="n">samples_1</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">lam</span><span class="p">,</span> <span class="n">size_1</span><span class="p">)</span>
+<span class="n">samples_2</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">lam</span><span class="p">,</span> <span class="n">size_2</span><span class="p">)</span>
+<span class="n">answer_1</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">samples_1</span><span class="p">)</span> <span class="o">-</span> <span class="n">lam</span><span class="p">)</span>
+<span class="n">answer_2</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">samples_2</span><span class="p">)</span> <span class="o">-</span> <span class="n">lam</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"|Lambda - sample mean| with {} samples is {} and with {} samples is {}. "</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">size_1</span><span class="p">,</span> <span class="n">answer_1</span><span class="p">,</span> <span class="n">size_2</span><span class="p">,</span> <span class="n">answer_2</span><span class="p">))</span>
+
+<span class="c1"># |Lambda - sample mean| with 3 samples is 0.33333333333333304 and with 1000 samples is 0.07699999999999996.
+</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import matplotlib.pyplot as plt
+plt.hist(samples_2)
+plt.xlabel('samples_2 value')
+plt.ylabel('count')
+plt.title('np.random.poisson result\nlamda:5')
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/2-2.png?w=640" alt="Desktop View" /></p>
+
+<p>Why do you think the larger size gives us a better result?</p>
+
+<p>####
+<strong>Shuffling a deck of cards</strong></p>
+
+<p>Often times we are interested in randomizing the order of a set of items. Consider a game of cards where you first shuffle the deck of cards or a game of scrabble where the letters are first mixed in a bag. As the final exercise of this section, you will learn another useful function –
+ <code class="language-plaintext highlighter-rouge">np.random.shuffle()</code>
+ . This function allows you to randomly shuffle a sequence in place. At the end of this exercise, you will know how to shuffle a deck of cards or any sequence of items.</p>
+
+<p>Examine
+ <code class="language-plaintext highlighter-rouge">deck_of_cards</code>
+ in the shell.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+print(deck_of_cards)
+
+# Shuffle the deck
+np.random.shuffle(deck_of_cards)
+
+# Print out the top three cards
+card_choices_after_shuffle = deck_of_cards[:3]
+print(card_choices_after_shuffle)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[('Heart', 0), ('Heart', 1), ('Heart', 2), ..., ('Diamond', 10), ('Diamond', 11), ('Diamond', 12)]
+[('Diamond', 9), ('Spade', 9), ('Spade', 4)]
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="12-simulation-basics"><strong>1.2 Simulation basics</strong></h2>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/3-1.png?w=903" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/4-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Throwing a fair die</strong></p>
+
+<p>Once you grasp the basics of designing a simulation, you can apply it to any system or process. Next, we will learn how each step is implemented using some basic examples.</p>
+
+<p>As we have learned, simulation involves repeated random sampling. The first step then is to get
+ <strong>one</strong>
+ random sample. Once we have that, all we do is repeat the process multiple times. This exercise will focus on understanding how we get one random sample. We will study this in the context of throwing a fair six-sided die.</p>
+
+<p>By the end of this exercise, you will be familiar with how to implement the first two steps of running a simulation – defining a random variable and assigning probabilities.</p>
+
+<p>For the rest of the course, look to the IPython shell to find out what seed has been set.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># The seed for this exercise is set to 123
+# Define die outcomes and probabilities
+</span><span class="n">die</span><span class="p">,</span> <span class="n">probabilities</span><span class="p">,</span> <span class="n">throws</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">]</span><span class="o">*</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span>
+
+<span class="c1"># Use np.random.choice to throw the die once and record the outcome
+</span><span class="n">outcome</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probabilities</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Outcome of the throw: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">outcome</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="c1"># Outcome of the throw: 5
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Throwing two fair dice</strong></p>
+
+<p>We now know how to implement the first two steps of a simulation. Now let’s implement the next step – defining the relationship between random variables.</p>
+
+<p>Often times, our simulation will involve not just one, but multiple random variables. Consider a game where throw you two dice and win if each die shows the same number. Here we have two random variables – the two dice – and a relationship between each of them – we win if they show the same number, lose if they don’t. In reality, the relationship between random variables can be much more complex, especially when simulating things like weather patterns.</p>
+
+<p>By the end of this exercise, you will be familiar with how to implement the third step of running a simulation – defining relationships between random variables.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># The seed for this exercise is set to 223
+# Initialize number of dice, simulate &amp; record outcome
+</span><span class="n">die</span><span class="p">,</span> <span class="n">probabilities</span><span class="p">,</span> <span class="n">num_dice</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">],</span> <span class="mi">2</span>
+<span class="n">outcomes</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_dice</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probabilities</span><span class="p">)</span>
+
+<span class="c1"># Win if the two dice show the same number
+</span><span class="k">if</span> <span class="n">outcomes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">outcomes</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="s">'win'</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">answer</span> <span class="o">=</span> <span class="s">'lose'</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"The dice show {} and {}. You {}!"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">outcomes</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">outcomes</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">answer</span><span class="p">))</span>
+<span class="c1"># The dice show 5 and 5. You win!
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Simulating the dice game</strong></p>
+
+<p>We now know how to implement the first three steps of a simulation. Now let’s consider the next step – repeated random sampling.</p>
+
+<p>Simulating an outcome once doesn’t tell us much about how often we can expect to see that outcome. In the case of the dice game from the previous exercise, it’s great that we won once. But suppose we want to see how many times we can expect to win if we played this game multiple times, we need to repeat the random sampling process many times. Repeating the process of random sampling is helpful to understand and visualize inherent uncertainty and deciding next steps.</p>
+
+<p>Following this exercise, you will be familiar with implementing the fourth step of running a simulation – sampling repeatedly and generating outcomes.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># The seed for this exercise is set to 223
+# Initialize model parameters &amp; simulate dice throw
+</span><span class="n">die</span><span class="p">,</span> <span class="n">probabilities</span><span class="p">,</span> <span class="n">num_dice</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">,</span> <span class="mi">1</span><span class="o">/</span><span class="mi">6</span><span class="p">],</span> <span class="mi">2</span>
+<span class="n">sims</span><span class="p">,</span> <span class="n">wins</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sims</span><span class="p">):</span>
+    <span class="n">outcomes</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">die</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_dice</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probabilities</span><span class="p">)</span>
+    <span class="c1"># Increment `wins` by 1 if the dice show same number
+</span>    <span class="k">if</span> <span class="n">outcomes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">outcomes</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="n">wins</span> <span class="o">=</span> <span class="n">wins</span> <span class="o">+</span> <span class="mi">1</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"In {} games, you win {} times"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">sims</span><span class="p">,</span> <span class="n">wins</span><span class="p">))</span>
+<span class="c1"># In 100 games, you win 25 times
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="13-using-simulation-for-decision-making"><strong>1.3 Using simulation for decision-making</strong></h2>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/5-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/9-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/6-1.png?w=909" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/7-1.png?w=929" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/8-1.png?w=929" alt="Desktop View" /></p>
+
+<p>####
+<strong>Simulating one lottery drawing</strong></p>
+
+<p>In the last three exercises of this chapter, we will be bringing together everything you’ve learned so far. We will run a complete simulation, take a decision based on our observed outcomes, and learn to modify inputs to the simulation model.</p>
+
+<p>We will use simulations to figure out whether or not we want to buy a lottery ticket. Suppose you have the opportunity to buy a lottery ticket which gives you a shot at a grand prize of $1 Million. Since there are 1000 tickets in total, your probability of winning is 1 in 1000. Each ticket costs $10. Let’s use our understanding of basic simulations to first simulate one drawing of the lottery.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># The seed for this exercise is set to 123
+# Pre-defined constant variables
+</span><span class="n">lottery_ticket_cost</span><span class="p">,</span> <span class="n">num_tickets</span><span class="p">,</span> <span class="n">grand_prize</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">1000000</span>
+
+<span class="c1"># Probability of winning
+</span><span class="n">chance_of_winning</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">num_tickets</span>
+
+<span class="c1"># Simulate a single drawing of the lottery
+</span><span class="n">gains</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">lottery_ticket_cost</span><span class="p">,</span> <span class="n">grand_prize</span><span class="o">-</span><span class="n">lottery_ticket_cost</span><span class="p">]</span>
+<span class="n">probability</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">-</span><span class="n">chance_of_winning</span><span class="p">,</span> <span class="n">chance_of_winning</span><span class="p">]</span>
+<span class="n">outcome</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">gains</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probability</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"Outcome of one drawing of the lottery is {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">outcome</span><span class="p">))</span>
+<span class="c1"># Outcome of one drawing of the lottery is [-10]
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Should we buy?</strong></p>
+
+<p>In the last exercise, we simulated the random drawing of the lottery ticket once. In this exercise, we complete the simulation process by repeating the process multiple times.</p>
+
+<p>Repeating the process gives us multiple outcomes. We can think of this as multiple universes where the same lottery drawing occurred. We can then determine the average winnings across all these universes. If the average winnings are greater than what we pay for the ticket then it makes sense to buy it, otherwise, we might not want to buy the ticket.</p>
+
+<p>This is typically how simulations are used for evaluating business investments. After completing this exercise, you will have the basic tools required to use simulations for decision-making.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize size and simulate outcome
+</span><span class="n">lottery_ticket_cost</span><span class="p">,</span> <span class="n">num_tickets</span><span class="p">,</span> <span class="n">grand_prize</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1000</span><span class="p">,</span> <span class="mi">1000000</span>
+<span class="n">chance_of_winning</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="n">num_tickets</span>
+<span class="n">size</span> <span class="o">=</span> <span class="mi">2000</span>
+<span class="n">payoffs</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="n">lottery_ticket_cost</span><span class="p">,</span> <span class="n">grand_prize</span><span class="o">-</span><span class="n">lottery_ticket_cost</span><span class="p">]</span>
+<span class="n">probs</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="o">-</span><span class="n">chance_of_winning</span><span class="p">,</span><span class="n">chance_of_winning</span><span class="p">]</span>
+
+<span class="n">outcomes</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">a</span><span class="o">=</span><span class="n">payoffs</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">size</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">probs</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Mean of outcomes.
+</span><span class="n">answer</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">outcomes</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Average payoff from {} simulations = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="n">answer</span><span class="p">))</span>
+<span class="c1"># Average payoff from 2000 simulations = 1990.0
+</span>
+</code></pre></div></div>
+
+<p>Is it worth spending $10 on the ticket for this average payoff?</p>
+
+<p>####
+<strong>Calculating a break-even lottery price</strong></p>
+
+<p>Simulations allow us to ask more nuanced questions that might not necessarily have an easy analytical solution. Rather than solving a complex mathematical formula, we directly get multiple sample outcomes. We can run experiments by modifying inputs and studying how those changes impact the system. For example, once we have a moderately reasonable model of global weather patterns, we could evaluate the impact of increased greenhouse gas emissions.</p>
+
+<p>In the lottery example, we might want to know how expensive the ticket needs to be for it to not make sense to buy it. To understand this, we need to modify the ticket cost to see when the expected payoff is negative.</p>
+
+<p><code class="language-plaintext highlighter-rouge">grand_prize</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">num_tickets</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">chance_of_winning</code>
+ are loaded in the environment.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># The seed for this exercise is set to 333
+# Initialize simulations and cost of ticket
+</span><span class="n">sims</span><span class="p">,</span> <span class="n">lottery_ticket_cost</span> <span class="o">=</span> <span class="mi">3000</span><span class="p">,</span> <span class="mi">0</span>
+
+<span class="c1"># Use a while loop to increment `lottery_ticket_cost` till average value of outcomes falls below zero
+</span><span class="k">while</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="n">outcomes</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">([</span><span class="o">-</span><span class="n">lottery_ticket_cost</span><span class="p">,</span> <span class="n">grand_prize</span><span class="o">-</span><span class="n">lottery_ticket_cost</span><span class="p">],</span>
+                 <span class="n">size</span><span class="o">=</span><span class="n">sims</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="o">-</span><span class="n">chance_of_winning</span><span class="p">,</span> <span class="n">chance_of_winning</span><span class="p">],</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">outcomes</span><span class="p">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lottery_ticket_cost</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">answer</span> <span class="o">=</span> <span class="n">lottery_ticket_cost</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"The highest price at which it makes sense to buy the ticket is {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">answer</span><span class="p">))</span>
+
+<span class="c1"># The highest price at which it makes sense to buy the ticket is 9
+</span>
+<span class="sb">``</span><span class="err">`</span><span class="n">python</span>
+
+<span class="c1"># **2. Probability &amp; data generation process**
+</span><span class="o">---------------------------------------------</span>
+
+
+<span class="c1">## **2.1 Probability basics**
+</span>
+
+
+<span class="err">!</span><span class="p">[</span><span class="n">Desktop</span> <span class="n">View</span><span class="p">](</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">assets</span><span class="o">/</span><span class="n">datacamp</span><span class="o">/</span><span class="n">statistical</span><span class="o">-</span><span class="n">simulation</span><span class="o">-</span><span class="ow">in</span><span class="o">-</span><span class="n">python</span><span class="o">/</span><span class="mi">10</span><span class="o">-</span><span class="mf">1.</span><span class="n">png</span><span class="err">?</span><span class="n">w</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+
+<span class="c1">####
+</span><span class="o">**</span><span class="n">Queen</span> <span class="ow">or</span> <span class="n">spade</span><span class="o">**</span>
+
+
+
+ <span class="n">In</span> <span class="n">this</span> <span class="n">example</span><span class="p">,</span> <span class="n">you</span><span class="err">’</span><span class="n">ll</span> <span class="n">use</span> <span class="n">the</span> <span class="n">generalized</span> <span class="n">probability</span> <span class="n">formula</span>
+
+
+
+
+ <span class="n">P</span><span class="p">(</span><span class="n">A</span><span class="err">∪</span><span class="n">B</span><span class="p">)</span><span class="o">=</span><span class="n">P</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">+</span><span class="n">P</span><span class="p">(</span><span class="n">B</span><span class="p">)</span><span class="err">−</span><span class="n">P</span><span class="p">(</span><span class="n">A</span><span class="err">∩</span><span class="n">B</span><span class="p">)</span>
+
+
+
+
+ <span class="n">to</span> <span class="n">calculate</span> <span class="n">the</span> <span class="n">probability</span> <span class="n">of</span> <span class="n">two</span> <span class="n">events</span><span class="p">.</span> <span class="n">Consider</span> <span class="n">a</span> <span class="n">deck</span> <span class="n">of</span> <span class="n">cards</span> <span class="p">(</span><span class="mi">13</span> <span class="n">cards</span> <span class="n">x</span> <span class="mi">4</span> <span class="n">suites</span> <span class="o">=</span> <span class="mi">52</span> <span class="n">cards</span> <span class="ow">in</span> <span class="n">total</span><span class="p">).</span> <span class="n">One</span> <span class="n">card</span> <span class="ow">is</span> <span class="n">drawn</span> <span class="n">at</span> <span class="n">random</span><span class="p">.</span> <span class="n">What</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">probability</span> <span class="n">of</span> <span class="n">getting</span> <span class="n">a</span> <span class="n">queen</span> <span class="ow">or</span> <span class="n">a</span> <span class="n">spade</span><span class="err">?</span> <span class="n">Here</span> <span class="n">event</span> <span class="n">A</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">card</span> <span class="n">being</span> <span class="n">a</span> <span class="n">queen</span> <span class="ow">and</span> <span class="n">event</span> <span class="n">B</span> <span class="ow">is</span> <span class="n">the</span> <span class="n">card</span> <span class="n">being</span> <span class="n">a</span> <span class="n">spade</span><span class="p">.</span> <span class="n">Think</span> <span class="n">carefully</span> <span class="n">about</span> <span class="n">whether</span> <span class="n">the</span> <span class="n">two</span> <span class="n">events</span> <span class="n">have</span> <span class="n">anything</span> <span class="ow">in</span> <span class="n">common</span><span class="p">.</span>
+
+
+
+
+
+<span class="sb">``</span><span class="err">`</span><span class="n">python</span>
+
+<span class="c1"># P(Queens) + P(Spades) - P(Queen of Spades)
+</span><span class="mi">4</span><span class="o">/</span><span class="mi">52</span> <span class="o">+</span> <span class="mi">13</span><span class="o">/</span><span class="mi">52</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="mi">52</span>
+<span class="o">=</span> <span class="mi">16</span><span class="o">/</span><span class="mi">52</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Two of a kind</strong></p>
+
+<p>Now let’s use simulation to estimate probabilities. Suppose you’ve been invited to a game of poker at your friend’s home. In this variation of the game, you are dealt five cards and the player with the better hand wins. You will use a simulation to estimate the probabilities of getting certain hands. Let’s work on estimating the probability of getting at least two of a kind. Two of a kind is when you get two cards of different suites but having the same numeric value (e.g., 2 of hearts, 2 of spades, and 3 other cards).</p>
+
+<p>By the end of this exercise, you will know how to use simulation to calculate probabilities for card games.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># The seed for this exercise is set to 123
+# Shuffle deck &amp; count card occurrences in the hand
+</span><span class="n">n_sims</span><span class="p">,</span> <span class="n">two_kind</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_sims</span><span class="p">):</span>
+    <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">deck_of_cards</span><span class="p">)</span>
+    <span class="n">hand</span><span class="p">,</span> <span class="n">cards_in_hand</span> <span class="o">=</span> <span class="n">deck_of_cards</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">],</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">hand</span><span class="p">:</span>
+        <span class="c1"># Use .get() method on cards_in_hand
+</span>        <span class="n">cards_in_hand</span><span class="p">[</span><span class="n">card</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">cards_in_hand</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">card</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="c1"># Condition for getting at least 2 of a kind
+</span>    <span class="n">highest_card</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">cards_in_hand</span><span class="p">.</span><span class="n">values</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">highest_card</span><span class="o">&gt;=</span><span class="mi">2</span><span class="p">:</span>
+        <span class="n">two_kind</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"Probability of seeing at least two of a kind = {} "</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">two_kind</span><span class="o">/</span><span class="n">n_sims</span><span class="p">))</span>
+
+<span class="c1"># Probability of seeing at least two of a kind = 0.4952
+</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+np.random.shuffle(deck_of_cards)
+        hand, cards_in_hand = deck_of_cards[0:5], {}
+        for card in hand:
+            # Use .get() method on cards_in_hand
+            cards_in_hand[card[1]] = cards_in_hand.get(card[1], 0) + 1
+
+hand
+[('Club', 1), ('Diamond', 4), ('Heart', 8), ('Spade', 4), ('Spade', 8)]
+
+cards_in_hand
+{1: 1, 4: 2, 8: 2}
+
+cards_in_hand.values()
+dict_values([1, 2, 2])
+
+</code></pre></div></div>
+
+<p>####
+<strong>Game of thirteen</strong></p>
+
+<p>A famous French mathematician Pierre Raymond De Montmart, who was known for his work in combinatorics, proposed a simple game called as Game of Thirteen. You have a deck of 13 cards, each numbered from 1 through 13. Shuffle this deck and draw cards one by one. A coincidence is when the number on the card matches the order in which the card is drawn. For instance, if the 5th card you draw happens to be a 5, it’s a coincidence. You win the game if you get through all the cards without any coincidences. Let’s calculate the probability of winning at this game using simulation.</p>
+
+<p>By completing this exercise, you will further strengthen your ability to cast abstract problems into the simulation framework for estimating probabilities.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Pre-set constant variables
+</span><span class="n">deck</span><span class="p">,</span> <span class="n">sims</span><span class="p">,</span> <span class="n">coincidences</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">14</span><span class="p">),</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">0</span>
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sims</span><span class="p">):</span>
+    <span class="c1"># Draw all the cards without replacement to simulate one game
+</span>    <span class="n">draw</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">deck</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">deck</span><span class="p">),</span> <span class="n">replace</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="c1"># Check if there are any coincidences
+</span>    <span class="n">coincidence</span> <span class="o">=</span> <span class="p">(</span><span class="n">draw</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">14</span><span class="p">))).</span><span class="nb">any</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">coincidence</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">coincidences</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="c1"># Calculate probability of winning
+</span><span class="n">prob_of_winning</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">coincidences</span> <span class="o">/</span> <span class="n">sims</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Probability of winning = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">prob_of_winning</span><span class="p">))</span>
+<span class="c1"># Probability of winning = 0.36950000000000005
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="22-more-probability-concepts"><strong>2.2 More probability concepts</strong></h2>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/1-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/2-4.png?w=687" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/3-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>The conditional urn</strong></p>
+
+<p>As we’ve learned, conditional probability is defined as the probability of an event given another event. To illustrate this concept, let’s turn to an urn problem.</p>
+
+<p>We have an urn that contains 7 white and 6 black balls. Four balls are drawn at random. We’d like to know the probability that the first and third balls are white, while the second and the fourth balls are black.</p>
+
+<p>Upon completion, you will learn to manipulate simulations to calculate simple conditional probabilities.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize success, sims and urn
+</span><span class="n">success</span><span class="p">,</span> <span class="n">sims</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5000</span>
+<span class="n">urn</span> <span class="o">=</span> <span class="p">[</span><span class="s">'w'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">7</span> <span class="o">+</span> <span class="p">[</span><span class="s">'b'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">6</span>
+
+<span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sims</span><span class="p">):</span>
+    <span class="c1"># Draw 4 balls without replacement
+</span>    <span class="n">draw</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">urn</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+    <span class="c1"># Count the number of successes
+</span>    <span class="k">if</span> <span class="p">(</span><span class="n">draw</span> <span class="o">==</span> <span class="p">[</span><span class="s">'w'</span><span class="p">,</span><span class="s">'b'</span><span class="p">,</span><span class="s">'w'</span><span class="p">,</span><span class="s">'b'</span><span class="p">]).</span><span class="nb">all</span><span class="p">():</span>
+        <span class="n">success</span> <span class="o">+=</span><span class="mi">1</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"Probability of success = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">success</span><span class="o">/</span><span class="n">sims</span><span class="p">))</span>
+
+<span class="c1"># Probability of success = 0.0722
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Birthday problem</strong></p>
+
+<p>Now we’ll use simulation to solve a famous probability puzzle – the birthday problem. It sounds quite straightforward –
+ <em>How many people do you need in a room to ensure at least a 50% chance that two of them share the same birthday?</em></p>
+
+<p>With 366 people in a 365-day year, we are 100% sure that at least two have the same birthday, but we only need to be 50% sure. Simulation gives us an elegant way of solving this problem.</p>
+
+<p>Upon completion of this exercise, you will begin to understand how to cast problems in a simulation framework.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Draw a sample of birthdays &amp; check if each birthday is unique
+</span><span class="n">days</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">366</span><span class="p">)</span>
+<span class="n">people</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="k">def</span> <span class="nf">birthday_sim</span><span class="p">(</span><span class="n">people</span><span class="p">):</span>
+    <span class="n">sims</span><span class="p">,</span> <span class="n">unique_birthdays</span> <span class="o">=</span> <span class="mi">2000</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sims</span><span class="p">):</span>
+        <span class="n">draw</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">days</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">people</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">draw</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">draw</span><span class="p">)):</span>
+            <span class="n">unique_birthdays</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">unique_birthdays</span> <span class="o">/</span> <span class="n">sims</span>
+    <span class="k">return</span> <span class="n">out</span>
+
+<span class="c1"># Break out of the loop if probability greater than 0.5
+</span><span class="k">while</span> <span class="p">(</span><span class="n">people</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="n">prop_bds</span> <span class="o">=</span> <span class="n">birthday_sim</span><span class="p">(</span><span class="n">people</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">prop_bds</span> <span class="o">&gt;</span> <span class="mf">0.5</span><span class="p">:</span>
+        <span class="k">break</span>
+    <span class="n">people</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"With {} people, there's a 50% chance that two share a birthday."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">people</span><span class="p">))</span>
+<span class="c1"># With 23 people, there's a 50% chance that two share a birthday.
+</span>
+</code></pre></div></div>
+
+<p>23 seems surprisingly low, but it’s enough to have a 50% chance!</p>
+
+<p>####
+<strong>Full house</strong></p>
+
+<p>Let’s return to our poker game. Last time, we calculated the probability of getting at least two of a kind. This time we are interested in a full house. A full house is when you get two cards of different suits that share the same numeric value and three other cards that have the same numeric value (e.g., 2 of hearts &amp; spades, jacks of clubs, diamonds, &amp; spades).</p>
+
+<p>Thus, a full house is the probability of getting exactly three of a kind conditional on getting exactly two of a kind of another value. Using the same code as before, modify the success condition to get the desired output. This exercise will teach you to estimate conditional probabilities in card games and build your foundation in framing abstract problems for simulation.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+#Shuffle deck &amp; count card occurrences in the hand
+n_sims, full_house, deck_of_cards = 50000, 0, deck.copy()
+for i in range(n_sims):
+    np.random.shuffle(deck_of_cards)
+    hand, cards_in_hand = deck_of_cards[0:5], {}
+    for card in hand:
+        # Use .get() method to count occurrences of each card
+        cards_in_hand[card[1]] = cards_in_hand.get(card[1], 0) + 1
+
+    # Condition for getting full house
+    condition = (max(cards_in_hand.values()) ==3) &amp; (min(cards_in_hand.values())==2)
+    if  condition == True:
+        full_house += 1
+print("Probability of seeing a full house = {}".format(full_house/n_sims))
+
+# Probability of seeing a full house = 0.0014
+
+</code></pre></div></div>
+
+<p>Look at how small this probability is compared to that of at least two of a kind.</p>
+
+<hr />
+
+<h2 id="23-data-generating-process"><strong>2.3 Data generating process</strong></h2>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/4-2.png?w=851" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/5-2.png?w=975" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/6-2.png?w=907" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/7-2.png?w=805" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/8-2.png?w=903" alt="Desktop View" /></p>
+
+<p>####
+<strong>Driving test</strong></p>
+
+<p>Through the next exercises, we will learn how to build a data generating process (DGP) through progressively complex examples.</p>
+
+<p>In this exercise, you will simulate a very simple DGP. Suppose that you are about to take a driving test tomorrow. Based on your own practice and based on data you have gathered, you know that the probability of you passing the test is 90% when it’s sunny and only 30% when it’s raining. Your local weather station forecasts that there’s a 40% chance of rain tomorrow. Based on this information, you want to know what is the probability of you passing the driving test tomorrow.</p>
+
+<p>This is a simple problem and can be solved analytically. Here, you will learn how to model a simple DGP and see how it can be used for simulation.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+sims, outcomes, p_rain, p_pass = 1000, [], 0.40, {'sun':0.9, 'rain':0.3}
+
+def test_outcome(p_rain):
+    # Simulate whether it will rain or not
+    weather = np.random.choice(['sun', 'rain'], p=[1-p_rain, p_rain])
+    # Simulate and return whether you will pass or fail
+    return np.random.choice(['pass', 'fail'], p=[p_pass[weather], 1-p_pass[weather]])
+
+
+for _ in range(sims):
+    outcomes.append(test_outcome(p_rain))
+
+# Calculate fraction of outcomes where you pass
+pass_outcomes_frac = outcomes.count('pass') / len(outcomes)
+print("Probability of Passing the driving test = {}".format(pass_outcomes_frac))
+
+# Probability of Passing the driving test = 0.654
+
+</code></pre></div></div>
+
+<p>####
+<strong>National elections</strong></p>
+
+<p>This exercise will give you a taste of how you can model a DGP at different levels of complexity.</p>
+
+<p>Consider national elections in a country with two political parties – Red and Blue. This country has 50 states and the party that wins the most states wins the elections. You have the probability pp of Red winning in each individual state and want to know the probability of Red winning nationally.</p>
+
+<p>Let’s model the DGP to understand the distribution. Suppose the election outcome in each state follows a binomial distribution with probability pp such that 00 indicates a loss for Red and 11 indicates a win. We then simulate a number of election outcomes. Finally, we can ask rich questions like
+ <strong>what is the probability of Red winning less than 45% of the states?</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># probabilities of red win in a state
+</span><span class="n">p</span>
+<span class="n">array</span><span class="p">([</span><span class="mf">0.52076814</span><span class="p">,</span> <span class="mf">0.67846401</span><span class="p">,</span> <span class="mf">0.82731745</span><span class="p">,</span> <span class="mf">0.64722761</span><span class="p">,</span> <span class="mf">0.03665174</span><span class="p">,</span>
+<span class="p">...</span>
+       <span class="mf">0.96263926</span><span class="p">,</span> <span class="mf">0.0548948</span> <span class="p">,</span> <span class="mf">0.14092758</span><span class="p">,</span> <span class="mf">0.54739446</span><span class="p">,</span> <span class="mf">0.54555576</span><span class="p">])</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+outcomes, sims, probs = [], 1000, p
+
+for _ in range(sims):
+    # Simulate elections in the 50 states
+    election = np.random.binomial(p=probs, n=1)
+    # Get average of Red wins and add to `outcomes`
+    outcomes.append(np.sum(election)/len(election))
+
+# Calculate probability of Red winning in less than 45% of the states
+prob_red_wins = sum(x&lt;0.45 for x in outcomes)/ len(outcomes)
+print("Probability of Red winning in less than 45% of the states = {}".format(prob_red_wins))
+
+# Probability of Red winning in less than 45% of the states = 0.196
+
+</code></pre></div></div>
+
+<p>Now think about what you would do if you were given the probabilities of winning in each county within a state.</p>
+
+<p>####
+<strong>Fitness goals</strong></p>
+
+<p>Let’s model how activity levels impact weight loss using modern fitness trackers. On days when you go to the gym, you average around 15k steps, and around 5k steps otherwise. You go to the gym 40% of the time. Let’s model the step counts in a day as a Poisson random variable with a mean λ dependent on whether or not you go to the gym.</p>
+
+<p>For simplicity, let’s say you have an 80% chance of losing 1lb and a 20% chance of gaining 1lb when you get more than 10k steps. The probabilities are reversed when you get less than 8k steps. Otherwise, there’s an even chance of gaining or losing 1lb. Given all this information, find the probability of losing weight in a month.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Simulate steps &amp; choose prob
+</span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sims</span><span class="p">):</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">days</span><span class="p">):</span>
+        <span class="n">lam</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">5000</span><span class="p">,</span> <span class="mi">15000</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="p">[</span><span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">steps</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">lam</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">steps</span> <span class="o">&gt;</span> <span class="mi">10000</span><span class="p">:</span>
+            <span class="n">prob</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">steps</span> <span class="o">&lt;</span> <span class="mi">8000</span><span class="p">:</span>
+            <span class="n">prob</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">prob</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]</span>
+        <span class="n">w</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="o">=</span><span class="n">prob</span><span class="p">))</span>
+    <span class="n">outcomes</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">w</span><span class="p">))</span>
+
+<span class="c1"># Calculate fraction of outcomes where there was a weight loss
+</span><span class="n">weight_loss_outcomes_frac</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="o">&lt;</span><span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">outcomes</span><span class="p">)</span><span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">outcomes</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Probability of Weight Loss = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">weight_loss_outcomes_frac</span><span class="p">))</span>
+
+<span class="c1"># Probability of Weight Loss = 0.215
+</span>
+</code></pre></div></div>
+
+<p>You now know how easy it is to break down complex DGPs into simple components.</p>
+
+<hr />
+
+<h2 id="24-ecommerce-ad-simulation"><strong>2.4 eCommerce Ad Simulation</strong></h2>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/1-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/2-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/3-3.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Sign up Flow</strong></p>
+
+<p>We will now model the DGP of an eCommerce ad flow starting with sign-ups.</p>
+
+<p>On any day, we get many ad impressions, which can be modeled as Poisson random variables (RV). You are told that λλ is normally distributed with a mean of 100k visitors and standard deviation 2000.</p>
+
+<p>During the signup journey, the customer sees an ad, decides whether or not to click, and then whether or not to signup. Thus both clicks and signups are binary, modeled using binomial RVs. What about probability pp of success? Our current low-cost option gives us a click-through rate of 1% and a sign-up rate of 20%. A higher cost option could increase the clickthrough and signup rate by up to 20%, but we are unsure of the level of improvement, so we model it as a uniform RV.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize click-through rate and signup rate dictionaries
+</span><span class="n">ct_rate</span> <span class="o">=</span> <span class="p">{</span><span class="s">'low'</span><span class="p">:</span><span class="mf">0.01</span><span class="p">,</span> <span class="s">'high'</span><span class="p">:</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1.2</span><span class="o">*</span><span class="mf">0.01</span><span class="p">)}</span>
+<span class="n">su_rate</span> <span class="o">=</span> <span class="p">{</span><span class="s">'low'</span><span class="p">:</span><span class="mf">0.2</span><span class="p">,</span> <span class="s">'high'</span><span class="p">:</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1.2</span><span class="o">*</span><span class="mf">0.2</span><span class="p">)}</span>
+
+<span class="k">def</span> <span class="nf">get_signups</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">ct_rate</span><span class="p">,</span> <span class="n">su_rate</span><span class="p">,</span> <span class="n">sims</span><span class="p">):</span>
+    <span class="n">lam</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">100000</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">2000</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">sims</span><span class="p">)</span>
+    <span class="c1"># Simulate impressions(poisson), clicks(binomial) and signups(binomial)
+</span>    <span class="n">impressions</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">lam</span><span class="o">=</span><span class="n">lam</span><span class="p">)</span>
+    <span class="n">clicks</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">binomial</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">impressions</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">ct_rate</span><span class="p">[</span><span class="n">cost</span><span class="p">])</span>
+    <span class="n">signups</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">binomial</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">clicks</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">su_rate</span><span class="p">[</span><span class="n">cost</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">signups</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"Simulated Signups = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">get_signups</span><span class="p">(</span><span class="s">'high'</span><span class="p">,</span> <span class="n">ct_rate</span><span class="p">,</span> <span class="n">su_rate</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+<span class="c1"># Simulated Signups = [268]
+</span>
+</code></pre></div></div>
+
+<p>Now that we have signups, let’s see how to model the purchases from these signups.</p>
+
+<p>####
+<strong>Purchase Flow</strong></p>
+
+<p>After signups, let’s model the revenue generation process. Once the customer has signed up, they decide whether or not to purchase – a natural candidate for a binomial RV. Let’s assume that 10% of signups result in a purchase.</p>
+
+<p>Although customers can make many purchases, let’s assume one purchase. The purchase value could be modeled by any continuous RV, but one nice candidate is the exponential RV. Suppose we know that purchase value per customer has averaged around $1000. We use this information to create the
+ <code class="language-plaintext highlighter-rouge">purchase_values</code>
+ RV. The revenue, then, is simply the sum of all purchase values.</p>
+
+<p>The variables
+ <code class="language-plaintext highlighter-rouge">ct_rate</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">su_rate</code>
+ and the function
+ <code class="language-plaintext highlighter-rouge">get_signups()</code>
+ from the last exercise are pre-loaded for you.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def get_revenue(signups):
+    rev = []
+    np.random.seed(123)
+    for s in signups:
+        # Model purchases as binomial, purchase_values as exponential
+        purchases = np.random.binomial(s, p=0.1)
+        purchase_values = np.random.exponential(size=purchases, scale=1000)
+
+        # Append to revenue the sum of all purchase values.
+        rev.append(np.sum(purchase_values))
+    return rev
+
+print("Simulated Revenue = ${}".format(get_revenue(get_signups('low', ct_rate, su_rate, 1))[0]))
+
+# Simulated Revenue = $22404.217742298042
+
+</code></pre></div></div>
+
+<p>What are some other distributions you could have used in place of exponential?</p>
+
+<p>####
+<strong>Probability of losing money</strong></p>
+
+<p>In this exercise, we will use the DGP model to estimate probability.</p>
+
+<p>As seen earlier, this company has the option of spending extra money, let’s say $3000, to redesign the ad. This could potentially get them higher clickthrough and signup rates, but this is not guaranteed. We would like to know whether or not to spend this extra $3000 by calculating the probability of losing money. In other words, the probability that the revenue from the high-cost option minus the revenue from the low-cost option is lesser than the cost.</p>
+
+<p>Once we have simulated revenue outcomes, we can ask a rich set of questions that might not have been accessible using traditional analytical methods.</p>
+
+<p>This simple yet powerful framework forms the basis of Bayesian methods for getting probabilities.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize cost_diff
+</span><span class="n">sims</span><span class="p">,</span> <span class="n">cost_diff</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">3000</span>
+
+<span class="c1"># Get revenue when the cost is 'low' and when the cost is 'high'
+</span><span class="n">rev_low</span> <span class="o">=</span> <span class="n">get_revenue</span><span class="p">(</span><span class="n">get_signups</span><span class="p">(</span><span class="s">'low'</span><span class="p">,</span> <span class="n">ct_rate</span><span class="p">,</span> <span class="n">su_rate</span><span class="p">,</span> <span class="n">sims</span><span class="p">))</span>
+<span class="n">rev_high</span> <span class="o">=</span> <span class="n">get_revenue</span><span class="p">(</span><span class="n">get_signups</span><span class="p">(</span><span class="s">'high'</span><span class="p">,</span> <span class="n">ct_rate</span><span class="p">,</span> <span class="n">su_rate</span><span class="p">,</span> <span class="n">sims</span><span class="p">))</span>
+
+<span class="c1"># calculate fraction of times rev_high - rev_low is less than cost_diff
+</span><span class="n">frac</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">rev_high</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">rev_low</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">cost_diff</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">rev_low</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Probability of losing money = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">frac</span><span class="p">))</span>
+
+<span class="c1"># Probability of losing money = 0.4659
+</span>
+<span class="sb">``</span><span class="err">`</span><span class="n">python</span>
+
+<span class="c1"># **3. Resampling methods**
+</span><span class="o">--------------------------</span>
+
+
+<span class="c1">## **3.1 Introduction to resampling methods**
+</span>
+
+
+<span class="err">!</span><span class="p">[</span><span class="n">Desktop</span> <span class="n">View</span><span class="p">](</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">assets</span><span class="o">/</span><span class="n">datacamp</span><span class="o">/</span><span class="n">statistical</span><span class="o">-</span><span class="n">simulation</span><span class="o">-</span><span class="ow">in</span><span class="o">-</span><span class="n">python</span><span class="o">/</span><span class="mi">4</span><span class="o">-</span><span class="mf">3.</span><span class="n">png</span><span class="err">?</span><span class="n">w</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+<span class="err">!</span><span class="p">[</span><span class="n">Desktop</span> <span class="n">View</span><span class="p">](</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">assets</span><span class="o">/</span><span class="n">datacamp</span><span class="o">/</span><span class="n">statistical</span><span class="o">-</span><span class="n">simulation</span><span class="o">-</span><span class="ow">in</span><span class="o">-</span><span class="n">python</span><span class="o">/</span><span class="mi">5</span><span class="o">-</span><span class="mf">3.</span><span class="n">png</span><span class="err">?</span><span class="n">w</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+<span class="err">!</span><span class="p">[</span><span class="n">Desktop</span> <span class="n">View</span><span class="p">](</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">assets</span><span class="o">/</span><span class="n">datacamp</span><span class="o">/</span><span class="n">statistical</span><span class="o">-</span><span class="n">simulation</span><span class="o">-</span><span class="ow">in</span><span class="o">-</span><span class="n">python</span><span class="o">/</span><span class="mi">6</span><span class="o">-</span><span class="mf">3.</span><span class="n">png</span><span class="err">?</span><span class="n">w</span><span class="o">=</span><span class="mi">984</span><span class="p">)</span>
+
+
+
+<span class="c1">####
+</span><span class="o">**</span><span class="n">Probability</span> <span class="n">example</span><span class="o">**</span>
+
+
+
+ <span class="n">In</span> <span class="n">this</span> <span class="n">exercise</span><span class="p">,</span> <span class="n">we</span> <span class="n">will</span> <span class="n">review</span> <span class="n">the</span> <span class="n">difference</span> <span class="n">between</span> <span class="n">sampling</span> <span class="k">with</span> <span class="ow">and</span> <span class="n">without</span> <span class="n">replacement</span><span class="p">.</span> <span class="n">We</span> <span class="n">will</span> <span class="n">calculate</span> <span class="n">the</span> <span class="n">probability</span> <span class="n">of</span> <span class="n">an</span> <span class="n">event</span> <span class="n">using</span> <span class="n">simulation</span><span class="p">,</span> <span class="n">but</span> <span class="n">vary</span> <span class="n">our</span> <span class="n">sampling</span> <span class="n">method</span> <span class="n">to</span> <span class="n">see</span> <span class="n">how</span> <span class="n">it</span> <span class="n">impacts</span> <span class="n">probability</span><span class="p">.</span>
+
+
+
+
+ <span class="n">Consider</span> <span class="n">a</span> <span class="n">bowl</span> <span class="n">filled</span> <span class="k">with</span> <span class="n">colored</span> <span class="n">candies</span> <span class="err">–</span> <span class="n">three</span> <span class="n">blue</span><span class="p">,</span> <span class="n">two</span> <span class="n">green</span><span class="p">,</span> <span class="ow">and</span> <span class="n">five</span> <span class="n">yellow</span><span class="p">.</span> <span class="n">Draw</span> <span class="n">three</span> <span class="n">candies</span> <span class="n">at</span> <span class="n">random</span><span class="p">,</span> <span class="k">with</span> <span class="n">replacement</span> <span class="ow">and</span> <span class="n">without</span> <span class="n">replacement</span><span class="p">.</span> <span class="n">You</span> <span class="n">want</span> <span class="n">to</span> <span class="n">know</span> <span class="n">the</span> <span class="n">probability</span> <span class="n">of</span>
+ <span class="o">**</span><span class="n">drawing</span> <span class="n">a</span> <span class="n">yellow</span> <span class="n">candy</span> <span class="n">on</span> <span class="n">the</span> <span class="n">third</span> <span class="n">draw</span> <span class="n">given</span> <span class="n">that</span> <span class="n">the</span> <span class="n">first</span> <span class="n">candy</span> <span class="n">was</span> <span class="n">blue</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">second</span> <span class="n">candy</span> <span class="n">was</span> <span class="n">green</span><span class="p">.</span><span class="o">**</span>
+
+
+
+
+
+<span class="sb">``</span><span class="err">`</span><span class="n">python</span>
+
+<span class="c1"># Set up the bowl
+</span><span class="n">success_rep</span><span class="p">,</span> <span class="n">success_no_rep</span><span class="p">,</span> <span class="n">sims</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10000</span>
+<span class="n">bowl</span> <span class="o">=</span> <span class="p">[</span><span class="s">'b'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span> <span class="o">+</span> <span class="p">[</span><span class="s">'g'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">[</span><span class="s">'y'</span><span class="p">]</span> <span class="o">*</span> <span class="mi">5</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sims</span><span class="p">):</span>
+    <span class="c1"># Sample with and without replacement &amp; increment success counters
+</span>    <span class="n">sample_rep</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">bowl</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="n">sample_no_rep</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">bowl</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sample_rep</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">'b'</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sample_rep</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">'g'</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sample_rep</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">'y'</span><span class="p">):</span>
+        <span class="n">success_rep</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">sample_no_rep</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s">'b'</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sample_no_rep</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">'g'</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sample_no_rep</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="s">'y'</span><span class="p">):</span>
+        <span class="n">success_no_rep</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="c1"># Calculate probabilities
+</span><span class="n">prob_with_replacement</span> <span class="o">=</span> <span class="n">success_rep</span> <span class="o">/</span> <span class="n">sims</span>
+<span class="n">prob_without_replacement</span> <span class="o">=</span> <span class="n">success_no_rep</span> <span class="o">/</span> <span class="n">sims</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Probability with replacement = {}, without replacement = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">prob_with_replacement</span><span class="p">,</span> <span class="n">prob_without_replacement</span><span class="p">))</span>
+
+<span class="c1"># Probability with replacement = 0.0266, without replacement = 0.0415
+</span>
+</code></pre></div></div>
+
+<p>Does the difference between sampling with and without replacement make sense now?</p>
+
+<hr />
+
+<h3 id="32-bootstrapping"><strong>3.2 Bootstrapping</strong></h3>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/7-3.png?w=648" alt="Desktop View" /></p>
+
+<p>####
+<strong>Running a simple bootstrap</strong></p>
+
+<p>Welcome to the first exercise in the bootstrapping section. We will work through an example where we learn to run a simple bootstrap. As we saw in the video, the main idea behind bootstrapping is sampling with replacement.</p>
+
+<p>Suppose you own a factory that produces wrenches. You want to be able to characterize the average length of the wrenches and ensure that they meet some specifications. Your factory produces thousands of wrenches every day, but it’s infeasible to measure the length of each wrench. However, you have access to a representative sample of 100 wrenches. Let’s use bootstrapping to get the 95% confidence interval (CI) for the average lengths.</p>
+
+<p>Examine the list
+ <code class="language-plaintext highlighter-rouge">wrench_lengths</code>
+ , which has 100 observed lengths of wrenches, in the shell.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Draw some random sample with replacement and append mean to mean_lengths.
+</span><span class="n">mean_lengths</span><span class="p">,</span> <span class="n">sims</span> <span class="o">=</span> <span class="p">[],</span> <span class="mi">1000</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sims</span><span class="p">):</span>
+    <span class="n">temp_sample</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">wrench_lengths</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="n">sample_mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">temp_sample</span><span class="p">)</span>
+    <span class="n">mean_lengths</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample_mean</span><span class="p">)</span>
+
+<span class="c1"># Calculate bootstrapped mean and 95% confidence interval.
+</span><span class="n">boot_mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mean_lengths</span><span class="p">)</span>
+<span class="n">boot_95_ci</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">mean_lengths</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Bootstrapped Mean Length = {}, 95% CI = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">boot_mean</span><span class="p">,</span> <span class="n">boot_95_ci</span><span class="p">))</span>
+
+<span class="c1"># Bootstrapped Mean Length = 10.027059690070363, 95% CI = [ 9.78662216 10.24854356]
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Non-standard estimators</strong></p>
+
+<p>In the last exercise, you ran a simple bootstrap that we will now modify for more complicated estimators.</p>
+
+<p>Suppose you are studying the health of students. You are given the height and weight of 1000 students and are interested in the median height as well as the correlation between height and weight and the associated 95% CI for these quantities. Let’s use bootstrapping.</p>
+
+<p>Examine the
+ <code class="language-plaintext highlighter-rouge">pandas</code>
+ DataFrame
+ <code class="language-plaintext highlighter-rouge">df</code>
+ with the heights and weights of 1000 students.
+ <em>Using this, calculate the 95% CI for both the
+ <strong>median height</strong>
+ as well as the
+ <strong>correlation</strong>
+ between height and weight.</em></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Sample with replacement and calculate quantities of interest
+</span><span class="n">sims</span><span class="p">,</span> <span class="n">data_size</span><span class="p">,</span> <span class="n">height_medians</span><span class="p">,</span> <span class="n">hw_corr</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="n">df</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[],</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sims</span><span class="p">):</span>
+    <span class="n">tmp_df</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="n">data_size</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">height_medians</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">median</span><span class="p">(</span><span class="n">tmp_df</span><span class="p">.</span><span class="n">heights</span><span class="p">))</span>
+    <span class="n">hw_corr</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_df</span><span class="p">.</span><span class="n">weights</span><span class="p">.</span><span class="n">corr</span><span class="p">(</span><span class="n">tmp_df</span><span class="p">.</span><span class="n">heights</span><span class="p">))</span>
+
+<span class="c1"># Calculate confidence intervals
+</span><span class="n">height_median_ci</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">height_medians</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+<span class="n">height_weight_corr_ci</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">hw_corr</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Height Median CI = {} </span><span class="se">\n</span><span class="s">Height Weight Correlation CI = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span> <span class="n">height_median_ci</span><span class="p">,</span> <span class="n">height_weight_corr_ci</span><span class="p">))</span>
+
+<span class="c1"># Height Median CI = [5.25262253 5.55928686]
+# Height Weight Correlation CI = [0.93892136 0.95103152]
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Bootstrapping regression</strong></p>
+
+<p>Now let’s see how bootstrapping works with regression. Bootstrapping helps estimate the uncertainty of non-standard estimators. Consider the R2 statistic associated with a regression. When you run a simple least squares regression, you get a value for R2. But let’s see how can we get a 95% CI for R2.</p>
+
+<p>Examine the DataFrame
+ <code class="language-plaintext highlighter-rouge">df</code>
+ with a dependent variable yy and two independent variables X1 and X2 using
+ <code class="language-plaintext highlighter-rouge">df.head()</code>
+ . We’ve already fit this regression with
+ <code class="language-plaintext highlighter-rouge">statsmodels</code>
+ (
+ <code class="language-plaintext highlighter-rouge">sm</code>
+ ) using:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+reg_fit = sm.OLS(df['y'], df.iloc[:,1:]).fit()
+
+</code></pre></div></div>
+
+<p>Examine the result using
+ <code class="language-plaintext highlighter-rouge">reg_fit.summary()</code>
+ to find that R2=0.3504. Use bootstrapping to calculate the 95% CI.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+df.head()
+          y  Intercept        X1        X2
+0  1.217851        1.0  0.696469  0.286139
+1  1.555250        1.0  0.226851  0.551315
+2  0.888520        1.0  0.719469  0.423106
+3  1.736052        1.0  0.980764  0.684830
+4  1.632073        1.0  0.480932  0.392118
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+rsquared_boot, coefs_boot, sims = [], [], 1000
+reg_fit = sm.OLS(df['y'], df.iloc[:,1:]).fit()
+
+# Run 1K iterations
+for i in range(sims):
+    # First create a bootstrap sample with replacement with n=df.shape[0]
+    bootstrap = df.sample(n=df.shape[0], replace=True)
+    # Fit the regression and append the r square to rsquared_boot
+    rsquared_boot.append(sm.OLS(bootstrap['y'],bootstrap.iloc[:,1:]).fit().rsquared)
+
+# Calculate 95% CI on rsquared_boot
+r_sq_95_ci = np.percentile(rsquared_boot, [2.5, 97.5])
+print("R Squared 95% CI = {}".format(r_sq_95_ci))
+
+# R Squared 95% CI = [0.31089312 0.40543591]
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="33-jackknife-resampling"><strong>3.3 Jackknife resampling</strong></h2>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/8-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/9-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Basic jackknife estimation – mean</strong></p>
+
+<p>Jackknife resampling is an older procedure, which isn’t used as often compared as bootstrapping. However, it’s still useful to know how to run a basic jackknife estimation procedure. In this first exercise, we will calculate the jackknife estimate for the mean. Let’s return to the wrench factory.</p>
+
+<p>You own a wrench factory and want to measure the average length of the wrenches to ensure that they meet some specifications. Your factory produces thousands of wrenches every day, but it’s infeasible to measure the length of each wrench. However, you have access to a representative sample of 100 wrenches. Let’s use jackknife estimation to get the average lengths.</p>
+
+<p>Examine the variable
+ <code class="language-plaintext highlighter-rouge">wrench_lengths</code>
+ in the shell.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Leave one observation out from wrench_lengths to get the jackknife sample and store the mean length
+</span><span class="n">mean_lengths</span><span class="p">,</span> <span class="n">n</span> <span class="o">=</span> <span class="p">[],</span> <span class="nb">len</span><span class="p">(</span><span class="n">wrench_lengths</span><span class="p">)</span>
+<span class="n">index</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="n">jk_sample</span> <span class="o">=</span> <span class="n">wrench_lengths</span><span class="p">[</span><span class="n">index</span> <span class="o">!=</span> <span class="n">i</span><span class="p">]</span>
+    <span class="n">mean_lengths</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">jk_sample</span><span class="p">))</span>
+
+<span class="c1"># The jackknife estimate is the mean of the mean lengths from each sample
+</span><span class="n">mean_lengths_jk</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">mean_lengths</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Jackknife estimate of the mean = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">mean_lengths_jk</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Jackknife confidence interval for the median</strong></p>
+
+<p>In this exercise, we will calculate the jackknife 95% CI for a non-standard estimator. Here, we will look at the median. Keep in mind that the variance of a jackknife estimator is
+ <code class="language-plaintext highlighter-rouge">n-1</code>
+ times the variance of the individual jackknife sample estimates where
+ <code class="language-plaintext highlighter-rouge">n</code>
+ is the number of observations in the original sample.</p>
+
+<p>Returning to the wrench factory, you are now interested in estimating the median length of the wrenches along with a 95% CI to ensure that the wrenches are within tolerance.</p>
+
+<p>Let’s revisit the code from the previous exercise, but this time in the context of median lengths. By the end of this exercise, you will have a much better idea of how to use jackknife resampling to calculate confidence intervals for non-standard estimators.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+n = 100
+# Leave one observation out to get the jackknife sample and store the median length
+median_lengths = []
+for i in range(n):
+    jk_sample = wrench_lengths[index != i]
+    median_lengths.append(np.median(jk_sample))
+
+median_lengths = np.array(median_lengths)
+
+# Calculate jackknife estimate and it's variance
+jk_median_length = np.mean(median_lengths)
+jk_var = (n-1)*np.var(median_lengths)
+
+# Assuming normality, calculate lower and upper 95% confidence intervals
+jk_lower_ci = jk_median_length - 1.96*np.sqrt(jk_var)
+jk_upper_ci = jk_median_length + 1.96*np.sqrt(jk_var)
+print("Jackknife 95% CI lower = {}, upper = {}".format(jk_lower_ci, jk_upper_ci))
+
+# Jackknife 95% CI lower = 9.138592467547202, upper = 10.754868069037098
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="34-permutation-testing"><strong>3.4 Permutation testing</strong></h2>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/12.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/13.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Generating a single permutation</strong></p>
+
+<p>In the next few exercises, we will run a significance test using permutation testing. As discussed in the video, we want to see if there’s any difference in the donations generated by the two designs – A and B. Suppose that you have been running both the versions for a few days and have generated 500 donations on A and 700 donations on B, stored in the variables
+ <code class="language-plaintext highlighter-rouge">donations_A</code>
+ and
+ <code class="language-plaintext highlighter-rouge">donations_B</code>
+ .</p>
+
+<p>We first need to generate a null distribution for the difference in means. We will achieve this by generating multiple permutations of the dataset and calculating the difference in means for each case.</p>
+
+<p>First, let’s generate one permutation and calculate the difference in means for the permuted dataset.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Concatenate the two arrays donations_A and donations_B into data
+</span><span class="n">len_A</span><span class="p">,</span> <span class="n">len_B</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">donations_A</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">donations_B</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">donations_A</span><span class="p">,</span> <span class="n">donations_B</span><span class="p">])</span>
+
+<span class="c1"># Get a single permutation of the concatenated length
+</span><span class="n">perm</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">donations_A</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">donations_B</span><span class="p">))</span>
+
+<span class="c1"># Calculate the permutated datasets and difference in means
+</span><span class="n">permuted_A</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">perm</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">donations_A</span><span class="p">)]]</span>
+<span class="n">permuted_B</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">perm</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">donations_A</span><span class="p">):]]</span>
+<span class="n">diff_in_means</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">permuted_A</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">permuted_B</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Difference in the permuted mean values = {}."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">diff_in_means</span><span class="p">))</span>
+
+<span class="c1"># Difference in the permuted mean values = -0.13886241452516757.
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Hypothesis testing – Difference of means</strong></p>
+
+<p>We want to test the hypothesis that there is a difference in the average donations received from A and B. Previously, you learned how to generate one permutation of the data. Now, we will generate a null distribution of the difference in means and then calculate the p-value.</p>
+
+<p>For the null distribution, we first generate multiple permuted datasets and store the difference in means for each case. We then calculate the test statistic as the difference in means with the original dataset. Finally, we calculate the p-value as twice the fraction of cases where the difference is greater than or equal to the absolute value of the test statistic (2-sided hypothesis). A p-value of less than say 0.05 could then determine statistical significance.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+perm
+array([[ 850,  473, 1067, ...,  592,  644,  944],
+       [ 594,  535,  125, ..., 1198, 1052,  233],
+       [ 494,  246,  809, ...,  179,  448,  953],
+       ...,
+       [ 923,  888,  393, ...,  314,   40,  258],
+       [ 915, 1140,  953, ...,   20,  526,  272],
+       [ 925,  480, 1102, ...,  371,   85,  379]])
+
+permuted_A_datasets
+array([[2.49959605e+00, 1.94959571e+00, 4.10970395e+00, ...,
+        1.28042313e+00, 3.09147765e+00, 3.00804073e-01],
+       ...,
+       [6.33883845e-01, 5.64755610e-01, 1.75817616e+00, ...,
+        5.46401636e-01, 1.97500056e+00, 5.43297027e+00]])
+
+reps
+1000
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Generate permutations equal to the number of repetitions
+</span><span class="n">perm</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">permutation</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">donations_A</span><span class="p">)</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">donations_B</span><span class="p">))</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">reps</span><span class="p">)])</span>
+<span class="n">permuted_A_datasets</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">perm</span><span class="p">[:,</span> <span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">donations_A</span><span class="p">)]]</span>
+<span class="n">permuted_B_datasets</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">perm</span><span class="p">[:,</span> <span class="nb">len</span><span class="p">(</span><span class="n">donations_A</span><span class="p">):]]</span>
+
+<span class="c1"># Calculate the difference in means for each of the datasets
+</span><span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">permuted_A_datasets</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">permuted_B_datasets</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Calculate the test statistic and p-value
+</span><span class="n">test_stat</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">donations_A</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">donations_B</span><span class="p">)</span>
+<span class="n">p_val</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">samples</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">test_stat</span><span class="p">))</span><span class="o">/</span><span class="n">reps</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"p-value = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">p_val</span><span class="p">))</span>
+
+<span class="c1"># p-value = 0.002
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Hypothesis testing – Non-standard statistics</strong></p>
+
+<p>In the previous two exercises, we ran a permutation test for the difference in mean values. Now let’s look at non-standard statistics.</p>
+
+<p>Suppose that you’re interested in understanding the distribution of the donations received from websites A and B. For this, you want to see if there’s a statistically significant difference in the median and the 80th percentile of the donations. Permutation testing gives you a wonderfully flexible framework for attacking such problems.</p>
+
+<p>Let’s go through running a test to see if there’s a difference in the median and the 80th percentile of the distribution of donations. As before, you’re given the donations from the websites A and B in the variables
+ <code class="language-plaintext highlighter-rouge">donations_A</code>
+ and
+ <code class="language-plaintext highlighter-rouge">donations_B</code>
+ respectively.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate the difference in 80th percentile and median for each of the permuted datasets (A and B)
+</span><span class="n">samples_percentile</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">permuted_A_datasets</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">permuted_B_datasets</span><span class="p">,</span> <span class="mi">80</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">samples_median</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">median</span><span class="p">(</span><span class="n">permuted_A_datasets</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">median</span><span class="p">(</span><span class="n">permuted_B_datasets</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Calculate the test statistic from the original dataset and corresponding p-values
+</span><span class="n">test_stat_percentile</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">donations_A</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">donations_B</span><span class="p">,</span> <span class="mi">80</span><span class="p">)</span>
+<span class="n">test_stat_median</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">median</span><span class="p">(</span><span class="n">donations_A</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">median</span><span class="p">(</span><span class="n">donations_B</span><span class="p">)</span>
+
+<span class="n">p_val_percentile</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">samples_percentile</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">test_stat_percentile</span><span class="p">))</span><span class="o">/</span><span class="n">reps</span>
+<span class="n">p_val_median</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">samples_median</span> <span class="o">&gt;=</span> <span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">test_stat_median</span><span class="p">))</span><span class="o">/</span><span class="n">reps</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"80th Percentile: test statistic = {}, p-value = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">test_stat_percentile</span><span class="p">,</span> <span class="n">p_val_percentile</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Median: test statistic = {}, p-value = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">test_stat_median</span><span class="p">,</span> <span class="n">p_val_median</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># 80th Percentile: test statistic = 1.6951624543447839, p-value = 0.026
+# Median: test statistic = 0.6434965714975927, p-value = 0.014
+</span>
+<span class="sb">``</span><span class="err">`</span><span class="n">python</span>
+
+<span class="c1"># **4. Advanced Applications of Simulation**
+</span><span class="o">-------------------------------------------</span>
+
+
+<span class="c1">## **4.1 Simulation for Business Planning**
+</span>
+
+
+<span class="err">!</span><span class="p">[</span><span class="n">Desktop</span> <span class="n">View</span><span class="p">](</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">assets</span><span class="o">/</span><span class="n">datacamp</span><span class="o">/</span><span class="n">statistical</span><span class="o">-</span><span class="n">simulation</span><span class="o">-</span><span class="ow">in</span><span class="o">-</span><span class="n">python</span><span class="o">/</span><span class="mi">1</span><span class="o">-</span><span class="mf">5.</span><span class="n">png</span><span class="err">?</span><span class="n">w</span><span class="o">=</span><span class="mi">582</span><span class="p">)</span>
+<span class="err">!</span><span class="p">[</span><span class="n">Desktop</span> <span class="n">View</span><span class="p">](</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">assets</span><span class="o">/</span><span class="n">datacamp</span><span class="o">/</span><span class="n">statistical</span><span class="o">-</span><span class="n">simulation</span><span class="o">-</span><span class="ow">in</span><span class="o">-</span><span class="n">python</span><span class="o">/</span><span class="mi">2</span><span class="o">-</span><span class="mf">6.</span><span class="n">png</span><span class="err">?</span><span class="n">w</span><span class="o">=</span><span class="mi">989</span><span class="p">)</span>
+<span class="err">!</span><span class="p">[</span><span class="n">Desktop</span> <span class="n">View</span><span class="p">](</span><span class="o">/</span><span class="n">blog</span><span class="o">/</span><span class="n">assets</span><span class="o">/</span><span class="n">datacamp</span><span class="o">/</span><span class="n">statistical</span><span class="o">-</span><span class="n">simulation</span><span class="o">-</span><span class="ow">in</span><span class="o">-</span><span class="n">python</span><span class="o">/</span><span class="mi">3</span><span class="o">-</span><span class="mf">4.</span><span class="n">png</span><span class="err">?</span><span class="n">w</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+
+
+
+<span class="c1">####
+</span><span class="o">**</span><span class="n">Modeling</span> <span class="n">Corn</span> <span class="n">Production</span><span class="o">**</span>
+
+
+
+ <span class="n">Suppose</span> <span class="n">that</span> <span class="n">you</span> <span class="n">manage</span> <span class="n">a</span> <span class="n">small</span> <span class="n">corn</span> <span class="n">farm</span> <span class="ow">and</span> <span class="n">are</span> <span class="n">interested</span> <span class="ow">in</span> <span class="n">optimizing</span> <span class="n">your</span> <span class="n">costs</span><span class="p">.</span> <span class="n">In</span> <span class="n">this</span> <span class="n">exercise</span><span class="p">,</span> <span class="n">we</span> <span class="n">will</span> <span class="n">model</span> <span class="n">the</span> <span class="n">production</span> <span class="n">of</span> <span class="n">corn</span><span class="p">.</span>
+
+
+
+
+ <span class="n">For</span> <span class="n">simplicity</span><span class="p">,</span> <span class="n">let</span><span class="err">’</span><span class="n">s</span> <span class="n">assume</span> <span class="n">that</span> <span class="n">corn</span> <span class="n">production</span> <span class="n">depends</span> <span class="n">on</span> <span class="n">only</span> <span class="n">two</span> <span class="n">factors</span><span class="p">:</span> <span class="n">rain</span><span class="p">,</span> <span class="n">which</span> <span class="n">you</span> <span class="n">don</span><span class="err">’</span><span class="n">t</span> <span class="n">control</span><span class="p">,</span> <span class="ow">and</span> <span class="n">cost</span><span class="p">,</span> <span class="n">which</span> <span class="n">you</span> <span class="n">control</span><span class="p">.</span> <span class="n">Rain</span> <span class="ow">is</span> <span class="n">normally</span> <span class="n">distributed</span> <span class="k">with</span> <span class="n">mean</span> <span class="mi">50</span> <span class="ow">and</span> <span class="n">standard</span> <span class="n">deviation</span> <span class="mf">15.</span> <span class="n">For</span> <span class="n">now</span><span class="p">,</span> <span class="n">let</span><span class="err">’</span><span class="n">s</span> <span class="n">fix</span> <span class="n">cost</span> <span class="n">at</span> <span class="mi">5</span><span class="p">,</span><span class="mf">000.</span> <span class="n">Corn</span> <span class="n">produced</span> <span class="ow">in</span> <span class="nb">any</span> <span class="n">season</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">Poisson</span> <span class="n">random</span> <span class="n">variable</span> <span class="k">while</span> <span class="n">the</span> <span class="n">average</span> <span class="n">corn</span> <span class="n">production</span> <span class="ow">is</span> <span class="n">governed</span> <span class="n">by</span> <span class="n">the</span> <span class="n">equation</span><span class="p">:</span>
+
+
+
+
+ <span class="mi">100</span><span class="err">×</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span><span class="o">^</span><span class="mf">0.1</span><span class="err">×</span><span class="p">(</span><span class="n">rain</span><span class="p">)</span><span class="o">^</span><span class="mf">0.2</span>
+
+
+
+
+ <span class="n">Let</span><span class="err">’</span><span class="n">s</span> <span class="n">model</span> <span class="n">this</span> <span class="n">production</span> <span class="n">function</span> <span class="ow">and</span> <span class="n">simulate</span> <span class="n">one</span> <span class="n">outcome</span><span class="p">.</span>
+
+
+
+
+
+<span class="sb">``</span><span class="err">`</span><span class="n">python</span>
+
+<span class="c1"># Initialize variables
+</span><span class="n">cost</span> <span class="o">=</span> <span class="mi">5000</span>
+<span class="n">rain</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+<span class="c1"># Corn Production Model
+</span><span class="k">def</span> <span class="nf">corn_produced</span><span class="p">(</span><span class="n">rain</span><span class="p">,</span> <span class="n">cost</span><span class="p">):</span>
+  <span class="n">mean_corn</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="n">cost</span> <span class="o">**</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="n">rain</span> <span class="o">**</span> <span class="mf">0.2</span>
+  <span class="n">corn</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">poisson</span><span class="p">(</span><span class="n">mean_corn</span><span class="p">)</span>
+  <span class="k">return</span> <span class="n">corn</span>
+
+<span class="c1"># Simulate and print corn production
+</span><span class="n">corn_result</span> <span class="o">=</span> <span class="n">corn_produced</span><span class="p">(</span><span class="n">rain</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Simulated Corn Production = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">corn_result</span><span class="p">))</span>
+
+<span class="c1"># Simulated Corn Production = 560
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Modeling Profits</strong></p>
+
+<p>In the previous exercise, you built a model of corn production. For a small farm, you typically have no control over the price or demand for corn. Suppose that price is normally distributed with mean 40 and standard deviation 10. You are given a function
+ <code class="language-plaintext highlighter-rouge">corn_demanded()</code>
+ , which takes the price and determines the demand for corn. This is reasonable because demand is usually determined by the market and is not in your control.</p>
+
+<p>In this exercise, you will work on a function to calculate the profit by pulling together all the other simulated variables. The only input to this function will be the cost. Upon completion, you will have a function that will give you one simulated profit outcome for a given cost. This function can then be used for planning your costs.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Function to calculate profits
+</span><span class="k">def</span> <span class="nf">profits</span><span class="p">(</span><span class="n">cost</span><span class="p">):</span>
+    <span class="n">rain</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">15</span><span class="p">)</span>
+    <span class="n">price</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">supply</span> <span class="o">=</span> <span class="n">corn_produced</span><span class="p">(</span><span class="n">rain</span><span class="p">,</span> <span class="n">cost</span><span class="p">)</span>
+    <span class="n">demand</span> <span class="o">=</span> <span class="n">corn_demanded</span><span class="p">(</span><span class="n">price</span><span class="p">)</span>
+    <span class="n">equil_short</span> <span class="o">=</span> <span class="n">supply</span> <span class="o">&lt;=</span> <span class="n">demand</span>
+    <span class="k">if</span> <span class="n">equil_short</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">supply</span><span class="o">*</span><span class="n">price</span> <span class="o">-</span> <span class="n">cost</span>
+        <span class="k">return</span> <span class="n">tmp</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">tmp2</span> <span class="o">=</span> <span class="n">demand</span><span class="o">*</span><span class="n">price</span> <span class="o">-</span> <span class="n">cost</span>
+        <span class="k">return</span> <span class="n">tmp2</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">profits</span><span class="p">(</span><span class="n">cost</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Simulated profit = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+
+<span class="c1"># Simulated profit = 20675.3291075312
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Optimizing Costs</strong></p>
+
+<p>Now we will use the functions you’ve built to optimize our cost of production. We are interested in maximizing average profits. However, our profits depend on a number of factors, but we only control cost. Thus, we can simulate the uncertainty in the other factors and vary cost to see how our profits are impacted.</p>
+
+<p>Since you manage the small corn farm, you have the ability to choose your cost – from $100 to $5,000. You want to choose the cost that gives you the maximum average profit. In this exercise, we will simulate multiple outcomes for each cost level and calculate an average. We will then choose the cost that gives us the maximum mean profit. Upon completion, you will have a framework for selecting optimal inputs for business decisions.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize results and cost_levels variables
+</span><span class="n">sims</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="p">{}</span>
+<span class="n">cost_levels</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">5100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># For each cost level, simulate profits and store mean profit
+</span><span class="k">for</span> <span class="n">cost</span> <span class="ow">in</span> <span class="n">cost_levels</span><span class="p">:</span>
+    <span class="n">tmp_profits</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sims</span><span class="p">):</span>
+        <span class="n">tmp_profits</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">profits</span><span class="p">(</span><span class="n">cost</span><span class="p">))</span>
+    <span class="n">results</span><span class="p">[</span><span class="n">cost</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">tmp_profits</span><span class="p">)</span>
+
+<span class="c1"># Get the cost that maximizes average profit
+</span><span class="n">cost_max</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">results</span><span class="p">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">results</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">results</span><span class="p">.</span><span class="n">values</span><span class="p">())][</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Average profit is maximized when cost = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">cost_max</span><span class="p">))</span>
+
+<span class="c1"># Average profit is maximized when cost = 1400
+</span>
+</code></pre></div></div>
+
+<p>Businesses use a similar framework with more details to help in a number of decisions.</p>
+
+<h2 id="42-monte-carlo-integration"><strong>4.2 Monte Carlo Integration</strong></h2>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/4-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/5-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/6-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/7-4.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Integrating a Simple Function</strong></p>
+
+<p>This is a simple exercise introducing the concept of Monte Carlo Integration.</p>
+
+<p>Here we will evaluate a simple integral ∫10xexdx∫01xexdx. We know that the exact answer is 11, but simulation will give us an approximate solution, so we can expect an answer close to 11. As we saw in the video, it’s a simple process. For a function of a single variable f(x):</p>
+
+<ol>
+  <li>Get the limits of the x-axis (xmin,xmax) and y-axis (max(f(x)),min(min(f(x)),0)).</li>
+  <li>Generate a number of uniformly distributed point in this box.</li>
+  <li>Multiply the area of the box ((max(f(x)−min(f(x))×(xmax−xmin) by the fraction of points that lie below f(x).</li>
+</ol>
+
+<p>Upon completion, you will have a framework for handling definite integrals using Monte Carlo Integration.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define the sim_integrate function
+</span><span class="k">def</span> <span class="nf">sim_integrate</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">sims</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">sims</span><span class="p">)</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="mi">0</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span> <span class="n">sims</span><span class="p">)</span>
+    <span class="n">area</span> <span class="o">=</span> <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">y</span><span class="p">))</span><span class="o">*</span><span class="p">(</span><span class="n">xmax</span><span class="o">-</span><span class="n">xmin</span><span class="p">)</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">area</span> <span class="o">*</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">abs</span><span class="p">(</span><span class="n">func</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span><span class="o">/</span><span class="n">sims</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+<span class="c1"># Call the sim_integrate function and print results
+</span><span class="n">result</span> <span class="o">=</span> <span class="n">sim_integrate</span><span class="p">(</span><span class="n">func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="o">*</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">xmin</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">xmax</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">sims</span> <span class="o">=</span> <span class="mi">50</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Simulated answer = {}, Actual Answer = 1"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+
+<span class="c1"># Simulated answer = 0.7240166789450252, Actual Answer = 1
+</span>
+</code></pre></div></div>
+
+<p>Try seeing what happens to the answer when you increase or decrease
+ <code class="language-plaintext highlighter-rouge">sims</code>
+ .</p>
+
+<p>####
+<strong>Calculating the value of pi</strong></p>
+
+<p>Now we work through a classic example – estimating the value of π.</p>
+
+<p>Imagine a square of side 2 with the origin (0,0) as its center and the four corners having coordinates (1,1),(1,−1),(−1,1),(−1,−1). The area of this square is 2×2=4. Now imagine a circle of radius 1 with its center at the origin fitting perfectly inside this square. The area of the circle will be π×radius^2=π.</p>
+
+<p>To estimate π, we randomly sample multiple points in this square &amp; get the fraction of points inside the circle (x^2+y^2&lt;=1). The area of the circle then is 4 times this fraction, which gives us our estimate of π.</p>
+
+<p>After this exercise, you’ll have a grasp of how to use simulation for computation.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize sims and circle_points
+</span><span class="n">sims</span><span class="p">,</span> <span class="n">circle_points</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">,</span> <span class="mi">0</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sims</span><span class="p">):</span>
+    <span class="c1"># Generate the two coordinates of a point
+</span>    <span class="n">point</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># if the point lies within the unit circle, increment counter
+</span>    <span class="n">within_circle</span> <span class="o">=</span> <span class="n">point</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">point</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">&lt;=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">within_circle</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">circle_points</span> <span class="o">+=</span><span class="mi">1</span>
+
+<span class="c1"># Estimate pi as 4 times the avg number of points in the circle.
+</span><span class="n">pi_sim</span> <span class="o">=</span> <span class="mi">4</span><span class="o">*</span><span class="n">circle_points</span><span class="o">/</span><span class="n">sims</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Simulated value of pi = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">pi_sim</span><span class="p">))</span>
+
+<span class="c1"># Simulated value of pi = 3.1468
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="43-simulation-for-power-analysis"><strong>4.3 Simulation for Power Analysis</strong></h2>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/1-7.png?w=832" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/2-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/3-6.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Factors influencing Statistical Power</strong></p>
+
+<p>In this exercise, you will refresh some basic concepts to test your understanding of statistical power. It is very important to understand statistical power, especially if you are designing an
+ <a href="https://en.wikipedia.org/wiki/A/B_testing">A/B test</a>
+ .</p>
+
+<p>Consider the following four options and select the factor that influence the statistical power of an experiment:</p>
+
+<ul>
+  <li>Magnitude of the effect / Effect size</li>
+  <li>Sample Size</li>
+  <li>Statistical Significance Level (α)</li>
+</ul>
+
+<p>Note: The number of simulations doesn’t really impact the statistical power of an experiment.</p>
+
+<p>####
+<strong>Power Analysis – Part I</strong></p>
+
+<p>Now we turn to power analysis. You typically want to ensure that any experiment or A/B test you run has at least 80% power. One way to ensure this is to calculate the sample size required to achieve 80% power.</p>
+
+<p>Suppose that you are in charge of a news media website and you are interested in increasing the amount of time users spend on your website. Currently, the time users spend on your website is normally distributed with a mean of 1 minute and a variance of 0.5 minutes. Suppose that you are introducing a feature that loads pages faster and want to know the sample size required to measure a 10% increase in time spent on the website.</p>
+
+<p>In this exercise, we will set up the framework to run one simulation, run a t-test, &amp; calculate the p-value.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import scipy.stats as st
+# Initialize effect_size, control_mean, control_sd
+effect_size, sample_size, control_mean, control_sd = 0.05, 50, 1, 0.5
+
+# Simulate control_time_spent and treatment_time_spent, assuming equal variance
+control_time_spent = np.random.normal(loc=control_mean, scale=control_sd, size=sample_size)
+treatment_time_spent = np.random.normal(loc=control_mean*(1+effect_size), scale=control_sd, size=sample_size)
+
+# Run the t-test and get the p_value
+t_stat, p_value = st.ttest_ind(control_time_spent, treatment_time_spent)
+stat_sig = p_value &lt; 0.05
+print("P-value: {}, Statistically Significant? {}".format(p_value, stat_sig))
+
+# P-value: 0.5766409395002308, Statistically Significant? False
+
+</code></pre></div></div>
+
+<p>####
+<strong>Power Analysis – Part II</strong></p>
+
+<p>Previously, we simulated one instance of the experiment &amp; generated a p-value. We will now use this framework to calculate statistical power. Power of an experiment is the experiment’s ability to detect a difference between treatment &amp; control if the difference really exists. It’s good statistical hygiene to strive for 80% power.</p>
+
+<p>For our website, we want to know how many people need to visit each variant, such that we can detect a 10% increase in time spent with 80% power. For this, we start with a small sample (50), simulate multiple instances of this experiment &amp; check power. If 80% power is reached, we stop. If not, we increase the sample size &amp; try again.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+sample_size = 50
+
+# Keep incrementing sample size by 10 till we reach required power
+while 1:
+    control_time_spent = np.random.normal(loc=control_mean, scale=control_sd, size=(sample_size, sims))
+    treatment_time_spent = np.random.normal(loc=control_mean*(1+effect_size), scale=control_sd, size=(sample_size, sims))
+    t, p = st.ttest_ind(treatment_time_spent, control_time_spent)
+
+    # Power is the fraction of times in the simulation when the p-value was less than 0.05
+    power = (p &lt; 0.05).sum()/sims
+    if power &gt;= 0.8:
+        break
+    else:
+        sample_size += 10
+print("For 80% power, sample size required = {}".format(sample_size))
+
+# For 80% power, sample size required = 360
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="44-applications-in-finance"><strong>4.4 Applications in Finance</strong></h2>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/4-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/5-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/6-5.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Portfolio Simulation – Part I</strong></p>
+
+<p>In the next few exercises, you will calculate the expected returns of a stock portfolio &amp; characterize its uncertainty.</p>
+
+<p>Suppose you have invested $10,000 in your portfolio comprising of multiple stocks. You want to evaluate the portfolio’s performance over 10 years. You can tweak your overall expected rate of return and volatility (standard deviation of the rate of return). Assume the rate of return follows a normal distribution.</p>
+
+<p>First, let’s write a function that takes the principal (initial investment), number of years, expected rate of return and volatility as inputs and returns the portfolio’s total value after 10 years.</p>
+
+<p>Upon completion of this exercise, you will have a function you can call to determine portfolio performance.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># rates is a Normal random variable and has size equal to number of years
+</span><span class="k">def</span> <span class="nf">portfolio_return</span><span class="p">(</span><span class="n">yrs</span><span class="p">,</span> <span class="n">avg_return</span><span class="p">,</span> <span class="n">sd_of_return</span><span class="p">,</span> <span class="n">principal</span><span class="p">):</span>
+    <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+    <span class="n">rates</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">avg_return</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">sd_of_return</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">yrs</span><span class="p">)</span>
+    <span class="c1"># Calculate the return at the end of the period
+</span>    <span class="n">end_return</span> <span class="o">=</span> <span class="n">principal</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">rates</span><span class="p">:</span>
+        <span class="n">end_return</span> <span class="o">=</span> <span class="n">end_return</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">end_return</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">portfolio_return</span><span class="p">(</span><span class="n">yrs</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span> <span class="n">avg_return</span> <span class="o">=</span> <span class="mf">0.07</span><span class="p">,</span> <span class="n">sd_of_return</span> <span class="o">=</span> <span class="mf">0.15</span><span class="p">,</span> <span class="n">principal</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Portfolio return after 5 years = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+
+<span class="c1"># Portfolio return after 5 years = 1021.4013412039292
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Portfolio Simulation – Part II</strong></p>
+
+<p>Now we will use the simulation function you built to evaluate 10-year returns.</p>
+
+<p>Your stock-heavy portfolio has an initial investment of $10,000, an expected return of 7% and a volatility of 30%. You want to get a 95% confidence interval of what your investment will be worth in 10 years. We will simulate multiple samples of 10-year returns and calculate the confidence intervals on the distribution of returns.</p>
+
+<p>By the end of this exercise, you will have run a complete portfolio simulation.</p>
+
+<p>The function
+ <code class="language-plaintext highlighter-rouge">portfolio_return()</code>
+ from the previous exercise is already initialized in the environment.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Run 1,000 iterations and store the results
+</span><span class="n">sims</span><span class="p">,</span> <span class="n">rets</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">sims</span><span class="p">):</span>
+    <span class="n">rets</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">portfolio_return</span><span class="p">(</span><span class="n">yrs</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">avg_return</span> <span class="o">=</span> <span class="mf">0.07</span><span class="p">,</span>
+                                 <span class="n">volatility</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span> <span class="n">principal</span> <span class="o">=</span> <span class="mi">10000</span><span class="p">))</span>
+
+<span class="c1"># Calculate the 95% CI
+</span><span class="n">lower_ci</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">rets</span><span class="p">,</span> <span class="mf">2.5</span><span class="p">)</span>
+<span class="n">upper_ci</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">rets</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"95% CI of Returns: Lower = {}, Upper = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">lower_ci</span><span class="p">,</span> <span class="n">upper_ci</span><span class="p">))</span>
+
+<span class="c1"># 95% CI of Returns: Lower = 1236.4468015417674, Upper = 79510.31743325583
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Portfolio Simulation – Part III</strong></p>
+
+<p>Previously, we ran a complete simulation to get a distribution for 10-year returns. Now we will use simulation for decision making.</p>
+
+<p>Let’s go back to your stock-heavy portfolio with an expected return of 7% and a volatility of 30%. You have the choice of rebalancing your portfolio with some bonds such that the expected return is 4% &amp; volatility is 10%. You have a principal of $10,000. You want to select a strategy based on how much your portfolio will be worth in 10 years. Let’s simulate returns for both the portfolios and choose based on the least amount you can expect with 75% probability (25th percentile).</p>
+
+<p>Upon completion, you will know how to use a portfolio simulation for investment decisions.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">portfolio_return()</code>
+ function is again pre-loaded in the environment.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+for i in range(sims):
+    rets_stock.append(portfolio_return(yrs = 10, avg_return = 0.07, volatility = 0.3, principal = 10000))
+    rets_bond.append(portfolio_return(yrs = 10, avg_return = 0.04, volatility = 0.1, principal = 10000))
+
+# Calculate the 25th percentile of the distributions and the amount you'd lose or gain
+rets_stock_perc = np.percentile(rets_stock, 25)
+rets_bond_perc = np.percentile(rets_bond, 25)
+additional_returns = rets_stock_perc - rets_bond_perc
+print("Sticking to stocks gets you an additional return of {}".format(additional_returns))
+
+# Sticking to stocks gets you an additional return of -5518.530403193416
+
+</code></pre></div></div>
+
+<p>####
+<strong>Summary</strong></p>
+
+<p><img src="/blog/assets/datacamp/statistical-simulation-in-python/7-6.png?w=716" alt="Desktop View" />
+<img src="/blog/assets/datacamp/statistical-simulation-in-python/8-5.png?w=824" alt="Desktop View" /></p>
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

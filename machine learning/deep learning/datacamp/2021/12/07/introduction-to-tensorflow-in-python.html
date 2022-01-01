@@ -1,0 +1,2145 @@
+<h1 id="introduction-to-tensorflow-in-python">Introduction to TensorFlow in Python</h1>
+
+<p>This is the memo of the 14th course (23 courses in all) of ‘Machine Learning Scientist with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/introduction-to-tensorflow-in-python">HERE</a></strong>
+ .</p>
+
+<p>###
+<strong>Course Description</strong></p>
+
+<p>Not long ago, cutting-edge computer vision algorithms couldn’t differentiate between images of cats and dogs. Today, a skilled data scientist equipped with nothing more than a laptop can classify tens of thousands of objects with greater accuracy than the human eye. In this course, you will use TensorFlow 2.0 to develop, train, and make predictions with the models that have powered major advances in recommendation systems, image classification, and FinTech. You will learn both high-level APIs, which will enable you to design and train deep learning models in 15 lines of code, and low-level APIs, which will allow you to move beyond off-the-shelf routines. You will also learn to accurately predict housing prices, credit card borrower defaults, and images of sign language gestures.</p>
+
+<p>###
+<strong>Table of contents</strong></p>
+
+<ul>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/26/introduction-to-tensorflow-in-python-from-datacamp/">Introduction to TensorFlow</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/26/introduction-to-tensorflow-in-python-from-datacamp/2/">Linear models</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/26/introduction-to-tensorflow-in-python-from-datacamp/3/">Neural Networks</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/26/introduction-to-tensorflow-in-python-from-datacamp/4/">High Level APIs</a></li>
+</ul>
+
+<h1 id="1-introduction-to-tensorflow"><strong>1. Introduction to TensorFlow</strong></h1>
+<hr />
+
+<h2 id="11-constants-and-variables"><strong>1.1 Constants and variables</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/1-16.png?w=932" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/2-16.png?w=619" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/3-15.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/4-15.png?w=911" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/5-15.png?w=903" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/6-15.png?w=979" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/7-15.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/8-15.png?w=982" alt="Desktop View" /></p>
+
+<h3 id="111-defining-data-as-constants"><strong>1.1.1 Defining data as constants</strong></h3>
+
+<p>Throughout this course, we will use
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ version 2.0 and will exclusively import the submodules needed to complete each exercise. This will usually be done for you, but you will do it in this exercise by importing
+ <code class="language-plaintext highlighter-rouge">constant</code>
+ from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ .</p>
+
+<p>After you have imported
+ <code class="language-plaintext highlighter-rouge">constant</code>
+ , you will use it to transform a
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ array,
+ <code class="language-plaintext highlighter-rouge">credit_numpy</code>
+ , into a
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ constant,
+ <code class="language-plaintext highlighter-rouge">credit_constant</code>
+ . This array contains feature columns from a dataset on credit card holders and is previewed in the image below. We will return to this dataset in later chapters.</p>
+
+<p>Note that
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ version 2.0 allows you to use data as either a
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ array or a
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+<code class="language-plaintext highlighter-rouge">constant</code>
+ object. Using a
+ <code class="language-plaintext highlighter-rouge">constant</code>
+ will ensure that any operations performed with that object are done in
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ .</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/3953/datasets/10c0da730973582584bc227f4bca4b5510d42c9f/default_features.jpg" alt="This image shows four feature columns from a dataset on credit card default: education, marriage, age, and bill amount." /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import constant from TensorFlow
+</span><span class="kn">from</span> <span class="nn">tensorflow</span> <span class="kn">import</span> <span class="n">constant</span>
+
+<span class="c1"># Convert the credit_numpy array into a tensorflow constant
+</span><span class="n">credit_constant</span> <span class="o">=</span> <span class="n">constant</span><span class="p">(</span><span class="n">credit_numpy</span><span class="p">)</span>
+
+<span class="c1"># Print constant datatype
+</span><span class="k">print</span><span class="p">(</span><span class="s">'The datatype is:'</span><span class="p">,</span> <span class="n">credit_constant</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span>
+
+<span class="c1"># Print constant shape
+</span><span class="k">print</span><span class="p">(</span><span class="s">'The shape is:'</span><span class="p">,</span> <span class="n">credit_constant</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+The datatype is: &lt;dtype: 'float64'&gt;
+The shape is: (30000, 4)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+credit_numpy
+array([[ 2.0000e+00,  1.0000e+00,  2.4000e+01,  3.9130e+03],
+       [ 2.0000e+00,  2.0000e+00,  2.6000e+01,  2.6820e+03],
+       [ 2.0000e+00,  2.0000e+00,  3.4000e+01,  2.9239e+04],
+       ...,
+       [ 2.0000e+00,  2.0000e+00,  3.7000e+01,  3.5650e+03],
+       [ 3.0000e+00,  1.0000e+00,  4.1000e+01, -1.6450e+03],
+       [ 2.0000e+00,  1.0000e+00,  4.6000e+01,  4.7929e+04]])
+
+credit_constant
+&lt;tf.Tensor: id=0, shape=(30000, 4), dtype=float64, numpy=
+array([[ 2.0000e+00,  1.0000e+00,  2.4000e+01,  3.9130e+03],
+       [ 2.0000e+00,  2.0000e+00,  2.6000e+01,  2.6820e+03],
+       [ 2.0000e+00,  2.0000e+00,  3.4000e+01,  2.9239e+04],
+       ...,
+       [ 2.0000e+00,  2.0000e+00,  3.7000e+01,  3.5650e+03],
+       [ 3.0000e+00,  1.0000e+00,  4.1000e+01, -1.6450e+03],
+       [ 2.0000e+00,  1.0000e+00,  4.6000e+01,  4.7929e+04]])&gt;
+
+</code></pre></div></div>
+
+<p>Excellent! You now understand how constants are used in
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ . In the following exercise, you’ll practice defining variables.</p>
+
+<h3 id="112-defining-variables"><strong>1.1.2 Defining variables</strong></h3>
+
+<p>Unlike a constant, a variable’s value can be modified. This will be quite useful when we want to train a model by updating its parameters. Constants can’t be used for this purpose, so variables are the natural choice.</p>
+
+<p>Let’s try defining and working with a variable. Note that
+ <code class="language-plaintext highlighter-rouge">Variable()</code>
+ , which is used to create a variable tensor, has been imported from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ and is available to use in the exercise.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from tensorflow import Variable
+
+# Define the 1-dimensional variable A1
+A1 = Variable([1, 2, 3, 4])
+
+# Print the variable A1
+print(A1)
+
+# Convert A1 to a numpy array and assign it to B1
+B1 = A1.numpy()
+
+# Print B1
+print(B1)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+&lt;tf.Variable 'Variable:0' shape=(4,) dtype=int32, numpy=array([1, 2, 3, 4], dtype=int32)&gt;
+[1 2 3 4]
+
+</code></pre></div></div>
+
+<p>Nice work! In our next exercise, we’ll review how to check the properties of a tensor after it is already defined.</p>
+
+<hr />
+
+<h2 id="12-basic-operations"><strong>1.2 Basic operations</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/1-17.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/2-17.png?w=906" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/3-16.png?w=908" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/4-16.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/5-16.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/6-16.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/7-16.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="121-performing-element-wise-multiplication"><strong>1.2.1 Performing element-wise multiplication</strong></h3>
+
+<p>Element-wise multiplication in TensorFlow is performed using two tensors with identical shapes. This is because the operation multiplies elements in corresponding positions in the two tensors. An example of an element-wise multiplication, denoted by the ⊙ symbol, is shown below:</p>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/10-14.png?w=381" alt="Desktop View" /></p>
+
+<p>In this exercise, you will perform element-wise multiplication, paying careful attention to the shape of the tensors you multiply. Note that
+ <code class="language-plaintext highlighter-rouge">multiply()</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">constant()</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">ones_like()</code>
+ have been imported for you.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define tensors A1 and A23 as constants
+</span><span class="n">A1</span> <span class="o">=</span> <span class="n">constant</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="n">A23</span> <span class="o">=</span> <span class="n">constant</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+
+<span class="c1"># Define B1 and B23 to have the correct shape
+</span><span class="n">B1</span> <span class="o">=</span> <span class="n">ones_like</span><span class="p">(</span><span class="n">A1</span><span class="p">)</span>
+<span class="n">B23</span> <span class="o">=</span> <span class="n">ones_like</span><span class="p">(</span><span class="n">A23</span><span class="p">)</span>
+
+<span class="c1"># Perform element-wise multiplication
+</span><span class="n">C1</span> <span class="o">=</span> <span class="n">multiply</span><span class="p">(</span><span class="n">A1</span><span class="p">,</span><span class="n">B1</span><span class="p">)</span>
+<span class="n">C23</span> <span class="o">=</span> <span class="n">multiply</span><span class="p">(</span><span class="n">A23</span><span class="p">,</span><span class="n">B23</span><span class="p">)</span>
+
+<span class="c1"># Print the tensors C1 and C23
+</span><span class="k">print</span><span class="p">(</span><span class="s">'C1: {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">C1</span><span class="p">.</span><span class="n">numpy</span><span class="p">()))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'C23: {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">C23</span><span class="p">.</span><span class="n">numpy</span><span class="p">()))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+C1: [1 2 3 4]
+C23: [[1 2 3]
+ [1 6 4]]
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+ones_like(A1)
+&lt;tf.Tensor: id=12, shape=(4,), dtype=int32, numpy=array([1, 1, 1, 1], dtype=int32)&gt;
+
+
+ones_like(A23)
+&lt;tf.Tensor: id=15, shape=(2, 3), dtype=int32, numpy=
+array([[1, 1, 1],
+       [1, 1, 1]], dtype=int32)&gt;
+
+</code></pre></div></div>
+
+<p>Excellent work! Notice how performing element-wise multiplication with tensors of ones leaves the original tensors unchanged.</p>
+
+<h3 id="122-making-predictions-with-matrix-multiplication"><strong>1.2.2 Making predictions with matrix multiplication</strong></h3>
+
+<p>In later chapters, you will learn to train linear regression models. This process will yield a vector of parameters that can be multiplied by the input data to generate predictions. In this exercise, you will use input data,
+ <code class="language-plaintext highlighter-rouge">features</code>
+ , and a target vector,
+ <code class="language-plaintext highlighter-rouge">bill</code>
+ , which are taken from a credit card dataset we will use later in the course.</p>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/8-16.png?w=791" alt="Desktop View" /></p>
+
+<p>The matrix of input data,
+ <code class="language-plaintext highlighter-rouge">features</code>
+ , contains two columns: education level and age. The target vector,
+ <code class="language-plaintext highlighter-rouge">bill</code>
+ , is the size of the credit card borrower’s bill.</p>
+
+<p>Since we have not trained the model, you will enter a guess for the values of the parameter vector,
+ <code class="language-plaintext highlighter-rouge">params</code>
+ . You will then use
+ <code class="language-plaintext highlighter-rouge">matmul()</code>
+ to perform matrix multiplication of
+ <code class="language-plaintext highlighter-rouge">features</code>
+ by
+ <code class="language-plaintext highlighter-rouge">params</code>
+ to generate predictions,
+ <code class="language-plaintext highlighter-rouge">billpred</code>
+ , which you will compare with
+ <code class="language-plaintext highlighter-rouge">bill</code>
+ . Note that we have imported
+ <code class="language-plaintext highlighter-rouge">matmul()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">constant()</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define features, params, and bill as constants
+</span><span class="n">features</span> <span class="o">=</span> <span class="n">constant</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">24</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">26</span><span class="p">],</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">57</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">37</span><span class="p">]])</span>
+<span class="n">params</span> <span class="o">=</span> <span class="n">constant</span><span class="p">([[</span><span class="mi">1000</span><span class="p">],</span> <span class="p">[</span><span class="mi">150</span><span class="p">]])</span>
+<span class="n">bill</span> <span class="o">=</span> <span class="n">constant</span><span class="p">([[</span><span class="mi">3913</span><span class="p">],</span> <span class="p">[</span><span class="mi">2682</span><span class="p">],</span> <span class="p">[</span><span class="mi">8617</span><span class="p">],</span> <span class="p">[</span><span class="mi">64400</span><span class="p">]])</span>
+
+<span class="c1"># Compute billpred using features and params
+</span><span class="n">billpred</span> <span class="o">=</span> <span class="n">matmul</span><span class="p">(</span><span class="n">features</span><span class="p">,</span><span class="n">params</span><span class="p">)</span>
+
+<span class="c1"># Compute and print the error
+</span><span class="n">error</span> <span class="o">=</span> <span class="n">bill</span> <span class="o">-</span> <span class="n">billpred</span>
+<span class="k">print</span><span class="p">(</span><span class="n">error</span><span class="p">.</span><span class="n">numpy</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[[-1687]
+ [-3218]
+ [-1933]
+ [57850]]
+
+billpred
+&lt;tf.Tensor: id=15, shape=(4, 1), dtype=int32, numpy=
+array([[ 5600],
+       [ 5900],
+       [10550],
+       [ 6550]], dtype=int32)&gt;
+
+</code></pre></div></div>
+
+<p>Nice job! Understanding matrix multiplication will make things simpler when we start making predictions with linear models.</p>
+
+<h3 id="123-summing-over-tensor-dimensions"><strong>1.2.3 Summing over tensor dimensions</strong></h3>
+
+<p>You’ve been given a matrix,
+ <code class="language-plaintext highlighter-rouge">wealth</code>
+ . This contains the value of bond and stock wealth for five individuals in thousands of dollars.</p>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/9-14.png?w=287" alt="Desktop View" /></p>
+
+<p>The first column corresponds to bonds and the second corresponds to stocks. Each row gives the bond and stock wealth for a single individual. Use
+ <code class="language-plaintext highlighter-rouge">wealth</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">reduce_sum()</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">.numpy()</code>
+ to determine which statements are correct about
+ <code class="language-plaintext highlighter-rouge">wealth</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+reduce_sum(wealth,0).numpy()
+# array([ 50, 122], dtype=int32)
+
+reduce_sum(wealth,1).numpy()
+# array([61,  9, 64,  3, 35], dtype=int32)
+
+reduce_sum(wealth).numpy()
+# 172
+
+</code></pre></div></div>
+
+<p><strong>Combined, the 5 individuals hold $50,000 in bonds.</strong></p>
+
+<p>Excellent work! Understanding how to sum over tensor dimensions will be helpful when preparing datasets and training models.</p>
+
+<hr />
+
+<h2 id="13-advanced-operations"><strong>1.3 Advanced operations</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/11-14.png?w=989" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/12-14.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/13-13.png?w=978" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/14-12.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/15-12.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/16-11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/17-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/18-6.png?w=976" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/19-5.png?w=989" alt="Desktop View" /></p>
+
+<h3 id="131-reshaping-tensors"><strong>1.3.1 Reshaping tensors</strong></h3>
+
+<p>Later in the course, you will classify images of sign language letters using a neural network. In some cases, the network will take 1-dimensional tensors as inputs, but your data will come in the form of images, which will either be either 2- or 3-dimensional tensors, depending on whether they are grayscale or color images.</p>
+
+<p>The figure below shows grayscale and color images of the sign language letter A. The two images have been imported for you and converted to the numpy arrays
+ <code class="language-plaintext highlighter-rouge">gray_tensor</code>
+ and
+ <code class="language-plaintext highlighter-rouge">color_tensor</code>
+ . Reshape these arrays into 1-dimensional vectors using the
+ <code class="language-plaintext highlighter-rouge">reshape</code>
+ operation, which has been imported for you from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ . Note that the shape of
+ <code class="language-plaintext highlighter-rouge">gray_tensor</code>
+ is 28×28 and the shape of
+ <code class="language-plaintext highlighter-rouge">color_tensor</code>
+ is 28x28x3.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/3953/datasets/f5cd02c63926113b407c33b3f2f7f05c57d4f8b8/sign_1_10.jpg" alt="This figure shows grayscale and color images of the sign language letter &quot;A&quot;." /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Reshape the grayscale image tensor into a vector
+</span><span class="n">gray_vector</span> <span class="o">=</span> <span class="n">reshape</span><span class="p">(</span><span class="n">gray_tensor</span><span class="p">,</span> <span class="p">(</span><span class="mi">28</span><span class="o">*</span><span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Reshape the color image tensor into a vector
+</span><span class="n">color_vector</span> <span class="o">=</span> <span class="n">reshape</span><span class="p">(</span><span class="n">color_tensor</span><span class="p">,</span> <span class="p">(</span><span class="mi">28</span><span class="o">*</span><span class="mi">28</span><span class="o">*</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<p>Excellent work! Notice that there are 3 times as many elements in
+ <code class="language-plaintext highlighter-rouge">color_vector</code>
+ as there are in
+ <code class="language-plaintext highlighter-rouge">gray_vector</code>
+ , since
+ <code class="language-plaintext highlighter-rouge">color_tensor</code>
+ has 3 color channels.</p>
+
+<h3 id="132-optimizing-with-gradients"><strong>1.3.2 Optimizing with gradients</strong></h3>
+
+<p>You are given a loss function, y=x2y=x2, which you want to minimize. You can do this by computing the slope using the
+ <code class="language-plaintext highlighter-rouge">GradientTape()</code>
+ operation at different values of
+ <code class="language-plaintext highlighter-rouge">x</code>
+ . If the slope is positive, you can decrease the loss by lowering
+ <code class="language-plaintext highlighter-rouge">x</code>
+ . If it is negative, you can decrease it by increasing
+ <code class="language-plaintext highlighter-rouge">x</code>
+ . This is how gradient descent works.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/3953/datasets/4a3d06616c28aed697d57914a26da3d831bac83c/gradient_plot.png" alt="The image shows a plot of y equals x squared. It also shows the gradient at x equals -1, x equals 0, and x equals 1." /></p>
+
+<p>In practice, you will use a high level
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ operation to perform gradient descent automatically. In this exercise, however, you will compute the slope at
+ <code class="language-plaintext highlighter-rouge">x</code>
+ values of -1, 1, and 0. The following operations are available:
+ <code class="language-plaintext highlighter-rouge">GradientTape()</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">multiply()</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">Variable()</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def compute_gradient(x0):
+  	# Define x as a variable with an initial value of x0
+	x = Variable(x0)
+	with GradientTape() as tape:
+		tape.watch(x)
+        # Define y using the multiply operation
+		y = multiply(x,x)
+    # Return the gradient of y with respect to x
+	return tape.gradient(y, x).numpy()
+
+# Compute and print gradients at x = -1, 1, and 0
+print(compute_gradient(-1.0))
+# -2.0
+print(compute_gradient(1.0))
+# 2.0
+print(compute_gradient(0.0))
+# 0.0
+
+</code></pre></div></div>
+
+<p>Excellent work! Notice that the slope is positive at
+ <code class="language-plaintext highlighter-rouge">x</code>
+ = 1, which means that we can lower the loss by reducing
+ <code class="language-plaintext highlighter-rouge">x</code>
+ . The slope is negative at
+ <code class="language-plaintext highlighter-rouge">x</code>
+ = -1, which means that we can lower the loss by increasing
+ <code class="language-plaintext highlighter-rouge">x</code>
+ . The slope at
+ <code class="language-plaintext highlighter-rouge">x</code>
+ = 0 is 0, which means that we cannot lower the loss by either increasing or decreasing
+ <code class="language-plaintext highlighter-rouge">x</code>
+ . This is because the loss is minimized at
+ <code class="language-plaintext highlighter-rouge">x</code>
+ = 0.</p>
+
+<h3 id="133-working-with-image-data"><strong>1.3.3 Working with image data</strong></h3>
+
+<p>You are given a black-and-white image of a letter, which has been encoded as a tensor,
+ <code class="language-plaintext highlighter-rouge">letter</code>
+ . You want to determine whether the letter is an X or a K. You don’t have a trained neural network, but you do have a simple model,
+ <code class="language-plaintext highlighter-rouge">model</code>
+ , which can be used to classify
+ <code class="language-plaintext highlighter-rouge">letter</code>
+ .</p>
+
+<p>The 3×3 tensor,
+ <code class="language-plaintext highlighter-rouge">letter</code>
+ , and the 1×3 tensor,
+ <code class="language-plaintext highlighter-rouge">model</code>
+ , are available in the Python shell. You can determine whether
+ <code class="language-plaintext highlighter-rouge">letter</code>
+ is a K by multiplying
+ <code class="language-plaintext highlighter-rouge">letter</code>
+ by
+ <code class="language-plaintext highlighter-rouge">model</code>
+ , summing over the result, and then checking if it is equal to 1. As with more complicated models, such as neural networks,
+ <code class="language-plaintext highlighter-rouge">model</code>
+ is a collection of weights, arranged in a tensor.</p>
+
+<p>Note that the functions
+ <code class="language-plaintext highlighter-rouge">reshape()</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">matmul()</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">reduce_sum()</code>
+ have been imported from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ and are available for use.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+letter
+array([[1., 0., 1.],
+       [1., 1., 0.],
+       [1., 0., 1.]], dtype=float32)
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Reshape model from a 1x3 to a 3x1 tensor
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">reshape</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Multiply letter by model
+</span><span class="n">output</span> <span class="o">=</span> <span class="n">matmul</span><span class="p">(</span><span class="n">letter</span><span class="p">,</span> <span class="n">model</span><span class="p">)</span>
+
+<span class="c1"># Sum over output and print prediction using the numpy method
+</span><span class="n">prediction</span> <span class="o">=</span> <span class="n">reduce_sum</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">prediction</span><span class="p">.</span><span class="n">numpy</span><span class="p">())</span>
+<span class="c1"># 1.0
+</span>
+</code></pre></div></div>
+
+<p>Excellent work! Your model found that
+ <code class="language-plaintext highlighter-rouge">prediction</code>
+ =1.0 and correctly classified the letter as a K. In the coming chapters, you will use data to train a model,
+ <code class="language-plaintext highlighter-rouge">model</code>
+ , and then combine this with matrix multiplication,
+ <code class="language-plaintext highlighter-rouge">matmul(letter, model)</code>
+ , as we have done here, to make predictions about the classes of objects.</p>
+
+<h1 id="2-linear-models"><strong>2. Linear models</strong></h1>
+<hr />
+
+<h2 id="21-input-data"><strong>2.1 Input data</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/1-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/2-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/3-17.png?w=947" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/4-17.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/5-17.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/6-17.png?w=927" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/7-17.png?w=916" alt="Desktop View" /></p>
+
+<h3 id="211-load-data-using-pandas"><strong>2.1.1 Load data using pandas</strong></h3>
+
+<p>Before you can train a machine learning model, you must first import data. There are several valid ways to do this, but for now, we will use a simple one-liner from
+ <code class="language-plaintext highlighter-rouge">pandas</code>
+ :
+ <code class="language-plaintext highlighter-rouge">pd.read_csv()</code>
+ . Recall from the video that the first argument specifies the path or URL. All other arguments are optional.</p>
+
+<p>In this exercise, you will import the King County housing dataset, which we will use to train a linear model later in the chapter.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pandas under the alias pd
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># Assign the path to a string variable named data_path
+</span><span class="n">data_path</span> <span class="o">=</span> <span class="s">'kc_house_data.csv'</span>
+
+<span class="c1"># Load the dataset as a dataframe named housing
+</span><span class="n">housing</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
+
+<span class="c1"># Print the price column of housing
+</span><span class="k">print</span><span class="p">(</span><span class="n">housing</span><span class="p">[</span><span class="s">'price'</span><span class="p">])</span>
+
+</code></pre></div></div>
+
+<p>Excellent work! Notice that you did not have to specify a delimiter with the
+ <code class="language-plaintext highlighter-rouge">sep</code>
+ parameter, since the dataset was stored in the default, comma-separated format.</p>
+
+<h3 id="212-setting-the-data-type"><strong>2.1.2 Setting the data type</strong></h3>
+
+<p>In this exercise, you will both load data and set its type. Note that
+ <code class="language-plaintext highlighter-rouge">housing</code>
+ is available and
+ <code class="language-plaintext highlighter-rouge">pandas</code>
+ has been imported as
+ <code class="language-plaintext highlighter-rouge">pd</code>
+ . You will import
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ and
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ , and define tensors that are usable in
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ using columns in
+ <code class="language-plaintext highlighter-rouge">housing</code>
+ with a given data type. Recall that you can select the
+ <code class="language-plaintext highlighter-rouge">price</code>
+ column, for instance, from
+ <code class="language-plaintext highlighter-rouge">housing</code>
+ using
+ <code class="language-plaintext highlighter-rouge">housing['price']</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import numpy and tensorflow with their standard aliases
+</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+
+<span class="c1"># Use a numpy array to define price as a 32-bit float
+</span><span class="n">price</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">housing</span><span class="p">[</span><span class="s">'price'</span><span class="p">],</span> <span class="n">np</span><span class="p">.</span><span class="nb">float</span><span class="p">)</span>
+
+<span class="c1"># Define waterfront as a Boolean using cast
+</span><span class="n">waterfront</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">housing</span><span class="p">[</span><span class="s">'waterfront'</span><span class="p">],</span> <span class="n">tf</span><span class="p">.</span><span class="nb">bool</span><span class="p">)</span>
+
+<span class="c1"># Print price and waterfront
+</span><span class="k">print</span><span class="p">(</span><span class="n">price</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">waterfront</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[221900. 538000. 180000. ... 402101. 400000. 325000.]
+tf.Tensor([False False False ... False False False], shape=(21613,), dtype=bool)
+
+</code></pre></div></div>
+
+<p>Great job! Notice that printing
+ <code class="language-plaintext highlighter-rouge">price</code>
+ yielded a
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ array; whereas printing
+ <code class="language-plaintext highlighter-rouge">waterfront</code>
+ yielded a
+ <code class="language-plaintext highlighter-rouge">tf.Tensor()</code>
+ .</p>
+
+<hr />
+
+<h2 id="22-loss-functions"><strong>2.2 Loss functions</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/8-17.png?w=875" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/9-15.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/10-15.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/11-15.png?w=847" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/12-15.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/13-14.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="221-loss-functions-in-tensorflow"><strong>2.2.1 Loss functions in TensorFlow</strong></h3>
+
+<p>In this exercise, you will compute the loss using data from the King County housing dataset. You are given a target,
+ <code class="language-plaintext highlighter-rouge">price</code>
+ , which is a tensor of house prices, and
+ <code class="language-plaintext highlighter-rouge">predictions</code>
+ , which is a tensor of predicted house prices. You will evaluate the loss function and print out the value of the loss.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the keras module from tensorflow
+</span><span class="kn">from</span> <span class="nn">tensorflow</span> <span class="kn">import</span> <span class="n">keras</span>
+
+<span class="c1"># Compute the mean squared error (mse)
+</span><span class="n">loss</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">losses</span><span class="p">.</span><span class="n">mse</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+
+<span class="c1"># Print the mean squared error (mse)
+</span><span class="k">print</span><span class="p">(</span><span class="n">loss</span><span class="p">.</span><span class="n">numpy</span><span class="p">())</span>
+<span class="c1"># 141171604777.12717
+</span>
+
+<span class="c1"># Compute the mean absolute error (mae)
+</span><span class="n">loss</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">losses</span><span class="p">.</span><span class="n">mae</span><span class="p">(</span><span class="n">price</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+
+<span class="c1"># Print the mean absolute error (mae)
+</span><span class="k">print</span><span class="p">(</span><span class="n">loss</span><span class="p">.</span><span class="n">numpy</span><span class="p">())</span>
+<span class="c1"># 268827.99302087986
+</span>
+</code></pre></div></div>
+
+<p>Great work! You may have noticed that the MAE was much smaller than the MSE, even though
+ <code class="language-plaintext highlighter-rouge">price</code>
+ and
+ <code class="language-plaintext highlighter-rouge">predictions</code>
+ were the same. This is because the different loss functions penalize deviations of
+ <code class="language-plaintext highlighter-rouge">predictions</code>
+ from
+ <code class="language-plaintext highlighter-rouge">price</code>
+ differently. MSE does not like large deviations and punishes them harshly.</p>
+
+<h3 id="222-modifying-the-loss-function"><strong>2.2.2 Modifying the loss function</strong></h3>
+
+<p>In the previous exercise, you defined a
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ loss function and then evaluated it once for a set of actual and predicted values. In this exercise, you will compute the loss within another function called
+ <code class="language-plaintext highlighter-rouge">loss_function()</code>
+ , which first generates predicted values from the data and variables. The purpose of this is to construct a function of the trainable model variables that returns the loss. You can then repeatedly evaluate this function for different variable values until you find the minimum. In practice, you will pass this function to an optimizer in
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ . Note that
+ <code class="language-plaintext highlighter-rouge">features</code>
+ and
+ <code class="language-plaintext highlighter-rouge">targets</code>
+ have been defined and are available. Additionally,
+ <code class="language-plaintext highlighter-rouge">Variable</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">float32</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ are available.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import tensorflow as tf
+from tensorflow import Variable
+from tensorflow import keras
+
+# Initialize a variable named scalar
+scalar = Variable(1.0, tf.float32)
+
+# Define the model
+def model(scalar, features = features):
+  	return scalar * features
+
+# Define a loss function
+def loss_function(scalar, features = features, targets = targets):
+	# Compute the predicted values
+	predictions = model(scalar, features)
+
+	# Return the mean absolute error loss
+	return keras.losses.mae(targets, predictions)
+
+# Evaluate the loss function and print the loss
+print(loss_function(scalar).numpy())
+# 3.0
+
+</code></pre></div></div>
+
+<p>Great work! As you will see in the following lessons, this exercise was the equivalent of evaluating the loss function for a linear regression where the intercept is 0.</p>
+
+<hr />
+
+<h2 id="23-linear-regression"><strong>2.3 Linear regression</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/14-13.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/15-13.png?w=866" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/16-12.png?w=929" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/17-9.png?w=926" alt="Desktop View" /></p>
+
+<h3 id="231-set-up-a-linear-regression"><strong>2.3.1 Set up a linear regression</strong></h3>
+
+<p>A univariate linear regression identifies the relationship between a single feature and the target tensor. In this exercise, we will use a property’s lot size and price. Just as we discussed in the video, we will take the natural logarithms of both tensors, which are available as
+ <code class="language-plaintext highlighter-rouge">price_log</code>
+ and
+ <code class="language-plaintext highlighter-rouge">size_log</code>
+ .</p>
+
+<p>In this exercise, you will define the model and the loss function. You will then evaluate the loss function for two different values of
+ <code class="language-plaintext highlighter-rouge">intercept</code>
+ and
+ <code class="language-plaintext highlighter-rouge">slope</code>
+ . Remember that the predicted values are given by
+ <code class="language-plaintext highlighter-rouge">intercept + features*slope</code>
+ . Additionally, note that
+ <code class="language-plaintext highlighter-rouge">keras.losses.mse()</code>
+ is available for you. Furthermore,
+ <code class="language-plaintext highlighter-rouge">slope</code>
+ and
+ <code class="language-plaintext highlighter-rouge">intercept</code>
+ have been defined as variables.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define a linear regression model
+</span><span class="k">def</span> <span class="nf">linear_regression</span><span class="p">(</span><span class="n">intercept</span><span class="p">,</span> <span class="n">slope</span><span class="p">,</span> <span class="n">features</span> <span class="o">=</span> <span class="n">size_log</span><span class="p">):</span>
+	<span class="k">return</span> <span class="n">intercept</span> <span class="o">+</span> <span class="n">slope</span><span class="o">*</span><span class="n">features</span>
+
+<span class="c1"># Set loss_function() to take the variables as arguments
+</span><span class="k">def</span> <span class="nf">loss_function</span><span class="p">(</span><span class="n">intercept</span><span class="p">,</span> <span class="n">slope</span><span class="p">,</span> <span class="n">features</span> <span class="o">=</span> <span class="n">size_log</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">price_log</span><span class="p">):</span>
+	<span class="c1"># Set the predicted values
+</span>	<span class="n">predictions</span> <span class="o">=</span> <span class="n">linear_regression</span><span class="p">(</span><span class="n">intercept</span><span class="p">,</span> <span class="n">slope</span><span class="p">,</span> <span class="n">features</span><span class="p">)</span>
+
+    <span class="c1"># Return the mean squared error loss
+</span>	<span class="k">return</span> <span class="n">keras</span><span class="p">.</span><span class="n">losses</span><span class="p">.</span><span class="n">mse</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+
+<span class="c1"># Compute the loss for different slope and intercept values
+</span><span class="k">print</span><span class="p">(</span><span class="n">loss_function</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">).</span><span class="n">numpy</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="n">loss_function</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">).</span><span class="n">numpy</span><span class="p">())</span>
+<span class="c1"># 145.44652
+# 71.866
+</span>
+</code></pre></div></div>
+
+<p>Great work! In the next exercise, you will actually run the regression and train
+ <code class="language-plaintext highlighter-rouge">intercept</code>
+ and
+ <code class="language-plaintext highlighter-rouge">slope</code>
+ .</p>
+
+<h3 id="232-train-a-linear-model"><strong>2.3.2 Train a linear model</strong></h3>
+
+<p>In this exercise, we will pick up where the previous exercise ended. The intercept and slope,
+ <code class="language-plaintext highlighter-rouge">intercept</code>
+ and
+ <code class="language-plaintext highlighter-rouge">slope</code>
+ , have been defined and initialized. Additionally, a function has been defined,
+ <code class="language-plaintext highlighter-rouge">loss_function(intercept, slope)</code>
+ , which computes the loss using the data and model variables.</p>
+
+<p>You will now define an optimization operation as
+ <code class="language-plaintext highlighter-rouge">opt</code>
+ . You will then train a univariate linear model by minimizing the loss to find the optimal values of
+ <code class="language-plaintext highlighter-rouge">intercept</code>
+ and
+ <code class="language-plaintext highlighter-rouge">slope</code>
+ . Note that the
+ <code class="language-plaintext highlighter-rouge">opt</code>
+ operation will try to move closer to the optimum with each step, but will require many steps to find it. Thus, you must repeatedly execute the operation.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize an adam optimizer
+</span><span class="n">opt</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">Adam</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+	<span class="c1"># Apply minimize, pass the loss function, and supply the variables
+</span>	<span class="n">opt</span><span class="p">.</span><span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">intercept</span><span class="p">,</span> <span class="n">slope</span><span class="p">),</span> <span class="n">var_list</span><span class="o">=</span><span class="p">[</span><span class="n">intercept</span><span class="p">,</span> <span class="n">slope</span><span class="p">])</span>
+
+	<span class="c1"># Print every 10th value of the loss
+</span>	<span class="k">if</span> <span class="n">j</span> <span class="o">%</span> <span class="mi">10</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+		<span class="k">print</span><span class="p">(</span><span class="n">loss_function</span><span class="p">(</span><span class="n">intercept</span><span class="p">,</span> <span class="n">slope</span><span class="p">).</span><span class="n">numpy</span><span class="p">())</span>
+
+<span class="c1"># Plot data and regression line
+</span><span class="n">plot_results</span><span class="p">(</span><span class="n">intercept</span><span class="p">,</span> <span class="n">slope</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+9.669481
+11.726705
+1.1193314
+1.6605749
+0.7982892
+0.8017315
+0.6106562
+0.59997994
+0.5811015
+0.5576157
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/18-7.png?w=1024" alt="Desktop View" /></p>
+
+<p>Excellent! Notice that we printed
+ <code class="language-plaintext highlighter-rouge">loss_function(intercept, slope)</code>
+ every 10th execution for 100 executions. Each time, the loss got closer to the minimum as the optimizer moved the
+ <code class="language-plaintext highlighter-rouge">slope</code>
+ and
+ <code class="language-plaintext highlighter-rouge">intercept</code>
+ parameters closer to their optimal values.</p>
+
+<h3 id="233-multiple-linear-regression"><strong>2.3.3 Multiple linear regression</strong></h3>
+
+<p>In most cases, performing a univariate linear regression will not yield a model that is useful for making accurate predictions. In this exercise, you will perform a multiple regression, which uses more than one feature.</p>
+
+<p>You will use
+ <code class="language-plaintext highlighter-rouge">price_log</code>
+ as your target and
+ <code class="language-plaintext highlighter-rouge">size_log</code>
+ and
+ <code class="language-plaintext highlighter-rouge">bedrooms</code>
+ as your features. Each of these tensors has been defined and is available. You will also switch from using the the mean squared error loss to the mean absolute error loss:
+ <code class="language-plaintext highlighter-rouge">keras.losses.mae()</code>
+ . Finally, the predicted values are computed as follows:
+ <code class="language-plaintext highlighter-rouge">params[0] + feature1*params[1] + feature2*params[2]</code>
+ . Note that we’ve defined a vector of parameters,
+ <code class="language-plaintext highlighter-rouge">params</code>
+ , as a variable, rather than using three variables. Here,
+ <code class="language-plaintext highlighter-rouge">params[0]</code>
+ is the intercept and
+ <code class="language-plaintext highlighter-rouge">params[1]</code>
+ and
+ <code class="language-plaintext highlighter-rouge">params[2]</code>
+ are the slopes.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define the linear regression model
+</span><span class="k">def</span> <span class="nf">linear_regression</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">feature1</span> <span class="o">=</span> <span class="n">size_log</span><span class="p">,</span> <span class="n">feature2</span> <span class="o">=</span> <span class="n">bedrooms</span><span class="p">):</span>
+	<span class="k">return</span> <span class="n">params</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">feature1</span><span class="o">*</span><span class="n">params</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">feature2</span><span class="o">*</span><span class="n">params</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+<span class="c1"># Define the loss function
+</span><span class="k">def</span> <span class="nf">loss_function</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">price_log</span><span class="p">,</span> <span class="n">feature1</span> <span class="o">=</span> <span class="n">size_log</span><span class="p">,</span> <span class="n">feature2</span> <span class="o">=</span> <span class="n">bedrooms</span><span class="p">):</span>
+	<span class="c1"># Set the predicted values
+</span>	<span class="n">predictions</span> <span class="o">=</span> <span class="n">linear_regression</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">feature1</span><span class="p">,</span> <span class="n">feature2</span><span class="p">)</span>
+
+	<span class="c1"># Use the mean absolute error loss
+</span>	<span class="k">return</span> <span class="n">keras</span><span class="p">.</span><span class="n">losses</span><span class="p">.</span><span class="n">mae</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+
+<span class="c1"># Define the optimize operation
+</span><span class="n">opt</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">Adam</span><span class="p">()</span>
+
+<span class="c1"># Perform minimization and print trainable variables
+</span><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+	<span class="n">opt</span><span class="p">.</span><span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">params</span><span class="p">),</span> <span class="n">var_list</span><span class="o">=</span><span class="p">[</span><span class="n">params</span><span class="p">])</span>
+	<span class="n">print_results</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+loss: 12.418, intercept: 0.101, slope_1: 0.051, slope_2: 0.021
+loss: 12.404, intercept: 0.102, slope_1: 0.052, slope_2: 0.022
+loss: 12.391, intercept: 0.103, slope_1: 0.053, slope_2: 0.023
+loss: 12.377, intercept: 0.104, slope_1: 0.054, slope_2: 0.024
+loss: 12.364, intercept: 0.105, slope_1: 0.055, slope_2: 0.025
+loss: 12.351, intercept: 0.106, slope_1: 0.056, slope_2: 0.026
+loss: 12.337, intercept: 0.107, slope_1: 0.057, slope_2: 0.027
+loss: 12.324, intercept: 0.108, slope_1: 0.058, slope_2: 0.028
+loss: 12.311, intercept: 0.109, slope_1: 0.059, slope_2: 0.029
+loss: 12.297, intercept: 0.110, slope_1: 0.060, slope_2: 0.030
+
+</code></pre></div></div>
+
+<p>Great job! Note that
+ <code class="language-plaintext highlighter-rouge">params[2]</code>
+ tells us how much the price will increase in percentage terms if we add one more bedroom. You could train
+ <code class="language-plaintext highlighter-rouge">params[2]</code>
+ and the other model parameters by increasing the number of times we iterate over
+ <code class="language-plaintext highlighter-rouge">opt</code>
+ .</p>
+
+<hr />
+
+<h2 id="24-batch-training"><strong>2.4 Batch training</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/19-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/20-5.png?w=779" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/21-4.png?w=966" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/22-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/23-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/24-4.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="241-preparing-to-batch-train"><strong>2.4.1 Preparing to batch train</strong></h3>
+
+<p>Before we can train a linear model in batches, we must first define variables, a loss function, and an optimization operation. In this exercise, we will prepare to train a model that will predict
+ <code class="language-plaintext highlighter-rouge">price_batch</code>
+ , a batch of house prices, using
+ <code class="language-plaintext highlighter-rouge">size_batch</code>
+ , a batch of lot sizes in square feet. In contrast to the previous lesson, we will do this by loading batches of data using
+ <code class="language-plaintext highlighter-rouge">pandas</code>
+ , converting it to
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ arrays, and then using it to minimize the loss function in steps.</p>
+
+<p><code class="language-plaintext highlighter-rouge">Variable()</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">keras()</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">float32</code>
+ have been imported for you. Note that you should not set default argument values for either the model or loss function, since we will generate the data in batches during the training process.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define the intercept and slope
+</span><span class="n">intercept</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="n">float32</span><span class="p">)</span>
+<span class="n">slope</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">float32</span><span class="p">)</span>
+
+<span class="c1"># Define the model
+</span><span class="k">def</span> <span class="nf">linear_regression</span><span class="p">(</span><span class="n">intercept</span><span class="p">,</span> <span class="n">slope</span><span class="p">,</span> <span class="n">features</span><span class="p">):</span>
+	<span class="c1"># Define the predicted values
+</span>	<span class="k">return</span> <span class="n">intercept</span> <span class="o">+</span> <span class="n">slope</span><span class="o">*</span><span class="n">features</span>
+
+<span class="c1"># Define the loss function
+</span><span class="k">def</span> <span class="nf">loss_function</span><span class="p">(</span><span class="n">intercept</span><span class="p">,</span> <span class="n">slope</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">features</span><span class="p">):</span>
+	<span class="c1"># Define the predicted values
+</span>	<span class="n">predictions</span> <span class="o">=</span> <span class="n">linear_regression</span><span class="p">(</span><span class="n">intercept</span><span class="p">,</span> <span class="n">slope</span><span class="p">,</span> <span class="n">features</span><span class="p">)</span>
+
+ 	<span class="c1"># Define the MSE loss
+</span>	<span class="k">return</span> <span class="n">keras</span><span class="p">.</span><span class="n">losses</span><span class="p">.</span><span class="n">mse</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Excellent work! Notice that we did not use default argument values for the input data,
+ <code class="language-plaintext highlighter-rouge">features</code>
+ and
+ <code class="language-plaintext highlighter-rouge">targets</code>
+ . This is because the input data has not been defined in advance. Instead, with batch training, we will load it during the training process.</p>
+
+<h3 id="242-training-a-linear-model-in-batches"><strong>2.4.2 Training a linear model in batches</strong></h3>
+
+<p>In this exercise, we will train a linear regression model in batches, starting where we left off in the previous exercise. We will do this by stepping through the dataset in batches and updating the model’s variables,
+ <code class="language-plaintext highlighter-rouge">intercept</code>
+ and
+ <code class="language-plaintext highlighter-rouge">slope</code>
+ , after each step. This approach will allow us to train with datasets that are otherwise too large to hold in memory.</p>
+
+<p>Note that the loss function,
+ <code class="language-plaintext highlighter-rouge">loss_function(intercept, slope, targets, features)</code>
+ , has been defined for you. Additionally,
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ has been imported for you and
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ is available as
+ <code class="language-plaintext highlighter-rouge">np</code>
+ . The trainable variables should be entered into
+ <code class="language-plaintext highlighter-rouge">var_list</code>
+ in the order in which they appear as loss function arguments.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize adam optimizer
+</span><span class="n">opt</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">Adam</span><span class="p">()</span>
+
+<span class="c1"># Load data in batches
+</span><span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'kc_house_data.csv'</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="mi">100</span><span class="p">):</span>
+	<span class="n">size_batch</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s">'sqft_lot'</span><span class="p">],</span> <span class="n">np</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+
+	<span class="c1"># Extract the price values for the current batch
+</span>	<span class="n">price_batch</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s">'price'</span><span class="p">],</span> <span class="n">np</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+
+	<span class="c1"># Complete the loss, fill in the variable list, and minimize
+</span>	<span class="n">opt</span><span class="p">.</span><span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">intercept</span><span class="p">,</span> <span class="n">slope</span><span class="p">,</span> <span class="n">price_batch</span><span class="p">,</span> <span class="n">size_batch</span><span class="p">),</span> <span class="n">var_list</span><span class="o">=</span><span class="p">[</span><span class="n">intercept</span><span class="p">,</span> <span class="n">slope</span><span class="p">])</span>
+
+<span class="c1"># Print trained parameters
+</span><span class="k">print</span><span class="p">(</span><span class="n">intercept</span><span class="p">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">slope</span><span class="p">.</span><span class="n">numpy</span><span class="p">())</span>
+<span class="c1"># 10.217888 0.7016
+</span>
+</code></pre></div></div>
+
+<p>Great work! Batch training will be very useful when you train neural networks, which we will do next.</p>
+
+<h1 id="3-neural-networks"><strong>3. Neural Networks</strong></h1>
+<hr />
+
+<h2 id="31-dense-layers"><strong>3.1 Dense layers</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/1-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/2-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/3-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/4-18.png?w=743" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/5-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/6-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/7-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/8-18.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="311-the-linear-algebra-of-dense-layers"><strong>3.1.1 The linear algebra of dense layers</strong></h3>
+
+<p>There are two ways to define a dense layer in
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ . The first involves the use of low-level, linear algebraic operations. The second makes use of high-level
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ operations. In this exercise, we will use the first method to construct the network shown in the image below.
+ <img src="https://assets.datacamp.com/production/repositories/3953/datasets/23d6f91f73eb1363c4fd67c83720ca3c84ce20a1/3_2_1_network2.png" alt="This image depicts an neural network with 5 input nodes and 3 output nodes." /></p>
+
+<p>The input layer contains 3 features — education, marital status, and age — which are available as
+ <code class="language-plaintext highlighter-rouge">borrower_features</code>
+ . The hidden layer contains 2 nodes and the output layer contains a single node.</p>
+
+<p>For each layer, you will take the previous layer as an input, initialize a set of weights, compute the product of the inputs and weights, and then apply an activation function. Note that
+ <code class="language-plaintext highlighter-rouge">Variable()</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">ones()</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">matmul()</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">keras()</code>
+ have been imported from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize bias1
+</span><span class="n">bias1</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="c1"># Initialize weights1 as 3x2 variable of ones
+</span><span class="n">weights1</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="c1"># Perform matrix multiplication of borrower_features and weights1
+</span><span class="n">product1</span> <span class="o">=</span> <span class="n">matmul</span><span class="p">(</span><span class="n">borrower_features</span><span class="p">,</span><span class="n">weights1</span><span class="p">)</span>
+
+<span class="c1"># Apply sigmoid activation function to product1 + bias1
+</span><span class="n">dense1</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">activations</span><span class="p">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">product1</span> <span class="o">+</span> <span class="n">bias1</span><span class="p">)</span>
+
+<span class="c1"># Print shape of dense1
+</span><span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s"> dense1's output shape: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">dense1</span><span class="p">.</span><span class="n">shape</span><span class="p">))</span>
+<span class="c1"># dense1's output shape: (1, 2)
+</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># From previous step
+</span><span class="n">bias1</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">weights1</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">ones</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+<span class="n">product1</span> <span class="o">=</span> <span class="n">matmul</span><span class="p">(</span><span class="n">borrower_features</span><span class="p">,</span> <span class="n">weights1</span><span class="p">)</span>
+<span class="n">dense1</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">activations</span><span class="p">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">product1</span> <span class="o">+</span> <span class="n">bias1</span><span class="p">)</span>
+
+<span class="c1"># Initialize bias2 and weights2
+</span><span class="n">bias2</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+<span class="n">weights2</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)))</span>
+
+<span class="c1"># Perform matrix multiplication of dense1 and weights2
+</span><span class="n">product2</span> <span class="o">=</span> <span class="n">matmul</span><span class="p">(</span><span class="n">dense1</span><span class="p">,</span> <span class="n">weights2</span><span class="p">)</span>
+
+<span class="c1"># Apply activation to product2 + bias2 and print the prediction
+</span><span class="n">prediction</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">activations</span><span class="p">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">product2</span> <span class="o">+</span> <span class="n">bias2</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s"> prediction: {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">prediction</span><span class="p">.</span><span class="n">numpy</span><span class="p">()[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s"> actual: 1'</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+ prediction: 0.9525741338729858
+
+ actual: 1
+
+</code></pre></div></div>
+
+<p>Excellent work! Our model produces predicted values in the interval between 0 and 1. For the example we considered, the actual value was 1 and the predicted value was a probability between 0 and 1. This, of course, is not meaningful, since we have not yet trained our model’s parameters.</p>
+
+<h3 id="312-the-low-level-approach-with-multiple-examples"><strong>3.1.2 The low-level approach with multiple examples</strong></h3>
+
+<p>In this exercise, we’ll build further intuition for the low-level approach by constructing the first dense hidden layer for the case where we have multiple examples. We’ll assume the model is trained and the first layer weights,
+ <code class="language-plaintext highlighter-rouge">weights1</code>
+ , and bias,
+ <code class="language-plaintext highlighter-rouge">bias1</code>
+ , are available. We’ll then perform matrix multiplication of the
+ <code class="language-plaintext highlighter-rouge">borrower_features</code>
+ tensor by the
+ <code class="language-plaintext highlighter-rouge">weights1</code>
+ variable. Recall that the
+ <code class="language-plaintext highlighter-rouge">borrower_features</code>
+ tensor includes education, marital status, and age. Finally, we’ll apply the sigmoid function to the elements of
+ <code class="language-plaintext highlighter-rouge">products1 + bias1</code>
+ , yielding
+ <code class="language-plaintext highlighter-rouge">dense1</code>
+ .</p>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/9-16.png?w=557" alt="Desktop View" /></p>
+
+<p>Note that
+ <code class="language-plaintext highlighter-rouge">matmul()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">keras()</code>
+ have been imported from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the product of borrower_features and weights1
+</span><span class="n">products1</span> <span class="o">=</span> <span class="n">matmul</span><span class="p">(</span><span class="n">borrower_features</span><span class="p">,</span><span class="n">weights1</span><span class="p">)</span>
+
+<span class="c1"># Apply a sigmoid activation function to products1 + bias1
+</span><span class="n">dense1</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">activations</span><span class="p">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">products1</span><span class="o">+</span><span class="n">bias1</span><span class="p">)</span>
+
+<span class="c1"># Print the shapes of borrower_features, weights1, bias1, and dense1
+</span><span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s"> shape of borrower_features: '</span><span class="p">,</span> <span class="n">borrower_features</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1">#  shape of borrower_features:  (5, 3)
+</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s"> shape of weights1: '</span><span class="p">,</span> <span class="n">weights1</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1">#  shape of weights1:  (3, 2)
+</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s"> shape of bias1: '</span><span class="p">,</span> <span class="n">bias1</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1">#  shape of bias1:  (1,)
+</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s"> shape of dense1: '</span><span class="p">,</span> <span class="n">dense1</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1">#  shape of dense1:  (5, 2)
+</span>
+</code></pre></div></div>
+
+<p>Good job! Note that our input data,
+ <code class="language-plaintext highlighter-rouge">borrower_features</code>
+ , is 5×3 because it consists of 5 examples for 3 features. The shape of
+ <code class="language-plaintext highlighter-rouge">weights1</code>
+ is 3×2, as it was in the previous exercise, since it does not depend on the number of examples. Additionally,
+ <code class="language-plaintext highlighter-rouge">bias1</code>
+ is a scalar. Finally,
+ <code class="language-plaintext highlighter-rouge">dense1</code>
+ is 5×2, which means that we can multiply it by the following set of weights,
+ <code class="language-plaintext highlighter-rouge">weights2</code>
+ , which we defined to be 2×1 in the previous exercise.</p>
+
+<h3 id="313-using-the-dense-layer-operation"><strong>3.1.3 Using the dense layer operation</strong></h3>
+
+<p>We’ve now seen how to define dense layers in
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ using linear algebra. In this exercise, we’ll skip the linear algebra and let
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ work out the details. This will allow us to construct the network below, which has 2 hidden layers and 10 features, using less code than we needed for the network with 1 hidden layer and 3 features.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/3953/datasets/eb2fda20a023befc69b53ff5bd278c2eee73dac8/10_7_3_1_network.png" alt="This image depicts an neural network with 10 inputs nodes and 1 output node." /></p>
+
+<p>To construct this network, we’ll need to define three dense layers, each of which takes the previous layer as an input, multiplies it by weights, and applies an activation function. Note that input data has been defined and is available as a 100×10 tensor:
+ <code class="language-plaintext highlighter-rouge">borrower_features</code>
+ . Additionally, the
+ <code class="language-plaintext highlighter-rouge">keras.layers</code>
+ module is available.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define the first dense layer
+</span><span class="n">dense1</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">7</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)(</span><span class="n">borrower_features</span><span class="p">)</span>
+
+<span class="c1"># Define a dense layer with 3 output nodes
+</span><span class="n">dense2</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)(</span><span class="n">dense1</span><span class="p">)</span>
+
+<span class="c1"># Define a dense layer with 1 output node
+</span><span class="n">predictions</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)(</span><span class="n">dense2</span><span class="p">)</span>
+
+<span class="c1"># Print the shapes of dense1, dense2, and predictions
+</span><span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s"> shape of dense1: '</span><span class="p">,</span> <span class="n">dense1</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1">#  shape of dense1:  (100, 7)
+</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s"> shape of dense2: '</span><span class="p">,</span> <span class="n">dense2</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1">#  shape of dense2:  (100, 3)
+</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s"> shape of predictions: '</span><span class="p">,</span> <span class="n">predictions</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1">#  shape of predictions:  (100, 1)
+</span>
+</code></pre></div></div>
+
+<p>Great work! With just 8 lines of code, you were able to define 2 dense hidden layers and an output layer. This is the advantage of using high-level operations in
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ . Note that each layer has 100 rows because the input data contains 100 examples.</p>
+
+<hr />
+
+<h2 id="32-activation-functions"><strong>3.2 Activation functions</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/10-16.png?w=904" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/11-16.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/12-16.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/13-15.png?w=885" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/14-14.png?w=821" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/15-14.png?w=991" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/16-13.png?w=986" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/17-10.png?w=979" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/18-8.png?w=930" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/19-7.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="321-binary-classification-problems"><strong>3.2.1 Binary classification problems</strong></h3>
+
+<p>In this exercise, you will again make use of credit card data. The target variable,
+ <code class="language-plaintext highlighter-rouge">default</code>
+ , indicates whether a credit card holder defaults on her payment in the following period. Since there are only two options–default or not–this is a binary classification problem. While the dataset has many features, you will focus on just three: the size of the three latest credit card bills. Finally, you will compute predictions from your untrained network,
+ <code class="language-plaintext highlighter-rouge">outputs</code>
+ , and compare those the target variable,
+ <code class="language-plaintext highlighter-rouge">default</code>
+ .</p>
+
+<p>The tensor of features has been loaded and is available as
+ <code class="language-plaintext highlighter-rouge">bill_amounts</code>
+ . Additionally, the
+ <code class="language-plaintext highlighter-rouge">constant()</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">float32</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">keras.layers.Dense()</code>
+ operations are available.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Construct input layer from features
+</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">constant</span><span class="p">(</span><span class="n">bill_amounts</span><span class="p">)</span>
+
+<span class="c1"># Define first dense layer
+</span><span class="n">dense1</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">)(</span><span class="n">inputs</span><span class="p">)</span>
+
+<span class="c1"># Define second dense layer
+</span><span class="n">dense2</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">)(</span><span class="n">dense1</span><span class="p">)</span>
+
+<span class="c1"># Define output layer
+</span><span class="n">outputs</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)(</span><span class="n">dense2</span><span class="p">)</span>
+
+<span class="c1"># Print error for first five examples
+</span><span class="n">error</span> <span class="o">=</span> <span class="n">default</span><span class="p">[:</span><span class="mi">5</span><span class="p">]</span> <span class="o">-</span> <span class="n">outputs</span><span class="p">.</span><span class="n">numpy</span><span class="p">()[:</span><span class="mi">5</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+    [[ 0.0000000e+00]
+     [ 3.4570694e-05]
+     [-1.0000000e+00]
+     [-1.0000000e+00]
+     [-1.0000000e+00]]
+
+</code></pre></div></div>
+
+<p>Excellent work! If you run the code several times, you’ll notice that the errors change each time. This is because you’re using an untrained model with randomly initialized parameters. Furthermore, the errors fall on the interval between -1 and 1 because
+ <code class="language-plaintext highlighter-rouge">default</code>
+ is a binary variable that takes on values of 0 and 1 and
+ <code class="language-plaintext highlighter-rouge">outputs</code>
+ is a probability between 0 and 1.</p>
+
+<h3 id="322-multiclass-classification-problems"><strong>3.2.2 Multiclass classification problems</strong></h3>
+
+<p>In this exercise, we expand beyond binary classification to cover multiclass problems. A multiclass problem has targets that can take on three or more values. In the credit card dataset, the education variable can take on 6 different values, each corresponding to a different level of education. We will use that as our target in this exercise and will also expand the feature set from 3 to 10 columns.</p>
+
+<p>As in the previous problem, you will define an input layer, dense layers, and an output layer. You will also print the untrained model’s predictions, which are probabilities assigned to the classes. The tensor of features has been loaded and is available as
+ <code class="language-plaintext highlighter-rouge">borrower_features</code>
+ . Additionally, the
+ <code class="language-plaintext highlighter-rouge">constant()</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">float32</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">keras.layers.Dense()</code>
+ operations are available.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import tensorflow as tf
+# Construct input layer from borrower features
+inputs = constant(borrower_features,tf.float32)
+
+# Define first dense layer
+dense1 = keras.layers.Dense(10, activation='sigmoid')(inputs)
+
+# Define second dense layer
+dense2 = keras.layers.Dense(8, activation='relu')(dense1)
+
+# Define output layer
+outputs = keras.layers.Dense(6, activation='softmax')(dense2)
+
+# Print first five predictions
+print(outputs.numpy()[:5])
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+    [[0.17133032 0.16293828 0.14702542 0.17789574 0.16075517 0.18005505]
+     [0.15597914 0.17065835 0.1275746  0.2044413  0.16524555 0.17610106]
+     [0.15597914 0.17065835 0.1275746  0.2044413  0.16524555 0.17610106]
+     [0.17133032 0.16293828 0.14702542 0.17789574 0.16075517 0.18005505]
+     [0.07605464 0.17264706 0.15399623 0.2247733  0.1516134  0.22091544]]
+
+
+</code></pre></div></div>
+
+<p>Great work! Notice that each row of
+ <code class="language-plaintext highlighter-rouge">outputs</code>
+ sums to one. This is because a row contains the predicted class probabilities for one example. As with the previous exercise, our predictions are not yet informative, since we are using an untrained model with randomly initialized parameters. This is why the model tends to assign similar probabilities to each class.</p>
+
+<hr />
+
+<h2 id="33-optimizers"><strong>3.3 Optimizers</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/21-5.png?w=975" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/22-5.png?w=914" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/23-5.png?w=770" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/24-5.png?w=713" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/25-3.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="331-the-dangers-of-local-minima"><strong>3.3.1 The dangers of local minima</strong></h3>
+
+<p>Consider the plot of the following loss function,
+ <code class="language-plaintext highlighter-rouge">loss_function()</code>
+ , which contains a global minimum, marked by the dot on the right, and several local minima, including the one marked by the dot on the left.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/3953/datasets/42876c85cba5c14941a3fac191eff75b41597112/local_minima_dots_4_10.png" alt="The graph is of a single variable function that contains multiple local minima and a global minimum." /></p>
+
+<p>In this exercise, you will try to find the global minimum of
+ <code class="language-plaintext highlighter-rouge">loss_function()</code>
+ using
+ <code class="language-plaintext highlighter-rouge">keras.optimizers.SGD()</code>
+ . You will do this twice, each time with a different initial value of the input to
+ <code class="language-plaintext highlighter-rouge">loss_function()</code>
+ . First, you will use
+ <code class="language-plaintext highlighter-rouge">x_1</code>
+ , which is a variable with an initial value of 6.0. Second, you will use
+ <code class="language-plaintext highlighter-rouge">x_2</code>
+ , which is a variable with an initial value of 0.3. Note that
+ <code class="language-plaintext highlighter-rouge">loss_function()</code>
+ has been defined and is available.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize x_1 and x_2
+</span><span class="n">x_1</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">6.0</span><span class="p">,</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">x_2</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">0.3</span><span class="p">,</span><span class="n">float32</span><span class="p">)</span>
+
+<span class="c1"># Define the optimization operation
+</span><span class="n">opt</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">SGD</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+	<span class="c1"># Perform minimization using the loss function and x_1
+</span>	<span class="n">opt</span><span class="p">.</span><span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">x_1</span><span class="p">),</span> <span class="n">var_list</span><span class="o">=</span><span class="p">[</span><span class="n">x_1</span><span class="p">])</span>
+	<span class="c1"># Perform minimization using the loss function and x_2
+</span>	<span class="n">opt</span><span class="p">.</span><span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">x_2</span><span class="p">),</span> <span class="n">var_list</span><span class="o">=</span><span class="p">[</span><span class="n">x_2</span><span class="p">])</span>
+
+<span class="c1"># Print x_1 and x_2 as numpy arrays
+</span><span class="k">print</span><span class="p">(</span><span class="n">x_1</span><span class="p">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">x_2</span><span class="p">.</span><span class="n">numpy</span><span class="p">())</span>
+<span class="c1"># 4.3801394 0.42052683
+</span>
+</code></pre></div></div>
+
+<p>Great work! Notice that we used the same optimizer and loss function, but two different initial values. When we started at 6.0 with
+ <code class="language-plaintext highlighter-rouge">x_1</code>
+ , we found the global minimum at 4.38, marked by the dot on the right. When we started at 0.3, we stopped around 0.42 with
+ <code class="language-plaintext highlighter-rouge">x_2</code>
+ , the local minimum marked by a dot on the far left.</p>
+
+<h3 id="332-avoiding-local-minima"><strong>3.3.2 Avoiding local minima</strong></h3>
+
+<p>The previous problem showed how easy it is to get stuck in local minima. We had a simple optimization problem in one variable and gradient descent still failed to deliver the global minimum when we had to travel through local minima first. One way to avoid this problem is to use momentum, which allows the optimizer to break through local minima. We will again use the loss function from the previous problem, which has been defined and is available for you as
+ <code class="language-plaintext highlighter-rouge">loss_function()</code>
+ .</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/3953/datasets/42876c85cba5c14941a3fac191eff75b41597112/local_minima_dots_4_10.png" alt="The graph is of a single variable function that contains multiple local minima and a global minimum." /></p>
+
+<p>Several optimizers in
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ have a momentum parameter, including
+ <code class="language-plaintext highlighter-rouge">SGD</code>
+ and
+ <code class="language-plaintext highlighter-rouge">RMSprop</code>
+ . You will make use of
+ <code class="language-plaintext highlighter-rouge">RMSprop</code>
+ in this exercise. Note that
+ <code class="language-plaintext highlighter-rouge">x_1</code>
+ and
+ <code class="language-plaintext highlighter-rouge">x_2</code>
+ have been initialized to the same value this time. Furthermore,
+ <code class="language-plaintext highlighter-rouge">keras.optimizers.RMSprop()</code>
+ has also been imported for you from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize x_1 and x_2
+</span><span class="n">x_1</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="n">float32</span><span class="p">)</span>
+<span class="n">x_2</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="mf">0.05</span><span class="p">,</span><span class="n">float32</span><span class="p">)</span>
+
+<span class="c1"># Define the optimization operation for opt_1 and opt_2
+</span><span class="n">opt_1</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">RMSprop</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+<span class="n">opt_2</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">RMSprop</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span> <span class="n">momentum</span><span class="o">=</span><span class="mf">0.00</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+	<span class="n">opt_1</span><span class="p">.</span><span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">x_1</span><span class="p">),</span> <span class="n">var_list</span><span class="o">=</span><span class="p">[</span><span class="n">x_1</span><span class="p">])</span>
+    <span class="c1"># Define the minimization operation for opt_2
+</span>	<span class="n">opt_2</span><span class="p">.</span><span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">x_2</span><span class="p">),</span> <span class="n">var_list</span><span class="o">=</span><span class="p">[</span><span class="n">x_2</span><span class="p">])</span>
+
+<span class="c1"># Print x_1 and x_2 as numpy arrays
+</span><span class="k">print</span><span class="p">(</span><span class="n">x_1</span><span class="p">.</span><span class="n">numpy</span><span class="p">(),</span> <span class="n">x_2</span><span class="p">.</span><span class="n">numpy</span><span class="p">())</span>
+<span class="c1"># 4.3150263 0.4205261
+</span>
+</code></pre></div></div>
+
+<p>Good work! Recall that the global minimum is approximately 4.38. Notice that
+ <code class="language-plaintext highlighter-rouge">opt_1</code>
+ built momentum, bringing
+ <code class="language-plaintext highlighter-rouge">x_1</code>
+ closer to the global minimum. To the contrary,
+ <code class="language-plaintext highlighter-rouge">opt_2</code>
+ , which had a
+ <code class="language-plaintext highlighter-rouge">momentum</code>
+ parameter of 0.0, got stuck in the local minimum on the left.</p>
+
+<hr />
+
+<h3 id="34-training-a-network-in-tensorflow"><strong>3.4 Training a network in TensorFlow</strong></h3>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/1-20.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/2-20.png?w=871" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/3-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/4-19.png?w=1016" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/5-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/6-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/7-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/8-19.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="341-initialization-in-tensorflow"><strong>3.4.1 Initialization in TensorFlow</strong></h3>
+
+<p>A good initialization can reduce the amount of time needed to find the global minimum. In this exercise, we will initialize weights and biases for a neural network that will be used to predict credit card default decisions. To build intuition, we will use the low-level, linear algebraic approach, rather than making use of convenience functions and high-level
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ operations. We will also expand the set of input features from 3 to 23. Several operations have been imported from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ :
+ <code class="language-plaintext highlighter-rouge">Variable()</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">random()</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">ones()</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define the layer 1 weights
+</span><span class="n">w1</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">([</span><span class="mi">23</span><span class="p">,</span> <span class="mi">7</span><span class="p">]))</span>
+
+<span class="c1"># Initialize the layer 1 bias
+</span><span class="n">b1</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">ones</span><span class="p">([</span><span class="mi">7</span><span class="p">]))</span>
+
+<span class="c1"># Define the layer 2 weights
+</span><span class="n">w2</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">(</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">([</span><span class="mi">7</span><span class="p">,</span> <span class="mi">1</span><span class="p">]))</span>
+
+<span class="c1"># Define the layer 2 bias
+</span><span class="n">b2</span> <span class="o">=</span> <span class="n">Variable</span><span class="p">((</span><span class="mi">0</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Variable(random.normal([7, 1]))
+&lt;tf.Variable 'Variable:0' shape=(7, 1) dtype=float32, numpy=
+array([[ 0.654808  ],
+       [ 0.05108023],
+       [-0.4015795 ],
+       [ 0.17105988],
+       [-0.71988714],
+       [ 1.8440487 ],
+       [-0.0194056 ]], dtype=float32)&gt;
+
+</code></pre></div></div>
+
+<p>Excellent work! In the next exercise, you will start where we’ve ended and will finish constructing the neural network.</p>
+
+<h3 id="342-defining-the-model-and-loss-function"><strong>3.4.2 Defining the model and loss function</strong></h3>
+
+<p>In this exercise, you will train a neural network to predict whether a credit card holder will default. The features and targets you will use to train your network are available in the Python shell as
+ <code class="language-plaintext highlighter-rouge">borrower_features</code>
+ and
+ <code class="language-plaintext highlighter-rouge">default</code>
+ . You defined the weights and biases in the previous exercise.</p>
+
+<p>Note that the
+ <code class="language-plaintext highlighter-rouge">predictions</code>
+ layer is defined as σ(layer1∗w2+b2)σ(layer1∗w2+b2), where σσ is the sigmoid activation,
+ <code class="language-plaintext highlighter-rouge">layer1</code>
+ is a tensor of nodes for the first hidden dense layer,
+ <code class="language-plaintext highlighter-rouge">w2</code>
+ is a tensor of weights, and
+ <code class="language-plaintext highlighter-rouge">b2</code>
+ is the bias tensor.</p>
+
+<p>The trainable variables are
+ <code class="language-plaintext highlighter-rouge">w1</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">b1</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">w2</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">b2</code>
+ . Additionally, the following operations have been imported for you:
+ <code class="language-plaintext highlighter-rouge">keras.activations.relu()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">keras.layers.Dropout()</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define the model
+</span><span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">features</span> <span class="o">=</span> <span class="n">borrower_features</span><span class="p">):</span>
+	<span class="c1"># Apply relu activation functions to layer 1
+</span>	<span class="n">layer1</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">activations</span><span class="p">.</span><span class="n">relu</span><span class="p">(</span><span class="n">matmul</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">w1</span><span class="p">)</span> <span class="o">+</span> <span class="n">b1</span><span class="p">)</span>
+    <span class="c1"># Apply dropout
+</span>	<span class="n">dropout</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)(</span><span class="n">layer1</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">keras</span><span class="p">.</span><span class="n">activations</span><span class="p">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">matmul</span><span class="p">(</span><span class="n">dropout</span><span class="p">,</span> <span class="n">w2</span><span class="p">)</span> <span class="o">+</span> <span class="n">b2</span><span class="p">)</span>
+
+<span class="c1"># Define the loss function
+</span><span class="k">def</span> <span class="nf">loss_function</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">features</span> <span class="o">=</span> <span class="n">borrower_features</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">default</span><span class="p">):</span>
+	<span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="n">b2</span><span class="p">)</span>
+	<span class="c1"># Pass targets and predictions to the cross entropy loss
+</span>	<span class="k">return</span> <span class="n">keras</span><span class="p">.</span><span class="n">losses</span><span class="p">.</span><span class="n">binary_crossentropy</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Nice work! One of the benefits of using
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ is that you have the option to customize models down to the linear algebraic-level, as we’ve shown in the last two exercises. If you print
+ <code class="language-plaintext highlighter-rouge">w1</code>
+ , you can see that the objects we’re working with are simply tensors.</p>
+
+<h3 id="343-training-neural-networks-with-tensorflow"><strong>3.4.3 Training neural networks with TensorFlow</strong></h3>
+
+<p>In the previous exercise, you defined a model,
+ <code class="language-plaintext highlighter-rouge">model(w1, b1, w2, b2, features)</code>
+ , and a loss function,
+ <code class="language-plaintext highlighter-rouge">loss_function(w1, b1, w2, b2, features, targets)</code>
+ , both of which are available to you in this exercise. You will now train the model and then evaluate its performance by predicting default outcomes in a test set, which consists of
+ <code class="language-plaintext highlighter-rouge">test_features</code>
+ and
+ <code class="language-plaintext highlighter-rouge">test_targets</code>
+ and is available to you. The trainable variables are
+ <code class="language-plaintext highlighter-rouge">w1</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">b1</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">w2</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">b2</code>
+ . Additionally, the following operations have been imported for you:
+ <code class="language-plaintext highlighter-rouge">keras.activations.relu()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">keras.layers.Dropout()</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Train the model
+</span><span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="c1"># Complete the optimizer
+</span>	<span class="n">opt</span><span class="p">.</span><span class="n">minimize</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="n">b2</span><span class="p">),</span>
+                 <span class="n">var_list</span><span class="o">=</span><span class="p">[</span><span class="n">w1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="n">b2</span><span class="p">])</span>
+
+<span class="c1"># Make predictions with model
+</span><span class="n">model_predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">w1</span><span class="p">,</span> <span class="n">b1</span><span class="p">,</span> <span class="n">w2</span><span class="p">,</span> <span class="n">b2</span><span class="p">,</span> <span class="n">test_features</span><span class="p">)</span>
+
+<span class="c1"># Construct the confusion matrix
+</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">test_targets</span><span class="p">,</span> <span class="n">model_predictions</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/9-17.png?w=1024" alt="Desktop View" /></p>
+
+<p>Nice work! The diagram shown is called a “confusion matrix.” The diagonal elements show the number of correct predictions. The off-diagonal elements show the number of incorrect predictions. We can see that the model performs reasonably-well, but does so by overpredicting non-default. This suggests that we may need to train longer, tune the model’s hyperparameters, or change the model’s architecture.</p>
+
+<h1 id="4-high-level-apis"><strong>4. High Level APIs</strong></h1>
+<hr />
+
+<h2 id="41-defining-neural-networks-with-keras"><strong>4.1 Defining neural networks with Keras</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/10-17.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/11-17.png?w=561" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/12-17.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/13-16.png?w=857" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/14-15.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/15-15.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="411-the-sequential-model-in-keras"><strong>4.1.1 The sequential model in Keras</strong></h3>
+
+<p>In chapter 3, we used components of the
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ API in
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ to define a neural network, but we stopped short of using its full capabilities to streamline model definition and training. In this exercise, you will use the
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ sequential model API to define a neural network that can be used to classify images of sign language letters. You will also use the
+ <code class="language-plaintext highlighter-rouge">.summary()</code>
+ method to print the model’s architecture, including the shape and number of parameters associated with each layer.</p>
+
+<p>Note that the images were reshaped from (28, 28) to (784,), so that they could be used as inputs to a dense layer. Additionally, note that
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ has been imported from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ for you.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define a Keras sequential model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Define the first dense layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">784</span><span class="p">,)))</span>
+
+<span class="c1"># Define the second dense layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+
+<span class="c1"># Define the output layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Print the model architecture
+</span><span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Model: "sequential"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+dense (Dense)                (None, 16)                12560
+_________________________________________________________________
+dense_1 (Dense)              (None, 8)                 136
+_________________________________________________________________
+dense_2 (Dense)              (None, 4)                 36
+=================================================================
+Total params: 12,732
+Trainable params: 12,732
+Non-trainable params: 0
+_________________________________________________________________
+None
+
+</code></pre></div></div>
+
+<p>Excellent work! Notice that we’ve defined a model, but we haven’t compiled it. The compilation step in
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ allows us to set the optimizer, loss function, and other useful training parameters in a single line of code. Furthermore, the
+ <code class="language-plaintext highlighter-rouge">.summary()</code>
+ method allows us to view the model’s architecture.</p>
+
+<h3 id="412-compiling-a-sequential-model"><strong>4.1.2 Compiling a sequential model</strong></h3>
+
+<p>In this exercise, you will work towards classifying letters from the Sign Language MNIST dataset; however, you will adopt a different network architecture than what you used in the previous exercise. There will be fewer layers, but more nodes. You will also apply dropout to prevent overfitting. Finally, you will compile the model to use the
+ <code class="language-plaintext highlighter-rouge">adam</code>
+ optimizer and the
+ <code class="language-plaintext highlighter-rouge">categorical_crossentropy</code>
+ loss. You will also use a method in
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ to summarize your model’s architecture. Note that
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ has been imported from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ for you and a sequential
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ model has been defined as
+ <code class="language-plaintext highlighter-rouge">model</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define the first dense layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">784</span><span class="p">,)))</span>
+
+<span class="c1"># Apply dropout to the first layer's output
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.25</span><span class="p">))</span>
+
+<span class="c1"># Define the output layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Compile the model
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="s">'adam'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">)</span>
+
+<span class="c1"># Print a model summary
+</span><span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Model: "sequential"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+dense (Dense)                (None, 16)                12560
+_________________________________________________________________
+dense_1 (Dense)              (None, 16)                272
+_________________________________________________________________
+dropout (Dropout)            (None, 16)                0
+_________________________________________________________________
+dense_2 (Dense)              (None, 4)                 68
+=================================================================
+Total params: 12,900
+Trainable params: 12,900
+Non-trainable params: 0
+_________________________________________________________________
+None
+
+</code></pre></div></div>
+
+<p>Great work! You’ve now defined and compiled a neural network using the
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ sequential model. Notice that printing the
+ <code class="language-plaintext highlighter-rouge">.summary()</code>
+ method shows the layer type, output shape, and number of parameters of each layer.</p>
+
+<h3 id="413-defining-a-multiple-input-model"><strong>4.1.3 Defining a multiple input model</strong></h3>
+
+<p>In some cases, the sequential API will not be sufficiently flexible to accommodate your desired model architecture and you will need to use the functional API instead. If, for instance, you want to train two models with different architectures jointly, you will need to use the functional API to do this. In this exercise, we will see how to do this. We will also use the
+ <code class="language-plaintext highlighter-rouge">.summary()</code>
+ method to examine the joint model’s architecture.</p>
+
+<p>Note that
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ has been imported from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ for you. Additionally, the input layers of the first and second models have been defined as
+ <code class="language-plaintext highlighter-rouge">m1_inputs</code>
+ and
+ <code class="language-plaintext highlighter-rouge">m2_inputs</code>
+ , respectively. Note that the two models have the same architecture, but one of them uses a
+ <code class="language-plaintext highlighter-rouge">sigmoid</code>
+ activation in the first layer and the other uses a
+ <code class="language-plaintext highlighter-rouge">relu</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># For model 1, pass the input layer to layer 1 and layer 1 to layer 2
+</span><span class="n">m1_layer1</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)(</span><span class="n">m1_inputs</span><span class="p">)</span>
+<span class="n">m1_layer2</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">)(</span><span class="n">m1_layer1</span><span class="p">)</span>
+
+<span class="c1"># For model 2, pass the input layer to layer 1 and layer 1 to layer 2
+</span><span class="n">m2_layer1</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">)(</span><span class="n">m2_inputs</span><span class="p">)</span>
+<span class="n">m2_layer2</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">)(</span><span class="n">m2_layer1</span><span class="p">)</span>
+
+<span class="c1"># Merge model outputs and define a functional model
+</span><span class="n">merged</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">add</span><span class="p">([</span><span class="n">m1_layer2</span><span class="p">,</span> <span class="n">m2_layer2</span><span class="p">])</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">Model</span><span class="p">(</span><span class="n">inputs</span><span class="o">=</span><span class="p">[</span><span class="n">m1_inputs</span><span class="p">,</span> <span class="n">m2_inputs</span><span class="p">],</span> <span class="n">outputs</span><span class="o">=</span><span class="n">merged</span><span class="p">)</span>
+
+<span class="c1"># Print a model summary
+</span><span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Model: "model"
+__________________________________________________________________________________________________
+Layer (type)                    Output Shape         Param #     Connected to
+==================================================================================================
+input_1 (InputLayer)            [(None, 784)]        0
+__________________________________________________________________________________________________
+input_2 (InputLayer)            [(None, 784)]        0
+__________________________________________________________________________________________________
+dense (Dense)                   (None, 12)           9420        input_1[0][0]
+__________________________________________________________________________________________________
+dense_2 (Dense)                 (None, 12)           9420        input_2[0][0]
+__________________________________________________________________________________________________
+dense_1 (Dense)                 (None, 4)            52          dense[0][0]
+__________________________________________________________________________________________________
+dense_3 (Dense)                 (None, 4)            52          dense_2[0][0]
+__________________________________________________________________________________________________
+add (Add)                       (None, 4)            0           dense_1[0][0]
+                                                                 dense_3[0][0]
+==================================================================================================
+Total params: 18,944
+Trainable params: 18,944
+Non-trainable params: 0
+__________________________________________________________________________________________________
+None
+
+</code></pre></div></div>
+
+<p>Nice work! Notice that the
+ <code class="language-plaintext highlighter-rouge">.summary()</code>
+ method yields a new column:
+ <code class="language-plaintext highlighter-rouge">connected to</code>
+ . This column tells you how layers connect to each other within the network. We can see that
+ <code class="language-plaintext highlighter-rouge">dense_2</code>
+ , for instance, is connected to the
+ <code class="language-plaintext highlighter-rouge">input_2</code>
+ layer. We can also see that the
+ <code class="language-plaintext highlighter-rouge">add</code>
+ layer, which merged the two models, connected to both
+ <code class="language-plaintext highlighter-rouge">dense_1</code>
+ and
+ <code class="language-plaintext highlighter-rouge">dense_3</code>
+ .</p>
+
+<hr />
+
+<h2 id="42-training-and-validation-with-keras"><strong>4.2 Training and validation with Keras</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/16-14.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/17-11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/18-9.png?w=957" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/19-8.png?w=537" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/20-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/21-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/22-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/23-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/24-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/25-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/26-3.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="421-training-with-keras"><strong>4.2.1 Training with Keras</strong></h3>
+
+<p>In this exercise, we return to our sign language letter classification problem. We have 2000 images of four letters–A, B, C, and D–and we want to classify them with a high level of accuracy. We will complete all parts of the problem, including the model definition, compilation, and training.</p>
+
+<p>Note that
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ has been imported from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ for you. Additionally, the features are available as
+ <code class="language-plaintext highlighter-rouge">sign_language_features</code>
+ and the targets are available as
+ <code class="language-plaintext highlighter-rouge">sign_language_labels</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define a sequential model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Define a hidden layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">784</span><span class="p">,)))</span>
+
+<span class="c1"># Define the output layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Compile the model
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="s">'SGD'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">)</span>
+
+<span class="c1"># Complete the fitting operation
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">sign_language_features</span><span class="p">,</span> <span class="n">sign_language_labels</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Train on 1999 samples
+Epoch 1/5
+
+  32/1999 [..............................] - ETA: 29s - loss: 1.6657
+...
+Epoch 5/5
+...
+1999/1999 [==============================] - 0s 92us/sample - loss: 0.4493
+
+</code></pre></div></div>
+
+<p>Great work! You probably noticed that your only measure of performance improvement was the value of the loss function in the training sample, which is not particularly informative. You will improve on this in the next exercise.</p>
+
+<h3 id="422-metrics-and-validation-with-keras"><strong>4.2.2 Metrics and validation with Keras</strong></h3>
+
+<p>We trained a model to predict sign language letters in the previous exercise, but it is unclear how successful we were in doing so. In this exercise, we will try to improve upon the interpretability of our results. Since we did not use a validation split, we only observed performance improvements within the training set; however, it is unclear how much of that was due to overfitting. Furthermore, since we did not supply a metric, we only saw decreases in the loss function, which do not have any clear interpretation.</p>
+
+<p>Note that
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ has been imported for you from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define sequential model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Define the first layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">784</span><span class="p">,)))</span>
+
+<span class="c1"># Add activation function to classifier
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Set the optimizer, loss function, and metrics
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'RMSprop'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># Add the number of epochs and the validation split
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">sign_language_features</span><span class="p">,</span> <span class="n">sign_language_labels</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Train on 1799 samples, validate on 200 samples
+Epoch 1/10
+
+  32/1799 [..............................] - ETA: 43s - loss: 1.6457 - accuracy: 0.2500
+...
+
+Epoch 10/10
+...
+1799/1799 [==============================] - 0s 119us/sample - loss: 0.1381 - accuracy: 0.9772 - val_loss: 0.1356 - val_accuracy: 0.9700
+
+</code></pre></div></div>
+
+<p>Nice work! With the
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ API, you only needed 14 lines of code to define, compile, train, and validate a model. You may have noticed that your model performed quite well. In just 10 epochs, we achieved a classification accuracy of around 98% in the validation sample!</p>
+
+<h3 id="423-overfitting-detection"><strong>4.2.3 Overfitting detection</strong></h3>
+
+<p>In this exercise, we’ll work with a small subset of the examples from the original sign language letters dataset. A small sample, coupled with a heavily-parameterized model, will generally lead to overfitting. This means that your model will simply memorize the class of each example, rather than identifying features that generalize to many examples.</p>
+
+<p>You will detect overfitting by checking whether the validation sample loss is substantially higher than the training sample loss and whether it increases with further training. With a small sample and a high learning rate, the model will struggle to converge on an optimum. You will set a low learning rate for the optimizer, which will make it easier to identify overfitting.</p>
+
+<p>Note that
+ <code class="language-plaintext highlighter-rouge">keras</code>
+ has been imported from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define sequential model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Define the first layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">784</span><span class="p">,)))</span>
+
+<span class="c1"># Add activation function to classifier
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Finish the model compilation
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">),</span>
+              <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># Complete the model fit operation
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">sign_language_features</span><span class="p">,</span> <span class="n">sign_language_labels</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Train on 25 samples, validate on 25 samples
+Epoch 1/200
+
+25/25 [==============================] - 1s 37ms/sample - loss: 1.5469 - accuracy: 0.2000 - val_loss: 48.8668 - val_accuracy: 0.2400
+...
+Epoch 200/200
+
+25/25 [==============================] - 0s 669us/sample - loss: 0.0068 - accuracy: 1.0000 - val_loss: 0.5236 - val_accuracy: 0.8400
+
+</code></pre></div></div>
+
+<p>Excellent work! You may have noticed that the validation loss,
+ <code class="language-plaintext highlighter-rouge">val_loss</code>
+ , was substantially higher than the training loss,
+ <code class="language-plaintext highlighter-rouge">loss</code>
+ . Furthermore, if
+ <code class="language-plaintext highlighter-rouge">val_loss</code>
+ started to increase before the training process was terminated, then we may have overfitted. When this happens, you will want to try decreasing the number of epochs.</p>
+
+<h3 id="424-evaluating-models"><strong>4.2.4 Evaluating models</strong></h3>
+
+<p>Two models have been trained and are available:
+ <code class="language-plaintext highlighter-rouge">large_model</code>
+ , which has many parameters; and
+ <code class="language-plaintext highlighter-rouge">small_model</code>
+ , which has fewer parameters. Both models have been trained using
+ <code class="language-plaintext highlighter-rouge">train_features</code>
+ and
+ <code class="language-plaintext highlighter-rouge">train_labels</code>
+ , which are available to you. A separate test set, which consists of
+ <code class="language-plaintext highlighter-rouge">test_features</code>
+ and
+ <code class="language-plaintext highlighter-rouge">test_labels</code>
+ , is also available.</p>
+
+<p>Your goal is to evaluate relative model performance and also determine whether either model exhibits signs of overfitting. You will do this by evaluating
+ <code class="language-plaintext highlighter-rouge">large_model</code>
+ and
+ <code class="language-plaintext highlighter-rouge">small_model</code>
+ on both the train and test sets. For each model, you can do this by applying the
+ <code class="language-plaintext highlighter-rouge">.evaluate(x, y)</code>
+ method to compute the loss for features
+ <code class="language-plaintext highlighter-rouge">x</code>
+ and labels
+ <code class="language-plaintext highlighter-rouge">y</code>
+ . You will then compare the four losses generated.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Evaluate the small model using the train data
+</span><span class="n">small_train</span> <span class="o">=</span> <span class="n">small_model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">train_features</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">)</span>
+
+<span class="c1"># Evaluate the small model using the test data
+</span><span class="n">small_test</span> <span class="o">=</span> <span class="n">small_model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_features</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">)</span>
+
+<span class="c1"># Evaluate the large model using the train data
+</span><span class="n">large_train</span> <span class="o">=</span> <span class="n">large_model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">train_features</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">)</span>
+
+<span class="c1"># Evaluate the large model using the test data
+</span><span class="n">large_test</span> <span class="o">=</span> <span class="n">large_model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_features</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">)</span>
+
+<span class="c1"># Print losses
+</span><span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s"> Small - Train: {}, Test: {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">small_train</span><span class="p">,</span> <span class="n">small_test</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Large - Train: {}, Test: {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">large_train</span><span class="p">,</span> <span class="n">large_test</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Small - Train: 0.7137059640884399, Test: 0.8472499084472657
+Large - Train: 0.036491363495588305, Test: 0.1792870020866394
+
+</code></pre></div></div>
+
+<p>Great job! Notice that the gap between the test and train set losses is substantially higher for
+ <code class="language-plaintext highlighter-rouge">large_model</code>
+ , suggesting that overfitting may be an issue. Furthermore, both test and train set performance is better for
+ <code class="language-plaintext highlighter-rouge">large_model</code>
+ . This suggests that we may want to use
+ <code class="language-plaintext highlighter-rouge">large_model</code>
+ , but reduce the number of training epochs.</p>
+
+<hr />
+
+<h2 id="43-training-models-with-the-estimators-api"><strong>4.3 Training models with the Estimators API</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/1-21.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/2-21.png?w=938" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/3-20.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/4-20.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/5-20.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/6-20.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/7-20.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="431-preparing-to-train-with-estimators"><strong>4.3.1 Preparing to train with Estimators</strong></h3>
+
+<p>For this exercise, we’ll return to the King County housing transaction dataset from chapter 2. We will again develop and train a machine learning model to predict house prices; however, this time, we’ll do it using the
+ <code class="language-plaintext highlighter-rouge">estimator</code>
+ API.</p>
+
+<p>Rather than completing everything in one step, we’ll break this procedure down into parts. We’ll begin by defining the feature columns and loading the data. In the next exercise, we’ll define and train a premade
+ <code class="language-plaintext highlighter-rouge">estimator</code>
+ . Note that
+ <code class="language-plaintext highlighter-rouge">feature_column</code>
+ has been imported for you from
+ <code class="language-plaintext highlighter-rouge">tensorflow</code>
+ . Additionally,
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ has been imported as
+ <code class="language-plaintext highlighter-rouge">np</code>
+ , and the Kings County housing dataset is available as a
+ <code class="language-plaintext highlighter-rouge">pandas</code>
+<code class="language-plaintext highlighter-rouge">DataFrame</code>
+ :
+ <code class="language-plaintext highlighter-rouge">housing</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+housing.columns
+Index(['id', 'date', 'price', 'bedrooms', 'bathrooms', 'sqft_living', 'sqft_lot', 'floors', 'waterfront', 'view', 'condition', 'grade', 'sqft_above', 'sqft_basement', 'yr_built', 'yr_renovated',
+       'zipcode', 'lat', 'long', 'sqft_living15', 'sqft_lot15'],
+      dtype='object')
+
+housing.shape
+(21613, 21)
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define feature columns for bedrooms and bathrooms
+</span><span class="n">bedrooms</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">numeric_column</span><span class="p">(</span><span class="s">"bedrooms"</span><span class="p">)</span>
+<span class="n">bathrooms</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">numeric_column</span><span class="p">(</span><span class="s">"bathrooms"</span><span class="p">)</span>
+
+<span class="c1"># Define the list of feature columns
+</span><span class="n">feature_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">bedrooms</span><span class="p">,</span> <span class="n">bathrooms</span><span class="p">]</span>
+
+<span class="k">def</span> <span class="nf">input_fn</span><span class="p">():</span>
+	<span class="c1"># Define the labels
+</span>	<span class="n">labels</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">housing</span><span class="p">[</span><span class="s">'price'</span><span class="p">])</span>
+	<span class="c1"># Define the features
+</span>	<span class="n">features</span> <span class="o">=</span> <span class="p">{</span><span class="s">'bedrooms'</span><span class="p">:</span><span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">housing</span><span class="p">[</span><span class="s">'bedrooms'</span><span class="p">]),</span>
+                <span class="s">'bathrooms'</span><span class="p">:</span><span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">housing</span><span class="p">[</span><span class="s">'bathrooms'</span><span class="p">])}</span>
+	<span class="k">return</span> <span class="n">features</span><span class="p">,</span> <span class="n">labels</span>
+
+</code></pre></div></div>
+
+<p>Excellent work! In the next exercise, we’ll use the feature columns and data input function to define and train an estimator.</p>
+
+<h3 id="432-defining-estimators"><strong>4.3.2 Defining Estimators</strong></h3>
+
+<p>In the previous exercise, you defined a list of feature columns,
+ <code class="language-plaintext highlighter-rouge">feature_list</code>
+ , and a data input function,
+ <code class="language-plaintext highlighter-rouge">input_fn()</code>
+ . In this exercise, you will build on that work by defining an
+ <code class="language-plaintext highlighter-rouge">estimator</code>
+ that makes use of input data.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define the model and set the number of steps
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">estimator</span><span class="p">.</span><span class="n">DNNRegressor</span><span class="p">(</span><span class="n">feature_columns</span><span class="o">=</span><span class="n">feature_list</span><span class="p">,</span> <span class="n">hidden_units</span><span class="o">=</span><span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="n">model</span><span class="p">.</span><span class="n">train</span><span class="p">(</span><span class="n">input_fn</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+INFO:tensorflow:Using default config.
+WARNING:tensorflow:Using temporary folder as model directory: /tmp/tmpwdsztbla
+INFO:tensorflow:Using config: {'_model_dir': '/tmp/tmpwdsztbla', '_tf_random_seed': None, '_save_summary_steps': 100, '_save_checkpoints_steps': None, '_save_checkpoints_secs': 600, '_session_config': allow_soft_placement: true
+graph_options {
+  rewrite_options {
+    meta_optimizer_iterations: ONE
+  }
+}
+, '_keep_checkpoint_max': 5, '_keep_checkpoint_every_n_hours': 10000, '_log_step_count_steps': 100, '_train_distribute': None, '_device_fn': None, '_protocol': None, '_eval_distribute': None, '_experimental_distribute': None, '_experimental_max_worker_delay_secs': None, '_session_creation_timeout_secs': 7200, '_service': None, '_cluster_spec': ClusterSpec({}), '_task_type': 'worker', '_task_id': 0, '_global_id_in_cluster': 0, '_master': '', '_evaluation_master': '', '_is_chief': True, '_num_ps_replicas': 0, '_num_worker_replicas': 1}
+WARNING:tensorflow:From /usr/local/lib/python3.6/dist-packages/tensorflow_core/python/ops/resource_variable_ops.py:1635: calling BaseResourceVariable.__init__ (from tensorflow.python.ops.resource_variable_ops) with constraint is deprecated and will be removed in a future version.
+Instructions for updating:
+If using Keras pass *_constraint arguments to layers.
+WARNING:tensorflow:From /usr/local/lib/python3.6/dist-packages/tensorflow_core/python/training/training_util.py:236: Variable.initialized_value (from tensorflow.python.ops.variables) is deprecated and will be removed in a future version.
+Instructions for updating:
+Use Variable.read_value. Variables in 2.X are initialized automatically both in eager and graph (inside tf.defun) contexts.
+INFO:tensorflow:Calling model_fn.
+WARNING:tensorflow:Layer dnn is casting an input tensor from dtype float64 to the layer's dtype of float32, which is new behavior in TensorFlow 2.  The layer has dtype float32 because it's dtype defaults to floatx.
+
+If you intended to run this layer in float32, you can safely ignore this warning. If in doubt, this warning is likely only an issue if you are porting a TensorFlow 1.X model to TensorFlow 2.
+
+To change all layers to have dtype float64 by default, call `tf.keras.backend.set_floatx('float64')`. To change just this layer, pass dtype='float64' to the layer constructor. If you are the author of this layer, you can disable autocasting by passing autocast=False to the base Layer constructor.
+
+WARNING:tensorflow:From /usr/local/lib/python3.6/dist-packages/tensorflow_core/python/keras/optimizer_v2/adagrad.py:103: calling Constant.__init__ (from tensorflow.python.ops.init_ops) with dtype is deprecated and will be removed in a future version.
+Instructions for updating:
+Call initializer instance with the dtype argument instead of passing it to the constructor
+INFO:tensorflow:Done calling model_fn.
+INFO:tensorflow:Create CheckpointSaverHook.
+INFO:tensorflow:Graph was finalized.
+INFO:tensorflow:Running local_init_op.
+INFO:tensorflow:Done running local_init_op.
+INFO:tensorflow:Saving checkpoints for 0 into /tmp/tmpwdsztbla/model.ckpt.
+INFO:tensorflow:loss = 426469720000.0, step = 0
+INFO:tensorflow:Saving checkpoints for 1 into /tmp/tmpwdsztbla/model.ckpt.
+INFO:tensorflow:Loss for final step: 426469720000.0.
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define the model and set the number of steps
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">estimator</span><span class="p">.</span><span class="n">LinearRegressor</span><span class="p">(</span><span class="n">feature_columns</span><span class="o">=</span><span class="n">feature_list</span><span class="p">)</span>
+<span class="n">model</span><span class="p">.</span><span class="n">train</span><span class="p">(</span><span class="n">input_fn</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Great work! Note that you have other premade
+ <code class="language-plaintext highlighter-rouge">estimator</code>
+ options, such as
+ <code class="language-plaintext highlighter-rouge">BoostedTreesRegressor()</code>
+ , and can also create your own custom estimators.</p>
+
+<hr />
+
+<p>###
+<strong>Congratulations!</strong></p>
+
+<p><img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/8-20.png?w=710" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/9-18.png?w=553" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/10-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-tensorflow-in-python/11-18.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

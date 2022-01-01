@@ -1,0 +1,902 @@
+<h1 id="statistical-thinking-in-python-part-1">Statistical Thinking in Python (Part 1)</h1>
+
+<p>This is the memo of the 1st course (5 courses in all) of ‘Statistics Fundamentals with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/statistical-thinking-in-python-part-1">HERE</a></strong>
+ .</p>
+
+<p>###
+<strong>Table of contents</strong></p>
+
+<ol>
+  <li>Graphical exploratory data analysis</li>
+  <li>Quantitative exploratory data analysis</li>
+  <li>Thinking probabilistically– Discrete variables</li>
+  <li>Thinking probabilistically– Continuous variables</li>
+</ol>
+
+<h1 id="1-graphical-exploratory-data-analysis"><strong>1. Graphical exploratory data analysis</strong></h1>
+<hr />
+
+<p>###
+ Introduction to exploratory data analysis</p>
+
+<p>####
+ Tukey’s comments on EDA</p>
+
+<ul>
+  <li>Exploratory data analysis is detective work.</li>
+  <li>There is no excuse for failing to plot and look.</li>
+  <li>The greatest value of a picture is that it forces us to notice what we never expected to see.</li>
+  <li>It is important to understand what you can do before you learn how to measure how well you seem to have done it.</li>
+</ul>
+
+<p>####
+ Advantages of graphical EDA</p>
+
+<ul>
+  <li>It often involves converting tabular data into graphical form.</li>
+  <li>If done well, graphical representations can allow for more rapid interpretation of data.</li>
+  <li>There is no excuse for neglecting to do graphical EDA.</li>
+</ul>
+
+<p>###
+ Plotting a histogram</p>
+
+<p>####
+ Plotting a histogram of iris data</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+versicolor_petal_length
+array([4.7, 4.5, 4.9, 4. , 4.6, 4.5, 4.7, 3.3, 4.6, 3.9, 3.5, 4.2, 4. ,
+       4.7, 3.6, 4.4, 4.5, 4.1, 4.5, 3.9, 4.8, 4. , 4.9, 4.7, 4.3, 4.4,
+       4.8, 5. , 4.5, 3.5, 3.8, 3.7, 3.9, 5.1, 4.5, 4.5, 4.7, 4.4, 4.1,
+       4. , 4.4, 4.6, 4. , 3.3, 4.2, 4.2, 4.2, 4.3, 3. , 4.1])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import plotting modules
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+
+<span class="c1"># Set default Seaborn style
+</span><span class="n">sns</span><span class="p">.</span><span class="nb">set</span><span class="p">()</span>
+
+<span class="c1"># Plot histogram of versicolor petal lengths
+</span><span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">)</span>
+
+<span class="c1"># Show histogram
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture-12.png" alt="Desktop View" /></p>
+
+<p>####
+ Axis labels!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot histogram of versicolor petal lengths
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">)</span>
+
+<span class="c1"># Label axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'petal length (cm)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'count'</span><span class="p">)</span>
+
+<span class="c1"># Show histogram
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture1-11.png" alt="Desktop View" /></p>
+
+<p>####
+ Adjusting the number of bins in a histogram</p>
+
+<p>The “square root rule” is a commonly-used rule of thumb for choosing number of bins: choose the number of bins to be the square root of the number of samples.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import numpy
+</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="c1"># Compute number of data points: n_data
+</span><span class="n">n_data</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">)</span>
+
+<span class="c1"># Number of bins is the square root of number of data points: n_bins
+</span><span class="n">n_bins</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">n_data</span><span class="p">)</span>
+
+<span class="c1"># Convert number of bins to integer: n_bins
+</span><span class="n">n_bins</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">n_bins</span><span class="p">)</span>
+
+<span class="c1"># Plot the histogram
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">n_bins</span><span class="p">)</span>
+
+<span class="c1"># Label axes
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'petal length (cm)'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'count'</span><span class="p">)</span>
+
+<span class="c1"># Show histogram
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture2-10.png" alt="Desktop View" /></p>
+
+<p>###
+ Plotting all of your data: Bee swarm plots</p>
+
+<p>####
+ Bee swarm plot</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create bee swarm plot with Seaborn's default settings
+</span><span class="n">sns</span><span class="p">.</span><span class="n">swarmplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'species'</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="s">'petal length (cm)'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'species'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'petal length (cm)'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture3-9.png" alt="Desktop View" /></p>
+
+<p>####
+ Interpreting a bee swarm plot</p>
+
+<p><em>I. virginica</em>
+ petals tend to be the longest, and
+ <em>I. setosa</em>
+ petals tend to be the shortest of the three species.</p>
+
+<p>###
+ Plotting all of your data: Empirical cumulative distribution functions (ECDF)</p>
+
+<p>####
+ Computing the ECDF</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def ecdf(data):
+    """Compute ECDF for a one-dimensional array of measurements."""
+    # Number of data points: n
+    n = len(data)
+
+    # x-data for the ECDF: x
+    x = np.sort(data)
+
+    # y-data for the ECDF: y
+    y = np.arange(1, n + 1) / n
+
+    return x, y
+
+</code></pre></div></div>
+
+<p>####
+ Plotting the ECDF</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute ECDF for versicolor data: x_vers, y_vers
+</span><span class="n">x_vers</span><span class="p">,</span> <span class="n">y_vers</span> <span class="o">=</span> <span class="n">ecdf</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">)</span>
+
+<span class="c1"># Generate plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_vers</span><span class="p">,</span> <span class="n">y_vers</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span> <span class="o">=</span> <span class="s">'none'</span><span class="p">)</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'petal length (cm)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'ECDF'</span><span class="p">)</span>
+
+<span class="c1"># Display the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture4-9.png" alt="Desktop View" /></p>
+
+<p>####
+ Comparison of ECDFs</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute ECDFs
+</span><span class="n">x_set</span><span class="p">,</span> <span class="n">y_set</span> <span class="o">=</span> <span class="n">ecdf</span><span class="p">(</span><span class="n">setosa_petal_length</span><span class="p">)</span>
+<span class="n">x_vers</span><span class="p">,</span> <span class="n">y_vers</span> <span class="o">=</span> <span class="n">ecdf</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">)</span>
+<span class="n">x_virg</span><span class="p">,</span> <span class="n">y_virg</span> <span class="o">=</span> <span class="n">ecdf</span><span class="p">(</span><span class="n">virginica_petal_length</span><span class="p">)</span>
+
+<span class="c1"># Plot all ECDFs on the same plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_set</span><span class="p">,</span> <span class="n">y_set</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span> <span class="o">=</span> <span class="s">'none'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_vers</span><span class="p">,</span> <span class="n">y_vers</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span> <span class="o">=</span> <span class="s">'none'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_virg</span><span class="p">,</span> <span class="n">y_virg</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span> <span class="o">=</span> <span class="s">'none'</span><span class="p">)</span>
+
+
+<span class="c1"># Annotate the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">((</span><span class="s">'setosa'</span><span class="p">,</span> <span class="s">'versicolor'</span><span class="p">,</span> <span class="s">'virginica'</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s">'lower right'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'petal length (cm)'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'ECDF'</span><span class="p">)</span>
+
+<span class="c1"># Display the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture5-7.png" alt="Desktop View" /></p>
+
+<h1 id="2-quantitative-exploratory-data-analysis"><strong>2. Quantitative exploratory data analysis</strong></h1>
+<hr />
+
+<p>###
+ Introduction to summary statistics: The sample mean and median</p>
+
+<p>####
+ Means and medians</p>
+
+<p>An outlier can significantly affect the value of the mean, but not the median.</p>
+
+<p>####
+ Computing means</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the mean: mean_length_vers
+</span><span class="n">mean_length_vers</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">)</span>
+
+<span class="c1"># Print the result with some nice formatting
+</span><span class="k">print</span><span class="p">(</span><span class="s">'I. versicolor:'</span><span class="p">,</span> <span class="n">mean_length_vers</span><span class="p">,</span> <span class="s">'cm'</span><span class="p">)</span>
+<span class="n">I</span><span class="p">.</span> <span class="n">versicolor</span><span class="p">:</span> <span class="mf">4.26</span> <span class="n">cm</span>
+
+</code></pre></div></div>
+
+<p>###
+ Percentiles, outliers, and box plots</p>
+
+<p>####
+ Computing percentiles</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Specify array of percentiles: percentiles
+</span><span class="n">percentiles</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+
+<span class="c1"># Compute percentiles: ptiles_vers
+</span><span class="n">ptiles_vers</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">,</span> <span class="n">percentiles</span><span class="p">)</span>
+
+<span class="c1"># Print the result
+</span><span class="k">print</span><span class="p">(</span><span class="n">ptiles_vers</span><span class="p">)</span>
+<span class="p">[</span><span class="mf">3.3</span>    <span class="mf">4.</span>     <span class="mf">4.35</span>   <span class="mf">4.6</span>    <span class="mf">4.9775</span><span class="p">]</span>
+
+</code></pre></div></div>
+
+<p>####
+ Comparing percentiles to ECDF</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the ECDF
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_vers</span><span class="p">,</span> <span class="n">y_vers</span><span class="p">,</span> <span class="s">'.'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'petal length (cm)'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'ECDF'</span><span class="p">)</span>
+
+<span class="c1"># Overlay percentiles as red diamonds.
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ptiles_vers</span><span class="p">,</span> <span class="n">percentiles</span><span class="o">/</span><span class="mi">100</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'D'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">,</span>
+         <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture-13.png" alt="Desktop View" /></p>
+
+<p>####
+ Box-and-whisker plot</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create box plot with Seaborn's default settings
+</span><span class="n">sns</span><span class="p">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'species'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'petal length (cm)'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'species'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'petal length (cm)'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture1-12.png" alt="Desktop View" /></p>
+
+<p>###
+ Variance and standard deviation</p>
+
+<p>####
+ Computing the variance</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Array of differences to mean: differences
+</span><span class="n">differences</span> <span class="o">=</span> <span class="n">versicolor_petal_length</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">)</span>
+
+<span class="c1"># Square the differences: diff_sq
+</span><span class="n">diff_sq</span> <span class="o">=</span> <span class="n">differences</span> <span class="o">**</span> <span class="mi">2</span>
+
+<span class="c1"># Compute the mean square difference: variance_explicit
+</span><span class="n">variance_explicit</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">diff_sq</span><span class="p">)</span>
+
+<span class="c1"># Compute the variance using NumPy: variance_np
+</span><span class="n">variance_np</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">var</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">)</span>
+
+<span class="c1"># Print the results
+</span><span class="k">print</span><span class="p">(</span><span class="n">variance_explicit</span><span class="p">,</span> <span class="n">variance_np</span><span class="p">)</span>
+<span class="mf">0.21640000000000004</span> <span class="mf">0.21640000000000004</span>
+
+</code></pre></div></div>
+
+<p>####
+ The standard deviation and the variance</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the variance: variance
+</span><span class="n">variance</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">var</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">)</span>
+
+<span class="c1"># Print the square root of the variance
+</span><span class="k">print</span><span class="p">(</span><span class="n">variance</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># Print the standard deviation
+</span><span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">))</span>
+
+<span class="mf">0.4651881339845203</span>
+<span class="mf">0.4651881339845203</span>
+
+</code></pre></div></div>
+
+<p>###
+ Covariance and Pearson correlation coefficient</p>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture2-11.png" alt="Desktop View" /></p>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture3-10.png" alt="Desktop View" /></p>
+
+<p>####
+ Scatter plots</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Make a scatter plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">,</span> <span class="n">versicolor_petal_width</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'petal length (cm)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'petal width (cm)'</span><span class="p">)</span>
+
+
+<span class="c1"># Show the result
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture4-10.png" alt="Desktop View" /></p>
+
+<p>####
+ Variance and covariance by looking</p>
+
+<p>Consider four scatter plots of x-y data, appearing to the right. Which has, respectively,</p>
+
+<ul>
+  <li>the highest variance in the variable x, d</li>
+  <li>the highest covariance, c</li>
+  <li>negative covariance, b</li>
+</ul>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture5-8.png" alt="Desktop View" /></p>
+
+<p>####
+ Computing the covariance</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the covariance matrix: covariance_matrix
+</span><span class="n">covariance_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">cov</span><span class="p">(</span><span class="n">versicolor_petal_length</span><span class="p">,</span> <span class="n">versicolor_petal_width</span><span class="p">)</span>
+
+
+<span class="c1"># Print covariance matrix
+</span><span class="k">print</span><span class="p">(</span><span class="n">covariance_matrix</span><span class="p">)</span>
+
+<span class="c1"># Extract covariance of length and width of petals: petal_cov
+</span><span class="n">petal_cov</span> <span class="o">=</span> <span class="n">covariance_matrix</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Print the length/width covariance
+</span><span class="k">print</span><span class="p">(</span><span class="n">petal_cov</span><span class="p">)</span>
+
+
+<span class="p">[[</span><span class="mf">0.22081633</span> <span class="mf">0.07310204</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.07310204</span> <span class="mf">0.03910612</span><span class="p">]]</span>
+<span class="mf">0.07310204081632653</span>
+
+</code></pre></div></div>
+
+<p>####
+ Computing the Pearson correlation coefficient</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def pearson_r(x, y):
+    """Compute Pearson correlation coefficient between two arrays."""
+    # Compute correlation matrix: corr_mat
+    corr_mat = np.corrcoef(x, y)
+
+    # Return entry [0,1]
+    return corr_mat[0,1]
+
+# Compute Pearson correlation coefficient for I. versicolor: r
+r = pearson_r(versicolor_petal_length , versicolor_petal_width)
+
+# Print the result
+print(r)
+0.7866680885228169
+
+</code></pre></div></div>
+
+<h1 id="3-thinking-probabilistically-discrete-variables"><strong>3. Thinking probabilistically– Discrete variables</strong></h1>
+<hr />
+
+<p>###
+ Probabilistic logic and statistical inference</p>
+
+<p>####
+ What is the goal of statistical inference?</p>
+
+<p>Why do we do statistical inference?</p>
+
+<ul>
+  <li>To draw probabilistic conclusions about what we might expect if we collected the same data again.</li>
+  <li>To draw actionable conclusions from data.</li>
+  <li>To draw more general conclusions from relatively few data or observations.</li>
+</ul>
+
+<p>####
+ Why do we use the language of probability?</p>
+
+<p>Why we use probabilistic language in statistical inference?</p>
+
+<ul>
+  <li>Probability provides a measure of uncertainty.</li>
+  <li>Data are almost never exactly the same when acquired again, and probability allows us to say how much we expect them to vary.</li>
+</ul>
+
+<p>###
+ Random number generators and hacker statistics</p>
+
+<p>###
+ Generating random numbers using the np.random module</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Seed the random number generator
+</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="c1"># Initialize random numbers: random_numbers
+</span><span class="n">random_numbers</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">100000</span><span class="p">)</span>
+
+<span class="c1"># Generate random numbers by looping over range(100000)
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100000</span><span class="p">):</span>
+    <span class="n">random_numbers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">random</span><span class="p">()</span>
+
+<span class="c1"># Plot a histogram
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">random_numbers</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture-14.png" alt="Desktop View" /></p>
+
+<p>####
+ The np.random module and Bernoulli trials</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Seed random number generator
+</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="c1"># Initialize the number of defaults: n_defaults
+</span><span class="n">n_defaults</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="c1"># Compute the number of defaults
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="n">n_defaults</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">perform_bernoulli_trials</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">)</span>
+
+<span class="c1"># Plot the histogram with default number of bins; label your axes
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">n_defaults</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'number of defaults out of 100 loans'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'probability'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture1-13.png" alt="Desktop View" /></p>
+
+<p>####
+ Will the bank fail?</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute ECDF: x, y
+</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">ecdf</span><span class="p">(</span><span class="n">n_defaults</span><span class="p">)</span>
+
+<span class="c1"># Plot the ECDF with labeled axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span> <span class="o">=</span> <span class="s">'none'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'number of defaults out of 100'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'CDF'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Compute the number of 100-loan simulations with 10 or more defaults: n_lose_money
+</span><span class="n">n_lose_money</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">n_defaults</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Compute and print probability of losing money
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Probability of losing money ='</span><span class="p">,</span> <span class="n">n_lose_money</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">n_defaults</span><span class="p">))</span>
+
+<span class="n">Probability</span> <span class="n">of</span> <span class="n">losing</span> <span class="n">money</span> <span class="o">=</span> <span class="mf">0.022</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture2-12.png" alt="Desktop View" /></p>
+
+<p>###
+ Probability distributions and stories: The Binomial distribution</p>
+
+<p>####
+ Sampling out of the Binomial distribution</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Take 10,000 samples out of the binomial distribution: n_defaults
+</span><span class="n">n_defaults</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">binomial</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute CDF: x, y
+</span><span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">ecdf</span><span class="p">(</span><span class="n">n_defaults</span><span class="p">)</span>
+
+<span class="c1"># Plot the CDF with axis labels
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'number of defaults out of 100 loans'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'CDF'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture3-11.png" alt="Desktop View" /></p>
+
+<p>####
+ Plotting the Binomial PMF(probability mass function)</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute bin edges: bins
+</span><span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">n_defaults</span><span class="p">)</span> <span class="o">+</span> <span class="mf">1.5</span><span class="p">)</span> <span class="o">-</span> <span class="mf">0.5</span>
+
+<span class="c1"># Generate histogram
+</span><span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">n_defaults</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">bins</span><span class="p">)</span>
+
+<span class="c1"># Label axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'number of defaults out of 100 loans'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'PMF'</span><span class="p">)</span>
+
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture4-11.png" alt="Desktop View" /></p>
+
+<p>###
+ Poisson processes and the Poisson distribution</p>
+
+<p>####
+ Relationship between Binomial and Poisson distributions</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Draw 10,000 samples out of Poisson distribution: samples_poisson
+</span><span class="n">samples_poisson</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">poisson</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Print the mean and standard deviation
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Poisson:     '</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">samples_poisson</span><span class="p">),</span>
+                       <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">samples_poisson</span><span class="p">))</span>
+
+<span class="c1"># Specify values of n and p to consider for Binomial: n, p
+</span><span class="n">n</span> <span class="o">=</span> <span class="p">[</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]</span>
+<span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">]</span>
+
+
+<span class="c1"># Draw 10,000 samples for each n,p pair: samples_binomial
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">):</span>
+    <span class="n">samples_binomial</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">binomial</span><span class="p">(</span><span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+    <span class="c1"># Print results
+</span>    <span class="k">print</span><span class="p">(</span><span class="s">'n ='</span><span class="p">,</span> <span class="n">n</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s">'Binom:'</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">samples_binomial</span><span class="p">),</span>
+                                 <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">samples_binomial</span><span class="p">))</span>
+
+
+<span class="n">Poisson</span><span class="p">:</span>      <span class="mf">10.0186</span> <span class="mf">3.144813832327758</span>
+
+<span class="n">n</span> <span class="o">=</span> <span class="mi">20</span> <span class="n">Binom</span><span class="p">:</span> <span class="mf">9.9637</span> <span class="mf">2.2163443572694206</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">100</span> <span class="n">Binom</span><span class="p">:</span> <span class="mf">9.9947</span> <span class="mf">3.0135812433050484</span>
+<span class="n">n</span> <span class="o">=</span> <span class="mi">1000</span> <span class="n">Binom</span><span class="p">:</span> <span class="mf">9.9985</span> <span class="mf">3.139378561116833</span>
+
+</code></pre></div></div>
+
+<p>####
+ How many no-hitters in a season?</p>
+
+<p>In baseball, a no-hitter is a game in which a pitcher does not allow the other team to get a hit. This is a rare event, and since the beginning of the so-called modern era of baseball (starting in 1901), there have only been 251 of them through the 2015 season in over 200,000 games. The ECDF of the number of no-hitters in a season is shown to the below. Which probability distribution would be appropriate to describe the number of no-hitters we would expect in a given season?</p>
+
+<p>Both Binomial and Poisson, though Poisson is easier to model and compute.</p>
+
+<p>When we have rare events (low p, high n), the Binomial distribution is Poisson. This has a single parameter, the mean number of successes per time interval, in our case the mean number of no-hitters per season.</p>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture5-9.png" alt="Desktop View" /></p>
+
+<p>###
+ Was 2015 anomalous?</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Draw 10,000 samples out of Poisson distribution: n_nohitters
+</span><span class="n">n_nohitters</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">poisson</span><span class="p">(</span><span class="mi">251</span><span class="o">/</span><span class="mi">115</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute number of samples that are seven or greater: n_large
+</span><span class="n">n_large</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">n_nohitters</span> <span class="o">&gt;=</span> <span class="mi">7</span><span class="p">)</span>
+
+<span class="c1"># Compute probability of getting seven or more: p_large
+</span><span class="n">p_large</span> <span class="o">=</span> <span class="n">n_large</span> <span class="o">/</span> <span class="mi">10000</span>
+
+<span class="c1"># Print the result
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Probability of seven or more no-hitters:'</span><span class="p">,</span> <span class="n">p_large</span><span class="p">)</span>
+
+<span class="n">Probability</span> <span class="n">of</span> <span class="n">seven</span> <span class="ow">or</span> <span class="n">more</span> <span class="n">no</span><span class="o">-</span><span class="n">hitters</span><span class="p">:</span> <span class="mf">0.0067</span>
+
+</code></pre></div></div>
+
+<h1 id="4-thinking-probabilistically-continuous-variables"><strong>4. Thinking probabilistically– Continuous variables</strong></h1>
+<hr />
+
+<p>###
+ Probability density functions</p>
+
+<p>####
+ Interpreting PDFs</p>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture-15.png" alt="Desktop View" /></p>
+
+<p>x is more likely than not greater than 10.</p>
+
+<p>The probability is given by the
+ <em>area under the PDF</em>
+ , and there is more area to the left of 10 than to the right.</p>
+
+<p>####
+ Interpreting CDFs</p>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture1-14.png" alt="Desktop View" /></p>
+
+<p>Above is the CDF corresponding to the PDF. Using the CDF, what is the probability that x is greater than 10?</p>
+
+<p>0.25</p>
+
+<p>The value of the CDF at x = 10 is 0.75, so the probability that x &lt; 10 is 0.75. Thus, the probability that x &gt; 10 is 0.25.</p>
+
+<p>###
+ Introduction to the Normal distribution</p>
+
+<p>####
+ The Normal PDF(Probability density functions)</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Draw 100000 samples from Normal distribution with stds of interest: samples_std1, samples_std3, samples_std10
+</span><span class="n">samples_std1</span>  <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+<span class="n">samples_std3</span>  <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+<span class="n">samples_std10</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+
+
+<span class="c1"># Make histograms
+</span><span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">samples_std1</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s">'step'</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">samples_std3</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s">'step'</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">samples_std10</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s">'step'</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+
+<span class="c1"># Make a legend, set limits and show plot
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">((</span><span class="s">'std = 1'</span><span class="p">,</span> <span class="s">'std = 3'</span><span class="p">,</span> <span class="s">'std = 10'</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">(</span><span class="o">-</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.42</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture2-13.png" alt="Desktop View" /></p>
+
+<p>####
+ The Normal CDF</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Generate CDFs
+</span><span class="n">x_std1</span><span class="p">,</span> <span class="n">y_std1</span>   <span class="o">=</span> <span class="n">ecdf</span><span class="p">(</span><span class="n">samples_std1</span><span class="p">)</span>
+<span class="n">x_std3</span><span class="p">,</span> <span class="n">y_std3</span>   <span class="o">=</span> <span class="n">ecdf</span><span class="p">(</span><span class="n">samples_std3</span><span class="p">)</span>
+<span class="n">x_std10</span><span class="p">,</span> <span class="n">y_std10</span> <span class="o">=</span> <span class="n">ecdf</span><span class="p">(</span><span class="n">samples_std10</span><span class="p">)</span>
+
+<span class="c1"># Plot CDFs
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_std1</span><span class="p">,</span> <span class="n">y_std1</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span> <span class="o">=</span> <span class="s">'none'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_std3</span><span class="p">,</span> <span class="n">y_std3</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span> <span class="o">=</span> <span class="s">'none'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_std10</span><span class="p">,</span> <span class="n">y_std10</span><span class="p">,</span> <span class="n">marker</span> <span class="o">=</span> <span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span> <span class="o">=</span> <span class="s">'none'</span><span class="p">)</span>
+
+
+<span class="c1"># Make a legend and show the plot
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">((</span><span class="s">'std = 1'</span><span class="p">,</span> <span class="s">'std = 3'</span><span class="p">,</span> <span class="s">'std = 10'</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s">'lower right'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture3-12.png" alt="Desktop View" /></p>
+
+<p>The CDFs all pass through the mean at the 50th percentile; the mean and median of a Normal distribution are equal. The width of the CDF varies with the standard deviation.</p>
+
+<p>###
+ The Normal distribution: Properties and warnings</p>
+
+<p>####
+ Gauss and the 10 Deutschmark banknote</p>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture4-12.png" alt="Desktop View" /></p>
+
+<p><a href="https://forgottenbucks.com/german-mark/">source</a></p>
+
+<p>What are the mean and standard deviation, respectively, of the Normal distribution that was on the 10 Deutschmark banknote ?</p>
+
+<p>mean = 3, std = 1</p>
+
+<p>####
+ Are the Belmont Stakes results Normally distributed?</p>
+
+<p>data souce:
+ <a href="https://en.wikipedia.org/wiki/Belmont_Stakes">Belmont_Stakes</a></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+belmont_no_outliers
+array([148.51, 146.65, 148.52, 150.7 , 150.42, 150.88, 151.57, 147.54,
+       149.65, 148.74, 147.86, 148.75, 147.5 , 148.26, 149.71, 146.56,
+       151.19, 147.88, 149.16, 148.82, 148.96, 152.02, 146.82, 149.97,
+       146.13, 148.1 , 147.2 , 146.  , 146.4 , 148.2 , 149.8 , 147.  ,
+       147.2 , 147.8 , 148.2 , 149.  , 149.8 , 148.6 , 146.8 , 149.6 ,
+       149.  , 148.2 , 149.2 , 148.  , 150.4 , 148.8 , 147.2 , 148.8 ,
+       149.6 , 148.4 , 148.4 , 150.2 , 148.8 , 149.2 , 149.2 , 148.4 ,
+       150.2 , 146.6 , 149.8 , 149.  , 150.8 , 148.6 , 150.2 , 149.  ,
+       148.6 , 150.2 , 148.2 , 149.4 , 150.8 , 150.2 , 152.2 , 148.2 ,
+       149.2 , 151.  , 149.6 , 149.6 , 149.4 , 148.6 , 150.  , 150.6 ,
+       149.2 , 152.6 , 152.8 , 149.6 , 151.6 , 152.8 , 153.2 , 152.4 ,
+       152.2 ])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute mean and standard deviation: mu, sigma
+</span><span class="n">mu</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">belmont_no_outliers</span><span class="p">)</span>
+<span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">belmont_no_outliers</span><span class="p">)</span>
+
+<span class="c1"># Sample out of a normal distribution with this mu and sigma: samples
+</span><span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+
+<span class="c1"># Get the CDF of the samples and of the data
+</span><span class="n">x_theor</span><span class="p">,</span> <span class="n">y_theor</span> <span class="o">=</span> <span class="n">ecdf</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">ecdf</span><span class="p">(</span><span class="n">belmont_no_outliers</span><span class="p">)</span>
+
+
+<span class="c1"># Plot the CDFs and show the plot
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_theor</span><span class="p">,</span> <span class="n">y_theor</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Belmont winning time (sec.)'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'CDF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture5-10.png" alt="Desktop View" /></p>
+
+<p>####
+ What are the chances of a horse matching or beating Secretariat’s record?</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Take a million samples out of the Normal distribution: samples
+</span><span class="n">samples</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mu</span><span class="p">,</span> <span class="n">sigma</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">1000000</span><span class="p">)</span>
+
+<span class="c1"># Compute the fraction that are faster than 144 seconds: prob
+</span><span class="n">prob</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">samples</span> <span class="o">&lt;</span> <span class="mi">144</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000000</span>
+
+<span class="c1"># Print the result
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Probability of beating Secretariat:'</span><span class="p">,</span> <span class="n">prob</span><span class="p">)</span>
+
+<span class="n">Probability</span> <span class="n">of</span> <span class="n">beating</span> <span class="n">Secretariat</span><span class="p">:</span> <span class="mf">0.000635</span>
+
+</code></pre></div></div>
+
+<p>###
+ The Exponential distribution</p>
+
+<p>####
+ Matching a story and a distribution</p>
+
+<p>How might we expect the time between Major League no-hitters to be distributed? Be careful here: a few exercises ago, we considered the probability distribution for the number of no-hitters in a season. Now, we are looking at the probability distribution of the
+ <em>time between</em>
+ no hitters.</p>
+
+<p>Exponential</p>
+
+<p>####
+ Waiting for the next Secretariat</p>
+
+<p>Unfortunately, Justin was not alive when Secretariat ran the Belmont in 1973. Do you think he will get to see a performance like that? To answer this, you are interested in how many years you would expect to wait until you see another performance like Secretariat’s. How is the waiting time until the next performance as good or better than Secretariat’s distributed?</p>
+
+<p>Exponential: A horse as fast as Secretariat is a rare event, which can be modeled as a Poisson process, and the waiting time between arrivals of a Poisson process is Exponentially distributed.</p>
+
+<p><strong>The Exponential distribution describes the waiting times between rare events, and Secretariat is
+ <em>rare</em>
+ !</strong></p>
+
+<p>####
+ If you have a story, you can simulate it!</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def successive_poisson(tau1, tau2, size=1):
+    """Compute time for arrival of 2 successive Poisson processes."""
+    # Draw samples out of first exponential distribution: t1
+    t1 = np.random.exponential(tau1, size)
+
+    # Draw samples out of second exponential distribution: t2
+    t2 = np.random.exponential(tau2, size)
+
+    return t1 + t2
+
+</code></pre></div></div>
+
+<p>####
+ Distribution of no-hitters and cycles</p>
+
+<p>In baseball,
+ <strong>hitting for the cycle</strong>
+ is the accomplishment of one batter hitting a single, a double, a triple, and a home run in the same game.</p>
+
+<p>Now, you’ll use your sampling function to compute the waiting time to observe a no-hitter and hitting of the cycle. The mean waiting time for a no-hitter is 764 games, and the mean waiting time for hitting the cycle is 715 games.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Draw samples of waiting times: waiting_times
+</span><span class="n">waiting_times</span> <span class="o">=</span> <span class="n">successive_poisson</span><span class="p">(</span><span class="mi">764</span><span class="p">,</span> <span class="mi">715</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+
+<span class="c1"># Make the histogram
+</span><span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">waiting_times</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">normed</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s">'step'</span><span class="p">)</span>
+
+
+<span class="c1"># Label axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'total waiting time (games)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'PDF'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture6-7.png" alt="Desktop View" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+x, y = ecdf(waiting_times)
+plt.plot(x, y)
+plt.xlabel('total waiting time (games)')
+plt.ylabel('CDF')
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/statistical-thinking-in-python-(part-1)/capture7-8.png" alt="Desktop View" /></p>
+

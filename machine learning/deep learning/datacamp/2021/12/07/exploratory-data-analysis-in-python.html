@@ -1,0 +1,1373 @@
+<h1 id="exploratory-data-analysis-in-python">Exploratory Data Analysis in Python</h1>
+
+<p>This is the memo of
+ <strong>Exploratory Data Analysis in Python</strong>
+ from DataCamp.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/exploratory-data-analysis-in-python">HERE</a></strong>
+ .</p>
+
+<p><strong><a href="https://nbviewer.jupyter.org/github/AllenDowney/empiricaldist/blob/master/empiricaldist/dist_demo.ipynb">reference</a></strong></p>
+
+<p>###
+<strong>Course Description</strong></p>
+
+<p>How do we get from data to answers? Exploratory data analysis is a process for exploring datasets, answering questions, and visualizing results. This course presents the tools you need to clean and validate data, to visualize distributions and relationships between variables, and to use regression models to predict and explain. You’ll explore data related to demographics and health, including the National Survey of Family Growth and the General Social Survey. But the methods you learn apply to all areas of science, engineering, and business. You’ll use Pandas, a powerful library for working with data, and other core Python libraries including NumPy and SciPy, StatsModels for regression, and Matplotlib for visualization. With these tools and skills, you will be prepared to work with real data, make discoveries, and present compelling results.</p>
+
+<p>###
+ Table of contents</p>
+
+<ol>
+  <li>Read, clean, and validate</li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/12/10/exploratory-data-analysis-in-python-from-datacamp/2/">Distributions</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/12/10/exploratory-data-analysis-in-python-from-datacamp/3/">Relationships</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/12/10/exploratory-data-analysis-in-python-from-datacamp/4/">Multivariate Thinking</a></li>
+</ol>
+
+<h1 id="1-read-clean-and-validate"><strong>1. Read, clean, and validate</strong></h1>
+<hr />
+
+<h2 id="11-dataframes-and-series"><strong>1.1 DataFrames and Series</strong></h2>
+
+<p>What’s the average birth weight for babies in the US?</p>
+
+<h3 id="111-read-the-codebook"><strong>1.1.1 Read the codebook</strong></h3>
+
+<p>When you work with datasets like the NSFG, it is important to read the documentation carefully. If you interpret a variable incorrectly, you can generate nonsense results and never realize it. So, before we start coding, I want to make sure you are familiar with the NSFG codebook, which describes every variable.</p>
+
+<ul>
+  <li>Follow
+ <a href="https://www.icpsr.umich.edu/icpsradmin/nsfg/index?studyNumber=9999">this link</a>
+ to get to the interactive codebook.</li>
+  <li>Type “birthweight” in the search field, UNSELECT the checkbox that says “Search variable name only”, and press “Search”. You should see a list of variables related to birthweight.</li>
+  <li>Click on “BIRTHWGT_OZ1” and read the documentation of this variable. For your convenience, it is also displayed here:</li>
+</ul>
+
+<p><img src="https://assets.datacamp.com/production/repositories/4025/datasets/0d2a0c18b63f3ddf056858c145a6bdc022d8656c/Screenshot%202019-03-31%2019.16.14.png" alt="birthwgt_oz1 codebook" /></p>
+
+<p>How many respondents refused to answer this question?</p>
+
+<p>1</p>
+
+<h3 id="112-exploring-the-nsfg-data"><strong>1.1.2 Exploring the NSFG data</strong></h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Display the number of rows and columns
+</span><span class="n">nsfg</span><span class="p">.</span><span class="n">shape</span>
+<span class="c1"># (9358, 10)
+</span>
+<span class="c1"># Display the names of the columns
+</span><span class="n">nsfg</span><span class="p">.</span><span class="n">columns</span>
+<span class="c1"># Index(['caseid', 'outcome', 'birthwgt_lb1', 'birthwgt_oz1', 'prglngth', 'nbrnaliv', 'agecon', 'agepreg', 'hpagelb', 'wgt2013_2015'], dtype='object')
+</span>
+<span class="c1"># Select column birthwgt_oz1: ounces
+</span><span class="n">ounces</span> <span class="o">=</span> <span class="n">nsfg</span><span class="p">[</span><span class="s">'birthwgt_oz1'</span><span class="p">]</span>
+
+<span class="c1"># Print the first 5 elements of ounces
+</span><span class="k">print</span><span class="p">(</span><span class="n">ounces</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+nsfg.head()
+   caseid  outcome  birthwgt_lb1  birthwgt_oz1  prglngth  nbrnaliv  agecon  agepreg  hpagelb  wgt2013_2015
+0   60418        1           5.0           4.0        40       1.0    2000   2075.0     22.0   3554.964843
+1   60418        1           4.0          12.0        36       1.0    2291   2358.0     25.0   3554.964843
+2   60418        1           5.0           4.0        36       1.0    3241   3308.0     52.0   3554.964843
+3   60419        6           NaN           NaN        33       NaN    3650      NaN      NaN   2484.535358
+4   60420        1           8.0          13.0        41       1.0    2191   2266.0     24.0   2903.782914
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="12-clean-and-validate"><strong>1.2 Clean and Validate</strong></h2>
+
+<h3 id="121-validate-a-variable"><strong>1.2.1 Validate a variable</strong></h3>
+
+<p>In the NSFG dataset, the variable
+ <code class="language-plaintext highlighter-rouge">'outcome'</code>
+ encodes the outcome of each pregnancy as shown below:</p>
+
+<p>|
+ value
+  |
+ label
+  |
+| — | — |
+|
+ 1
+  |
+ Live birth
+  |
+|
+ 2
+  |
+ Induced abortion
+  |
+|
+ 3
+  |
+ Stillbirth
+  |
+|
+ 4
+  |
+ Miscarriage
+  |
+|
+ 5
+  |
+ Ectopic pregnancy
+  |
+|
+ 6
+  |
+ Current pregnancy
+  |</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">nsfg</code>
+ DataFrame has been pre-loaded for you. Explore it in the IPython Shell and use the methods Allen showed you in the video to answer the following question: How many pregnancies in this dataset ended with a live birth?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+nsfg.outcome.value_counts()
+1    6489
+4    1469
+2     947
+6     249
+5     118
+3      86
+Name: outcome, dtype: int64
+
+</code></pre></div></div>
+
+<h3 id="122-clean-a-variable"><strong>1.2.2 Clean a variable</strong></h3>
+
+<p>In the NSFG dataset, the variable
+ <code class="language-plaintext highlighter-rouge">'nbrnaliv'</code>
+ records the number of babies born alive at the end of a pregnancy.</p>
+
+<p>If you use
+ <code class="language-plaintext highlighter-rouge">.value_counts()</code>
+ to view the responses, you’ll see that the value
+ <code class="language-plaintext highlighter-rouge">8</code>
+ appears once, and if you consult the codebook, you’ll see that this value indicates that the respondent refused to answer the question.</p>
+
+<p>Your job in this exercise is to replace this value with
+ <code class="language-plaintext highlighter-rouge">np.nan</code>
+ . Recall from the video how Allen replaced the values
+ <code class="language-plaintext highlighter-rouge">98</code>
+ and
+ <code class="language-plaintext highlighter-rouge">99</code>
+ in the
+ <code class="language-plaintext highlighter-rouge">ounces</code>
+ column using the
+ <code class="language-plaintext highlighter-rouge">.replace()</code>
+ method:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+ounces.replace([98, 99], np.nan, inplace=True)
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Replace the value 8 with NaN
+</span><span class="n">nsfg</span><span class="p">[</span><span class="s">'nbrnaliv'</span><span class="p">].</span><span class="n">replace</span><span class="p">([</span><span class="mi">8</span><span class="p">],</span> <span class="n">np</span><span class="p">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Print the values and their frequencies
+</span><span class="k">print</span><span class="p">(</span><span class="n">nsfg</span><span class="p">[</span><span class="s">'nbrnaliv'</span><span class="p">].</span><span class="n">value_counts</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+1.0    6379
+2.0     100
+3.0       5
+Name: nbrnaliv, dtype: int64
+
+</code></pre></div></div>
+
+<p>If you are careful about this kind of cleaning and validation, it will save time (in the long run) and avoid potentially serious errors.</p>
+
+<h3 id="123-compute-a-variable"><strong>1.2.3 Compute a variable</strong></h3>
+
+<p>For each pregnancy in the NSFG dataset, the variable
+ <code class="language-plaintext highlighter-rouge">'agecon'</code>
+ encodes the respondent’s age at conception, and
+ <code class="language-plaintext highlighter-rouge">'agepreg'</code>
+ the respondent’s age at the end of the pregnancy.</p>
+
+<p>Both variables are recorded as integers with two implicit decimal places, so the value
+ <code class="language-plaintext highlighter-rouge">2575</code>
+ means that the respondent’s age was
+ <code class="language-plaintext highlighter-rouge">25.75</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Select the columns and divide by 100
+</span><span class="n">agecon</span> <span class="o">=</span> <span class="n">nsfg</span><span class="p">[</span><span class="s">'agecon'</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span>
+<span class="n">agepreg</span> <span class="o">=</span> <span class="n">nsfg</span><span class="p">[</span><span class="s">'agepreg'</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span>
+
+<span class="c1"># Compute the difference
+</span><span class="n">preg_length</span> <span class="o">=</span> <span class="n">agepreg</span> <span class="o">-</span> <span class="n">agecon</span>
+
+<span class="c1"># Compute summary statistics
+</span><span class="k">print</span><span class="p">(</span><span class="n">preg_length</span><span class="p">.</span><span class="n">describe</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+count    9109.000000
+mean        0.552069
+std         0.271479
+min         0.000000
+25%         0.250000
+50%         0.670000
+75%         0.750000
+max         0.920000
+dtype: float64
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="13-filter-and-visualize"><strong>1.3 Filter and visualize</strong></h2>
+
+<h3 id="131-make-a-histogram"><strong>1.3.1 Make a histogram</strong></h3>
+
+<p>Histograms are one of the most useful tools in exploratory data analysis. They quickly give you an overview of the distribution of a variable, that is, what values the variable can have, and how many times each value appears.</p>
+
+<p>As we saw in a previous exercise, the NSFG dataset includes a variable
+ <code class="language-plaintext highlighter-rouge">'agecon'</code>
+ that records age at conception for each pregnancy. Here, you’re going to plot a histogram of this variable. You’ll use the
+ <code class="language-plaintext highlighter-rouge">bins</code>
+ parameter that you saw in the video, and also a new parameter –
+ <code class="language-plaintext highlighter-rouge">histtype</code>
+ – which you can read more about
+ <a href="https://matplotlib.org/api/_as_gen/matplotlib.pyplot.hist.html">here</a>
+ in the
+ <code class="language-plaintext highlighter-rouge">matplotlib</code>
+ documentation. Learning how to read documentation is an essential skill. If you want to learn more about
+ <code class="language-plaintext highlighter-rouge">matplotlib</code>
+ , you can check out DataCamp’s
+ <a href="https://www.datacamp.com/courses/introduction-to-matplotlib">Introduction to Matplotlib</a>
+ course.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the histogram
+</span><span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">agecon</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Age at conception'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Number of pregnancies'</span><span class="p">)</span>
+
+<span class="c1"># Show the figure
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/12-4.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the histogram
+</span><span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">agecon</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">histtype</span><span class="o">=</span><span class="s">'step'</span><span class="p">)</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Age at conception'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Number of pregnancies'</span><span class="p">)</span>
+
+<span class="c1"># Show the figure
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/13-4.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="132-compute-birth-weight"><strong>1.3.2 Compute birth weight</strong></h3>
+
+<p>Now let’s pull together the steps in this chapter to compute the average birth weight for full-term babies.</p>
+
+<p>I’ve provided a function,
+ <code class="language-plaintext highlighter-rouge">resample_rows_weighted</code>
+ , that takes the NSFG data and resamples it using the sampling weights in
+ <code class="language-plaintext highlighter-rouge">wgt2013_2015</code>
+ . The result is a sample that is representative of the U.S. population.</p>
+
+<p>Then I extract
+ <code class="language-plaintext highlighter-rouge">birthwgt_lb1</code>
+ and
+ <code class="language-plaintext highlighter-rouge">birthwgt_oz1</code>
+ , replace special codes with
+ <code class="language-plaintext highlighter-rouge">NaN</code>
+ , and compute total birth weight in pounds,
+ <code class="language-plaintext highlighter-rouge">birth_weight</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Resample the data
+</span><span class="n">nsfg</span> <span class="o">=</span> <span class="n">resample_rows_weighted</span><span class="p">(</span><span class="n">nsfg</span><span class="p">,</span> <span class="s">'wgt2013_2015'</span><span class="p">)</span>
+
+<span class="c1"># Clean the weight variables
+</span><span class="n">pounds</span> <span class="o">=</span> <span class="n">nsfg</span><span class="p">[</span><span class="s">'birthwgt_lb1'</span><span class="p">].</span><span class="n">replace</span><span class="p">([</span><span class="mi">98</span><span class="p">,</span> <span class="mi">99</span><span class="p">],</span> <span class="n">np</span><span class="p">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="n">ounces</span> <span class="o">=</span> <span class="n">nsfg</span><span class="p">[</span><span class="s">'birthwgt_oz1'</span><span class="p">].</span><span class="n">replace</span><span class="p">([</span><span class="mi">98</span><span class="p">,</span> <span class="mi">99</span><span class="p">],</span> <span class="n">np</span><span class="p">.</span><span class="n">nan</span><span class="p">)</span>
+
+<span class="c1"># Compute total birth weight
+</span><span class="n">birth_weight</span> <span class="o">=</span> <span class="n">pounds</span> <span class="o">+</span> <span class="n">ounces</span><span class="o">/</span><span class="mi">16</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a Boolean Series for full-term babies
+</span><span class="n">full_term</span> <span class="o">=</span> <span class="n">nsfg</span><span class="p">.</span><span class="n">prglngth</span> <span class="o">&gt;=</span><span class="mi">37</span>
+
+<span class="c1"># Select the weights of full-term babies
+</span><span class="n">full_term_weight</span> <span class="o">=</span> <span class="n">birth_weight</span><span class="p">[</span><span class="n">full_term</span><span class="p">]</span>
+
+<span class="c1"># Compute the mean weight of full-term babies
+</span><span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">full_term_weight</span><span class="p">))</span>
+<span class="c1"># 7.392597951914515
+</span>
+</code></pre></div></div>
+
+<h3 id="133-filter"><strong>1.3.3 Filter</strong></h3>
+
+<p>In the previous exercise, you computed the mean birth weight for full-term babies; you filtered out preterm babies because their distribution of weight is different.</p>
+
+<p>The distribution of weight is also different for multiple births, like twins and triplets. In this exercise, you’ll filter them out, too, and see what effect it has on the mean.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Filter full-term babies
+</span><span class="n">full_term</span> <span class="o">=</span> <span class="n">nsfg</span><span class="p">[</span><span class="s">'prglngth'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">37</span>
+
+<span class="c1"># Filter single births
+</span><span class="n">single</span> <span class="o">=</span> <span class="n">nsfg</span><span class="p">[</span><span class="s">'nbrnaliv'</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+
+<span class="c1"># Compute birth weight for single full-term babies
+</span><span class="n">single_full_term_weight</span> <span class="o">=</span> <span class="n">birth_weight</span><span class="p">[</span><span class="n">single</span> <span class="o">&amp;</span> <span class="n">full_term</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Single full-term mean:'</span><span class="p">,</span> <span class="n">single_full_term_weight</span><span class="p">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="c1"># Single full-term mean: 7.40297320308299
+</span>
+<span class="c1"># Compute birth weight for multiple full-term babies
+</span><span class="n">mult_full_term_weight</span> <span class="o">=</span> <span class="n">birth_weight</span><span class="p">[</span><span class="o">~</span><span class="n">single</span> <span class="o">&amp;</span> <span class="n">full_term</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Multiple full-term mean:'</span><span class="p">,</span> <span class="n">mult_full_term_weight</span><span class="p">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="c1"># Multiple full-term mean: 5.784722222222222
+</span>
+</code></pre></div></div>
+
+<h1 id="2-distributions"><strong>2. Distributions</strong></h1>
+<hr />
+
+<h2 id="21-probability-mass-functions"><strong>2.1 Probability mass functions</strong></h2>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/1-6.png?w=996" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/2-7.png?w=983" alt="Desktop View" /></p>
+
+<h3 id="211-make-a-pmf"><strong>2.1.1 Make a PMF</strong></h3>
+
+<p>The GSS dataset has been pre-loaded for you into a DataFrame called
+ <code class="language-plaintext highlighter-rouge">gss</code>
+ . You can explore it in the IPython Shell to get familiar with it.</p>
+
+<p>In this exercise, you’ll focus on one variable in this dataset,
+ <code class="language-plaintext highlighter-rouge">'year'</code>
+ , which represents the year each respondent was interviewed.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">Pmf</code>
+ class you saw in the video has already been created for you. You can access it outside of DataCamp via the
+ <a href="https://pypi.org/project/empiricaldist/"><code class="language-plaintext highlighter-rouge">empiricaldist</code></a>
+ library.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+gss
+       year  sex   age  cohort  race  educ      realinc   wtssall
+0      1972    1  26.0  1946.0     1  18.0   13537.0000  0.889300
+1      1972    2  38.0  1934.0     1  12.0   18951.0000  0.444600
+...     ...  ...   ...     ...   ...   ...          ...       ...
+62462  2016    2  61.0  1955.0     1  16.0   65520.0000  0.956994
+62463  2016    2  67.0  1949.0     1  13.0          NaN  1.564363
+62464  2016    2  57.0  1959.0     1  12.0    9945.0000  0.956994
+62465  2016    2  56.0  1960.0     1  12.0   38610.0000  0.478497
+
+[62466 rows x 8 columns]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the PMF for year
+</span><span class="n">pmf_year</span> <span class="o">=</span> <span class="n">Pmf</span><span class="p">(</span><span class="n">gss</span><span class="p">.</span><span class="n">year</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># Print the result
+</span><span class="k">print</span><span class="p">(</span><span class="n">pmf_year</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+1972    1613
+1973    1504
+...
+2014    2538
+2016    2867
+Name: Pmf, dtype: int64
+
+</code></pre></div></div>
+
+<h3 id="212-plot-a-pmf"><strong>2.1.2 Plot a PMF</strong></h3>
+
+<p>Now let’s plot a PMF for the age of the respondents in the GSS dataset. The variable
+ <code class="language-plaintext highlighter-rouge">'age'</code>
+ contains respondents’ age in years.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Select the age column
+</span><span class="n">age</span> <span class="o">=</span> <span class="n">gss</span><span class="p">[</span><span class="s">'age'</span><span class="p">]</span>
+
+<span class="c1"># Make a PMF of age
+</span><span class="n">pmf_age</span> <span class="o">=</span> <span class="n">Pmf</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+
+<span class="c1"># Plot the PMF
+</span><span class="n">pmf_age</span><span class="p">.</span><span class="n">bar</span><span class="p">()</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Age'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'PMF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/3-7.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="22-cumulative-distribution-functions"><strong>2.2 Cumulative distribution functions</strong></h2>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/4-7.png?w=995" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/5-7.png?w=991" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/6-7.png?w=992" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/7-7.png?w=991" alt="Desktop View" /></p>
+
+<h3 id="221-make-a-cdf"><strong>2.2.1 Make a CDF</strong></h3>
+
+<p>In this exercise, you’ll make a CDF and use it to determine the fraction of respondents in the GSS dataset who are OLDER than 30.</p>
+
+<p>The GSS dataset has been preloaded for you into a DataFrame called
+ <code class="language-plaintext highlighter-rouge">gss</code>
+ .</p>
+
+<p>As with the
+ <code class="language-plaintext highlighter-rouge">Pmf</code>
+ class from the previous lesson, the
+ <code class="language-plaintext highlighter-rouge">Cdf</code>
+ class you just saw in the video has been created for you, and you can access it outside of DataCamp via the
+ <a href="https://pypi.org/project/empiricaldist/"><code class="language-plaintext highlighter-rouge">empiricaldist</code></a>
+ library.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Select the age column
+</span><span class="n">age</span> <span class="o">=</span> <span class="n">gss</span><span class="p">[</span><span class="s">'age'</span><span class="p">]</span>
+
+<span class="c1"># Compute the CDF of age
+</span><span class="n">cdf_age</span> <span class="o">=</span> <span class="n">Cdf</span><span class="p">(</span><span class="n">age</span><span class="p">)</span>
+
+<span class="c1"># Calculate the CDF of 30
+</span><span class="k">print</span><span class="p">(</span><span class="n">cdf_age</span><span class="p">[</span><span class="mi">30</span><span class="p">])</span>
+<span class="c1"># 0.2539137136526388
+</span>
+</code></pre></div></div>
+
+<h3 id="222-compute-iqr"><strong>2.2.2 Compute IQR</strong></h3>
+
+<p>Recall from the video that the interquartile range (IQR) is the difference between the 75th and 25th percentiles. It is a measure of variability that is robust in the presence of errors or extreme values.</p>
+
+<p>In this exercise, you’ll compute the interquartile range of income in the GSS dataset. Income is stored in the
+ <code class="language-plaintext highlighter-rouge">'realinc'</code>
+ column, and the CDF of income has already been computed and stored in
+ <code class="language-plaintext highlighter-rouge">cdf_income</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+np.percentile(gss.realinc.sort_values().dropna(),75)
+# 43426.0
+
+cdf_income.inverse(0.75)
+# array(43426.)
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate the 75th percentile
+</span><span class="n">percentile_75th</span> <span class="o">=</span> <span class="n">cdf_income</span><span class="p">.</span><span class="n">inverse</span><span class="p">(</span><span class="mf">0.75</span><span class="p">)</span>
+
+<span class="c1"># Calculate the 25th percentile
+</span><span class="n">percentile_25th</span> <span class="o">=</span> <span class="n">cdf_income</span><span class="p">.</span><span class="n">inverse</span><span class="p">(</span><span class="mf">0.25</span><span class="p">)</span>
+
+<span class="c1"># Calculate the interquartile range
+</span><span class="n">iqr</span> <span class="o">=</span> <span class="n">percentile_75th</span> <span class="o">-</span> <span class="n">percentile_25th</span>
+
+<span class="c1"># Print the interquartile range
+</span><span class="k">print</span><span class="p">(</span><span class="n">iqr</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<h3 id="223-plot-a-cdf"><strong>2.2.3 Plot a CDF</strong></h3>
+
+<p>The distribution of income in almost every country is long-tailed; that is, there are a small number of people with very high incomes.</p>
+
+<p>In the GSS dataset, the variable
+ <code class="language-plaintext highlighter-rouge">'realinc'</code>
+ represents total household income, converted to 1986 dollars. We can get a sense of the shape of this distribution by plotting the CDF.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Select realinc
+</span><span class="n">income</span> <span class="o">=</span> <span class="n">gss</span><span class="p">.</span><span class="n">realinc</span>
+
+<span class="c1"># Make the CDF
+</span><span class="n">cdf_income</span> <span class="o">=</span> <span class="n">Cdf</span><span class="p">(</span><span class="n">income</span><span class="p">)</span>
+
+<span class="c1"># Plot it
+</span><span class="n">cdf_income</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Income (1986 USD)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'CDF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/8-6.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="23-comparing-distributions"><strong>2.3 Comparing distributions</strong></h2>
+
+<h3 id="231-distribution-of-education"><strong>2.3.1 Distribution of education</strong></h3>
+
+<p>Let’s begin comparing incomes for different levels of education in the GSS dataset, which has been pre-loaded for you into a DataFrame called
+ <code class="language-plaintext highlighter-rouge">gss</code>
+ . The variable
+ <code class="language-plaintext highlighter-rouge">educ</code>
+ represents the respondent’s years of education.</p>
+
+<p>What fraction of respondents report that they have 12 years of education or fewer?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Cdf(gss.educ)
+0.0     0.002311
+1.0     0.002921
+...
+12.0    0.532261
+...
+19.0    0.979231
+20.0    1.000000
+Name: Cdf, dtype: float64
+
+
+Cdf(gss.educ)(12)
+# array(0.53226117)
+
+</code></pre></div></div>
+
+<h3 id="232-extract-education-levels"><strong>2.3.2 Extract education levels</strong></h3>
+
+<p>Let’s create Boolean Series to identify respondents with different levels of education.</p>
+
+<p>In the U.S, 12 years of education usually means the respondent has completed high school (secondary education). A respondent with 14 years of education has probably completed an associate degree (two years of college); someone with 16 years has probably completed a bachelor’s degree (four years of college).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Select educ
+</span><span class="n">educ</span> <span class="o">=</span> <span class="n">gss</span><span class="p">[</span><span class="s">'educ'</span><span class="p">]</span>
+
+<span class="c1"># Bachelor's degree
+</span><span class="n">bach</span> <span class="o">=</span> <span class="p">(</span><span class="n">educ</span> <span class="o">&gt;=</span> <span class="mi">16</span><span class="p">)</span>
+
+<span class="c1"># Associate degree
+</span><span class="n">assc</span> <span class="o">=</span> <span class="p">(</span><span class="n">educ</span> <span class="o">&gt;=</span> <span class="mi">14</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">educ</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">)</span>
+
+<span class="c1"># High school (12 or fewer years of education)
+</span><span class="n">high</span> <span class="o">=</span> <span class="p">(</span><span class="n">educ</span> <span class="o">&lt;=</span> <span class="mi">12</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">high</span><span class="p">.</span><span class="n">mean</span><span class="p">())</span>
+<span class="c1"># 0.5308807991547402
+</span>
+</code></pre></div></div>
+
+<h3 id="233-plot-income-cdfs"><strong>2.3.3 Plot income CDFs</strong></h3>
+
+<p>Let’s now see what the distribution of income looks like for people with different education levels. You can do this by plotting the CDFs. Recall how Allen plotted the income CDFs of respondents interviewed before and after 1995:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Cdf(income[pre95]).plot(label='Before 1995')
+Cdf(income[~pre95]).plot(label='After 1995')
+
+</code></pre></div></div>
+
+<p>You can assume that Boolean Series have been defined, as in the previous exercise, to identify respondents with different education levels:
+ <code class="language-plaintext highlighter-rouge">high</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">assc</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">bach</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+income = gss['realinc']
+
+# Plot the CDFs
+Cdf(income[high]).plot(label='High school')
+Cdf(income[assc]).plot(label='Associate')
+Cdf(income[bach]).plot(label='Bachelor')
+
+# Label the axes
+plt.xlabel('Income (1986 USD)')
+plt.ylabel('CDF')
+plt.legend()
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/9-6.png?w=1024" alt="Desktop View" /></p>
+
+<p>It might not be surprising that people with more education have higher incomes, but looking at these distributions, we can see where the differences are.</p>
+
+<hr />
+
+<h2 id="24-modeling-distributions"><strong>2.4 Modeling distributions</strong></h2>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/10-5.png?w=784" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/11-5.png?w=578" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/12-5.png?w=947" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/13-5.png?w=796" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/14-4.png?w=938" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/15-3.png?w=787" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/16-1.png?w=768" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/17-1.png?w=832" alt="Desktop View" /></p>
+
+<h3 id="241-distribution-of-income"><strong>2.4.1 Distribution of income</strong></h3>
+
+<p>In many datasets, the distribution of income is approximately lognormal, which means that the logarithms of the incomes fit a normal distribution. We’ll see whether that’s true for the GSS data. As a first step, you’ll compute the mean and standard deviation of the log of incomes using NumPy’s
+ <code class="language-plaintext highlighter-rouge">np.log10()</code>
+ function.</p>
+
+<p>Then, you’ll use the computed mean and standard deviation to make a
+ <code class="language-plaintext highlighter-rouge">norm</code>
+ object using the
+ <a href="https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.norm.html"><code class="language-plaintext highlighter-rouge">scipy.stats.norm()</code></a>
+ function.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Extract realinc and compute its log
+</span><span class="n">income</span> <span class="o">=</span> <span class="n">gss</span><span class="p">[</span><span class="s">'realinc'</span><span class="p">]</span>
+<span class="n">log_income</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">log10</span><span class="p">(</span><span class="n">income</span><span class="p">)</span>
+
+<span class="c1"># Compute mean and standard deviation
+</span><span class="n">mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">log_income</span><span class="p">)</span>
+<span class="n">std</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">log_income</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">)</span>
+<span class="c1"># 4.371148677934171 0.42900437330100427
+</span>
+<span class="c1"># Make a norm object
+</span><span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
+<span class="n">dist</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span><span class="n">std</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<h3 id="242-comparing-cdfs"><strong>2.4.2 Comparing CDFs</strong></h3>
+
+<p>To see whether the distribution of income is well modeled by a lognormal distribution, we’ll compare the CDF of the logarithm of the data to a normal distribution with the same mean and standard deviation.</p>
+
+<p><code class="language-plaintext highlighter-rouge">dist</code>
+ is a
+ <code class="language-plaintext highlighter-rouge">scipy.stats.norm</code>
+ object with the same mean and standard deviation as the data. It provides
+ <code class="language-plaintext highlighter-rouge">.cdf()</code>
+ , which evaluates the normal cumulative distribution function.</p>
+
+<p>Be careful with capitalization:
+ <code class="language-plaintext highlighter-rouge">Cdf()</code>
+ , with an uppercase
+ <code class="language-plaintext highlighter-rouge">C</code>
+ , creates
+ <code class="language-plaintext highlighter-rouge">Cdf</code>
+ objects.
+ <code class="language-plaintext highlighter-rouge">dist.cdf()</code>
+ , with a lowercase
+ <code class="language-plaintext highlighter-rouge">c</code>
+ , evaluates the normal cumulative distribution function.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Evaluate the model CDF
+</span><span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">dist</span><span class="p">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+
+<span class="c1"># Plot the model CDF
+</span><span class="n">plt</span><span class="p">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'gray'</span><span class="p">)</span>
+
+<span class="c1"># Create and plot the Cdf of log_income
+</span><span class="n">Cdf</span><span class="p">(</span><span class="n">log_income</span><span class="p">).</span><span class="n">plot</span><span class="p">()</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'log10 of realinc'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'CDF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/18-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>The lognormal model is a pretty good fit for the data, but clearly not a perfect match. That’s what real data is like; sometimes it doesn’t fit the model.</p>
+
+<h3 id="243-comparing-pdfs"><strong>2.4.3 Comparing PDFs</strong></h3>
+
+<p>In the previous exercise, we used CDFs to see if the distribution of income is lognormal. We can make the same comparison using a PDF and KDE. That’s what you’ll do in this exercise!</p>
+
+<p>Just as all
+ <code class="language-plaintext highlighter-rouge">norm</code>
+ objects have a
+ <code class="language-plaintext highlighter-rouge">.cdf()</code>
+ method, they also have a
+ <code class="language-plaintext highlighter-rouge">.pdf()</code>
+ method.</p>
+
+<p>To create a KDE plot, you can use Seaborn’s
+ <a href="https://seaborn.pydata.org/generated/seaborn.kdeplot.html"><code class="language-plaintext highlighter-rouge">kdeplot()</code></a>
+ function. To learn more about this function and Seaborn, you can check out DataCamp’s
+ <a href="https://www.datacamp.com/courses/data-visualization-with-seaborn">Data Visualization with Seaborn</a>
+ course. Here, Seaborn has been imported for you as
+ <code class="language-plaintext highlighter-rouge">sns</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Evaluate the normal PDF
+</span><span class="n">xs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mf">5.5</span><span class="p">)</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">dist</span><span class="p">.</span><span class="n">pdf</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+
+<span class="c1"># Plot the model PDF
+</span><span class="n">plt</span><span class="p">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'gray'</span><span class="p">)</span>
+
+<span class="c1"># Plot the data KDE
+</span><span class="n">sns</span><span class="p">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">log_income</span><span class="p">)</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'log10 of realinc'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'PDF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/19-1.png?w=1024" alt="Desktop View" /></p>
+
+<h1 id="3-relationships"><strong>3. Relationships</strong></h1>
+<hr />
+
+<h2 id="31-exploring-relationships"><strong>3.1 Exploring relationships</strong></h2>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/20-1.png?w=995" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/21-1.png?w=992" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/22-1.png?w=992" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/23-1.png?w=978" alt="Desktop View" /></p>
+
+<h3 id="311-pmf-of-age"><strong>3.1.1 PMF of age</strong></h3>
+
+<p>Do people tend to gain weight as they get older? We can answer this question by visualizing the relationship between weight and age. But before we make a scatter plot, it is a good idea to visualize distributions one variable at a time. Here, you’ll visualize age using a bar chart first. Recall that all PMF objects have a
+ <code class="language-plaintext highlighter-rouge">.bar()</code>
+ method to make a bar chart.</p>
+
+<p>The BRFSS dataset includes a variable,
+ <code class="language-plaintext highlighter-rouge">'AGE'</code>
+ (note the capitalization!), which represents each respondent’s age. To protect respondents’ privacy, ages are rounded off into 5-year bins.
+ <code class="language-plaintext highlighter-rouge">'AGE'</code>
+ contains the midpoint of the bins.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Extract age
+</span><span class="n">age</span> <span class="o">=</span> <span class="n">brfss</span><span class="p">.</span><span class="n">AGE</span>
+
+<span class="c1"># Plot the PMF
+</span><span class="n">Pmf</span><span class="p">(</span><span class="n">age</span><span class="p">).</span><span class="n">bar</span><span class="p">()</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Age in years'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'PMF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/24-1.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="312-scatter-plot"><strong>3.1.2 Scatter plot</strong></h3>
+
+<p>Now let’s make a scatterplot of
+ <code class="language-plaintext highlighter-rouge">weight</code>
+ versus
+ <code class="language-plaintext highlighter-rouge">age</code>
+ . To make the code run faster, I’ve selected only the first 1000 rows from the
+ <code class="language-plaintext highlighter-rouge">brfss</code>
+ DataFrame.</p>
+
+<p><code class="language-plaintext highlighter-rouge">weight</code>
+ and
+ <code class="language-plaintext highlighter-rouge">age</code>
+ have already been extracted for you. Your job is to use
+ <code class="language-plaintext highlighter-rouge">plt.plot()</code>
+ to make a scatter plot.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Select the first 1000 respondents
+</span><span class="n">brfss</span> <span class="o">=</span> <span class="n">brfss</span><span class="p">[:</span><span class="mi">1000</span><span class="p">]</span>
+
+<span class="c1"># Extract age and weight
+</span><span class="n">age</span> <span class="o">=</span> <span class="n">brfss</span><span class="p">[</span><span class="s">'AGE'</span><span class="p">]</span>
+<span class="n">weight</span> <span class="o">=</span> <span class="n">brfss</span><span class="p">[</span><span class="s">'WTKG3'</span><span class="p">]</span>
+
+<span class="c1"># Make a scatter plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age</span><span class="p">,</span><span class="n">weight</span><span class="p">,</span><span class="s">'o'</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Age in years'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Weight in kg'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/25-1.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="313-jittering"><strong>3.1.3 Jittering</strong></h3>
+
+<p>In the previous exercise, the ages fall in columns because they’ve been rounded into 5-year bins. If we jitter them, the scatter plot will show the relationship more clearly. Recall how Allen jittered
+ <code class="language-plaintext highlighter-rouge">height</code>
+ and
+ <code class="language-plaintext highlighter-rouge">weight</code>
+ in the video:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+height_jitter = height + np.random.normal(0, 2, size=len(brfss))
+weight_jitter = weight + np.random.normal(0, 2, size=len(brfss))
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Select the first 1000 respondents
+</span><span class="n">brfss</span> <span class="o">=</span> <span class="n">brfss</span><span class="p">[:</span><span class="mi">1000</span><span class="p">]</span>
+
+<span class="c1"># Add jittering to age
+</span><span class="n">age</span> <span class="o">=</span> <span class="n">brfss</span><span class="p">[</span><span class="s">'AGE'</span><span class="p">]</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mf">2.5</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">brfss</span><span class="p">))</span>
+<span class="c1"># Extract weight
+</span><span class="n">weight</span> <span class="o">=</span> <span class="n">brfss</span><span class="p">[</span><span class="s">'WTKG3'</span><span class="p">]</span>
+
+<span class="c1"># Make a scatter plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">age</span><span class="p">,</span><span class="n">weight</span><span class="p">,</span><span class="s">'o'</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span><span class="n">markersize</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Age in years'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Weight in kg'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/26-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>By smoothing out the ages and avoiding saturation, we get the best view of the data. But in this case the nature of the relationship is still hard to see.</p>
+
+<hr />
+
+<h2 id="32-visualizing-relationships"><strong>3.2 Visualizing relationships</strong></h2>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/27-1.png?w=989" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/28-1.png?w=984" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/29-1.png?w=826" alt="Desktop View" /></p>
+
+<h2 id="321-height-and-weight"><strong>3.2.1 Height and weight</strong></h2>
+
+<p>Previously we looked at a scatter plot of height and weight, and saw that taller people tend to be heavier. Now let’s take a closer look using a box plot. The
+ <code class="language-plaintext highlighter-rouge">brfss</code>
+ DataFrame contains a variable
+ <code class="language-plaintext highlighter-rouge">'_HTMG10'</code>
+ that represents height in centimeters, binned into 10 cm groups.</p>
+
+<p>Recall how Allen created the box plot of
+ <code class="language-plaintext highlighter-rouge">'AGE'</code>
+ and
+ <code class="language-plaintext highlighter-rouge">'WTKG3'</code>
+ in the video, with the y-axis on a logarithmic scale:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+sns.boxplot(x='AGE', y='WTKG3', data=data, whis=10)
+plt.yscale('log')
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Drop rows with missing data
+</span><span class="n">data</span> <span class="o">=</span> <span class="n">brfss</span><span class="p">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s">'_HTMG10'</span><span class="p">,</span> <span class="s">'WTKG3'</span><span class="p">])</span>
+
+<span class="c1"># Make a box plot
+</span><span class="n">sns</span><span class="p">.</span><span class="n">boxplot</span><span class="p">(</span><span class="s">'_HTMG10'</span><span class="p">,</span><span class="s">'WTKG3'</span><span class="p">,</span><span class="n">whis</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Plot the y-axis on a log scale
+</span><span class="n">plt</span><span class="p">.</span><span class="n">yscale</span><span class="p">(</span><span class="s">'log'</span><span class="p">)</span>
+
+<span class="c1"># Remove unneeded lines and label axes
+</span><span class="n">sns</span><span class="p">.</span><span class="n">despine</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Height in cm'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Weight in kg'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/30-1.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="322-distribution-of-income"><strong>3.2.2 Distribution of income</strong></h3>
+
+<p>In the next two exercises we’ll look at relationships between income and other variables. In the BRFSS, income is represented as a categorical variable; that is, respondents are assigned to one of 8 income categories. The variable name is
+ <code class="language-plaintext highlighter-rouge">'INCOME2'</code>
+ . Before we connect income with anything else, let’s look at the distribution by computing the PMF. Recall that all
+ <code class="language-plaintext highlighter-rouge">Pmf</code>
+ objects have a
+ <code class="language-plaintext highlighter-rouge">.bar()</code>
+ method.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Extract income
+</span><span class="n">income</span> <span class="o">=</span> <span class="n">brfss</span><span class="p">.</span><span class="n">INCOME2</span>
+
+<span class="c1"># Plot the PMF
+</span><span class="n">Pmf</span><span class="p">(</span><span class="n">income</span><span class="p">).</span><span class="n">bar</span><span class="p">()</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Income level'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'PMF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p>Almost half of the respondents are in the top income category, so this dataset doesn’t distinguish between the highest incomes and the median. But maybe it can tell us something about people with incomes below the median.</p>
+
+<h3 id="323-income-and-height"><strong>3.2.3 Income and height</strong></h3>
+
+<p>Let’s now use a violin plot to visualize the relationship between income and height.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Drop rows with missing data
+</span><span class="n">data</span> <span class="o">=</span> <span class="n">brfss</span><span class="p">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s">'INCOME2'</span><span class="p">,</span> <span class="s">'HTM4'</span><span class="p">])</span>
+
+<span class="c1"># Make a violin plot
+</span><span class="n">sns</span><span class="p">.</span><span class="n">violinplot</span><span class="p">(</span><span class="s">'INCOME2'</span><span class="p">,</span><span class="s">'HTM4'</span><span class="p">,</span><span class="n">inner</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span><span class="n">data</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Remove unneeded lines and label axes
+</span><span class="n">sns</span><span class="p">.</span><span class="n">despine</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Income level'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Height in cm'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/31-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>It looks like there is a weak positive relationsip between income and height, at least for incomes below the median.</p>
+
+<hr />
+
+<h2 id="33-correlation"><strong>3.3 Correlation</strong></h2>
+
+<h3 id="331-computing-correlations"><strong>3.3.1 Computing correlations</strong></h3>
+
+<p>The purpose of the BRFSS is to explore health risk factors, so it includes questions about diet. The variable
+ <code class="language-plaintext highlighter-rouge">'_VEGESU1'</code>
+ represents the number of servings of vegetables respondents reported eating per day.</p>
+
+<p>Let’s see how this variable relates to age and income.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Select columns
+</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'AGE'</span><span class="p">,</span> <span class="s">'INCOME2'</span><span class="p">,</span> <span class="s">'_VEGESU1'</span><span class="p">]</span>
+<span class="n">subset</span> <span class="o">=</span> <span class="n">brfss</span><span class="p">[</span><span class="n">columns</span><span class="p">]</span>
+
+<span class="c1"># Compute the correlation matrix
+</span><span class="k">print</span><span class="p">(</span><span class="n">subset</span><span class="p">.</span><span class="n">corr</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+               AGE   INCOME2  _VEGESU1
+AGE       1.000000 -0.015158 -0.009834
+INCOME2  -0.015158  1.000000  0.119670
+_VEGESU1 -0.009834  0.119670  1.000000
+
+</code></pre></div></div>
+
+<h3 id="332-interpreting-correlations"><strong>3.3.2 Interpreting correlations</strong></h3>
+
+<p>In the previous exercise, the correlation between income and vegetable consumption is about
+ <code class="language-plaintext highlighter-rouge">0.12</code>
+ . The correlation between age and vegetable consumption is about
+ <code class="language-plaintext highlighter-rouge">-0.01</code>
+ .</p>
+
+<p>The following are correct interpretations of these results:</p>
+
+<ul>
+  <li>People with higher incomes eat more vegetables.</li>
+  <li>There could be a strong nonlinear relationship between age and vegetable consumption.</li>
+</ul>
+
+<p>The correlation between income and vegetable consumption is small ( 0.12 ), but it suggests that there is a week relationship.</p>
+
+<p>But a correlation( -0.01) close to 0 does mean there is no relationship.</p>
+
+<h2 id="34-simple-regression"><strong>3.4 Simple regression</strong></h2>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/3-8.png?w=762" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/4-8.png?w=868" alt="Desktop View" /></p>
+
+<h3 id="341-income-and-vegetables"><strong>3.4.1 Income and vegetables</strong></h3>
+
+<p>As we saw in a previous exercise, the variable
+ <code class="language-plaintext highlighter-rouge">'_VEGESU1'</code>
+ represents the number of vegetable servings respondents reported eating per day.</p>
+
+<p>Let’s estimate the slope of the relationship between vegetable consumption and income.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from scipy.stats import linregress
+
+# Extract the variables
+subset = brfss.dropna(subset=['INCOME2', '_VEGESU1'])
+xs = subset['INCOME2']
+ys = subset['_VEGESU1']
+
+# Compute the linear regression
+res = linregress(xs,ys)
+print(res)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+LinregressResult(slope=0.06988048092105019, intercept=1.5287786243363106, rvalue=0.11967005884864107, pvalue=1.378503916247615e-238, stderr=0.002110976356332332)
+
+# rvalue: correlation coefficient
+
+</code></pre></div></div>
+
+<h3 id="342-fit-a-line"><strong>3.4.2 Fit a line</strong></h3>
+
+<p>Continuing from the previous exercise:</p>
+
+<ul>
+  <li>Assume that
+ <code class="language-plaintext highlighter-rouge">xs</code>
+ and
+ <code class="language-plaintext highlighter-rouge">ys</code>
+ contain income codes and daily vegetable consumption, respectively, and</li>
+  <li><code class="language-plaintext highlighter-rouge">res</code>
+ contains the results of a simple linear regression of
+ <code class="language-plaintext highlighter-rouge">ys</code>
+ onto
+ <code class="language-plaintext highlighter-rouge">xs</code>
+ .</li>
+</ul>
+
+<p>Now, you’re going to compute the line of best fit. NumPy has been imported for you as
+ <code class="language-plaintext highlighter-rouge">np</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the scatter plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">x_jitter</span> <span class="o">=</span> <span class="n">xs</span> <span class="o">+</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">xs</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_jitter</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="s">'o'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+<span class="c1"># Plot the line of best fit
+</span><span class="n">fx</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="n">xs</span><span class="p">.</span><span class="nb">min</span><span class="p">(),</span> <span class="n">xs</span><span class="p">.</span><span class="nb">max</span><span class="p">()])</span>
+<span class="n">fy</span> <span class="o">=</span> <span class="n">res</span><span class="p">.</span><span class="n">slope</span> <span class="o">*</span> <span class="n">fx</span> <span class="o">+</span> <span class="n">res</span><span class="p">.</span><span class="n">intercept</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fx</span><span class="p">,</span> <span class="n">fy</span><span class="p">,</span> <span class="s">'-'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Income code'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Vegetable servings per day'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/6-8.png?w=1024" alt="Desktop View" /></p>
+
+<h1 id="4-multivariate-thinking"><strong>4. Multivariate Thinking</strong></h1>
+<hr />
+
+<h2 id="41-limits-of-simple-regression"><strong>4.1 Limits of simple regression</strong></h2>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/7-8.png?w=947" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/8-7.png?w=994" alt="Desktop View" /></p>
+
+<h3 id="411-regression-and-causation"><strong>4.1.1 Regression and causation</strong></h3>
+
+<p>In the BRFSS dataset, there is a strong relationship between vegetable consumption and income. The income of people who eat 8 servings of vegetables per day is double the income of people who eat none, on average.</p>
+
+<p>Which of the following conclusions can we draw from this data?</p>
+
+<ul>
+  <li>A. Eating a good diet leads to better health and higher income.</li>
+  <li>B. People with higher income can afford a better diet.</li>
+  <li>C. People with high income are more likely to be vegetarians.</li>
+</ul>
+
+<p><strong>None of them.</strong></p>
+
+<p>This data is consistent with all of these conclusions, but it does not provide conclusive evidence for any of them.</p>
+
+<h3 id="412-using-statsmodels"><strong>4.1.2 Using StatsModels</strong></h3>
+
+<p>Let’s run the same regression using SciPy and StatsModels, and confirm we get the same results.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from scipy.stats import linregress
+import statsmodels.formula.api as smf
+
+# Run regression with linregress
+subset = brfss.dropna(subset=['INCOME2', '_VEGESU1'])
+xs = subset['INCOME2']
+ys = subset['_VEGESU1']
+res = linregress(xs,ys)
+print(res)
+
+# Run regression with StatsModels
+results = smf.ols('_VEGESU1 ~ INCOME2', data = brfss).fit()
+print(results.params)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+LinregressResult(slope=0.06988048092105019, intercept=1.5287786243363106, rvalue=0.11967005884864107, pvalue=1.378503916247615e-238, stderr=0.002110976356332332)
+
+
+Intercept    1.528779
+INCOME2      0.069880
+dtype: float64
+
+</code></pre></div></div>
+
+<p>When you start working with a new library, checks like this help ensure that you are doing it right.</p>
+
+<hr />
+
+<h2 id="42-multiple-regression"><strong>4.2 Multiple regression</strong></h2>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/9-7.png?w=1012" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/10-6.png?w=851" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/11-6.png?w=894" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/12-6.png?w=946" alt="Desktop View" /></p>
+
+<h3 id="421-plot-income-and-education"><strong>4.2.1 Plot income and education</strong></h3>
+
+<p>To get a closer look at the relationship between income and education, let’s use the variable
+ <code class="language-plaintext highlighter-rouge">'educ'</code>
+ to group the data, then plot mean income in each group.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Group by educ
+</span><span class="n">grouped</span> <span class="o">=</span> <span class="n">gss</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'educ'</span><span class="p">)</span>
+
+<span class="c1"># Compute mean income in each group
+</span><span class="n">mean_income_by_educ</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s">'realinc'</span><span class="p">].</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># Plot mean income as a scatter plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mean_income_by_educ</span><span class="p">,</span> <span class="s">'o'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Education (years)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Income (1986 $)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/13-6.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="422-non-linear-model-of-education"><strong>4.2.2 Non-linear model of education</strong></h3>
+
+<p>The graph in the previous exercise suggests that the relationship between income and education is non-linear. So let’s try fitting a non-linear model.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import statsmodels.formula.api as smf
+
+# Add a new column with educ squared
+gss['educ2'] = gss['educ'] ** 2
+
+# Run a regression model with educ, educ2, age, and age2
+results = smf.ols('realinc ~ educ + educ2 + age + age2',data=gss).fit()
+
+# Print the estimated parameters
+print(results.params)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Intercept   -23241.884034
+educ          -528.309369
+educ2          159.966740
+age           1696.717149
+age2           -17.196984
+dtype: float64
+
+</code></pre></div></div>
+
+<p>The slope associated with
+ <code class="language-plaintext highlighter-rouge">educ2</code>
+ is positive, so the model curves upward.</p>
+
+<hr />
+
+<h2 id="43-visualizing-regression-results"><strong>4.3 Visualizing regression results</strong></h2>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/14-5.png?w=981" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/15-4.png?w=699" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/16-2.png?w=877" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/17-2.png?w=932" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/18-2.png?w=833" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/19-2.png?w=911" alt="Desktop View" /></p>
+
+<h3 id="431-making-predictions"><strong>4.3.1 Making predictions</strong></h3>
+
+<p>At this point, we have a model that predicts income using age, education, and sex.</p>
+
+<p>Let’s see what it predicts for different levels of education, holding
+ <code class="language-plaintext highlighter-rouge">age</code>
+ constant.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Run a regression model with educ, educ2, age, and age2
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">smf</span><span class="p">.</span><span class="n">ols</span><span class="p">(</span><span class="s">'realinc ~ educ + educ2 + age + age2'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">gss</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
+
+<span class="c1"># Make the DataFrame
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'educ'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'age'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'educ2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'educ'</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'age2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'age'</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="c1"># Generate and plot the predictions
+</span><span class="n">pred</span> <span class="o">=</span> <span class="n">results</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">pred</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+0    12182.344976
+1    11993.358518
+2    11857.672098
+3    11775.285717
+4    11746.199374
+dtype: float64
+
+</code></pre></div></div>
+
+<h3 id="432-visualizing-predictions"><strong>4.3.2 Visualizing predictions</strong></h3>
+
+<p>Now let’s visualize the results from the previous exercise!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot mean income in each age group
+</span><span class="n">plt</span><span class="p">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">grouped</span> <span class="o">=</span> <span class="n">gss</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'educ'</span><span class="p">)</span>
+<span class="n">mean_income_by_educ</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s">'realinc'</span><span class="p">].</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mean_income_by_educ</span><span class="p">,</span><span class="s">'o'</span><span class="p">,</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># Plot the predictions
+</span><span class="n">pred</span> <span class="o">=</span> <span class="n">results</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'educ'</span><span class="p">],</span> <span class="n">pred</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Age 30'</span><span class="p">)</span>
+
+<span class="c1"># Label axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Education (years)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Income (1986 $)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/20-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>Looks like this model captures the relationship pretty well.</p>
+
+<hr />
+
+<h2 id="44-logistic-regression"><strong>4.4 Logistic regression</strong></h2>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/21-2.png?w=1009" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/22-2.png?w=1007" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/23-2.png?w=699" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/24-2.png?w=681" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/25-2.png?w=887" alt="Desktop View" /></p>
+
+<h3 id="441-predicting-a-binary-variable"><strong>4.4.1 Predicting a binary variable</strong></h3>
+
+<p>Let’s use logistic regression to predict a binary variable. Specifically, we’ll use age, sex, and education level to predict support for legalizing cannabis (marijuana) in the U.S.</p>
+
+<p>In the GSS dataset, the variable
+ <code class="language-plaintext highlighter-rouge">grass</code>
+ records the answer to the question “Do you think the use of marijuana should be made legal or not?”</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Recode grass
+</span><span class="n">gss</span><span class="p">[</span><span class="s">'grass'</span><span class="p">].</span><span class="n">replace</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Run logistic regression
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">smf</span><span class="p">.</span><span class="n">logit</span><span class="p">(</span><span class="s">'grass ~ age + age2 + educ + educ2 + C(sex)'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">gss</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">results</span><span class="p">.</span><span class="n">params</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Intercept     -1.685223
+C(sex)[T.2]   -0.384611
+age           -0.034756
+age2           0.000192
+educ           0.221860
+educ2         -0.004163
+dtype: float64
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Make a DataFrame with a range of ages
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'age'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">89</span><span class="p">)</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'age2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'age'</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="c1"># Set the education level to 12
+</span><span class="n">df</span><span class="p">[</span><span class="s">'educ'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">df</span><span class="p">[</span><span class="s">'educ2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s">'educ'</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
+
+<span class="c1"># Generate predictions for men and women
+</span><span class="n">df</span><span class="p">[</span><span class="s">'sex'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">pred1</span> <span class="o">=</span> <span class="n">results</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s">'sex'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">pred2</span> <span class="o">=</span> <span class="n">results</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+<span class="n">grouped</span> <span class="o">=</span> <span class="n">gss</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'age'</span><span class="p">)</span>
+<span class="n">favor_by_age</span> <span class="o">=</span> <span class="n">grouped</span><span class="p">[</span><span class="s">'grass'</span><span class="p">].</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">clf</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">favor_by_age</span><span class="p">,</span> <span class="s">'o'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'age'</span><span class="p">],</span> <span class="n">pred1</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Male'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'age'</span><span class="p">],</span> <span class="n">pred2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Female'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Age'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Probability of favoring legalization'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/26-2.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="45-next-step"><strong>4.5 Next Step</strong></h2>
+
+<p><img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/27-2.png?w=800" alt="Desktop View" />
+<img src="/blog/assets/datacamp/exploratory-data-analysis-in-python/28-2.png?w=973" alt="Desktop View" /></p>
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

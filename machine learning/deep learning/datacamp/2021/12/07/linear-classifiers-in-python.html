@@ -1,0 +1,1263 @@
+<h1 id="linear-classifiers-in-python">Linear Classifiers in Python</h1>
+
+<p>This is the memo of the 3rd course (5 courses in all) of ‘Machine Learning with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/linear-classifiers-in-python">HERE</a></strong>
+ .</p>
+
+<hr />
+
+<h1 id="1-applying-logistic-regression-and-svm"><strong>1. Applying logistic regression and SVM</strong></h1>
+<hr />
+
+<h2 id="11-scikit-learn-refresher"><strong>1.1 scikit-learn refresher</strong></h2>
+
+<p>####
+<strong>KNN classification</strong></p>
+
+<p>In this exercise you’ll explore a subset of the
+ <a href="http://ai.stanford.edu/~amaas/data/sentiment/">Large Movie Review Dataset</a>
+ . The variables
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ are already loaded into the environment. The
+ <code class="language-plaintext highlighter-rouge">X</code>
+ variables contain features based on the words in the movie reviews, and the
+ <code class="language-plaintext highlighter-rouge">y</code>
+ variables contain labels for whether the review sentiment is positive (+1) or negative (-1).</p>
+
+<p><em>This course touches on a lot of concepts you may have forgotten, so if you ever need a quick refresher, download the
+ <a href="https://datacamp-community-prod.s3.amazonaws.com/5433fa18-9f43-44cc-b228-74672efcd116">Scikit-Learn Cheat Sheet</a>
+ and keep it handy!</em></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X_train.shape
+# (2000, 2500)
+
+X_test.shape
+# (2000, 2500)
+
+type(X_train)
+scipy.sparse.csr.csr_matrix
+
+X_train[0]
+&lt;1x2500 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
+	with 73 stored elements in Compressed Sparse Row format&gt;
+
+y_train[-10:]
+array([-1.,  1.,  1., -1., -1.,  1., -1.,  1.,  1.,  1.])
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.neighbors import KNeighborsClassifier
+
+# Create and fit the model
+knn = KNeighborsClassifier()
+knn.fit(X_train, y_train)
+
+# Predict on the test features, print the results
+pred = knn.predict(X_test)[0]
+print("Prediction for test example 0:", pred)
+
+# Prediction for test example 0: 1.0
+
+</code></pre></div></div>
+
+<p>####
+<strong>Comparing models</strong></p>
+
+<p>Compare k nearest neighbors classifiers with k=1 and k=5 on the handwritten digits data set, which is already loaded into the variables
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ .</p>
+
+<p>Which model has a higher test accuracy?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+knn = KNeighborsClassifier(n_neighbors=1)
+knn.fit(X_train, y_train)
+y_pred = knn.predict(X_test)
+print(accuracy_score(y_test, y_pred))
+# 0.9888888888888889
+
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train, y_train)
+y_pred = knn.predict(X_test)
+print(accuracy_score(y_test, y_pred))
+# 0.9933333333333333
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="12-applying-logistic-regression-and-svm"><strong>1.2 Applying logistic regression and SVM</strong></h2>
+
+<p>####
+<strong>Running LogisticRegression and SVC</strong></p>
+
+<p>In this exercise, you’ll apply logistic regression and a support vector machine to classify images of handwritten digits.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X_train[:2]
+array([[ 0.,  0., 10., 16.,  5.,  0.,  0.,  0.,  0.,  1., 10., 14., 12.,
+         0.,  0.,  0.,  0.,  0.,  0.,  9., 11.,  0.,  0.,  0.,  0.,  0.,
+         2., 11., 13.,  3.,  0.,  0.,  0.,  0., 11., 16., 16., 16.,  7.,
+         0.,  0.,  0.,  3., 16.,  4.,  5.,  1.,  0.,  0.,  0.,  7., 13.,
+         0.,  0.,  0.,  0.,  0.,  0., 13.,  6.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  3., 11., 13., 15.,  3.,  0.,  0.,  4., 16., 14., 11.,
+        16.,  8.,  0.,  0.,  2.,  5.,  0., 14., 15.,  1.,  0.,  0.,  0.,
+         0.,  0., 16., 11.,  0.,  0.,  0.,  0.,  0.,  0., 11., 10.,  0.,
+         0.,  0.,  0.,  0.,  0.,  8., 12.,  0.,  0.,  0.,  0.,  8., 11.,
+        15.,  8.,  0.,  0.,  0.,  0.,  2., 12., 14.,  3.,  0.,  0.]])
+
+y_train[:2]
+# array([7, 3])
+
+X_train.shape
+# (1347, 64)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.model_selection import train_test_split
+from sklearn import datasets
+
+# load the data
+digits = datasets.load_digits()
+X_train, X_test, y_train, y_test = train_test_split(digits.data, digits.target)
+
+# Apply logistic regression and print scores
+lr = LogisticRegression()
+lr.fit(X_train, y_train)
+
+# score(self, X, y[, sample_weight])
+# Returns the mean accuracy on the given test data and labels.
+print(lr.score(X_train, y_train))
+print(lr.score(X_test, y_test))
+# 0.9955456570155902
+# 0.9622222222222222
+
+
+# Apply SVM and print scores
+svm = SVC()
+svm.fit(X_train, y_train)
+
+# score(self, X, y[, sample_weight])
+# Returns the mean accuracy on the given test data and labels.
+print(svm.score(X_train, y_train))
+print(svm.score(X_test, y_test))
+# 1.0
+# 0.48
+
+</code></pre></div></div>
+
+<p>Later in the course we’ll look at the similarities and differences of logistic regression vs. SVMs.</p>
+
+<p>####
+<strong>Sentiment analysis for movie reviews</strong></p>
+
+<p>In this exercise you’ll explore the probabilities outputted by logistic regression on a subset of the
+ <a href="http://ai.stanford.edu/~amaas/data/sentiment/">Large Movie Review Dataset</a>
+ .</p>
+
+<p>The variables
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ are already loaded into the environment.
+ <code class="language-plaintext highlighter-rouge">X</code>
+ contains features based on the number of times words appear in the movie reviews, and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ contains labels for whether the review sentiment is positive (+1) or negative (-1).</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+get_features?
+Signature: get_features(review)
+Docstring: &lt;no docstring&gt;
+File:      /tmp/tmpn52ffwy5/&lt;ipython-input-1-33e0d8df8588&gt;
+Type:      function
+
+review1 = "LOVED IT! This movie was amazing. Top 10 this year."
+review1_features = get_features(review1)
+
+review1_features
+&lt;1x2500 sparse matrix of type '&lt;class 'numpy.int64'&gt;'
+	with 8 stored elements in Compressed Sparse Row format&gt;
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Instantiate logistic regression and train
+</span><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+<span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="c1"># Predict sentiment for a glowing review
+</span><span class="n">review1</span> <span class="o">=</span> <span class="s">"LOVED IT! This movie was amazing. Top 10 this year."</span>
+<span class="n">review1_features</span> <span class="o">=</span> <span class="n">get_features</span><span class="p">(</span><span class="n">review1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Review:"</span><span class="p">,</span> <span class="n">review1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Probability of positive review:"</span><span class="p">,</span> <span class="n">lr</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">review1_features</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+<span class="c1"># Review: LOVED IT! This movie was amazing. Top 10 this year.
+# Probability of positive review: 0.8079007873616059
+</span>
+
+<span class="c1"># Predict sentiment for a poor review
+</span><span class="n">review2</span> <span class="o">=</span> <span class="s">"Total junk! I'll never watch a film by that director again, no matter how good the reviews."</span>
+<span class="n">review2_features</span> <span class="o">=</span> <span class="n">get_features</span><span class="p">(</span><span class="n">review2</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Review:"</span><span class="p">,</span> <span class="n">review2</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Probability of positive review:"</span><span class="p">,</span> <span class="n">lr</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">review2_features</span><span class="p">)[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Review: Total junk! I'll never watch a film by that director again, no matter how good the reviews.
+# Probability of positive review: 0.5855117402793947
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="13-linear-classifiers"><strong>1.3 Linear classifiers</strong></h2>
+
+<p>####
+<strong>Visualizing decision boundaries</strong></p>
+
+<p>In this exercise, you’ll visualize the decision boundaries of various classifier types.</p>
+
+<p>A subset of
+ <code class="language-plaintext highlighter-rouge">scikit-learn</code>
+ ‘s built-in
+ <code class="language-plaintext highlighter-rouge">wine</code>
+ dataset is already loaded into
+ <code class="language-plaintext highlighter-rouge">X</code>
+ , along with binary labels in
+ <code class="language-plaintext highlighter-rouge">y</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X[:3]
+array([[11.45,  2.4 ],
+       [13.62,  4.95],
+       [13.88,  1.89]])
+
+y[:3]
+array([ True,  True, False])
+
+
+plot_4_classifiers?
+Signature: plot_4_classifiers(X, y, clfs)
+Docstring: &lt;no docstring&gt;
+File:      /usr/local/share/datasets/plot_classifier.py
+Type:      function
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC, LinearSVC
+from sklearn.neighbors import KNeighborsClassifier
+
+# Define the classifiers
+classifiers = [LogisticRegression(), LinearSVC(), SVC(), KNeighborsClassifier()]
+
+# Fit the classifiers
+for c in classifiers:
+    c.fit(X, y)
+
+# Plot the classifiers
+plot_4_classifiers(X, y, classifiers)
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture-6.png?w=1024" alt="Desktop View" /></p>
+
+<p>As you can see,
+ <strong>logistic regression and linear SVM are linear classifiers whereas the default SVM and KNN are not.</strong></p>
+
+<hr />
+
+<h1 id="2-loss-functions"><strong>2. Loss functions</strong></h1>
+<hr />
+
+<h2 id="21-linear-classifiers-the-coefficients"><strong>2.1 Linear classifiers: the coefficients</strong></h2>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture1-6.png?w=983" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture2-8.png?w=971" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture3-10.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture4-9.png?w=943" alt="Desktop View" /></p>
+
+<p>####
+<strong>Changing the model coefficients</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Set the coefficients
+</span><span class="n">model</span><span class="p">.</span><span class="n">coef_</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">model</span><span class="p">.</span><span class="n">intercept_</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="c1"># Plot the data and decision boundary
+</span><span class="n">plot_classifier</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">model</span><span class="p">)</span>
+
+<span class="c1"># Print the number of errors
+</span><span class="n">num_err</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">y</span> <span class="o">!=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Number of errors:"</span><span class="p">,</span> <span class="n">num_err</span><span class="p">)</span>
+
+<span class="c1"># Number of errors: 0
+</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture5-9.png?w=644" alt="Desktop View" /></p>
+
+<p>model.coef_ = np.array([[-1,1]])</p>
+
+<p>model.intercept_ = np.array([-3])
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture6-9.png?w=642" alt="Desktop View" /></p>
+
+<p>model.coef_ = np.array([[-1,1]])</p>
+
+<p>model.intercept_ = np.array([1])
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture5-10.png?w=644" alt="Desktop View" /></p>
+
+<p>model.coef_ = np.array([[-1,1]])</p>
+
+<p>model.intercept_ = np.array([-3])
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture7-7.png?w=639" alt="Desktop View" /></p>
+
+<p>model.coef_ = np.array([[-1,0]])</p>
+
+<p>model.intercept_ = np.array([-3])
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture5-11.png?w=644" alt="Desktop View" /></p>
+
+<p>model.coef_ = np.array([[-1,1]])</p>
+
+<p>model.intercept_ = np.array([-3])
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture10-6.png?w=640" alt="Desktop View" /></p>
+
+<p>model.coef_ = np.array([[-1,2]])</p>
+
+<p>model.intercept_ = np.array([-3])
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture5-12.png?w=644" alt="Desktop View" /></p>
+
+<p>model.coef_ = np.array([[-1,1]])</p>
+
+<p>model.intercept_ = np.array([-3])
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture9-4.png?w=637" alt="Desktop View" /></p>
+
+<p>model.coef_ = np.array([[0,1]])</p>
+
+<p>model.intercept_ = np.array([-3])</p>
+
+<p>As you can see, the coefficients determine the slope of the boundary and the intercept shifts it.</p>
+
+<hr />
+
+<h2 id="22-what-is-a-loss-function"><strong>2.2 What is a loss function?</strong></h2>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture11-5.png?w=976" alt="Desktop View" /></p>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture12-5.png?w=985" alt="Desktop View" /></p>
+
+<p>####
+<strong>Minimizing a loss function</strong></p>
+
+<p>In this exercise you’ll implement linear regression “from scratch” using
+ <code class="language-plaintext highlighter-rouge">scipy.optimize.minimize</code>
+ .</p>
+
+<p>We’ll train a model on the Boston housing price data set, which is already loaded into the variables
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ . For simplicity, we won’t include an intercept in our regression model.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X.shape
+(506, 13)
+
+X[:2]
+array([[6.3200e-03, 1.8000e+01, 2.3100e+00, 0.0000e+00, 5.3800e-01,
+        6.5750e+00, 6.5200e+01, 4.0900e+00, 1.0000e+00, 2.9600e+02,
+        1.5300e+01, 3.9690e+02, 4.9800e+00],
+       [2.7310e-02, 0.0000e+00, 7.0700e+00, 0.0000e+00, 4.6900e-01,
+        6.4210e+00, 7.8900e+01, 4.9671e+00, 2.0000e+00, 2.4200e+02,
+        1.7800e+01, 3.9690e+02, 9.1400e+00]])
+
+y[:3]
+array([24. , 21.6, 34.7])
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from scipy.optimize import minimize
+# The squared error, summed over training examples
+def my_loss(w):
+    s = 0
+    for i in range(y.size):
+        # Get the true and predicted target values for example 'i'
+        y_i_true = y[i]
+        y_i_pred = w@X[i]
+        s = s + (y_i_true - y_i_pred)**2
+    return s
+
+# Returns the w that makes my_loss(w) smallest
+w_fit = minimize(my_loss, X[0]).x
+print(w_fit)
+
+# Compare with scikit-learn's LinearRegression coefficients
+lr = LinearRegression(fit_intercept=False).fit(X,y)
+print(lr.coef_)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[-9.16299112e-02  4.86754828e-02 -3.77698794e-03  2.85635998e+00
+ -2.88057050e+00  5.92521269e+00 -7.22470732e-03 -9.67992974e-01
+  1.70448714e-01 -9.38971600e-03 -3.92421893e-01  1.49830571e-02
+ -4.16973012e-01]
+
+[-9.16297843e-02  4.86751203e-02 -3.77930006e-03  2.85636751e+00
+ -2.88077933e+00  5.92521432e+00 -7.22447929e-03 -9.67995240e-01
+  1.70443393e-01 -9.38925373e-03 -3.92425680e-01  1.49832102e-02
+ -4.16972624e-01]
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="23-loss-function-diagrams"><strong>2.3 Loss function diagrams</strong></h2>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture13-5.png?w=947" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture14-4.png?w=942" alt="Desktop View" /></p>
+
+<p>not good for classification because loss is large on the correct predict
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture15-5.png?w=934" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture16-5.png?w=945" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture17-2.png?w=900" alt="Desktop View" /></p>
+
+<p>####
+<strong>Classification loss functions</strong></p>
+
+<p>Which of the four loss functions makes sense for classification?</p>
+
+<p><img src="https://s3.amazonaws.com/assets.datacamp.com/production/course_6199/datasets/multiple_choice_loss_diagram.png" alt="" /></p>
+
+<p>2.</p>
+
+<p>This loss is very similar to the hinge loss used in SVMs (just shifted slightly).</p>
+
+<p>####
+<strong>Comparing the logistic and hinge losses</strong></p>
+
+<p>In this exercise you’ll create a plot of the logistic and hinge losses using their mathematical expressions, which are provided to you.</p>
+
+<p>The loss function diagram from the video is shown below.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Mathematical functions for logistic and hinge losses
+</span><span class="k">def</span> <span class="nf">log_loss</span><span class="p">(</span><span class="n">raw_model_output</span><span class="p">):</span>
+   <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span><span class="o">+</span><span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">raw_model_output</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">hinge_loss</span><span class="p">(</span><span class="n">raw_model_output</span><span class="p">):</span>
+   <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">maximum</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="o">-</span><span class="n">raw_model_output</span><span class="p">)</span>
+
+<span class="c1"># Create a grid of values and plot
+</span><span class="n">grid</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">log_loss</span><span class="p">(</span><span class="n">grid</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s">'logistic'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">grid</span><span class="p">,</span> <span class="n">hinge_loss</span><span class="p">(</span><span class="n">grid</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s">'hinge'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture18-3.png?w=1024" alt="Desktop View" /></p>
+
+<p>As you can see, these match up with the loss function diagrams above.</p>
+
+<p>####
+<strong>Implementing logistic regression</strong></p>
+
+<p>This is very similar to the earlier exercise where you implemented linear regression “from scratch” using
+ <code class="language-plaintext highlighter-rouge">scipy.optimize.minimize</code>
+ . However, this time we’ll minimize the logistic loss and compare with scikit-learn’s
+ <code class="language-plaintext highlighter-rouge">LogisticRegression</code>
+ (we’ve set
+ <code class="language-plaintext highlighter-rouge">C</code>
+ to a large value to disable regularization; more on this in Chapter 3!).</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">log_loss()</code>
+ function from the previous exercise is already defined in your environment, and the
+ <code class="language-plaintext highlighter-rouge">sklearn</code>
+ breast cancer prediction dataset (first 10 features, standardized) is loaded into the variables
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X.shape
+(569, 10)
+
+
+X[:2]
+array([[ 1.09706398e+00, -2.07333501e+00,  1.26993369e+00,
+         9.84374905e-01,  1.56846633e+00,  3.28351467e+00,
+         2.65287398e+00,  2.53247522e+00,  2.21751501e+00,
+         2.25574689e+00],
+       [ 1.82982061e+00, -3.53632408e-01,  1.68595471e+00,
+         1.90870825e+00, -8.26962447e-01, -4.87071673e-01,
+        -2.38458552e-02,  5.48144156e-01,  1.39236330e-03,
+        -8.68652457e-01]])
+
+
+y[:2]
+array([-1, -1])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># The logistic loss, summed over training examples
+</span><span class="k">def</span> <span class="nf">my_loss</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">y</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">raw_model_output</span> <span class="o">=</span> <span class="n">w</span><span class="o">@</span><span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">s</span> <span class="o">+</span> <span class="n">log_loss</span><span class="p">(</span><span class="n">raw_model_output</span> <span class="o">*</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">s</span>
+
+<span class="c1"># Returns the w that makes my_loss(w) smallest
+</span><span class="n">w_fit</span> <span class="o">=</span> <span class="n">minimize</span><span class="p">(</span><span class="n">my_loss</span><span class="p">,</span> <span class="n">X</span><span class="p">[</span><span class="mi">0</span><span class="p">]).</span><span class="n">x</span>
+<span class="k">print</span><span class="p">(</span><span class="n">w_fit</span><span class="p">)</span>
+
+<span class="c1"># Compare with scikit-learn's LogisticRegression
+</span><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">C</span><span class="o">=</span><span class="mi">1000000</span><span class="p">).</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[ 1.03592182 -1.65378492  4.08331342 -9.40923002 -1.06786489  0.07892114
+ -0.85110344 -2.44103305 -0.45285671  0.43353448]
+
+[[ 1.03731085 -1.65339037  4.08143924 -9.40788356 -1.06757746  0.07895582
+  -0.85072003 -2.44079089 -0.45271     0.43334997]]
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+minimize(my_loss, X[0])
+
+      fun: 73.43533837769074
+ hess_inv: array([[ 0.36738362, -0.00184266, -0.09662977, -0.38758529, -0.0212197 ,
+        -0.05640658, -0.03033375,  0.21477573,  0.01029659, -0.03659313],
+...
+       [-0.03659313, -0.00862774,  0.09674119,  0.03706539,  0.02197145,
+        -0.16126887,  0.06496472, -0.09572242,  0.01406182,  0.0907421 ]])
+      jac: array([ 0.00000000e+00,  4.76837158e-06,  2.86102295e-06,  3.81469727e-06,
+       -4.76837158e-06, -2.86102295e-06, -6.67572021e-06, -9.53674316e-07,
+        9.53674316e-07, -7.62939453e-06])
+  message: 'Optimization terminated successfully.'
+     nfev: 660
+      nit: 40
+     njev: 55
+   status: 0
+  success: True
+        x: array([ 1.03592182, -1.65378492,  4.08331342, -9.40923002, -1.06786489,
+        0.07892114, -0.85110344, -2.44103305, -0.45285671,  0.43353448])
+
+</code></pre></div></div>
+
+<p>As you can see, logistic regression is just minimizing the loss function we’ve been looking at.</p>
+
+<hr />
+
+<h1 id="3-logistic-regression"><strong>3. Logistic regression</strong></h1>
+<hr />
+
+<h2 id="31-logistic-regression-and-regularization"><strong>3.1 Logistic regression and regularization</strong></h2>
+
+<p>####
+<strong>Regularized logistic regression</strong></p>
+
+<p>In Chapter 1, you used logistic regression on the handwritten digits data set. Here, we’ll explore the effect of L2 regularization.</p>
+
+<p>The handwritten digits dataset is already loaded, split, and stored in the variables
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">X_valid</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">y_valid</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X_train[:2]
+array([[ 0.,  0.,  7., 15., 15.,  5.,  0.,  0.,  0.,  6., 16., 12., 16.,
+        12.,  0.,  0.,  0.,  1.,  7.,  0., 16., 10.,  0.,  0.,  0.,  0.,
+         0., 10., 15.,  0.,  0.,  0.,  0.,  0.,  1., 16.,  7.,  0.,  0.,
+         0.,  0.,  0., 10., 13.,  1.,  5.,  1.,  0.,  0.,  0., 12., 12.,
+        13., 15.,  3.,  0.,  0.,  0., 10., 16., 13.,  3.,  0.,  0.],
+       [ 0.,  0.,  0., 10., 11.,  0.,  0.,  0.,  0.,  0.,  3., 16., 10.,
+         0.,  0.,  0.,  0.,  0.,  8., 16.,  0.,  0.,  0.,  0.,  0.,  0.,
+        12., 14.,  0.,  0.,  0.,  0.,  0.,  0., 14., 16., 15.,  6.,  0.,
+         0.,  0.,  0., 12., 16., 12., 15.,  6.,  0.,  0.,  0.,  7., 16.,
+        10., 13., 14.,  0.,  0.,  0.,  0.,  9., 13., 11.,  6.,  0.]])
+
+y_train[:2]
+array([2, 6])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Train and validaton errors initialized as empty list
+</span><span class="n">train_errs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="n">valid_errs</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+
+<span class="c1"># Loop over values of C_value
+</span><span class="k">for</span> <span class="n">C_value</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1000</span><span class="p">]:</span>
+    <span class="c1"># Create LogisticRegression object and fit
+</span>    <span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="n">C_value</span><span class="p">)</span>
+    <span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+    <span class="c1"># Evaluate error rates and append to lists
+</span>    <span class="n">train_errs</span><span class="p">.</span><span class="n">append</span><span class="p">(</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span> <span class="p">)</span>
+    <span class="n">valid_errs</span><span class="p">.</span><span class="n">append</span><span class="p">(</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">lr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_valid</span><span class="p">,</span> <span class="n">y_valid</span><span class="p">)</span> <span class="p">)</span>
+
+<span class="c1"># Plot results
+</span><span class="n">plt</span><span class="p">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">C_values</span><span class="p">,</span> <span class="n">train_errs</span><span class="p">,</span> <span class="n">C_values</span><span class="p">,</span> <span class="n">valid_errs</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">((</span><span class="s">"train"</span><span class="p">,</span> <span class="s">"validation"</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture4-10.png?w=1024" alt="Desktop View" /></p>
+
+<p>As you can see, too much regularization (small
+ <code class="language-plaintext highlighter-rouge">C</code>
+ ) doesn’t work well – due to underfitting – and too little regularization (large
+ <code class="language-plaintext highlighter-rouge">C</code>
+ ) doesn’t work well either – due to overfitting.</p>
+
+<p>####
+<strong>Logistic regression and feature selection</strong></p>
+
+<p>In this exercise we’ll perform feature selection on the movie review sentiment data set using L1 regularization. The features and targets are already loaded for you in
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ .</p>
+
+<p>We’ll search for the best value of
+ <code class="language-plaintext highlighter-rouge">C</code>
+ using scikit-learn’s
+ <code class="language-plaintext highlighter-rouge">GridSearchCV()</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Specify L1 regularization
+</span><span class="n">lr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">penalty</span><span class="o">=</span><span class="s">'l1'</span><span class="p">)</span>
+
+<span class="c1"># Instantiate the GridSearchCV object and run the search
+</span><span class="n">searcher</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">lr</span><span class="p">,</span> <span class="p">{</span><span class="s">'C'</span><span class="p">:[</span><span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">]})</span>
+<span class="n">searcher</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Report the best parameters
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Best CV params"</span><span class="p">,</span> <span class="n">searcher</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+
+<span class="c1"># Find the number of nonzero coefficients (selected features)
+</span><span class="n">best_lr</span> <span class="o">=</span> <span class="n">searcher</span><span class="p">.</span><span class="n">best_estimator_</span>
+<span class="n">coefs</span> <span class="o">=</span> <span class="n">best_lr</span><span class="p">.</span><span class="n">coef_</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Total number of features:"</span><span class="p">,</span> <span class="n">coefs</span><span class="p">.</span><span class="n">size</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Number of selected features:"</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">count_nonzero</span><span class="p">(</span><span class="n">coefs</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Best CV params {'C': 1}
+Total number of features: 2500
+Number of selected features: 1220
+
+</code></pre></div></div>
+
+<p>####
+<strong>Identifying the most positive and negative words</strong></p>
+
+<p>In this exercise we’ll try to interpret the coefficients of a logistic regression fit on the movie review sentiment dataset. The model object is already instantiated and fit for you in the variable
+ <code class="language-plaintext highlighter-rouge">lr</code>
+ .</p>
+
+<p>In addition, the words corresponding to the different features are loaded into the variable
+ <code class="language-plaintext highlighter-rouge">vocab</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+lr
+LogisticRegression(C=1.0, class_weight=None, dual=False, fit_intercept=True,
+          intercept_scaling=1, max_iter=100, multi_class='ovr', n_jobs=1,
+          penalty='l2', random_state=None, solver='liblinear', tol=0.0001,
+          verbose=0, warm_start=False)
+
+vocab.shape
+(2500,)
+
+vocab[:3]
+array(['the', 'and', 'a'], dtype='&lt;U14')
+
+vocab[-3:]
+array(['birth', 'sorts', 'gritty'], dtype='&lt;U14')
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Get the indices of the sorted cofficients
+</span><span class="n">inds_ascending</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="p">.</span><span class="n">flatten</span><span class="p">())</span>
+<span class="n">inds_ascending</span>
+<span class="c1"># array([1278,  427,  240, ..., 1458,  870,  493])
+</span>
+<span class="n">inds_descending</span> <span class="o">=</span> <span class="n">inds_ascending</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">inds_descending</span>
+<span class="c1"># array([ 493,  870, 1458, ...,  240,  427, 1278])
+</span>
+
+<span class="c1"># Print the most positive words
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Most positive words: "</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">""</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">vocab</span><span class="p">[</span><span class="n">inds_descending</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">end</span><span class="o">=</span><span class="s">", "</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+
+<span class="c1"># Most positive words: favorite, superb, noir, knowing, loved,
+</span>
+
+<span class="c1"># Print most negative words
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Most negative words: "</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">""</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">vocab</span><span class="p">[</span><span class="n">inds_ascending</span><span class="p">][</span><span class="n">i</span><span class="p">],</span> <span class="n">end</span><span class="o">=</span><span class="s">", "</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+
+<span class="c1"># Most negative words: disappointing, waste, worst, boring, lame,
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="32-logistic-regression-and-probabilities"><strong>3.2 Logistic regression and probabilities</strong></h2>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture5-13.png?w=966" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture6-10.png?w=935" alt="Desktop View" /></p>
+
+<p>####
+<strong>Regularization and probabilities</strong></p>
+
+<p>In this exercise, you will observe the effects of changing the regularization strength on the predicted probabilities.</p>
+
+<p>A 2D binary classification dataset is already loaded into the environment as
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X.shape
+(20, 2)
+
+X[:3]
+array([[ 1.78862847,  0.43650985],
+       [ 0.09649747, -1.8634927 ],
+       [-0.2773882 , -0.35475898]])
+
+y[:3]
+array([-1, -1, -1])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Set the regularization strength
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Fit and plot
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+<span class="n">plot_classifier</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">model</span><span class="p">,</span><span class="n">proba</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Predict probabilities on training points
+</span><span class="n">prob</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Maximum predicted probability"</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">prob</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture7-8.png?w=1024" alt="Desktop View" /></p>
+
+<p>C = 1</p>
+
+<p>Maximum predicted probability 0.9761229966765974
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture8-6.png?w=1024" alt="Desktop View" /></p>
+
+<p>C=0.1</p>
+
+<p>Maximum predicted probability 0.8990965659596716</p>
+
+<p>Smaller values of
+ <code class="language-plaintext highlighter-rouge">C</code>
+ lead to less confident predictions.</p>
+
+<p>That’s because smaller
+ <code class="language-plaintext highlighter-rouge">C</code>
+ means more regularization, which in turn means smaller coefficients, which means raw model outputs closer to zero.</p>
+
+<p>####
+<strong>Visualizing easy and difficult examples</strong></p>
+
+<p>In this exercise, you’ll visualize the examples that the logistic regression model is most and least confident about by looking at the largest and smallest predicted probabilities.</p>
+
+<p>The handwritten digits dataset is already loaded into the variables
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ . The
+ <code class="language-plaintext highlighter-rouge">show_digit</code>
+ function takes in an integer index and plots the corresponding image, with some extra information displayed above the image.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X.shape
+(1797, 64)
+
+X[0]
+array([ 0.,  0.,  5., 13.,  9.,  1.,  0.,  0.,  0.,  0., 13., 15., 10.,
+       15.,  5.,  0.,  0.,  3., 15.,  2.,  0., 11.,  8.,  0.,  0.,  4.,
+       12.,  0.,  0.,  8.,  8.,  0.,  0.,  5.,  8.,  0.,  0.,  9.,  8.,
+        0.,  0.,  4., 11.,  0.,  1., 12.,  7.,  0.,  0.,  2., 14.,  5.,
+       10., 12.,  0.,  0.,  0.,  0.,  6., 13., 10.,  0.,  0.,  0.])
+
+y[:3]
+array([0, 1, 2])
+
+show_digit?
+Signature: show_digit(i, lr=None)
+Docstring: &lt;no docstring&gt;
+File:      /tmp/tmp12h5q4tk/&lt;ipython-input-1-5d2049073a74&gt;
+Type:      function
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+lr = LogisticRegression()
+lr.fit(X,y)
+
+# Get predicted probabilities
+proba = lr.predict_proba(X)
+
+# Sort the example indices by their maximum probability
+proba_inds = np.argsort(np.max(proba,axis=1))
+
+# Show the most confident (least ambiguous) digit
+show_digit(proba_inds[-1], lr)
+
+# Show the least confident (most ambiguous) digit
+show_digit(proba_inds[0], lr)
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture9-5.png?w=547" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture10-7.png?w=543" alt="Desktop View" /></p>
+
+<p>As you can see, the least confident example looks like a weird 4, and the most confident example looks like a very typical 0.</p>
+
+<hr />
+
+<h2 id="33-multi-class-logistic-regression"><strong>3.3 Multi-class logistic regression</strong></h2>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture11-6.png?w=985" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture12-6.png?w=978" alt="Desktop View" /></p>
+
+<p>####
+<strong>Counting the coefficients</strong></p>
+
+<p>If you fit a logistic regression model on a classification problem with 3 classes and 100 features, how many coefficients would you have, including intercepts?</p>
+
+<p>303</p>
+
+<p>100 coefficients + 1 intercept for each binary classifier. (A, B), (B, C), (C, A)</p>
+
+<p>101 * 3 = 303</p>
+
+<p>####
+<strong>Fitting multi-class logistic regression</strong></p>
+
+<p>In this exercise, you’ll fit the two types of multi-class logistic regression, one-vs-rest and softmax/multinomial, on the handwritten digits data set and compare the results.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Fit one-vs-rest logistic regression classifier
+</span><span class="n">lr_ovr</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">()</span>
+<span class="n">lr_ovr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"OVR training accuracy:"</span><span class="p">,</span> <span class="n">lr_ovr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"OVR test accuracy    :"</span><span class="p">,</span> <span class="n">lr_ovr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
+
+<span class="c1"># Fit softmax classifier
+</span><span class="n">lr_mn</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">multi_class</span><span class="o">=</span><span class="s">'multinomial'</span><span class="p">,</span> <span class="n">solver</span><span class="o">=</span><span class="s">'lbfgs'</span><span class="p">)</span>
+<span class="n">lr_mn</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"Softmax training accuracy:"</span><span class="p">,</span> <span class="n">lr_mn</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Softmax test accuracy    :"</span><span class="p">,</span> <span class="n">lr_mn</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+OVR training accuracy: 0.9948032665181886
+OVR test accuracy    : 0.9644444444444444
+
+Softmax training accuracy: 1.0
+Softmax test accuracy    : 0.9688888888888889
+
+</code></pre></div></div>
+
+<p>As you can see, the accuracies of the two methods are fairly similar on this data set.</p>
+
+<p>####
+<strong>Visualizing multi-class logistic regression</strong></p>
+
+<p>In this exercise we’ll continue with the two types of multi-class logistic regression, but on a toy 2D data set specifically designed to break the one-vs-rest scheme.</p>
+
+<p>The data set is loaded into
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ . The two logistic regression objects,
+ <code class="language-plaintext highlighter-rouge">lr_mn</code>
+ and
+ <code class="language-plaintext highlighter-rouge">lr_ovr</code>
+ , are already instantiated (with
+ <code class="language-plaintext highlighter-rouge">C=100</code>
+ ), fit, and plotted.</p>
+
+<p>Notice that
+ <code class="language-plaintext highlighter-rouge">lr_ovr</code>
+ never predicts the dark blue class… yikes! Let’s explore why this happens by plotting one of the binary classifiers that it’s using behind the scenes.</p>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture1-7.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture2-9.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print training accuracies
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Softmax     training accuracy:"</span><span class="p">,</span> <span class="n">lr_mn</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"One-vs-rest training accuracy:"</span><span class="p">,</span> <span class="n">lr_ovr</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">))</span>
+
+<span class="c1"># Softmax     training accuracy: 0.996
+# One-vs-rest training accuracy: 0.916
+</span>
+<span class="c1"># Create the binary classifier (class 1 vs. rest)
+</span><span class="n">lr_class_1</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="n">lr_class_1</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Plot the binary classifier (class 1 vs. rest)
+</span><span class="n">plot_classifier</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span> <span class="n">lr_class_1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture3-11.png?w=1024" alt="Desktop View" /></p>
+
+<p>As you can see, the binary classifier incorrectly labels almost all points in class 1 (shown as red triangles in the final plot)! Thus, this classifier is not a very effective component of the one-vs-rest classifier.</p>
+
+<p>In general, though, one-vs-rest often works well.</p>
+
+<p>####
+<strong>One-vs-rest SVM</strong></p>
+
+<p>As motivation for the next and final chapter on support vector machines, we’ll repeat the previous exercise with a non-linear SVM.</p>
+
+<p>Instead of using
+ <code class="language-plaintext highlighter-rouge">LinearSVC</code>
+ , we’ll now use scikit-learn’s
+ <code class="language-plaintext highlighter-rouge">SVC</code>
+ object, which is a non-linear “kernel” SVM (much more on what this means in Chapter 4!). Again, your task is to create a plot of the binary classifier for class 1 vs. rest.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># We'll use SVC instead of LinearSVC from now on
+</span><span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
+
+<span class="c1"># Create/plot the binary classifier (class 1 vs. rest)
+</span><span class="n">svm_class_1</span> <span class="o">=</span> <span class="n">SVC</span><span class="p">()</span>
+<span class="n">svm_class_1</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">==</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plot_classifier</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="o">==</span><span class="mi">1</span><span class="p">,</span> <span class="n">svm_class_1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture4-11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture5-14.png?w=1024" alt="Desktop View" /></p>
+
+<p>The non-linear SVM works fine with one-vs-rest on this dataset because it learns to “surround” class 1.</p>
+
+<hr />
+
+<h1 id="4-support-vector-machines"><strong>4. Support Vector Machines</strong></h1>
+<hr />
+
+<h2 id="41-support-vectors"><strong>4.1 Support vectors</strong></h2>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture7-9.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture6-11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture8-7.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Effect of removing examples</strong></p>
+
+<p>Support vectors are defined as training examples that influence the decision boundary. In this exercise, you’ll observe this behavior by removing non support vectors from the training set.</p>
+
+<p>The wine quality dataset is already loaded into
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ (first two features only). (Note: we specify
+ <code class="language-plaintext highlighter-rouge">lims</code>
+ in
+ <code class="language-plaintext highlighter-rouge">plot_classifier()</code>
+ so that the two plots are forced to use the same axis limits and can be compared directly.)</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X.shape
+(178, 2)
+
+X[:3]
+array([[14.23,  1.71],
+       [13.2 ,  1.78],
+       [13.16,  2.36]])
+
+set(y)
+{0, 1, 2}
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Train a linear SVM
+</span><span class="n">svm</span> <span class="o">=</span> <span class="n">SVC</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s">"linear"</span><span class="p">)</span>
+<span class="n">svm</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+<span class="n">plot_classifier</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">svm</span><span class="p">,</span> <span class="n">lims</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+<span class="c1"># Make a new data set keeping only the support vectors
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Number of original examples"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Number of support vectors"</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">svm</span><span class="p">.</span><span class="n">support_</span><span class="p">))</span>
+<span class="n">X_small</span> <span class="o">=</span> <span class="n">X</span><span class="p">[</span><span class="n">svm</span><span class="p">.</span><span class="n">support_</span><span class="p">]</span>
+<span class="n">y_small</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">svm</span><span class="p">.</span><span class="n">support_</span><span class="p">]</span>
+
+<span class="c1"># Train a new SVM using only the support vectors
+</span><span class="n">svm_small</span> <span class="o">=</span> <span class="n">SVC</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s">"linear"</span><span class="p">)</span>
+<span class="n">svm_small</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_small</span><span class="p">,</span> <span class="n">y_small</span><span class="p">)</span>
+<span class="n">plot_classifier</span><span class="p">(</span><span class="n">X_small</span><span class="p">,</span> <span class="n">y_small</span><span class="p">,</span> <span class="n">svm_small</span><span class="p">,</span> <span class="n">lims</span><span class="o">=</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span><span class="mi">15</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">6</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture9-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture10-8.png?w=1024" alt="Desktop View" /></p>
+
+<p>By the definition of support vectors, the decision boundaries of the two trained models are the same.</p>
+
+<hr />
+
+<h2 id="42-kernel-svms"><strong>4.2 Kernel SVMs</strong></h2>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture1-8.png?w=971" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture2-10.png?w=989" alt="Desktop View" /></p>
+
+<p>####
+<strong>GridSearchCV warm-up</strong></p>
+
+<p>Increasing the RBF kernel hyperparameter
+ <code class="language-plaintext highlighter-rouge">gamma</code>
+ increases training accuracy.</p>
+
+<p>In this exercise we’ll search for the
+ <code class="language-plaintext highlighter-rouge">gamma</code>
+ that maximizes cross-validation accuracy using scikit-learn’s
+ <code class="language-plaintext highlighter-rouge">GridSearchCV</code>
+ .</p>
+
+<p>A binary version of the handwritten digits dataset, in which you’re just trying to predict whether or not an image is a “2”, is already loaded into the variables
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+set(y)
+{False, True}
+
+X.shape
+(898, 64)
+
+X[0]
+array([ 0.,  1., 10., 15., 11.,  1.,  0.,  0.,  0.,  3.,  8.,  8., 11.,
+       12.,  0.,  0.,  0.,  0.,  0.,  5., 14., 15.,  1.,  0.,  0.,  0.,
+        0., 11., 15.,  2.,  0.,  0.,  0.,  0.,  0.,  4., 15.,  2.,  0.,
+        0.,  0.,  0.,  0.,  0., 12., 10.,  0.,  0.,  0.,  0.,  3.,  4.,
+       10., 16.,  1.,  0.,  0.,  0., 13., 16., 15., 10.,  0.,  0.])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Instantiate an RBF SVM
+</span><span class="n">svm</span> <span class="o">=</span> <span class="n">SVC</span><span class="p">()</span>
+
+<span class="c1"># Instantiate the GridSearchCV object and run the search
+</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s">'gamma'</span><span class="p">:[</span><span class="mf">0.00001</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]}</span>
+<span class="n">searcher</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">svm</span><span class="p">,</span> <span class="n">param_grid</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+<span class="n">searcher</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+<span class="c1"># Report the best parameters
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Best CV params"</span><span class="p">,</span> <span class="n">searcher</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+
+<span class="c1"># Best CV params {'gamma': 0.001}
+</span>
+</code></pre></div></div>
+
+<p>Larger values of
+ <code class="language-plaintext highlighter-rouge">gamma</code>
+ are better for training accuracy, but cross-validation helped us find something different (and better!).</p>
+
+<p>####
+<strong>Jointly tuning gamma and C with GridSearchCV</strong></p>
+
+<p>In the previous exercise the best value of
+ <code class="language-plaintext highlighter-rouge">gamma</code>
+ was 0.001 using the default value of
+ <code class="language-plaintext highlighter-rouge">C</code>
+ , which is 1. In this exercise you’ll search for the best combination of
+ <code class="language-plaintext highlighter-rouge">C</code>
+ and
+ <code class="language-plaintext highlighter-rouge">gamma</code>
+ using
+ <code class="language-plaintext highlighter-rouge">GridSearchCV</code>
+ .</p>
+
+<p>As in the previous exercise, the 2-vs-not-2 digits dataset is already loaded, but this time it’s split into the variables
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ .</p>
+
+<p>Even though cross-validation already splits the training set into parts, it’s often a good idea to hold out a separate test set to make sure the cross-validation results are sensible.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Instantiate an RBF SVM
+</span><span class="n">svm</span> <span class="o">=</span> <span class="n">SVC</span><span class="p">()</span>
+
+<span class="c1"># Instantiate the GridSearchCV object and run the search
+</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s">'C'</span><span class="p">:[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="s">'gamma'</span><span class="p">:[</span><span class="mf">0.00001</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">]}</span>
+<span class="n">searcher</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">svm</span><span class="p">,</span> <span class="n">param_grid</span><span class="o">=</span><span class="n">parameters</span><span class="p">)</span>
+<span class="n">searcher</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Report the best parameters and the corresponding score
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Best CV params"</span><span class="p">,</span> <span class="n">searcher</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Best CV accuracy"</span><span class="p">,</span> <span class="n">searcher</span><span class="p">.</span><span class="n">best_score_</span><span class="p">)</span>
+
+<span class="c1"># Report the test accuracy using these best parameters
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Test accuracy of best grid search hypers:"</span><span class="p">,</span> <span class="n">searcher</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Best CV params {'C': 10, 'gamma': 0.0001}
+Best CV accuracy 0.9988864142538976
+Test accuracy of best grid search hypers: 0.9988876529477196
+
+</code></pre></div></div>
+
+<p>Note that the best value of
+ <code class="language-plaintext highlighter-rouge">gamma</code>
+ , 0.0001, is different from the value of 0.001 that we got in the previous exercise, when we fixed
+ <code class="language-plaintext highlighter-rouge">C=1</code>
+ . Hyperparameters can affect each other!</p>
+
+<hr />
+
+<h2 id="43-comparing-logistic-regression-and-svm-and-beyond"><strong>4.3 Comparing logistic regression and SVM (and beyond)</strong></h2>
+
+<p><img src="/blog/assets/datacamp/linear-classifiers-in-python/capture3-12.png?w=972" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture4-12.png?w=680" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture5-15.png?w=733" alt="Desktop View" />
+<img src="/blog/assets/datacamp/linear-classifiers-in-python/capture6-12.png?w=987" alt="Desktop View" /></p>
+
+<p>####
+<strong>An advantage of SVMs</strong></p>
+
+<p>Having a limited number of support vectors makes kernel SVMs computationally efficient.</p>
+
+<p>####
+<strong>An advantage of logistic regression</strong></p>
+
+<p>It naturally outputs meaningful probabilities.</p>
+
+<p>####
+<strong>Using SGDClassifier</strong></p>
+
+<p>In this final coding exercise, you’ll do a hyperparameter search over the regularization type, regularization strength, and the loss (logistic regression vs. linear SVM) using
+ <code class="language-plaintext highlighter-rouge">SGDClassifier()</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X_train.shape
+(1257, 64)
+
+X_train[0]
+array([ 0.,  0.,  2., 10., 16., 11.,  1.,  0.,  0.,  0., 13., 13., 10.,
+       16.,  8.,  0.,  0.,  4., 14.,  1.,  8., 14.,  1.,  0.,  0.,  4.,
+       15., 12., 15.,  8.,  0.,  0.,  0.,  0.,  6.,  7., 14.,  5.,  0.,
+        0.,  0.,  1.,  2.,  0., 12.,  5.,  0.,  0.,  0.,  8., 15.,  6.,
+       13.,  4.,  0.,  0.,  0.,  0.,  5., 11., 16.,  3.,  0.,  0.])
+
+set(y_train)
+{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># We set random_state=0 for reproducibility
+</span><span class="n">linear_classifier</span> <span class="o">=</span> <span class="n">SGDClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Instantiate the GridSearchCV object and run the search
+</span><span class="n">parameters</span> <span class="o">=</span> <span class="p">{</span><span class="s">'alpha'</span><span class="p">:[</span><span class="mf">0.00001</span><span class="p">,</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+             <span class="s">'loss'</span><span class="p">:[</span><span class="s">'hinge'</span><span class="p">,</span> <span class="s">'log'</span><span class="p">],</span> <span class="s">'penalty'</span><span class="p">:[</span><span class="s">'l1'</span><span class="p">,</span> <span class="s">'l2'</span><span class="p">]}</span>
+<span class="n">searcher</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span><span class="n">linear_classifier</span><span class="p">,</span> <span class="n">parameters</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">searcher</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Report the best parameters and the corresponding score
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Best CV params"</span><span class="p">,</span> <span class="n">searcher</span><span class="p">.</span><span class="n">best_params_</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Best CV accuracy"</span><span class="p">,</span> <span class="n">searcher</span><span class="p">.</span><span class="n">best_score_</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Test accuracy of best grid search hypers:"</span><span class="p">,</span> <span class="n">searcher</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Best CV params {'alpha': 0.0001, 'loss': 'hinge', 'penalty': 'l1'}
+Best CV accuracy 0.94351630867144
+Test accuracy of best grid search hypers: 0.9592592592592593
+
+</code></pre></div></div>
+
+<p>One advantage of
+ <code class="language-plaintext highlighter-rouge">SGDClassifier</code>
+ is that it’s very fast – this would have taken a lot longer with
+ <code class="language-plaintext highlighter-rouge">LogisticRegression</code>
+ or
+ <code class="language-plaintext highlighter-rouge">LinearSVC</code>
+ .</p>
+
+<p>The End.</p>
+
+<p>Thank you for reading.</p>
+

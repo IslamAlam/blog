@@ -1,0 +1,1650 @@
+<h1 id="dimensionality-reduction-in-python">Dimensionality Reduction in Python</h1>
+
+<p>This is the memo of the 7th course (23 courses in all) of ‘Machine Learning Scientist with Python’ skill track.
+<strong>You can find the original course</strong> <a href="https://www.datacamp.com/courses/dimensionality-reduction-in-python"><strong>HERE</strong></a>.</p>
+
+<h3 id="course-description">Course Description</h3>
+
+<p>High-dimensional datasets can be overwhelming and leave you not knowing where to start. Typically, you’d visually explore a new dataset first, but when you have too many dimensions the classical approaches will seem insufficient. Fortunately, there are visualization techniques designed specifically for high-dimensional data and you’ll be introduced to these in this course. After exploring the data, you’ll often find that many features hold little information because they don’t show any variance or because they are duplicates of other features. You’ll learn how to detect these features and drop them from the dataset so that you can focus on the informative ones. In a next step, you might want to build a model on these features, and it may turn out that some don’t have any effect on the thing you’re trying to predict. You’ll learn how to detect and drop these irrelevant features too, in order to reduce dimensionality and thus complexity. Finally, you’ll learn how feature extraction techniques can reduce dimensionality for you through the calculation of uncorrelated principal components.</p>
+
+<h3 id="table-of-contents"><strong>Table of contents</strong></h3>
+
+<ol>
+  <li>Exploring high dimensional data</li>
+  <li>Feature selection I, selecting for feature information</li>
+  <li>Feature selection II, selecting for model accuracy</li>
+  <li>
+    <p>Feature extraction</p>
+  </li>
+  <li>
+    <p><strong>Exploring high dimensional data</strong></p>
+
+    <p>You’ll be introduced to the concept of dimensionality reduction and will learn when an why this is important. You’ll learn the difference between feature selection and feature extraction and will apply both techniques for data exploration. The chapter ends with a lesson on t-SNE, a powerful feature extraction technique that will allow you to visualize a high-dimensional dataset.</p>
+  </li>
+  <li>
+    <p><strong>Feature selection I, selecting for feature information</strong></p>
+
+    <p>In this first out of two chapters on feature selection, you’ll learn about the curse of dimensionality and how dimensionality reduction can help you overcome it. You’ll be introduced to a number of techniques to detect and remove features that bring little added value to the dataset. Either because they have little variance, too many missing values, or because they are strongly correlated to other features.</p>
+  </li>
+  <li>
+    <p><strong>Feature selection II, selecting for model accuracy</strong></p>
+
+    <p>In this second chapter on feature selection, you’ll learn how to let models help you find the most important features in a dataset for predicting a particular target feature. In the final lesson of this chapter, you’ll combine the advice of multiple, different, models to decide on which features are worth keeping.</p>
+  </li>
+  <li>
+    <p><strong>Feature extraction</strong></p>
+
+    <p>This chapter is a deep-dive on the most frequently used dimensionality reduction algorithm, Principal Component Analysis (PCA). You’ll build intuition on how and why this algorithm is so powerful and will apply it both for data exploration and data pre-processing in a modeling pipeline. You’ll end with a cool image compression use case.</p>
+  </li>
+</ol>
+
+<h2 id="1-exploring-high-dimensional-data"><strong>1. Exploring high dimensional data</strong></h2>
+
+<p>You’ll be introduced to the concept of dimensionality reduction and will learn when an why this is important. You’ll learn the difference between feature selection and feature extraction and will apply both techniques for data exploration. The chapter ends with a lesson on t-SNE, a powerful feature extraction technique that will allow you to visualize a high-dimensional dataset.</p>
+
+<h3 id="11-introduction"><strong>1.1 Introduction</strong></h3>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/capture.png?w=689" alt="" /></p>
+
+<p><strong>1.1.1 Finding the number of dimensions in a dataset</strong></p>
+
+<p>A larger sample of the Pokemon dataset has been loaded for you as the Pandas dataframe <code class="language-plaintext highlighter-rouge">pokemon_df</code>.</p>
+
+<p>How many dimensions, or columns are in this dataset?</p>
+
+<p>| 12 | <code class="language-plaintext highlighter-rouge">pokemon_df.shape(160,</code> <code class="language-plaintext highlighter-rouge">7)</code> |
+| :— | :— |</p>
+
+<p><strong>1.1.2 Removing features without variance</strong></p>
+
+<p>A sample of the Pokemon dataset has been loaded as <code class="language-plaintext highlighter-rouge">pokemon_df</code>. To get an idea of which features have little variance you should use the IPython Shell to calculate summary statistics on this sample. Then adjust the code to create a smaller, easier to understand, dataset.</p>
+
+<p>| 12345678910 | <code class="language-plaintext highlighter-rouge">pokemon_df.describe()              HP     Attack     Defense  Generationcount</code>  <code class="language-plaintext highlighter-rouge">160.00000</code>  <code class="language-plaintext highlighter-rouge">160.00000</code>  <code class="language-plaintext highlighter-rouge">160.000000</code>       <code class="language-plaintext highlighter-rouge">160.0mean</code>    <code class="language-plaintext highlighter-rouge">64.61250</code>   <code class="language-plaintext highlighter-rouge">74.98125</code>   <code class="language-plaintext highlighter-rouge">70.175000</code>         <code class="language-plaintext highlighter-rouge">1.0std</code>     <code class="language-plaintext highlighter-rouge">27.92127</code>   <code class="language-plaintext highlighter-rouge">29.18009</code>   <code class="language-plaintext highlighter-rouge">28.883533</code>         <code class="language-plaintext highlighter-rouge">0.0min</code>     <code class="language-plaintext highlighter-rouge">10.00000</code>    <code class="language-plaintext highlighter-rouge">5.00000</code>    <code class="language-plaintext highlighter-rouge">5.000000</code>         <code class="language-plaintext highlighter-rouge">1.025%</code>     <code class="language-plaintext highlighter-rouge">45.00000</code>   <code class="language-plaintext highlighter-rouge">52.00000</code>   <code class="language-plaintext highlighter-rouge">50.000000</code>         <code class="language-plaintext highlighter-rouge">1.050%</code>     <code class="language-plaintext highlighter-rouge">60.00000</code>   <code class="language-plaintext highlighter-rouge">71.00000</code>   <code class="language-plaintext highlighter-rouge">65.000000</code>         <code class="language-plaintext highlighter-rouge">1.075%</code>     <code class="language-plaintext highlighter-rouge">80.00000</code>   <code class="language-plaintext highlighter-rouge">95.00000</code>   <code class="language-plaintext highlighter-rouge">85.000000</code>         <code class="language-plaintext highlighter-rouge">1.0max</code>    <code class="language-plaintext highlighter-rouge">250.00000</code>  <code class="language-plaintext highlighter-rouge">155.00000</code>  <code class="language-plaintext highlighter-rouge">180.000000</code>         <code class="language-plaintext highlighter-rouge">1.0</code> |
+| :— | :— |</p>
+
+<p>| 123456 | <code class="language-plaintext highlighter-rouge">pokemon_df.describe(exclude='number')              Name</code>   <code class="language-plaintext highlighter-rouge">Type</code> <code class="language-plaintext highlighter-rouge">Legendarycount</code>          <code class="language-plaintext highlighter-rouge">160</code>    <code class="language-plaintext highlighter-rouge">160</code>       <code class="language-plaintext highlighter-rouge">160unique</code>         <code class="language-plaintext highlighter-rouge">160</code>     <code class="language-plaintext highlighter-rouge">15</code>         <code class="language-plaintext highlighter-rouge">1top     Weepinbell  Water</code>     <code class="language-plaintext highlighter-rouge">Falsefreq</code>             <code class="language-plaintext highlighter-rouge">1</code>     <code class="language-plaintext highlighter-rouge">31</code>       <code class="language-plaintext highlighter-rouge">160</code> |
+| :— | :— |</p>
+
+<p>| 1234567891011 | <code class="language-plaintext highlighter-rouge"># Leave this list as isnumber_cols</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">['HP',</code> <code class="language-plaintext highlighter-rouge">'Attack',</code> <code class="language-plaintext highlighter-rouge">'Defense']</code> <code class="language-plaintext highlighter-rouge"># Remove the feature without variance from this listnon_number_cols</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">['Name',</code> <code class="language-plaintext highlighter-rouge">'Type']</code> <code class="language-plaintext highlighter-rouge"># Create a new dataframe by subselecting the chosen featuresdf_selected</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">pokemon_df[number_cols</code> <code class="language-plaintext highlighter-rouge">+</code> <code class="language-plaintext highlighter-rouge">non_number_cols]</code> <code class="language-plaintext highlighter-rouge"># Prints the first 5 lines of the new dataframeprint(df_selected.head())</code> |
+| :— | :— |</p>
+
+<p>| 123456 | <code class="language-plaintext highlighter-rouge">HP  Attack  Defense                   Name</code>   <code class="language-plaintext highlighter-rouge">Type0</code>  <code class="language-plaintext highlighter-rouge">45</code>      <code class="language-plaintext highlighter-rouge">49</code>       <code class="language-plaintext highlighter-rouge">49</code>              <code class="language-plaintext highlighter-rouge">Bulbasaur  Grass1</code>  <code class="language-plaintext highlighter-rouge">60</code>      <code class="language-plaintext highlighter-rouge">62</code>       <code class="language-plaintext highlighter-rouge">63</code>                <code class="language-plaintext highlighter-rouge">Ivysaur  Grass2</code>  <code class="language-plaintext highlighter-rouge">80</code>      <code class="language-plaintext highlighter-rouge">82</code>       <code class="language-plaintext highlighter-rouge">83</code>               <code class="language-plaintext highlighter-rouge">Venusaur  Grass3</code>  <code class="language-plaintext highlighter-rouge">80</code>     <code class="language-plaintext highlighter-rouge">100</code>      <code class="language-plaintext highlighter-rouge">123</code>  <code class="language-plaintext highlighter-rouge">VenusaurMega Venusaur  Grass4</code>  <code class="language-plaintext highlighter-rouge">39</code>      <code class="language-plaintext highlighter-rouge">52</code>       <code class="language-plaintext highlighter-rouge">43</code>             <code class="language-plaintext highlighter-rouge">Charmander   Fire</code> |
+| :— | :— |</p>
+
+<h3 id="12-feature-selection-vs-feature-extraction"><strong>1.2 Feature selection vs feature extraction</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/1-8.png?w=844" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/2-9.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/3-9.png?w=1016" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/4-9.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/5-9.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/6-9.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>1.2.1 Visually detecting redundant features</strong></p>
+
+<p>Data visualization is a crucial step in any data exploration. Let’s use Seaborn to explore some samples of the US Army ANSUR body measurement dataset.</p>
+
+<p>Two data samples have been pre-loaded as <code class="language-plaintext highlighter-rouge">ansur_df_1</code> and <code class="language-plaintext highlighter-rouge">ansur_df_2</code>.</p>
+
+<p>Seaborn has been imported as <code class="language-plaintext highlighter-rouge">sns</code>.</p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge"># Create a pairplot and color the points using the 'Gender' featuresns.pairplot(ansur_df_1, hue='Gender', diag_kind='hist')</code> <code class="language-plaintext highlighter-rouge"># Show the plotplt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/7-9.png?w=1024" alt="" /></p>
+
+<p>| 12345678 | <code class="language-plaintext highlighter-rouge"># Remove one of the redundant featuresreduced_df</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">ansur_df_1.drop('stature_m', axis=1)</code> <code class="language-plaintext highlighter-rouge"># Create a pairplot and color the points using the 'Gender' featuresns.pairplot(reduced_df, hue='Gender')</code> <code class="language-plaintext highlighter-rouge"># Show the plotplt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/8-8.png?w=1024" alt="" /></p>
+
+<p>| 123456 | <code class="language-plaintext highlighter-rouge"># Create a pairplot and color the points using the 'Gender' featuresns.pairplot(ansur_df_2, hue='Gender', diag_kind='hist')</code>  <code class="language-plaintext highlighter-rouge"># Show the plotplt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/9-8.png?w=1024" alt="" /></p>
+
+<p>| 12345678 | <code class="language-plaintext highlighter-rouge"># Remove the redundant featurereduced_df</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">ansur_df_2.drop('n_legs', axis=1)</code> <code class="language-plaintext highlighter-rouge"># Create a pairplot and color the points using the 'Gender' featuresns.pairplot(reduced_df, hue='Gender', diag_kind='hist')</code> <code class="language-plaintext highlighter-rouge"># Show the plotplt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/10-7.png?w=1024" alt="" /></p>
+
+<p>The body height (inches) and stature (meters) hold the same information in a different unit + all the individuals in the second sample have two legs.</p>
+
+<p><strong>1.2.2 Advantage of feature selection</strong></p>
+
+<p>What advantage does feature selection have over feature extraction?</p>
+
+<p>The selected features remain unchanged, and are therefore easy to interpret.</p>
+
+<h3 id="13-t-sne-visualization-of-high-dimensional-data"><strong>1.3 t-SNE visualization of high-dimensional data</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/11-7.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/12-7.png?w=963" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/13-7.png?w=863" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/14-6.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/15-5.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/16-3.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/capture-1.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/18-3.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/19-3.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>1.3.1 t-SNE intuition</strong></p>
+
+<p>t-SNE is super powerful, but do you know exactly when to use it?</p>
+
+<p>When you want to visually explore the patterns in a high dimensional dataset.</p>
+
+<p><strong>1.3.2 Fitting t-SNE to the ANSUR data</strong></p>
+
+<p>t-SNE is a great technique for visual exploration of high dimensional datasets. In this exercise, you’ll apply it to the ANSUR dataset. You’ll remove non-numeric columns from the pre-loaded dataset <code class="language-plaintext highlighter-rouge">df</code> and fit <code class="language-plaintext highlighter-rouge">TSNE</code> to his numeric dataset.</p>
+
+<p>| 12345678910111213141516 | <code class="language-plaintext highlighter-rouge"># Non-numerical columns in the datasetnon_numeric</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">['Branch',</code> <code class="language-plaintext highlighter-rouge">'Gender',</code> <code class="language-plaintext highlighter-rouge">'Component']</code> <code class="language-plaintext highlighter-rouge"># Drop the non-numerical columns from dfdf_numeric</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">df.drop(non_numeric, axis=1)</code> <code class="language-plaintext highlighter-rouge"># Create a t-SNE model with learning rate 50m</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">TSNE(learning_rate=50)</code> <code class="language-plaintext highlighter-rouge"># Fit and transform the t-SNE model on the numeric datasettsne_features</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">m.fit_transform(df_numeric)print(tsne_features.shape)(6068,</code> <code class="language-plaintext highlighter-rouge">2)</code> <code class="language-plaintext highlighter-rouge">df.shape(6068,</code> <code class="language-plaintext highlighter-rouge">94)</code> |
+| :— | :— |</p>
+
+<p><strong>1.3.3 t-SNE visualisation of dimensionality</strong></p>
+
+<p>Time to look at the results of your hard work. In this exercise, you will visualize the output of t-SNE dimensionality reduction on the combined male and female Ansur dataset. You’ll create 3 scatterplots of the 2 t-SNE features (<code class="language-plaintext highlighter-rouge">'x'</code> and <code class="language-plaintext highlighter-rouge">'y'</code>) which were added to the dataset <code class="language-plaintext highlighter-rouge">df</code>. In each scatterplot you’ll color the points according to a different categorical variable.</p>
+
+<p><code class="language-plaintext highlighter-rouge">seaborn</code> has already been imported as <code class="language-plaintext highlighter-rouge">sns</code> and <code class="language-plaintext highlighter-rouge">matplotlib.pyplot</code> as <code class="language-plaintext highlighter-rouge">plt</code>.</p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge"># Color the points according to Army Componentsns.scatterplot(x="x", y="y", hue='Component', data=df)</code> <code class="language-plaintext highlighter-rouge"># Show the plotplt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/20-3.png?w=1024" alt="" /></p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge"># Color the points by Army Branchsns.scatterplot(x="x", y="y", hue='Branch', data=df)</code> <code class="language-plaintext highlighter-rouge"># Show the plotplt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/21-3.png?w=1024" alt="" /></p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge"># Color the points by Gendersns.scatterplot(x="x", y="y", hue='Gender', data=df)</code> <code class="language-plaintext highlighter-rouge"># Show the plotplt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/22-3.png?w=1024" alt="" /></p>
+
+<p>There is a Male and a Female cluster. t-SNE found these gender differences in body shape without being told about them explicitly! From the second plot you learned there are more males in the Combat Arms Branch.</p>
+
+<h2 id="2-feature-selection-i-selecting-for-feature-information"><strong>2. Feature selection I, selecting for feature information</strong></h2>
+
+<h3 id="21-the-curse-of-dimensionality"><strong>2.1 The curse of dimensionality</strong></h3>
+
+<p><strong>2.1.1 Train – test split</strong></p>
+
+<p>In this chapter, you will keep working with the ANSUR dataset. Before you can build a model on your dataset, you should first decide on which feature you want to predict. In this case, you’re trying to predict gender.</p>
+
+<p>You need to extract the column holding this feature from the dataset and then split the data into a training and test set. The training set will be used to train the model and the test set will be used to check its performance on unseen data.</p>
+
+<p><code class="language-plaintext highlighter-rouge">ansur_df</code> has been pre-loaded for you.</p>
+
+<p>| 1234567891011121314 | <code class="language-plaintext highlighter-rouge"># Import train_test_split()from</code> <code class="language-plaintext highlighter-rouge">sklearn.model_selection</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">train_test_split</code> <code class="language-plaintext highlighter-rouge"># Select the Gender column as the feature to be predicted (y)y</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">ansur_df['Gender']</code> <code class="language-plaintext highlighter-rouge"># Remove the Gender column to create the training dataX</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">ansur_df.drop('Gender', axis=1)</code> <code class="language-plaintext highlighter-rouge"># Perform a 70% train and 30% test data splitX_train, X_test, y_train, y_test</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">train_test_split(X, y, test_size=0.3)</code> <code class="language-plaintext highlighter-rouge">print("{} rows in test set vs. {} in training set. {} Features.".format(X_test.shape[0], X_train.shape[0], X_test.shape[1]))# 300 rows in test set vs. 700 in training set. 91 Features.</code> |
+| :— | :— |</p>
+
+<p><strong>2.1.2 Fitting and testing the model</strong></p>
+
+<p>In the previous exercise, you split the dataset into <code class="language-plaintext highlighter-rouge">X_train</code>, <code class="language-plaintext highlighter-rouge">X_test</code>, <code class="language-plaintext highlighter-rouge">y_train</code>, and <code class="language-plaintext highlighter-rouge">y_test</code>. These datasets have been pre-loaded for you. You’ll now create a support vector machine classifier model (<code class="language-plaintext highlighter-rouge">SVC()</code>) and fit that to the training data. You’ll then calculate the accuracy on both the test and training set to detect overfitting.</p>
+
+<p>| 12345678910111213141516 | <code class="language-plaintext highlighter-rouge"># Import SVC from sklearn.svm and accuracy_score from sklearn.metricsfrom</code> <code class="language-plaintext highlighter-rouge">sklearn.svm</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">SVCfrom</code> <code class="language-plaintext highlighter-rouge">sklearn.metrics</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">accuracy_score</code> <code class="language-plaintext highlighter-rouge"># Create an instance of the Support Vector Classification classsvc</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">SVC()</code> <code class="language-plaintext highlighter-rouge"># Fit the model to the training datasvc.fit(X_train, y_train)</code> <code class="language-plaintext highlighter-rouge"># Calculate accuracy scores on both train and test dataaccuracy_train</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">accuracy_score(y_train, svc.predict(X_train))accuracy_test</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">accuracy_score(y_test, svc.predict(X_test))</code> <code class="language-plaintext highlighter-rouge">print("{0:.1%} accuracy on test set vs. {1:.1%} on training set".format(accuracy_test, accuracy_train))# 49.7% accuracy on test set vs. 100.0% on training set</code> |
+| :— | :— |</p>
+
+<p>Looks like the model badly overfits on the training data. On unseen data it performs worse than a random selector would.</p>
+
+<p><strong>2.1.3 Accuracy after dimensionality reduction</strong></p>
+
+<p>You’ll reduce the overfit with the help of dimensionality reduction. In this case, you’ll apply a rather drastic form of dimensionality reduction by only selecting a single column that has some good information to distinguish between genders. You’ll repeat the train-test split, model fit and prediction steps to compare the accuracy on test vs. training data.</p>
+
+<p>| 1234567891011121314 | <code class="language-plaintext highlighter-rouge"># Assign just the 'neckcircumferencebase' column from ansur_df to XX</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">ansur_df[['neckcircumferencebase']]</code> <code class="language-plaintext highlighter-rouge"># Split the data, instantiate a classifier and fit the dataX_train, X_test, y_train, y_test</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">train_test_split(X, y, test_size=0.3)svc</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">SVC()svc.fit(X_train, y_train)</code> <code class="language-plaintext highlighter-rouge"># Calculate accuracy scores on both train and test dataaccuracy_train</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">accuracy_score(y_train, svc.predict(X_train))accuracy_test</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">accuracy_score(y_test, svc.predict(X_test))</code> <code class="language-plaintext highlighter-rouge">print("{0:.1%} accuracy on test set vs. {1:.1%} on training set".format(accuracy_test, accuracy_train))# 93.3% accuracy on test set vs. 94.9% on training set</code> |
+| :— | :— |</p>
+
+<p>Wow, what just happened!? On the full dataset the model is rubbish but with a single feature we can make good predictions? This is an example of the curse of dimensionality! The model badly overfits when we feed it too many features. It overlooks that neck circumference by itself is pretty different for males and females.</p>
+
+<h3 id="22-features-with-missing-values-or-little-variance"><strong>2.2 Features with missing values or little variance</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/23-3.png?w=803" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/24-3.png?w=975" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/25-3.png?w=718" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/26-3.png?w=749" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/27-3.png?w=1016" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/28-3.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>2.2.1 Finding a good variance threshold</strong></p>
+
+<p>You’ll be working on a slightly modified subsample of the ANSUR dataset with just head measurements pre-loaded as <code class="language-plaintext highlighter-rouge">head_df</code>.</p>
+
+<p>| 1234 | <code class="language-plaintext highlighter-rouge"># Create the boxplothead_df.boxplot()</code> <code class="language-plaintext highlighter-rouge">plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/29-2.png?w=1024" alt="" /></p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge"># Normalize the datanormalized_df</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">head_df</code> <code class="language-plaintext highlighter-rouge">/</code> <code class="language-plaintext highlighter-rouge">head_df.mean()</code> <code class="language-plaintext highlighter-rouge">normalized_df.boxplot()plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/30-2.png?w=1024" alt="" /></p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge"># Normalize the datanormalized_df</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">head_df</code> <code class="language-plaintext highlighter-rouge">/</code> <code class="language-plaintext highlighter-rouge">head_df.mean()</code> <code class="language-plaintext highlighter-rouge"># Print the variances of the normalized dataprint(normalized_df.var())</code> |
+| :— | :— |</p>
+
+<p>| 1234567 | <code class="language-plaintext highlighter-rouge">headbreadth</code>          <code class="language-plaintext highlighter-rouge">1.678952e-03headcircumference</code>    <code class="language-plaintext highlighter-rouge">1.029623e-03headlength</code>           <code class="language-plaintext highlighter-rouge">1.867872e-03tragiontopofhead</code>     <code class="language-plaintext highlighter-rouge">2.639840e-03n_hairs</code>              <code class="language-plaintext highlighter-rouge">1.002552e-08measurement_error</code>    <code class="language-plaintext highlighter-rouge">3.231707e-27dtype: float64</code> |
+| :— | :— |</p>
+
+<p>Inspect the printed variances. If you want to remove the 2 very low variance features. What would be a good variance threshold?</p>
+
+<p>1.0e-03</p>
+
+<p><strong>2.2.2 Features with low variance</strong></p>
+
+<p>In the previous exercise you established that 0.001 is a good threshold to filter out low variance features in <code class="language-plaintext highlighter-rouge">head_df</code> after normalization. Now use the <code class="language-plaintext highlighter-rouge">VarianceThreshold</code> feature selector to remove these features.</p>
+
+<p>| 12345678910111213141516 | <code class="language-plaintext highlighter-rouge">from</code> <code class="language-plaintext highlighter-rouge">sklearn.feature_selection</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">VarianceThreshold</code> <code class="language-plaintext highlighter-rouge"># Create a VarianceThreshold feature selectorsel</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">VarianceThreshold(threshold=10**-3)</code> <code class="language-plaintext highlighter-rouge"># Fit the selector to normalized head_dfsel.fit(head_df</code> <code class="language-plaintext highlighter-rouge">/</code> <code class="language-plaintext highlighter-rouge">head_df.mean())</code> <code class="language-plaintext highlighter-rouge"># Create a boolean maskmask</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">sel.get_support()</code> <code class="language-plaintext highlighter-rouge"># Apply the mask to create a reduced dataframereduced_df</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">head_df.loc[:, mask]</code> <code class="language-plaintext highlighter-rouge">print("Dimensionality reduced from {} to {}.".format(head_df.shape[1], reduced_df.shape[1]))# Dimensionality reduced from 6 to 4.</code> |
+| :— | :— |</p>
+
+<p><strong>2.2.3 Removing features with many missing values</strong></p>
+
+<p>You’ll apply feature selection on the Boston Public Schools dataset which has been pre-loaded as <code class="language-plaintext highlighter-rouge">school_df</code>. Calculate the missing value ratio per feature and then create a mask to remove features with many missing values.</p>
+
+<p>| 1234567891011121314151617181920212223 | <code class="language-plaintext highlighter-rouge">school_df.isna().sum()</code> <code class="language-plaintext highlighter-rouge">/</code> <code class="language-plaintext highlighter-rouge">len(school_df)x</code>             <code class="language-plaintext highlighter-rouge">0.000000y</code>             <code class="language-plaintext highlighter-rouge">0.000000objectid_1</code>    <code class="language-plaintext highlighter-rouge">0.000000objectid</code>      <code class="language-plaintext highlighter-rouge">0.000000bldg_id</code>       <code class="language-plaintext highlighter-rouge">0.000000bldg_name</code>     <code class="language-plaintext highlighter-rouge">0.000000address</code>       <code class="language-plaintext highlighter-rouge">0.000000city</code>          <code class="language-plaintext highlighter-rouge">0.000000zipcode</code>       <code class="language-plaintext highlighter-rouge">0.000000csp_sch_id</code>    <code class="language-plaintext highlighter-rouge">0.000000sch_id</code>        <code class="language-plaintext highlighter-rouge">0.000000sch_name</code>      <code class="language-plaintext highlighter-rouge">0.000000sch_label</code>     <code class="language-plaintext highlighter-rouge">0.000000sch_type</code>      <code class="language-plaintext highlighter-rouge">0.000000shared</code>        <code class="language-plaintext highlighter-rouge">0.877863complex</code>       <code class="language-plaintext highlighter-rouge">0.984733label</code>         <code class="language-plaintext highlighter-rouge">0.000000tlt</code>           <code class="language-plaintext highlighter-rouge">0.000000pl</code>            <code class="language-plaintext highlighter-rouge">0.000000point_x</code>       <code class="language-plaintext highlighter-rouge">0.000000point_y</code>       <code class="language-plaintext highlighter-rouge">0.000000dtype: float64</code> |
+| :— | :— |</p>
+
+<p>| 12345678910 | <code class="language-plaintext highlighter-rouge"># Create a boolean mask on whether each feature less than 50% missing values.mask</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">school_df.isna().sum()</code> <code class="language-plaintext highlighter-rouge">/</code> <code class="language-plaintext highlighter-rouge">len(school_df) &lt;</code> <code class="language-plaintext highlighter-rouge">0.5</code> <code class="language-plaintext highlighter-rouge"># Create a reduced dataset by applying the maskreduced_df</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">school_df.loc[:,mask]</code> <code class="language-plaintext highlighter-rouge">print(school_df.shape)print(reduced_df.shape)# (131, 21)# (131, 19)</code> |
+| :— | :— |</p>
+
+<h3 id="23-pairwise-correlation"><strong>2.3 Pairwise correlation</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/1-9.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/2-10.png?w=996" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/3-10.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>2.3.1 Correlation intuition</strong></p>
+
+<p>The correlation coefficient of A to B is equal to that of B to A.</p>
+
+<p><strong>2.3.2 Inspecting the correlation matrix</strong></p>
+
+<p>A sample of the ANSUR body measurements dataset has been pre-loaded as <code class="language-plaintext highlighter-rouge">ansur_df</code>. Use the terminal to create a correlation matrix for this dataset.</p>
+
+<p>What is the correlation coefficient between wrist and ankle circumference?</p>
+
+<p>| 1234567 | <code class="language-plaintext highlighter-rouge">ansur_df.corr()                     Elbow rest height  Wrist circumference  Ankle circumference  Buttock height  Crotch heightElbow rest height</code>             <code class="language-plaintext highlighter-rouge">1.000000</code>             <code class="language-plaintext highlighter-rouge">0.294753</code>             <code class="language-plaintext highlighter-rouge">0.301963</code>       <code class="language-plaintext highlighter-rouge">-0.007013</code>      <code class="language-plaintext highlighter-rouge">-0.026090Wrist circumference</code>           <code class="language-plaintext highlighter-rouge">0.294753</code>             <code class="language-plaintext highlighter-rouge">1.000000</code>             <code class="language-plaintext highlighter-rouge">0.702178</code>        <code class="language-plaintext highlighter-rouge">0.576679</code>       <code class="language-plaintext highlighter-rouge">0.606582Ankle circumference</code>           <code class="language-plaintext highlighter-rouge">0.301963</code>             <code class="language-plaintext highlighter-rouge">0.702178</code>             <code class="language-plaintext highlighter-rouge">1.000000</code>        <code class="language-plaintext highlighter-rouge">0.367548</code>       <code class="language-plaintext highlighter-rouge">0.386502Buttock height</code>               <code class="language-plaintext highlighter-rouge">-0.007013</code>             <code class="language-plaintext highlighter-rouge">0.576679</code>             <code class="language-plaintext highlighter-rouge">0.367548</code>        <code class="language-plaintext highlighter-rouge">1.000000</code>       <code class="language-plaintext highlighter-rouge">0.929411Crotch height</code>                <code class="language-plaintext highlighter-rouge">-0.026090</code>             <code class="language-plaintext highlighter-rouge">0.606582</code>             <code class="language-plaintext highlighter-rouge">0.386502</code>        <code class="language-plaintext highlighter-rouge">0.929411</code>       <code class="language-plaintext highlighter-rouge">1.000000</code> |
+| :— | :— |</p>
+
+<p>0.702178</p>
+
+<p><strong>2.3.3 Visualizing the correlation matrix</strong></p>
+
+<p>Reading the correlation matrix of <code class="language-plaintext highlighter-rouge">ansur_df</code> in its raw, numeric format doesn’t allow us to get a quick overview. Let’s improve this by removing redundant values and visualizing the matrix using seaborn.</p>
+
+<p>| 123456 | <code class="language-plaintext highlighter-rouge"># Create the correlation matrixcorr</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">ansur_df.corr()</code> <code class="language-plaintext highlighter-rouge"># Draw the heatmapsns.heatmap(corr,  cmap=cmap, center=0, linewidths=1, annot=True, fmt=".2f")plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/4-10.png?w=989" alt="" /></p>
+
+<p>| 123456789 | <code class="language-plaintext highlighter-rouge"># Create the correlation matrixcorr</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">ansur_df.corr()</code> <code class="language-plaintext highlighter-rouge"># Generate a mask for the upper trianglemask</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">np.triu(np.ones_like(corr, dtype=bool))</code> <code class="language-plaintext highlighter-rouge"># Add the mask to the heatmapsns.heatmap(corr, mask=mask, cmap=cmap, center=0, linewidths=1, annot=True, fmt=".2f")plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/5-10.png?w=992" alt="" /></p>
+
+<h3 id="24-removing-highly-correlated-features"><strong>2.4 Removing highly correlated features</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/6-10.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/7-10.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>2.4.1 Filtering out highly correlated features</strong></p>
+
+<p>You’re going to automate the removal of highly correlated features in the numeric ANSUR dataset. You’ll calculate the correlation matrix and filter out columns that have a correlation coefficient of more than 0.95 or less than -0.95.</p>
+
+<p>Since each correlation coefficient occurs twice in the matrix (correlation of A to B equals correlation of B to A) you’ll want to ignore half of the correlation matrix so that only one of the two correlated features is removed. Use a mask trick for this purpose.</p>
+
+<p>| 123456789101112131415 | <code class="language-plaintext highlighter-rouge"># Calculate the correlation matrix and take the absolute valuecorr_matrix</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">ansur_df.corr().abs()</code> <code class="language-plaintext highlighter-rouge"># Create a True/False mask and apply itmask</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">np.triu(np.ones_like(corr_matrix, dtype=bool))tri_df</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">corr_matrix.mask(mask)</code> <code class="language-plaintext highlighter-rouge"># List column names of highly correlated features (r &gt; 0.95)to_drop</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">[c</code> <code class="language-plaintext highlighter-rouge">for</code> <code class="language-plaintext highlighter-rouge">c</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">tri_df.columns</code> <code class="language-plaintext highlighter-rouge">if</code> <code class="language-plaintext highlighter-rouge">any(tri_df[c] &gt;</code>  <code class="language-plaintext highlighter-rouge">0.95)]</code> <code class="language-plaintext highlighter-rouge"># Drop the features in the to_drop listreduced_df</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">ansur_df.drop(to_drop, axis=1)</code> <code class="language-plaintext highlighter-rouge">print("The reduced dataframe has {} columns.".format(reduced_df.shape[1]))# The reduced dataframe has 88 columns.</code> |
+| :— | :— |</p>
+
+<p>You’ve automated the removal of highly correlated features.</p>
+
+<p><strong>2.4.2 Nuclear energy and pool drownings</strong></p>
+
+<p>The dataset that has been pre-loaded for you as <code class="language-plaintext highlighter-rouge">weird_df</code> contains actual data provided by the US Centers for Disease Control &amp; Prevention and Department of Energy.</p>
+
+<p>Let’s see if we can find a pattern.</p>
+
+<p>| 123 | <code class="language-plaintext highlighter-rouge"># Put nuclear energy production on the x-axis and the number of pool drownings on the y-axissns.scatterplot(x='nuclear_energy', y='pool_drownings', data=weird_df)plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/8-9.png?w=1022" alt="" /></p>
+
+<p>| 12 | <code class="language-plaintext highlighter-rouge"># Print out the correlation matrix of weird_dfprint(weird_df.corr())</code> |
+| :— | :— |</p>
+
+<p>| 123 | <code class="language-plaintext highlighter-rouge">pool_drownings  nuclear_energypool_drownings</code>        <code class="language-plaintext highlighter-rouge">1.000000</code>        <code class="language-plaintext highlighter-rouge">0.901179nuclear_energy</code>        <code class="language-plaintext highlighter-rouge">0.901179</code>        <code class="language-plaintext highlighter-rouge">1.000000</code> |
+| :— | :— |</p>
+
+<p>What can you conclude from the strong correlation (r=0.9) between these features?
+Not much, correlation does not imply causation.</p>
+
+<h2 id="3-feature-selection-ii-selecting-for-model-accuracy"><strong>3. Feature selection II, selecting for model accuracy</strong></h2>
+
+<h3 id="31-selecting-features-for-model-performance"><strong>3.1 Selecting features for model performance</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/9-9.png?w=954" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/10-8.png?w=771" alt="" /></li>
+</ul>
+
+<p><strong>3.1.1 Building a diabetes classifier</strong></p>
+
+<p>You’ll be using the Pima Indians diabetes dataset to predict whether a person has diabetes using logistic regression. There are 8 features and one target in this dataset. The data has been split into a training and test set and pre-loaded for you as <code class="language-plaintext highlighter-rouge">X_train</code>, <code class="language-plaintext highlighter-rouge">y_train</code>, <code class="language-plaintext highlighter-rouge">X_test</code>, and <code class="language-plaintext highlighter-rouge">y_test</code>.</p>
+
+<p>A <code class="language-plaintext highlighter-rouge">StandardScaler()</code> instance has been predefined as <code class="language-plaintext highlighter-rouge">scaler</code> and a <code class="language-plaintext highlighter-rouge">LogisticRegression()</code> one as <code class="language-plaintext highlighter-rouge">lr</code>.</p>
+
+<p>| 123456789101112131415 | <code class="language-plaintext highlighter-rouge"># Fit the scaler on the training features and transform these in one goX_train_std</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">scaler.fit_transform(X_train)</code> <code class="language-plaintext highlighter-rouge"># Fit the logistic regression model on the scaled training datalr.fit(X_train_std, y_train)</code> <code class="language-plaintext highlighter-rouge"># Scale the test featuresX_test_std</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">scaler.transform(X_test)</code> <code class="language-plaintext highlighter-rouge"># Predict diabetes presence on the scaled test sety_pred</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">lr.predict(X_test_std)</code> <code class="language-plaintext highlighter-rouge"># Prints accuracy metrics and feature coefficientsprint("{0:.1%} accuracy on test set.".format(accuracy_score(y_test, y_pred)))print(dict(zip(X.columns,</code> <code class="language-plaintext highlighter-rouge">abs(lr.coef_[0]).round(2))))</code> |
+| :— | :— |</p>
+
+<p>| 12 | <code class="language-plaintext highlighter-rouge">79.6%</code> <code class="language-plaintext highlighter-rouge">accuracy on test</code> <code class="language-plaintext highlighter-rouge">set.{'family':</code> <code class="language-plaintext highlighter-rouge">0.34,</code> <code class="language-plaintext highlighter-rouge">'diastolic':</code> <code class="language-plaintext highlighter-rouge">0.03,</code> <code class="language-plaintext highlighter-rouge">'glucose':</code> <code class="language-plaintext highlighter-rouge">1.23,</code> <code class="language-plaintext highlighter-rouge">'triceps':</code> <code class="language-plaintext highlighter-rouge">0.24,</code> <code class="language-plaintext highlighter-rouge">'age':</code> <code class="language-plaintext highlighter-rouge">0.34,</code> <code class="language-plaintext highlighter-rouge">'insulin':</code> <code class="language-plaintext highlighter-rouge">0.19,</code> <code class="language-plaintext highlighter-rouge">'bmi':</code> <code class="language-plaintext highlighter-rouge">0.38,</code> <code class="language-plaintext highlighter-rouge">'pregnant':</code> <code class="language-plaintext highlighter-rouge">0.04}</code> |
+| :— | :— |</p>
+
+<p><strong>3.1.2 Manual Recursive Feature Elimination</strong></p>
+
+<p>Now that we’ve created a diabetes classifier, let’s see if we can reduce the number of features without hurting the model accuracy too much.</p>
+
+<p>On the second line of code the features are selected from the original dataframe. Adjust this selection.</p>
+
+<p>A <code class="language-plaintext highlighter-rouge">StandardScaler()</code> instance has been predefined as <code class="language-plaintext highlighter-rouge">scaler</code> and a <code class="language-plaintext highlighter-rouge">LogisticRegression()</code> one as <code class="language-plaintext highlighter-rouge">lr</code>.</p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge"># Remove the feature with the lowest model coefficientX</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">diabetes_df[['pregnant',</code> <code class="language-plaintext highlighter-rouge">'glucose',</code> <code class="language-plaintext highlighter-rouge">'triceps',</code> <code class="language-plaintext highlighter-rouge">'insulin',</code> <code class="language-plaintext highlighter-rouge">'bmi',</code> <code class="language-plaintext highlighter-rouge">'family',</code> <code class="language-plaintext highlighter-rouge">'age']]</code> <code class="language-plaintext highlighter-rouge">80.6%</code> <code class="language-plaintext highlighter-rouge">accuracy on test</code> <code class="language-plaintext highlighter-rouge">set.{'family':</code> <code class="language-plaintext highlighter-rouge">0.34,</code> <code class="language-plaintext highlighter-rouge">'glucose':</code> <code class="language-plaintext highlighter-rouge">1.23,</code> <code class="language-plaintext highlighter-rouge">'triceps':</code> <code class="language-plaintext highlighter-rouge">0.24,</code> <code class="language-plaintext highlighter-rouge">'age':</code> <code class="language-plaintext highlighter-rouge">0.35,</code> <code class="language-plaintext highlighter-rouge">'insulin':</code> <code class="language-plaintext highlighter-rouge">0.2,</code> <code class="language-plaintext highlighter-rouge">'bmi':</code> <code class="language-plaintext highlighter-rouge">0.39,</code> <code class="language-plaintext highlighter-rouge">'pregnant':</code> <code class="language-plaintext highlighter-rouge">0.05}</code> |
+| :— | :— |</p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge"># Remove the 2 features with the lowest model coefficientsX</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">diabetes_df[['glucose',</code> <code class="language-plaintext highlighter-rouge">'triceps',</code> <code class="language-plaintext highlighter-rouge">'bmi',</code> <code class="language-plaintext highlighter-rouge">'family',</code> <code class="language-plaintext highlighter-rouge">'age']]</code> <code class="language-plaintext highlighter-rouge">79.6%</code> <code class="language-plaintext highlighter-rouge">accuracy on test</code> <code class="language-plaintext highlighter-rouge">set.{'family':</code> <code class="language-plaintext highlighter-rouge">0.34,</code> <code class="language-plaintext highlighter-rouge">'age':</code> <code class="language-plaintext highlighter-rouge">0.37,</code> <code class="language-plaintext highlighter-rouge">'bmi':</code> <code class="language-plaintext highlighter-rouge">0.34,</code> <code class="language-plaintext highlighter-rouge">'glucose':</code> <code class="language-plaintext highlighter-rouge">1.13,</code> <code class="language-plaintext highlighter-rouge">'triceps':</code> <code class="language-plaintext highlighter-rouge">0.25}</code> |
+| :— | :— |</p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge"># Only keep the feature with the highest coefficientX</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">diabetes_df[['glucose']]</code> <code class="language-plaintext highlighter-rouge">76.5%</code> <code class="language-plaintext highlighter-rouge">accuracy on test</code> <code class="language-plaintext highlighter-rouge">set.{'glucose':</code> <code class="language-plaintext highlighter-rouge">1.27}</code> |
+| :— | :— |</p>
+
+<p>| 12345678910 | <code class="language-plaintext highlighter-rouge"># Performs a 25-75% train test splitX_train, X_test, y_train, y_test</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">train_test_split(X, y, test_size=0.25, random_state=0)</code> <code class="language-plaintext highlighter-rouge"># Scales features and fits the logistic regression model to the datalr.fit(scaler.fit_transform(X_train), y_train)</code> <code class="language-plaintext highlighter-rouge"># Calculates the accuracy on the test set and prints coefficientsacc</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">accuracy_score(y_test, lr.predict(scaler.transform(X_test)))print("{0:.1%} accuracy on test set.".format(acc))print(dict(zip(X.columns,</code> <code class="language-plaintext highlighter-rouge">abs(lr.coef_[0]).round(2))))</code> |
+| :— | :— |</p>
+
+<p>Removing all but one feature only reduced the accuracy by a few percent.</p>
+
+<p><strong>3.1.3 Automatic Recursive Feature Elimination</strong></p>
+
+<p>Now let’s automate this recursive process. Wrap a Recursive Feature Eliminator (RFE) around our logistic regression estimator and pass it the desired number of features.</p>
+
+<p>| 123456789101112131415 | <code class="language-plaintext highlighter-rouge"># Create the RFE with a LogisticRegression estimator and 3 features to selectrfe</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">RFE(estimator=LogisticRegression(), n_features_to_select=3, verbose=1)</code> <code class="language-plaintext highlighter-rouge"># Fits the eliminator to the datarfe.fit(X_train, y_train)</code> <code class="language-plaintext highlighter-rouge"># Print the features and their ranking (high = dropped early on)print(dict(zip(X.columns, rfe.ranking_)))</code> <code class="language-plaintext highlighter-rouge"># Print the features that are not eliminatedprint(X.columns[rfe.support_])</code> <code class="language-plaintext highlighter-rouge"># Calculates the test set accuracyacc</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">accuracy_score(y_test, rfe.predict(X_test))print("{0:.1%} accuracy on test set.".format(acc))</code> |
+| :— | :— |</p>
+
+<p>| 12345678 | <code class="language-plaintext highlighter-rouge">Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">8</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">7</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">6</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">5</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">4</code> <code class="language-plaintext highlighter-rouge">features.{'family':</code> <code class="language-plaintext highlighter-rouge">2,</code> <code class="language-plaintext highlighter-rouge">'diastolic':</code> <code class="language-plaintext highlighter-rouge">6,</code> <code class="language-plaintext highlighter-rouge">'glucose':</code> <code class="language-plaintext highlighter-rouge">1,</code> <code class="language-plaintext highlighter-rouge">'triceps':</code> <code class="language-plaintext highlighter-rouge">3,</code> <code class="language-plaintext highlighter-rouge">'age':</code> <code class="language-plaintext highlighter-rouge">1,</code> <code class="language-plaintext highlighter-rouge">'insulin':</code> <code class="language-plaintext highlighter-rouge">4,</code> <code class="language-plaintext highlighter-rouge">'bmi':</code> <code class="language-plaintext highlighter-rouge">1,</code> <code class="language-plaintext highlighter-rouge">'pregnant':</code> <code class="language-plaintext highlighter-rouge">5}Index(['glucose',</code> <code class="language-plaintext highlighter-rouge">'bmi',</code> <code class="language-plaintext highlighter-rouge">'age'], dtype='object')80.6%</code> <code class="language-plaintext highlighter-rouge">accuracy on test</code> <code class="language-plaintext highlighter-rouge">set.</code> |
+| :— | :— |</p>
+
+<p>When we eliminate all but the 3 most relevant features we get a 80.6% accuracy on the test set.</p>
+
+<h3 id="32-tree-based-feature-selection"><strong>3.2 Tree-based feature selection</strong></h3>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/11-8.png?w=1024" alt="" /></p>
+
+<p><strong>3.2.1 Building a random forest model</strong></p>
+
+<p>You’ll again work on the Pima Indians dataset to predict whether an individual has diabetes. This time using a random forest classifier. You’ll fit the model on the training data after performing the train-test split and consult the feature importance values.</p>
+
+<p>| 123456789101112131415 | <code class="language-plaintext highlighter-rouge"># Perform a 75% training and 25% test data splitX_train, X_test, y_train, y_test</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">train_test_split(X, y, test_size=0.25, random_state=0)</code> <code class="language-plaintext highlighter-rouge"># Fit the random forest model to the training datarf</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">RandomForestClassifier(random_state=0)rf.fit(X_train, y_train)</code> <code class="language-plaintext highlighter-rouge"># Calculate the accuracyacc</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">accuracy_score(y_test, rf.predict(X_test))</code> <code class="language-plaintext highlighter-rouge"># Print the importances per featureprint(dict(zip(X.columns, rf.feature_importances_.round(2))))</code> <code class="language-plaintext highlighter-rouge"># Print accuracyprint("{0:.1%} accuracy on test set.".format(acc))</code> |
+| :— | :— |</p>
+
+<p>| 12 | <code class="language-plaintext highlighter-rouge">{'family':</code> <code class="language-plaintext highlighter-rouge">0.12,</code> <code class="language-plaintext highlighter-rouge">'diastolic':</code> <code class="language-plaintext highlighter-rouge">0.08,</code> <code class="language-plaintext highlighter-rouge">'glucose':</code> <code class="language-plaintext highlighter-rouge">0.21,</code> <code class="language-plaintext highlighter-rouge">'triceps':</code> <code class="language-plaintext highlighter-rouge">0.11,</code> <code class="language-plaintext highlighter-rouge">'age':</code> <code class="language-plaintext highlighter-rouge">0.16,</code> <code class="language-plaintext highlighter-rouge">'insulin':</code> <code class="language-plaintext highlighter-rouge">0.13,</code> <code class="language-plaintext highlighter-rouge">'bmi':</code> <code class="language-plaintext highlighter-rouge">0.09,</code> <code class="language-plaintext highlighter-rouge">'pregnant':</code> <code class="language-plaintext highlighter-rouge">0.09}77.6%</code> <code class="language-plaintext highlighter-rouge">accuracy on test</code> <code class="language-plaintext highlighter-rouge">set.</code> |
+| :— | :— |</p>
+
+<p>The random forest model gets 78% accuracy on the test set and <code class="language-plaintext highlighter-rouge">'glucose'</code> is the most important feature (<code class="language-plaintext highlighter-rouge">0.21</code>).</p>
+
+<p><strong>3.2.2 Random forest for feature selection</strong></p>
+
+<p>| 123456789 | <code class="language-plaintext highlighter-rouge"># Create a mask for features importances above the thresholdmask</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">rf.feature_importances_ &gt;</code> <code class="language-plaintext highlighter-rouge">0.15</code> <code class="language-plaintext highlighter-rouge"># Apply the mask to the feature dataset Xreduced_X</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">X.loc[:,mask]</code> <code class="language-plaintext highlighter-rouge"># prints out the selected column namesprint(reduced_X.columns)# Index(['glucose', 'age'], dtype='object')</code> |
+| :— | :— |</p>
+
+<p>Only the features <code class="language-plaintext highlighter-rouge">'glucose'</code> and <code class="language-plaintext highlighter-rouge">'age'</code> were considered sufficiently important.</p>
+
+<p><strong>3.2.3 Recursive Feature Elimination with random forests</strong></p>
+
+<p>You’ll wrap a Recursive Feature Eliminator around a random forest model to remove features step by step. This method is more conservative compared to selecting features after applying a single importance threshold. Since dropping one feature can influence the relative importances of the others.</p>
+
+<p>| 123456789101112 | <code class="language-plaintext highlighter-rouge"># Wrap the feature eliminator around the random forest modelrfe</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">RFE(estimator=RandomForestClassifier(), n_features_to_select=2, verbose=1)</code> <code class="language-plaintext highlighter-rouge"># Fit the model to the training datarfe.fit(X_train, y_train)</code> <code class="language-plaintext highlighter-rouge"># Create a mask using an attribute of rfemask</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">rfe.support_</code> <code class="language-plaintext highlighter-rouge"># Apply the mask to the feature dataset X and print the resultreduced_X</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">X.loc[:,mask]print(reduced_X.columns)</code> |
+| :— | :— |</p>
+
+<p>| 1234567 | <code class="language-plaintext highlighter-rouge">Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">8</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">7</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">6</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">5</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">4</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">3</code> <code class="language-plaintext highlighter-rouge">features.Index(['glucose',</code> <code class="language-plaintext highlighter-rouge">'bmi'], dtype='object')</code> |
+| :— | :— |</p>
+
+<p>| 123456789101112 | <code class="language-plaintext highlighter-rouge"># Set the feature eliminator to remove 2 features on each steprfe</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">RFE(estimator=RandomForestClassifier(), n_features_to_select=2, step=2, verbose=1)</code> <code class="language-plaintext highlighter-rouge"># Fit the model to the training datarfe.fit(X_train, y_train)</code> <code class="language-plaintext highlighter-rouge"># Create a maskmask</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">rfe.support_</code> <code class="language-plaintext highlighter-rouge"># Apply the mask to the feature dataset X and print the resultreduced_X</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">X.loc[:, mask]print(reduced_X.columns)</code> |
+| :— | :— |</p>
+
+<p>| 1234 | <code class="language-plaintext highlighter-rouge">Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">8</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">6</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">4</code> <code class="language-plaintext highlighter-rouge">features.Index(['glucose',</code> <code class="language-plaintext highlighter-rouge">'insulin'], dtype='object')</code> |
+| :— | :— |</p>
+
+<p>Compared to the quick and dirty single threshold method from the previous exercise one of the selected features is different.</p>
+
+<h3 id="33-regularized-linear-regression"><strong>3.3 Regularized linear regression</strong></h3>
+
+<p><strong>3.3.1 Creating a LASSO regressor</strong></p>
+
+<p>You’ll be working on the numeric ANSUR body measurements dataset to predict a persons Body Mass Index (BMI) using the pre-imported <code class="language-plaintext highlighter-rouge">Lasso()</code> regressor. BMI is a metric derived from body height and weight but those two features have been removed from the dataset to give the model a challenge.</p>
+
+<p>You’ll standardize the data first using the <code class="language-plaintext highlighter-rouge">StandardScaler()</code> that has been instantiated for you as <code class="language-plaintext highlighter-rouge">scaler</code> to make sure all coefficients face a comparable regularizing force trying to bring them down.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">1234567891011</th>
+      <th style="text-align:left">
+        <p><code># Set the test size to 30% to get a 70-30% train test split</code>
+        </p>
+        <p><code>X_train, X_test, y_train, y_test</code>  <code>= train_test_split(X, y, test_size=0.3, random_state=0)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Fit the scaler on the training features and transform these in one go</code>
+        </p>
+        <p><code>X_train_std</code>  <code>=</code>  <code>scaler.fit_transform(X_train)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Create the Lasso model</code>
+        </p>
+        <p><code>la</code>  <code>=</code>  <code>Lasso()</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Fit it to the standardized training data</code>
+        </p>
+        <p><code>la.fit(X_train_std, y_train)</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p><strong>3.3.2 Lasso model results</strong></p>
+
+<p>Now that you’ve trained the Lasso model, you’ll score its predictive capacity (R2) on the test set and count how many features are ignored because their coefficient is reduced to zero.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">12345678910111213</th>
+      <th style="text-align:left">
+        <p><code># Transform the test set with the pre-fitted scaler</code>
+        </p>
+        <p><code>X_test_std</code>  <code>=</code>  <code>scaler.transform(X_test)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Calculate the coefficient of determination (R squared) on X_test_std</code>
+        </p>
+        <p><code>r_squared =</code>  <code>la.score(X_test_std, y_test)</code>
+        </p>
+        <p><code>print(&quot;The model can predict {0:.1%} of the variance in the test set.&quot;.format(r_squared))</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p> <code># Create a list that has True values when coefficients equal 0</code>
+        </p>
+        <p><code>zero_coef</code>  <code>=</code>  <code>la.coef_</code>  <code>==</code>  <code>0</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Calculate how many features have a zero coefficient</code>
+        </p>
+        <p><code>n_ignored</code>  <code>=</code>  <code>sum(zero_coef)</code>
+        </p>
+        <p><code>print(&quot;The model has ignored {} out of {} features.&quot;.format(n_ignored,</code>  <code>len(la.coef_)))</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p>| 12 | <code class="language-plaintext highlighter-rouge">The model can predict</code> <code class="language-plaintext highlighter-rouge">84.7%</code> <code class="language-plaintext highlighter-rouge">of the variance</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">the test</code> <code class="language-plaintext highlighter-rouge">set.The model has ignored</code> <code class="language-plaintext highlighter-rouge">82</code> <code class="language-plaintext highlighter-rouge">out of</code> <code class="language-plaintext highlighter-rouge">91</code> <code class="language-plaintext highlighter-rouge">features.</code> |
+| :— | :— |</p>
+
+<p>We can predict almost 85% of the variance in the BMI value using just 9 out of 91 of the features. The R^2 could be higher though.</p>
+
+<p><strong>3.3.3 Adjusting the regularization strength</strong></p>
+
+<p>Your current Lasso model has an R2R2 score of 84.7%. When a model applies overly powerful regularization it can suffer from high bias, hurting its predictive power.</p>
+
+<p>Let’s improve the balance between predictive power and model simplicity by tweaking the <code class="language-plaintext highlighter-rouge">alpha</code> parameter.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">1234567891011</th>
+      <th style="text-align:left">
+        <p><code># Find the highest alpha value with R-squared above 98%</code>
+        </p>
+        <p><code>la</code>  <code>=</code>  <code>Lasso(alpha=0.1, random_state=0)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Fits the model and calculates performance stats</code>
+        </p>
+        <p><code>la.fit(X_train_std, y_train)</code>
+        </p>
+        <p><code>r_squared</code>  <code>=</code>  <code>la.score(X_test_std, y_test)</code>
+        </p>
+        <p><code>n_ignored_features</code>  <code>=</code>  <code>sum(la.coef_</code>  <code>==</code>  <code>0)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Print peformance stats</code>
+        </p>
+        <p><code>print(&quot;The model can predict {0:.1%} of the variance in the test set.&quot;.format(r_squared))</code>
+        </p>
+        <p><code>print(&quot;{} out of {} features were ignored.&quot;.format(n_ignored_features,</code>  <code>len(la.coef_)))</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p>| 12 | <code class="language-plaintext highlighter-rouge">The model can predict</code> <code class="language-plaintext highlighter-rouge">98.3%</code> <code class="language-plaintext highlighter-rouge">of the variance</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">the test</code> <code class="language-plaintext highlighter-rouge">set.64</code> <code class="language-plaintext highlighter-rouge">out of</code> <code class="language-plaintext highlighter-rouge">91</code> <code class="language-plaintext highlighter-rouge">features were ignored.</code> |
+| :— | :— |</p>
+
+<p>With this more appropriate regularization strength we can predict 98% of the variance in the BMI value while ignoring 2/3 of the features.</p>
+
+<h3 id="34-combining-feature-selectors"><strong>3.4 Combining feature selectors</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/12-9.png?w=627" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/13-8.png?w=924" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/14-7.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/15-6.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/16-4.png?w=951" alt="" /></li>
+</ul>
+
+<p><strong>3.4.1 Creating a LassoCV regressor</strong></p>
+
+<p>You’ll be predicting biceps circumference on a subsample of the male ANSUR dataset using the <code class="language-plaintext highlighter-rouge">LassoCV()</code> regressor that automatically tunes the regularization strength (alpha value) using Cross-Validation.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">1234567891011121314</th>
+      <th style="text-align:left">
+        <p><code>from</code>  <code>sklearn.linear_model</code>  <code>import</code>  <code>LassoCV</code>
+        </p>
+        <p></p>
+        <p><code># Create and fit the LassoCV model on the training set</code>
+        </p>
+        <p><code>lcv</code>  <code>=</code>  <code>LassoCV()</code>
+        </p>
+        <p><code>lcv.fit(X_train, y_train)</code>
+        </p>
+        <p><code>print(&apos;Optimal alpha = {0:.3f}&apos;.format(lcv.alpha_))</code>
+        </p>
+        <p></p>
+        <p><code># Calculate R squared on the test set</code>
+        </p>
+        <p><code>r_squared</code>  <code>=</code>  <code>lcv.score(X_test, y_test)</code>
+        </p>
+        <p><code>print(&apos;The model explains {0:.1%} of the test set variance&apos;.format(r_squared))</code>
+        </p>
+        <p></p>
+        <p><code># Create a mask for coefficients not equal to zero</code>
+        </p>
+        <p><code>lcv_mask</code>  <code>=</code>  <code>lcv.coef_ !=</code>  <code>0</code>
+        </p>
+        <p><code>print(&apos;{} features out of {} selected&apos;.format(sum(lcv_mask),</code>  <code>len(lcv_mask)))</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p>| 123 | <code class="language-plaintext highlighter-rouge">Optimal alpha</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">0.089The model explains</code> <code class="language-plaintext highlighter-rouge">88.2%</code> <code class="language-plaintext highlighter-rouge">of the test</code> <code class="language-plaintext highlighter-rouge">set</code> <code class="language-plaintext highlighter-rouge">variance26</code> <code class="language-plaintext highlighter-rouge">features out of</code> <code class="language-plaintext highlighter-rouge">32</code> <code class="language-plaintext highlighter-rouge">selected</code> |
+| :— | :— |</p>
+
+<p>We got a decent R squared and removed 6 features. We’ll save the <code class="language-plaintext highlighter-rouge">lcv_mask</code> for later on.</p>
+
+<p><strong>3.4.2 Ensemble models for extra votes</strong></p>
+
+<p>The <code class="language-plaintext highlighter-rouge">LassoCV()</code> model selected 26 out of 32 features. Not bad, but not a spectacular dimensionality reduction either. Let’s use two more models to select the 10 features they consider most important using the Recursive Feature Eliminator (RFE).</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">1234567891011121314</th>
+      <th style="text-align:left">
+        <p><code>from</code>  <code>sklearn.feature_selection</code>  <code>import</code>  <code>RFE</code>
+        </p>
+        <p><code>from</code>  <code>sklearn.ensemble</code>  <code>import</code>  <code>GradientBoostingRegressor</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Select 10 features with RFE on a GradientBoostingRegressor, drop 3 features on each step</code>
+        </p>
+        <p><code>rfe_gb = RFE(estimator=GradientBoostingRegressor(), <br /></code>
+        </p>
+        <p><code>             n_features_to_select=10, step=3, verbose=1)</code>
+        </p>
+        <p><code>rfe_gb.fit(X_train, y_train)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Calculate the R squared on the test set</code>
+        </p>
+        <p><code>r_squared</code>  <code>=</code>  <code>rfe_gb.score(X_test, y_test)</code>
+        </p>
+        <p><code>print(&apos;The model can explain {0:.1%} of the variance in the test set&apos;.format(r_squared))</code>
+        </p>
+        <p></p>
+        <p><code># Assign the support array to gb_mask</code>
+        </p>
+        <p><code>gb_mask</code>  <code>=</code>  <code>rfe_gb.support_</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p>| 123456789 | <code class="language-plaintext highlighter-rouge">Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">32</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">29</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">26</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">23</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">20</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">17</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">14</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">11</code> <code class="language-plaintext highlighter-rouge">features.The model can explain</code> <code class="language-plaintext highlighter-rouge">85.6%</code> <code class="language-plaintext highlighter-rouge">of the variance</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">the test</code> <code class="language-plaintext highlighter-rouge">set</code> |
+| :— | :— |</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">1234567891011121314</th>
+      <th style="text-align:left">
+        <p><code>from</code>  <code>sklearn.feature_selection</code>  <code>import</code>  <code>RFE</code>
+        </p>
+        <p><code>from</code>  <code>sklearn.ensemble</code>  <code>import</code>  <code>RandomForestRegressor</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Select 10 features with RFE on a RandomForestRegressor, drop 3 features on each step</code>
+        </p>
+        <p><code>rfe_rf</code>  <code>=</code>  <code>RFE(estimator=RandomForestRegressor(), <br /></code>
+        </p>
+        <p><code>             n_features_to_select=10, step=3, verbose=1)</code>
+        </p>
+        <p><code>rfe_rf.fit(X_train, y_train)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Calculate the R squared on the test set</code>
+        </p>
+        <p><code>r_squared</code>  <code>=</code>  <code>rfe_rf.score(X_test, y_test)</code>
+        </p>
+        <p><code>print(&apos;The model can explain {0:.1%} of the variance in the test set&apos;.format(r_squared))</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Assign the support array to gb_mask</code>
+        </p>
+        <p><code>rf_mask</code>  <code>=</code>  <code>rfe_rf.support_</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p>| 123456789 | <code class="language-plaintext highlighter-rouge">Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">32</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">29</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">26</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">23</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">20</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">17</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">14</code> <code class="language-plaintext highlighter-rouge">features.Fitting estimator with</code> <code class="language-plaintext highlighter-rouge">11</code> <code class="language-plaintext highlighter-rouge">features.The model can explain</code> <code class="language-plaintext highlighter-rouge">84.0%</code> <code class="language-plaintext highlighter-rouge">of the variance</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">the test</code> <code class="language-plaintext highlighter-rouge">set</code> |
+| :— | :— |</p>
+
+<p>Inluding the Lasso linear model from the previous exercise, we now have the votes from 3 models on which features are important.</p>
+
+<p><strong>3.4.3 Combining 3 feature selectors</strong></p>
+
+<p>We’ll combine the votes of the 3 models you built in the previous exercises, to decide which features are important into a meta mask. We’ll then use this mask to reduce dimensionality and see how a simple linear regressor performs on the reduced dataset.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">123456789101112131415</th>
+      <th style="text-align:left">
+        <p><code># Sum the votes of the three models</code>
+        </p>
+        <p><code>votes</code>  <code>=</code>  <code>np.sum([lcv_mask, rf_mask, gb_mask], axis=0)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Create a mask for features selected by all 3 models</code>
+        </p>
+        <p><code>meta_mask</code>  <code>=</code>  <code>votes &gt;=</code>  <code>3</code>
+        </p>
+        <p><code>print(meta_mask)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Apply the dimensionality reduction on X</code>
+        </p>
+        <p><code>X_reduced</code>  <code>=</code>  <code>X.loc[:, meta_mask]</code>
+        </p>
+        <p><code>print(X_reduced.columns)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Plug the reduced dataset into a linear regression pipeline<br /></code>
+        </p>
+        <p><code>X_train, X_test, y_train, y_test = train_test_split(X_reduced, y, test_size=0.3, random_state=0)<br /></code>
+        </p>
+        <p><code>lm.fit(scaler.fit_transform(X_train), y_train)<br /></code>
+        </p>
+        <p><code>r_squared = lm.score(scaler.transform(X_test), y_test)<br /></code>
+        </p>
+        <p><code>print(&apos;The model can explain {0:.1%} of the variance in the test set using {1:} features.&apos;.format(r_squared, len(lm.coef_)))</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code>r_squared</code>  <code>=</code>  <code>lm.score(scaler.transform(X_test), y_test)</code>
+        </p>
+        <p><code>print(&apos;The model can explain {0:.1%} of the variance in the test set using {1:} features.&apos;.format(r_squared,</code>  <code>len(lm.coef_)))</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># The model can explain 86.8% of the variance in the test set using 7 features.</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p>Using the votes from 3 models you were able to select just 7 features that allowed a simple linear model to get a high accuracy!</p>
+
+<h2 id="4-feature-extraction"><strong>4. Feature extraction</strong></h2>
+
+<h3 id="41-feature-extraction"><strong>4.1 Feature extraction</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/1-10.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/2-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/3-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/4-11.png?w=1024" alt="" /></li>
+</ul>
+
+<h3 id="411-manual-feature-extraction-i"><strong>4.1.1 Manual feature extraction I</strong></h3>
+
+<p>You want to compare prices for specific products between stores. The features in the pre-loaded dataset <code class="language-plaintext highlighter-rouge">sales_df</code> are: <code class="language-plaintext highlighter-rouge">storeID</code>, <code class="language-plaintext highlighter-rouge">product</code>, <code class="language-plaintext highlighter-rouge">quantity</code> and <code class="language-plaintext highlighter-rouge">revenue</code>. The <code class="language-plaintext highlighter-rouge">quantity</code> and <code class="language-plaintext highlighter-rouge">revenue</code> features tell you how many items of a particular product were sold in a store and what the total revenue was. For the purpose of your analysis it’s more interesting to know the average price per product.</p>
+
+<p>| 123456 | <code class="language-plaintext highlighter-rouge">storeID  product  quantity  revenue0</code>       <code class="language-plaintext highlighter-rouge">A   Apples</code>      <code class="language-plaintext highlighter-rouge">1811</code>   <code class="language-plaintext highlighter-rouge">9300.61</code>       <code class="language-plaintext highlighter-rouge">A  Bananas</code>      <code class="language-plaintext highlighter-rouge">1003</code>   <code class="language-plaintext highlighter-rouge">3375.22</code>       <code class="language-plaintext highlighter-rouge">A  Oranges</code>      <code class="language-plaintext highlighter-rouge">1604</code>   <code class="language-plaintext highlighter-rouge">8528.53</code>       <code class="language-plaintext highlighter-rouge">B   Apples</code>      <code class="language-plaintext highlighter-rouge">1785</code>   <code class="language-plaintext highlighter-rouge">9181.04</code>       <code class="language-plaintext highlighter-rouge">B  Bananas</code>       <code class="language-plaintext highlighter-rouge">944</code>   <code class="language-plaintext highlighter-rouge">3680.2</code> |
+| :— | :— |</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">1234567</th>
+      <th style="text-align:left">
+        <p><code># Calculate the price from the quantity sold and revenue</code>
+        </p>
+        <p><code>sales_df[&apos;price&apos;]</code>  <code>=</code>  <code>sales_df[&apos;revenue&apos;]</code>  <code>/</code>  <code>sales_df[&apos;quantity&apos;]</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Drop the quantity and revenue features</code>
+        </p>
+        <p><code>reduced_df</code>  <code>=</code>  <code>sales_df.drop([&apos;revenue&apos;,</code>  <code>&apos;quantity&apos;], axis=1)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code>print(reduced_df.head())</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">123456</th>
+      <th style="text-align:left">
+        <p><code>&apos;pregnant&apos;,<br /></code>
+        </p>
+        <p><code>   weight_kg  height_1  height_2  height_3<br /></code>
+        </p>
+        <p><code>0       81.5      1.78      1.80      1.80<br /></code>
+        </p>
+        <p><code>1       72.6      1.70      1.70      1.69<br /></code>
+        </p>
+        <p><code>2       92.9      1.74      1.75      1.73<br /></code>
+        </p>
+        <p><code>3       79.4      1.66      1.68      1.67<br /></code>
+        </p>
+        <p><code>4       94.6      1.91      1.93      1.90</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p>When you understand the dataset well, always check if you can calculate relevant features and drop irrelevant ones.</p>
+
+<p><strong>4.1.2 Manual feature extraction II</strong></p>
+
+<p>You’re working on a variant of the ANSUR dataset, <code class="language-plaintext highlighter-rouge">height_df</code>, where a person’s height was measured 3 times. Add a feature with the mean height to the dataset and then drop the 3 original features.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">123456</th>
+      <th style="text-align:left">
+        <p><code>    weight_kg  height_1  height_2  height_3<br /></code>
+        </p>
+        <p><code>0        81.5      1.78      1.80      1.80<br /></code>
+        </p>
+        <p><code>1        72.6      1.70      1.70      1.69<br /></code>
+        </p>
+        <p><code>2        92.9      1.74      1.75      1.73<br /></code>
+        </p>
+        <p><code>3        79.4      1.66      1.68      1.67</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">1234567</th>
+      <th style="text-align:left">
+        <p><code># Calculate the mean height</code>
+        </p>
+        <p><code>height_df[&apos;height&apos;]</code>  <code>=</code>  <code>height_df[[&apos;height_1&apos;,&apos;height_2&apos;,&apos;height_3&apos;]].mean(axis=1)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Drop the 3 original height features</code>
+        </p>
+        <p><code>reduced_df</code>  <code>=</code>  <code>height_df.drop([&apos;height_1&apos;,&apos;height_2&apos;,&apos;height_3&apos;], axis=1)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code>print(reduced_df.head())</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">123456</th>
+      <th style="text-align:left">
+        <p><code>   weight_kg    height<br /></code>
+        </p>
+        <p><code>0       81.5  1.793333<br /></code>
+        </p>
+        <p><code>1       72.6  1.696667<br /></code>
+        </p>
+        <p><code>2       92.9  1.740000<br /></code>
+        </p>
+        <p><code>3       79.4  1.670000<br /></code>
+        </p>
+        <p><code>4       94.6  1.913333</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p><strong>4.1.3 Principal component intuition</strong></p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/3515/datasets/e27f8bb70e835e93ebd24a18f65d1399b142184f/lower_vs_upper_arm_vectors_small.png" alt="Forearm vs upper arm lengths" /></p>
+
+<p>After standardizing the lower and upper arm lengths from the ANSUR dataset we’ve added two perpendicular vectors that are aligned with the main directions of variance. We can describe each point in the dataset as a combination of these two vectors multiplied with a value each. These values are then called principal components.</p>
+
+<p>People with a negative component for the yellow vector have long forearms relative to their upper arms.</p>
+
+<h3 id="42-principal-component-analysis"><strong>4.2 Principal component analysis</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/5-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/6-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/7-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/8-10.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/9-10.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/10-10.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>4.2.1 Calculating Principal Components</strong></p>
+
+<p>You’ll visually inspect a 4 feature sample of the ANSUR dataset before and after PCA using Seaborn’s <code class="language-plaintext highlighter-rouge">pairplot()</code>. This will allow you to inspect the pairwise correlations between the features.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">1234</th>
+      <th style="text-align:left">
+        <p><code># Create a pairplot to inspect ansur_df</code>
+        </p>
+        <p><code>sns.pairplot(ansur_df)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code>plt.show()</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/11-9.png?w=1024" alt="" /></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">123456789101112131415</th>
+      <th style="text-align:left">
+        <p><code>from</code>  <code>sklearn.preprocessing</code>  <code>import</code>  <code>StandardScaler</code>
+        </p>
+        <p><code>from</code>  <code>sklearn.decomposition</code>  <code>import</code>  <code>PCA</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Create the scaler</code>
+        </p>
+        <p><code>scaler</code>  <code>=</code>  <code>StandardScaler()</code>
+        </p>
+        <p><code>ansur_std</code>  <code>=</code>  <code>scaler.fit_transform(ansur_df)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Create the PCA instance and fit and transform the data with pca</code>
+        </p>
+        <p><code>pca</code>  <code>=</code>  <code>PCA()</code>
+        </p>
+        <p><code>pc</code>  <code>=</code>  <code>pca.fit_transform(ansur_std)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># This changes the numpy array output back to a dataframe</code>
+        </p>
+        <p><code>pc_df</code>  <code>=</code>  <code>pd.DataFrame(pc, columns=[&apos;PC 1&apos;,</code>  <code>&apos;PC 2&apos;,</code>  <code>&apos;PC 3&apos;,</code>  <code>&apos;PC 4&apos;])</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Create a pairplot of the principal component dataframe</code>
+        </p>
+        <p><code>sns.pairplot(pc_df)</code>
+        </p>
+        <p><code>plt.show()</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/12-10.png?w=1024" alt="" /></p>
+
+<p>Notice how, in contrast to the input features, none of the principal components are correlated to one another.</p>
+
+<p><strong>4.2.2 PCA on a larger dataset</strong></p>
+
+<p>You’ll now apply PCA on a somewhat larger ANSUR datasample with 13 dimensions, once again pre-loaded as <code class="language-plaintext highlighter-rouge">ansur_df</code>. The fitted model will be used in the next exercise. Since we are not using the principal components themselves there is no need to transform the data, instead, it is sufficient to fit <code class="language-plaintext highlighter-rouge">pca</code> to the data.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">12345678910</th>
+      <th style="text-align:left">
+        <p><code>from</code>  <code>sklearn.preprocessing</code>  <code>import</code>  <code>StandardScaler</code>
+        </p>
+        <p><code>from</code>  <code>sklearn.decomposition</code>  <code>import</code>  <code>PCA</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Scale the data</code>
+        </p>
+        <p><code>scaler</code>  <code>=</code>  <code>StandardScaler()</code>
+        </p>
+        <p><code>ansur_std</code>  <code>=</code>  <code>scaler.fit_transform(ansur_df)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Apply PCA</code>
+        </p>
+        <p><code>pca</code>  <code>=</code>  <code>PCA()</code>
+        </p>
+        <p><code>pca.fit(ansur_std)</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p>You’ve fitted PCA on our 13 feature data samples. Now let’s see how the components explain the variance.</p>
+
+<p><strong>4.2.3 PCA explained variance</strong></p>
+
+<p>You’ll be inspecting the variance explained by the different principal components of the <code class="language-plaintext highlighter-rouge">pca</code> instance you created in the previous exercise.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">123456</th>
+      <th style="text-align:left">
+        <p><code># Inspect the explained variance ratio per component</code>
+        </p>
+        <p><code>print(pca.explained_variance_ratio_)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code>&lt;script.py&gt; output:<br /></code>
+        </p>
+        <p><code>    [0.61449404 0.19893965 0.06803095 0.03770499 0.03031502 0.0171759<br /></code>
+        </p>
+        <p><code>     0.01072762 0.00656681 0.00634743 0.00436015 0.0026586  0.00202617<br /></code>
+        </p>
+        <p><code>     0.00065268]</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">123456</th>
+      <th style="text-align:left">
+        <p><code># Print the cumulative sum of the explained variance ratio</code>
+        </p>
+        <p><code>print(pca.explained_variance_ratio_.cumsum())</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code>&lt;script.py&gt; output:<br /></code>
+        </p>
+        <p><code>    [0.61449404 0.81343368 0.88146463 0.91916962 0.94948464 0.96666054<br /></code>
+        </p>
+        <p><code>     0.97738816 0.98395496 0.99030239 0.99466254 0.99732115 0.99934732<br /></code>
+        </p>
+        <p><code>     1.        ]</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p>What’s the lowest number of principal components you should keep if you don’t want to lose more than 10% of explained variance during dimensionality reduction?
+<strong>4 principal components</strong></p>
+
+<p>Using no more than 4 principal components we can explain more than 90% of the variance in the 13 feature dataset.</p>
+
+<h3 id="43-pca-applications"><strong>4.3 PCA applications</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/13-9.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/15-7.png?w=677" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/16-5.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/17-3.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/18-4.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/19-4.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/20-4.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/21-4.png?w=923" alt="" /></li>
+</ul>
+
+<h3 id="431-understanding-the-components"><strong>4.3.1 Understanding the components</strong></h3>
+
+<p>You’ll apply PCA to the numeric features of the Pokemon dataset, <code class="language-plaintext highlighter-rouge">poke_df</code>, using a pipeline to combine the feature scaling and PCA in one go. You’ll then interpret the meanings of the first two components.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">1234567891011121314</th>
+      <th style="text-align:left">
+        <p><code># Build the pipeline<br /></code>
+        </p>
+        <p><code>pipe = Pipeline([(&apos;scaler&apos;, StandardScaler()),<br /></code>
+        </p>
+        <p><code>        		 (&apos;reducer&apos;, PCA(n_components=2))])</code>
+        </p>
+        <p></p>
+        <p><code># Fit it to the dataset and extract the component vectors<br /></code>
+        </p>
+        <p><code>pipe.fit(poke_df)<br /></code>
+        </p>
+        <p><code>vectors = pipe.steps[1][1].components_.round(2)<br /></code>
+        </p>
+        <p><code><br /></code>
+        </p>
+        <p><code># Print feature effects<br /></code>
+        </p>
+        <p><code>print(&apos;PC 1 effects = &apos; + str(dict(zip(poke_df.columns, vectors[0]))))<br /></code>
+        </p>
+        <p><code>print(&apos;PC 2 effects = &apos; + str(dict(zip(poke_df.columns, vectors[1]))))</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code>PC 1 effects = {&apos;HP&apos;: 0.39, &apos;Attack&apos;: 0.44, &apos;Defense&apos;: 0.36, &apos;Sp. Atk&apos;: 0.46, &apos;Sp. Def&apos;: 0.45, &apos;Speed&apos;: 0.34}<br /></code>
+        </p>
+        <p><code>PC 2 effects = {&apos;HP&apos;: 0.08, &apos;Attack&apos;: -0.01, &apos;Defense&apos;: 0.63, &apos;Sp. Atk&apos;: -0.31, &apos;Sp. Def&apos;: 0.24, &apos;Speed&apos;: -0.67}</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<ul>
+  <li>PC1: All features have a similar positive effect. PC 1 can be interpreted as a measure of overall quality (high stats).</li>
+  <li>
+    <p>PC2: Defense has a strong positive effect on the second component and speed a strong negative one. This component quantifies an agility vs. armor &amp; protection trade-off.</p>
+
+    <p>You’ve used the pipeline for the first time and understand how the features relate to the components.</p>
+  </li>
+</ul>
+
+<p><strong>Question</strong></p>
+
+<ul>
+  <li>Inspect the PC 1 effects. Which statement is true?</li>
+</ul>
+
+<p><strong>Possible Answers</strong></p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">Sp. Atk</code> has the biggest effect on this feature by far. PC 1 can be interpreted as a measure of how good a Pokemon’s special attack is.</li>
+  <li><strong>All features have a similar positive effect. PC 1 can be interpreted as a measure of overall quality (high stats).</strong></li>
+</ul>
+
+<p>****</p>
+
+<p><strong>Question</strong></p>
+
+<ul>
+  <li>Inspect the PC 2 effects. Which statement is true?</li>
+</ul>
+
+<p><strong>Possible Answers</strong></p>
+
+<ul>
+  <li>Defense has a strong positive effect on the second component and speed a strong negative one. This component quantifies an agility vs. armor &amp; protection trade-off.</li>
+  <li>Fast Pokemon have high values for this component.</li>
+</ul>
+
+<p><strong>4.3.2 PCA for feature exploration</strong></p>
+
+<p>You’ll use the PCA pipeline you’ve built in the previous exercise to visually explore how some categorical features relate to the variance in <code class="language-plaintext highlighter-rouge">poke_df</code>. These categorical features (<code class="language-plaintext highlighter-rouge">Type</code> &amp; <code class="language-plaintext highlighter-rouge">Legendary</code>) can be found in a separate dataframe <code class="language-plaintext highlighter-rouge">poke_cat_df</code>.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">1234567</th>
+      <th style="text-align:left">
+        <p><code>poke_df.head()      </code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code>HP  Attack  Defense  Sp. Atk  Sp. Def  Speed<br /></code>
+        </p>
+        <p><code>0  45      49       49       65       65     45<br /></code>
+        </p>
+        <p><code>1  60      62       63       80       80     60<br /></code>
+        </p>
+        <p><code>2  80      82       83      100      100     80<br /></code>
+        </p>
+        <p><code>3  80     100      123      122      120     80<br /></code>
+        </p>
+        <p><code>4  39      52       43       60       50     65</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">12345</th>
+      <th style="text-align:left">
+        <p><code># Build the pipeline<br /></code>
+        </p>
+        <p><code>pipe = Pipeline([(&apos;scaler&apos;, StandardScaler()),<br /></code>
+        </p>
+        <p><code>                 (&apos;reducer&apos;, PCA(n_components=2))])</code>
+        </p>
+        <p></p>
+        <p><code># Fit the pipeline to poke_df and transform the data</code>
+        </p>
+        <p><code>pc</code>  <code>=</code>  <code>pipe.fit_transform(poke_df)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code>print(pc)</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">12345678</th>
+      <th style="text-align:left">
+        <p><code>&lt;script.py&gt; output:<br /></code>
+        </p>
+        <p><code>    [[-1.5563747  -0.02148212]<br /></code>
+        </p>
+        <p><code>     [-0.36286656 -0.05026854]<br /></code>
+        </p>
+        <p><code>     [ 1.28015158 -0.06272022]<br /></code>
+        </p>
+        <p><code>     ...<br /></code>
+        </p>
+        <p><code>     [ 2.45821626 -0.51588158]<br /></code>
+        </p>
+        <p><code>     [ 3.5303971  -0.95106516]<br /></code>
+        </p>
+        <p><code>     [ 2.23378629  0.53762985]]</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">123</th>
+      <th style="text-align:left">
+        <p><code># Add the 2 components to poke_cat_df</code>
+        </p>
+        <p><code># Add the 2 components to poke_cat_df<br /></code>
+        </p>
+        <p><code>poke_cat_df[&apos;PC 1&apos;] = pc[:, 0]<br /></code>
+        </p>
+        <p><code>poke_cat_df[&apos;PC 2&apos;] = pc[:, 1]<br /></code>
+        </p>
+        <p><code><br /></code>
+        </p>
+        <p><code>print(poke_cat_df.head())</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">1234</th>
+      <th style="text-align:left">
+        <p><code># Use the Type feature to color the PC 1 vs PC 2 scatterplot</code>
+        </p>
+        <p><code>sns.scatterplot(data=poke_cat_df, <br /></code>
+        </p>
+        <p><code>                x=&apos;PC 1&apos;, y=&apos;PC 2&apos;, hue=&apos;Type&apos;)<br /></code>
+        </p>
+        <p><code>plt.show()</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/22-4.png?w=1024" alt="" /></p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">1234</th>
+      <th style="text-align:left">
+        <p><code># Use the Legendary feature to color the PC 1 vs PC 2 scatterplot<br /></code>
+        </p>
+        <p><code>sns.scatterplot(data=poke_cat_df, <br /></code>
+        </p>
+        <p><code>                x=&apos;PC 1&apos;, y=&apos;PC 2&apos;, hue=&apos;Legendary&apos;)<br /></code>
+        </p>
+        <p><code>plt.show()</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/23-4.png?w=1024" alt="" /></p>
+
+<p>Looks like the different types are scattered all over the place while the legendary pokemon always score high for PC 1 meaning they have high stats overall. Their spread along the PC 2 axis tells us they aren’t consistently fast and vulnerable or slow and armored.</p>
+
+<p><strong>4.3.3 PCA in a model pipeline</strong></p>
+
+<p>We just saw that legendary pokemon tend to have higher stats overall. Let’s see if we can add a classifier to our pipeline that detects legendary versus non-legendary pokemon based on the principal components.</p>
+
+<p>The data has been pre-loaded for you and split into training and tests datasets: X_train, X_test, y_train, y_test.</p>
+
+<p>Same goes for all relevant packages and classes(Pipeline(), StandardScaler(), PCA(), RandomForestClassifier()).</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">123456789101112131415</th>
+      <th style="text-align:left">
+        <p><code># Build the pipeline<br /></code>
+        </p>
+        <p><code>pipe = Pipeline([<br /></code>
+        </p>
+        <p><code>        (&apos;scaler&apos;, StandardScaler()),<br /></code>
+        </p>
+        <p><code>        (&apos;reducer&apos;, PCA(n_components=2)),<br /></code>
+        </p>
+        <p><code>        (&apos;classifier&apos;, RandomForestClassifier(random_state=0))])</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Fit the pipeline to the training data</code>
+        </p>
+        <p><code>pipe.fit(X_train, y_train)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Prints the explained variance ratio<br /></code>
+        </p>
+        <p><code>print(pipe.steps[1][1].explained_variance_ratio_)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Score the accuracy on the test set<br /></code>
+        </p>
+        <p><code>accuracy = pipe.score(X_test, y_test)<br /></code>
+        </p>
+        <p><code><br /></code>
+        </p>
+        <p><code># Prints the model accuracy<br /></code>
+        </p>
+        <p><code>print(&apos;{0:.1%} test set accuracy&apos;.format(accuracy))</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align:left"></td>
+      <td style="text-align:left">
+        <p><code># Build the pipeline<br /></code>
+        </p>
+        <p><code>pipe = Pipeline([<br /></code>
+        </p>
+        <p><code>        (&apos;scaler&apos;, StandardScaler()),<br /></code>
+        </p>
+        <p><code>        (&apos;reducer&apos;, PCA(n_components=3)),<br /></code>
+        </p>
+        <p><code>        (&apos;classifier&apos;, RandomForestClassifier(random_state=0))])<br /></code>
+        </p>
+        <p><code><br /></code>
+        </p>
+        <p><code># Fit the pipeline to the training data<br /></code>
+        </p>
+        <p><code>pipe.fit(X_train, y_train)<br /></code>
+        </p>
+        <p><code><br /></code>
+        </p>
+        <p><code># Score the accuracy on the test set<br /></code>
+        </p>
+        <p><code>accuracy = pipe.score(X_test, y_test)<br /></code>
+        </p>
+        <p><code><br /></code>
+        </p>
+        <p><code># Prints the explained variance ratio and accuracy<br /></code>
+        </p>
+        <p><code>print(pipe.steps[1][1].explained_variance_ratio_)<br /></code>
+        </p>
+        <p><code>print(&apos;{0:.1%} test set accuracy&apos;.format(accuracy))</code>
+        </p>
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align:left"></td>
+      <td style="text-align:left">
+        <p> <code>&lt;script.py&gt; output:<br /></code>
+        </p>
+        <p><code>    [0.45624044 0.17767414] </code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code>&lt;script.py&gt; output:<br /></code>
+        </p>
+        <p><code>    95.8% test set accuracy<br /></code>
+        </p>
+        <p><code><br /></code>
+        </p>
+        <p><code>&lt;script.py&gt; output:<br /></code>
+        </p>
+        <p><code>    [0.45624044 0.17767414 0.12858833]<br /></code>
+        </p>
+        <p><code>    95.0% test set accuracy</code>
+        </p>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>Looks like adding the third component does not increase the model accuracy, even though it adds information to the dataset.</p>
+
+<h3 id="44-principal-component-selection"><strong>4.4 Principal Component selection</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/24-4.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/25-4.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/26-4.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/27-4.png?w=618" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/28-4.png?w=790" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/29-3.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/30-3.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>4.4.1 Selecting the proportion of variance to keep</strong></p>
+
+<p>You’ll let PCA determine the number of components to calculate based on an explained variance threshold that you decide.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">12345678</th>
+      <th style="text-align:left">
+        <p><code># Pipe a scaler to PCA selecting 80% of the variance<br /></code>
+        </p>
+        <p><code>pipe = Pipeline([(&apos;scaler&apos;, StandardScaler()),<br /></code>
+        </p>
+        <p><code>        		 (&apos;reducer&apos;, PCA(n_components=0.8))])</code>
+        </p>
+        <p></p>
+        <p><code># Fit the pipe to the data<br /></code>
+        </p>
+        <p><code>pipe.fit(ansur_df) <br /></code>
+        </p>
+        <p><code><br /></code>
+        </p>
+        <p><code>print(&apos;{} components selected&apos;.format(len(pipe.steps[1][1].components_)))</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Pipe a scaler to PCA selecting 80% of the variance<br /></code>
+        </p>
+        <p><code>pipe = Pipeline([(&apos;scaler&apos;, StandardScaler()),<br /></code>
+        </p>
+        <p><code>        		 (&apos;reducer&apos;, PCA(n_components=0.9))])</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Fit the pipe to the data<br /></code>
+        </p>
+        <p><code>pipe.fit(ansur_df) <br /></code>
+        </p>
+        <p><code><br /></code>
+        </p>
+        <p><code>print(&apos;{} components selected&apos;.format(len(pipe.steps[1][1].components_)))</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">12345</th>
+      <th style="text-align:left">
+        <p><code>&lt;script.py&gt; output:<br /></code>
+        </p>
+        <p><code>    11 components selected<br /></code>
+        </p>
+        <p><code><br /></code>
+        </p>
+        <p><code>&lt;script.py&gt; output:<br /></code>
+        </p>
+        <p><code>    23 components selected</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p>We need to more than double the components to go from 80% to 90% explained variance.</p>
+
+<p><strong>Question</strong></p>
+
+<ul>
+  <li>How many <strong>additional</strong> features do you need to explain 90% instead of 80% of the variance?</li>
+</ul>
+
+<p><strong>Possible Answers</strong></p>
+
+<ul>
+  <li>11</li>
+  <li><strong>12</strong></li>
+  <li>23</li>
+</ul>
+
+<p><strong>4.4.2 Choosing the number of components</strong></p>
+
+<p>You’ll now make a more informed decision on the number of principal components to reduce your data to using the “elbow in the plot” technique.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">12345678910111213</th>
+      <th style="text-align:left">
+        <p><code># Pipeline a scaler and PCA selecting 10 components<br /></code>
+        </p>
+        <p><code>pipe = Pipeline([(&apos;scaler&apos;, StandardScaler()),<br /></code>
+        </p>
+        <p><code>        		 (&apos;reducer&apos;, PCA(n_components=10))])</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Fit the pipe to the data</code>
+        </p>
+        <p><code>pipe.fit(ansur_df)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Plot the explained variance ratio</code>
+        </p>
+        <p><code>plt.plot(pipe.steps[1][1].explained_variance_ratio_)</code>
+        </p>
+        <p></p>
+        <p><code>plt.xlabel(&apos;Principal component index&apos;)</code>
+        </p>
+        <p><code>plt.ylabel(&apos;Explained variance ratio&apos;)</code>
+        </p>
+        <p><code>plt.show()</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/31-2.png?w=1024" alt="" /></p>
+
+<p>To how many components can you reduce the dataset without compromising too much on explained variance? Note that the x-axis is zero indexed.</p>
+
+<p>The ‘elbow’ in the plot is at 3 components (the 3rd component has index 2).</p>
+
+<p><strong>Question</strong></p>
+
+<ul>
+  <li>To how many components can you reduce the dataset without compromising too much on explained variance? Note that the x-axis is zero indexed.</li>
+</ul>
+
+<p><strong>Possible Answers</strong></p>
+
+<ul>
+  <li>1</li>
+  <li>2</li>
+  <li><strong>3</strong></li>
+  <li>4</li>
+</ul>
+
+<p><strong>4.4.3 PCA for image compression</strong></p>
+
+<p>You’ll reduce the size of 16 images with hand written digits (MNIST dataset) using PCA.</p>
+
+<p>The samples are 28 by 28 pixel gray scale images that have been flattened to arrays with 784 elements each (28 x 28 = 784) and added to the 2D numpy array <code class="language-plaintext highlighter-rouge">X_test</code>. Each of the 784 pixels has a value between 0 and 255 and can be regarded as a feature.</p>
+
+<p>A pipeline with a scaler and PCA model to select 78 components has been pre-loaded for you as <code class="language-plaintext highlighter-rouge">pipe</code>. This pipeline has already been fitted to the entire MNIST dataset except for the 16 samples in <code class="language-plaintext highlighter-rouge">X_test</code>.</p>
+
+<p>Finally, a function <code class="language-plaintext highlighter-rouge">plot_digits</code> has been created for you that will plot 16 images in a grid.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">12</th>
+      <th style="text-align:left">
+        <p><code># Plot the MNIST sample data</code>
+        </p>
+        <p><code>plot_digits(X_test)</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/32-1.png?w=998" alt="" /></p>
+
+<p>| 1234 | <code class="language-plaintext highlighter-rouge">pipePipeline(memory=None,     steps=[('scaler', StandardScaler(copy=True, with_mean=True, with_std=True)), ('reducer', PCA(copy=True, iterated_power='auto', n_components=78, random_state=None,  svd_solver='auto', tol=0.0, whiten=False))])</code> |
+| :— | :— |</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align:left">12345678910111213141516171819</th>
+      <th style="text-align:left">
+        <p><code># Transform the input data to principal components</code>
+        </p>
+        <p><code>pc</code>  <code>=</code>  <code>pipe.transform(X_test)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Prints the number of features per dataset</code>
+        </p>
+        <p><code>print(&quot;X_test has {} features&quot;.format(X_test.shape[1]))</code>
+        </p>
+        <p><code>print(&quot;pc has {} features&quot;.format(pc.shape[1]))</code>
+        </p>
+        <p></p>
+        <p><code>#    X_test has 784 features</code>
+        </p>
+        <p><code>#    pc has 78 features</code>
+        </p>
+        <p> <code># Inverse transform the components to original feature space</code>
+        </p>
+        <p><code>X_rebuilt</code>  <code>=</code>  <code>pipe.inverse_transform(pc)</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p> <code># Prints the number of features</code>
+        </p>
+        <p><code>print(&quot;X_rebuilt has {} features&quot;.format(X_rebuilt.shape[1]))</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># X_rebuilt has 784 features</code>
+        </p>
+        <p>&lt;code&gt;&lt;/code&gt;</p>
+        <p><code># Plot the reconstructed data</code>
+        </p>
+        <p><code>plot_digits(X_rebuilt)</code>
+        </p>
+      </th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/33-1.png?w=983" alt="" /></p>
+
+<p>You’ve reduced the size of the data 10 fold but were able to reconstruct images with reasonable quality.</p>
+
+<h3 id="the-end"><strong>The End</strong></h3>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/34.png?w=942" alt="" /></p>
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

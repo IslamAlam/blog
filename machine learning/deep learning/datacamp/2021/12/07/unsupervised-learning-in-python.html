@@ -1,0 +1,1526 @@
+<h1 id="unsupervised-learning-in-python">Unsupervised Learning in Python</h1>
+
+<p>This is the memo of the 23th course of ‘Data Scientist with Python’ track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/unsupervised-learning-in-python">HERE</a></strong>
+ .</p>
+
+<hr />
+
+<h1 id="1-clustering-for-dataset-exploration"><strong>1. Clustering for dataset exploration</strong></h1>
+<hr />
+
+<h2 id="11-unsupervised-learning"><strong>1.1 Unsupervised learning</strong></h2>
+
+<p>####
+<strong>How many clusters?</strong></p>
+
+<p>You are given an array
+ <code class="language-plaintext highlighter-rouge">points</code>
+ of size 300×2, where each row gives the (x, y) co-ordinates of a point on a map. Make a scatter plot of these points, and use the scatter plot to guess how many clusters there are.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+points[:3]
+array([[ 0.06544649, -0.76866376],
+       [-1.52901547, -0.42953079],
+       [ 1.70993371,  0.69885253]])
+
+xs=points[:,0]
+ys=points[:,1]
+
+plt.scatter(xs,ys)
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture3.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Clustering 2D points</strong></p>
+
+<p>From the scatter plot of the previous exercise, you saw that the points seem to separate into 3 clusters. You’ll now create a KMeans model to find 3 clusters, and fit it to the data points from the previous exercise. After the model has been fit, you’ll obtain the cluster labels for some new points using the
+ <code class="language-plaintext highlighter-rouge">.predict()</code>
+ method.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import KMeans
+</span><span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
+
+<span class="c1"># Create a KMeans instance with 3 clusters: model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># Fit model to points
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">points</span><span class="p">)</span>
+
+<span class="c1"># Determine the cluster labels of new_points: labels
+</span><span class="n">labels</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">new_points</span><span class="p">)</span>
+
+<span class="c1"># Print cluster labels of new_points
+</span><span class="k">print</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+
+<span class="p">[</span><span class="mi">1</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">2</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">2</span>
+<span class="p">...</span>
+ <span class="mi">0</span> <span class="mi">2</span> <span class="mi">2</span> <span class="mi">1</span><span class="p">]</span>
+
+
+</code></pre></div></div>
+
+<p>You’ve successfully performed k-Means clustering and predicted the labels of new points. But it is not easy to inspect the clustering by just looking at the printed labels. A visualization would be far more useful. In the next exercise, you’ll inspect your clustering with a scatter plot!</p>
+
+<p>####
+<strong>Inspect your clustering</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pyplot
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Assign the columns of new_points: xs and ys
+</span><span class="n">xs</span> <span class="o">=</span> <span class="n">new_points</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">ys</span> <span class="o">=</span> <span class="n">new_points</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Make a scatter plot of xs and ys, using labels to define the colors
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># Assign the cluster centers: centroids
+</span><span class="n">centroids</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">cluster_centers_</span>
+
+<span class="c1"># Assign the columns of centroids: centroids_x, centroids_y
+</span><span class="n">centroids_x</span> <span class="o">=</span> <span class="n">centroids</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">centroids_y</span> <span class="o">=</span> <span class="n">centroids</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Make a scatter plot of centroids_x and centroids_y
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">centroids_x</span><span class="p">,</span> <span class="n">centroids_y</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'D'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture4.png?w=1024" alt="Desktop View" /></p>
+
+<p>The clustering looks great! But how can you be sure that 3 clusters is the correct choice? In other words, how can you evaluate the quality of a clustering?</p>
+
+<hr />
+
+<h2 id="12-evaluating-a-clustering"><strong>1.2 Evaluating a clustering</strong></h2>
+
+<p>####
+<strong>How many clusters of grain?</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+samples
+array([[15.26  , 14.84  ,  0.871 , ...,  3.312 ,  2.221 ,  5.22  ],
+       ...,
+       [12.3   , 13.34  ,  0.8684, ...,  2.974 ,  5.637 ,  5.063 ]])
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+ks = range(1, 6)
+inertias = []
+
+for k in ks:
+    # Create a KMeans instance with k clusters: model
+    model = KMeans(n_clusters=k)
+
+    # Fit model to samples
+    model.fit(samples)
+
+    # Append the inertia to the list of inertias
+    inertias.append(model.inertia_)
+
+# Plot ks vs inertias
+plt.plot(ks, inertias, '-o')
+plt.xlabel('number of clusters, k')
+plt.ylabel('inertia')
+plt.xticks(ks)
+plt.show()
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture5.png?w=647" alt="Desktop View" /></p>
+
+<p>The inertia decreases very slowly from 3 clusters to 4, so it looks like 3 clusters would be a good choice for this data.</p>
+
+<p>####
+<strong>Evaluating the grain clustering</strong></p>
+
+<p>In the previous exercise, you observed from the inertia plot that 3 is a good number of clusters for the grain data. In fact, the grain samples come from a mix of 3 different grain varieties: “Kama”, “Rosa” and “Canadian”. In this exercise, cluster the grain samples into three clusters, and compare the clusters to the grain varieties using a cross-tabulation.</p>
+
+<p>You have the array
+ <code class="language-plaintext highlighter-rouge">samples</code>
+ of grain samples, and a list
+ <code class="language-plaintext highlighter-rouge">varieties</code>
+ giving the grain variety for each sample.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+varieties
+['Kama wheat',
+ 'Kama wheat',
+...
+ 'Canadian wheat',
+ 'Canadian wheat']
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a KMeans model with 3 clusters: model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># Use fit_predict to fit model and obtain cluster labels: labels
+</span><span class="n">labels</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit_predict</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+
+<span class="c1"># Create a DataFrame with labels and varieties as columns: df
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s">'labels'</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span> <span class="s">'varieties'</span><span class="p">:</span> <span class="n">varieties</span><span class="p">})</span>
+
+<span class="c1"># Create crosstab: ct
+</span><span class="n">ct</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'labels'</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s">'varieties'</span><span class="p">])</span>
+
+<span class="c1"># Display ct
+</span><span class="k">print</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+varieties  Canadian wheat  Kama wheat  Rosa wheat
+labels
+0                       0           1          60
+1                      68           9           0
+2                       2          60          10
+
+</code></pre></div></div>
+
+<p>The cross-tabulation shows that the 3 varieties of grain separate really well into 3 clusters. But depending on the type of data you are working with, the clustering may not always be this good. Is there anything you can do in such situations to improve your clustering?</p>
+
+<hr />
+
+<h2 id="13-transforming-features-for-better-clusterings"><strong>1.3 Transforming features for better clusterings</strong></h2>
+
+<p>####
+<strong>Scaling fish data for clustering</strong></p>
+
+<p>You are given an array
+ <code class="language-plaintext highlighter-rouge">samples</code>
+ giving measurements of fish. Each row represents an individual fish. The measurements, such as weight in grams, length in centimeters, and the percentage ratio of height to length, have very different scales. In order to cluster this data effectively, you’ll need to standardize these features first. In this exercise, you’ll build a pipeline to standardize and cluster the data.</p>
+
+<p>These fish measurement data were sourced from the
+ <a href="http://ww2.amstat.org/publications/jse/jse_data_archive.htm">Journal of Statistics Education</a>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Perform the necessary imports
+</span><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">make_pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
+
+<span class="c1"># Create scaler: scaler
+</span><span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+
+<span class="c1"># Create KMeans instance: kmeans
+</span><span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+<span class="c1"># Create pipeline: pipeline
+</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">scaler</span><span class="p">,</span> <span class="n">kmeans</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<p>####
+<strong>Clustering the fish data</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+samples
+array([[ 242. ,   23.2,   25.4,   30. ,   38.4,   13.4],
+       [ 290. ,   24. ,   26.3,   31.2,   40. ,   13.8],
+       [ 340. ,   23.9,   26.5,   31.1,   39.8,   15.1],
+...
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pandas
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># Fit the pipeline to samples
+</span><span class="n">pipeline</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+
+<span class="c1"># Calculate the cluster labels: labels
+</span><span class="n">labels</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+
+<span class="c1"># Create a DataFrame with labels and species as columns: df
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s">'labels'</span><span class="p">:</span><span class="n">labels</span><span class="p">,</span> <span class="s">'species'</span><span class="p">:</span><span class="n">species</span><span class="p">})</span>
+
+<span class="c1"># Create crosstab: ct
+</span><span class="n">ct</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'labels'</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s">'species'</span><span class="p">])</span>
+
+<span class="c1"># Display ct
+</span><span class="k">print</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+species  Bream  Pike  Roach  Smelt
+labels
+0            0     0      0     13
+1           33     0      1      0
+2            0    17      0      0
+3            1     0     19      1
+
+</code></pre></div></div>
+
+<p>It looks like the fish data separates really well into 4 clusters!</p>
+
+<p>####
+<strong>Clustering stocks using KMeans</strong></p>
+
+<p>In this exercise, you’ll cluster companies using their daily stock price movements (i.e. the dollar difference between the closing and opening prices for each trading day). You are given a NumPy array
+ <code class="language-plaintext highlighter-rouge">movements</code>
+ of daily price movements from 2010 to 2015 (obtained from Yahoo! Finance), where each row corresponds to a company, and each column corresponds to a trading day.</p>
+
+<p>Some stocks are more expensive than others. To account for this, include a
+ <code class="language-plaintext highlighter-rouge">Normalizer</code>
+ at the beginning of your pipeline. The Normalizer will separately transform each company’s stock price to a relative scale before the clustering begins.</p>
+
+<p>Note that
+ <code class="language-plaintext highlighter-rouge">Normalizer()</code>
+ is different to
+ <code class="language-plaintext highlighter-rouge">StandardScaler()</code>
+ , which you used in the previous exercise. While
+ <code class="language-plaintext highlighter-rouge">StandardScaler()</code>
+ standardizes
+ <strong>features</strong>
+ (such as the features of the fish data from the previous exercise) by removing the mean and scaling to unit variance,
+ <code class="language-plaintext highlighter-rouge">Normalizer()</code>
+ rescales
+ <strong>each sample</strong>
+ – here, each company’s stock price – independently of the other.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+movements
+array([[ 5.8000000e-01, -2.2000500e-01, -3.4099980e+00, ...,
+        -5.3599620e+00,  8.4001900e-01, -1.9589981e+01],
+       ...,
+       [ 1.5999900e-01,  1.0001000e-02,  0.0000000e+00, ...,
+        -6.0001000e-02,  2.5999800e-01,  9.9998000e-02]])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import Normalizer
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Normalizer</span>
+
+<span class="c1"># Create a normalizer: normalizer
+</span><span class="n">normalizer</span> <span class="o">=</span> <span class="n">Normalizer</span><span class="p">()</span>
+
+<span class="c1"># Create a KMeans model with 10 clusters: kmeans
+</span><span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Make a pipeline chaining normalizer and kmeans: pipeline
+</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">normalizer</span><span class="p">,</span> <span class="n">kmeans</span><span class="p">)</span>
+
+<span class="c1"># Fit pipeline to the daily price movements
+</span><span class="n">pipeline</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">movements</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<p>Now that your pipeline has been set up, you can find out which stocks move together in the next exercise!</p>
+
+<p>####
+<strong>Which stocks move together?</strong></p>
+
+<p>In the previous exercise, you clustered companies by their daily stock price movements. So which company have stock prices that tend to change in the same way? You’ll now inspect the cluster labels from your clustering to find out.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pandas
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># Predict the cluster labels: labels
+</span><span class="n">labels</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">movements</span><span class="p">)</span>
+
+<span class="c1"># Create a DataFrame aligning labels and companies: df
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s">'labels'</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span> <span class="s">'companies'</span><span class="p">:</span> <span class="n">companies</span><span class="p">})</span>
+
+<span class="c1"># Display df sorted by cluster label
+</span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'labels'</span><span class="p">))</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                             companies  labels
+59                               Yahoo       0
+15                                Ford       0
+35                            Navistar       0
+26                      JPMorgan Chase       1
+16                   General Electrics       1
+58                               Xerox       1
+11                               Cisco       1
+18                       Goldman Sachs       1
+20                          Home Depot       1
+5                      Bank of America       1
+3                     American express       1
+55                         Wells Fargo       1
+1                                  AIG       1
+38                               Pepsi       2
+...
+
+</code></pre></div></div>
+
+<p>In the next chapter, you’ll learn about how to communicate results such as this through visualizations.</p>
+
+<hr />
+
+<h1 id="2-visualization-with-hierarchical-clustering-and-t-sne"><strong>2. Visualization with hierarchical clustering and t-SNE</strong></h1>
+<hr />
+
+<p>###
+<strong>Visualizing hierarchies</strong></p>
+
+<p>####
+<strong>Hierarchical clustering of the grain data</strong></p>
+
+<p>Use the
+ <code class="language-plaintext highlighter-rouge">linkage()</code>
+ function to obtain a hierarchical clustering of the grain samples, and use
+ <code class="language-plaintext highlighter-rouge">dendrogram()</code>
+ to visualize the result.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Perform the necessary imports
+</span><span class="kn">from</span> <span class="nn">scipy.cluster.hierarchy</span> <span class="kn">import</span> <span class="n">linkage</span><span class="p">,</span> <span class="n">dendrogram</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Calculate the linkage: mergings
+</span><span class="n">mergings</span> <span class="o">=</span> <span class="n">linkage</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">'complete'</span><span class="p">)</span>
+
+<span class="c1"># Plot the dendrogram, using varieties as labels
+</span><span class="n">dendrogram</span><span class="p">(</span><span class="n">mergings</span><span class="p">,</span>
+           <span class="n">labels</span><span class="o">=</span><span class="n">varieties</span><span class="p">,</span>
+           <span class="n">leaf_rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span>
+           <span class="n">leaf_font_size</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture6.png?w=1024" alt="Desktop View" /></p>
+
+<p>Dendrograms are a great way to illustrate the arrangement of the clusters produced by hierarchical clustering.</p>
+
+<p>####
+<strong>Hierarchies of stocks</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import normalize
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">normalize</span>
+
+<span class="c1"># Normalize the movements: normalized_movements
+</span><span class="n">normalized_movements</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">movements</span><span class="p">)</span>
+
+<span class="c1"># Calculate the linkage: mergings
+</span><span class="n">mergings</span> <span class="o">=</span> <span class="n">linkage</span><span class="p">(</span><span class="n">normalized_movements</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">'complete'</span><span class="p">)</span>
+
+<span class="c1"># Plot the dendrogram
+</span><span class="n">dendrogram</span><span class="p">(</span><span class="n">mergings</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">companies</span><span class="p">,</span> <span class="n">leaf_rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">leaf_font_size</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture7.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<p>###
+<strong>Cluster labels in hierarchical clustering</strong></p>
+
+<p>####
+<strong>Different linkage, different hierarchical clustering!</strong></p>
+
+<p>Perform a hierarchical clustering of the voting countries with
+ <code class="language-plaintext highlighter-rouge">'single'</code>
+ linkage, and compare the resulting dendrogram with the one in the video. Different linkage, different hierarchical clustering!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Perform the necessary imports
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.cluster.hierarchy</span> <span class="kn">import</span> <span class="n">linkage</span><span class="p">,</span> <span class="n">dendrogram</span>
+
+<span class="c1"># Calculate the linkage: mergings
+</span><span class="n">mergings</span> <span class="o">=</span> <span class="n">linkage</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s">'single'</span><span class="p">)</span>
+
+<span class="c1"># Plot the dendrogram
+</span><span class="n">dendrogram</span><span class="p">(</span><span class="n">mergings</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">country_names</span><span class="p">,</span> <span class="n">leaf_rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">,</span> <span class="n">leaf_font_size</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture8.png?w=1024" alt="Desktop View" /></p>
+
+<p>As you can see, performing single linkage hierarchical clustering produces a different dendrogram!</p>
+
+<p>###
+<strong>Extracting the cluster labels</strong></p>
+
+<p>Use the
+ <code class="language-plaintext highlighter-rouge">fcluster()</code>
+ function to extract the cluster labels for this intermediate clustering, and compare the labels with the grain varieties using a cross-tabulation.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Perform the necessary imports
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">from</span> <span class="nn">scipy.cluster.hierarchy</span> <span class="kn">import</span> <span class="n">fcluster</span>
+
+<span class="c1"># Use fcluster to extract labels: labels
+</span><span class="n">labels</span> <span class="o">=</span> <span class="n">fcluster</span><span class="p">(</span><span class="n">mergings</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">criterion</span><span class="o">=</span><span class="s">'distance'</span><span class="p">)</span>
+
+<span class="c1"># Create a DataFrame with labels and varieties as columns: df
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s">'labels'</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span> <span class="s">'varieties'</span><span class="p">:</span> <span class="n">varieties</span><span class="p">})</span>
+
+<span class="c1"># Create crosstab: ct
+</span><span class="n">ct</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">crosstab</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'labels'</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s">'varieties'</span><span class="p">])</span>
+
+<span class="c1"># Display ct
+</span><span class="k">print</span><span class="p">(</span><span class="n">ct</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+varieties  Canadian wheat  Kama wheat  Rosa wheat
+labels
+1                      14           3           0
+2                       0           0          14
+3                       0          11           0
+
+</code></pre></div></div>
+
+<p>You’ve now mastered the fundamentals of k-Means and agglomerative hierarchical clustering. Next, you’ll learn about t-SNE, which is a powerful tool for visualizing high dimensional data.</p>
+
+<hr />
+
+<p>###
+<strong>t-SNE for 2-dimensional maps</strong></p>
+
+<p>####
+<strong>t-SNE visualization of grain dataset</strong></p>
+
+<p><a href="https://en.wikipedia.org/wiki/T-distributed_stochastic_neighbor_embedding">t-distributed stochastic neighbor embedding</a></p>
+
+<p>In this exercise, you’ll apply t-SNE to the grain samples data and inspect the resulting t-SNE features using a scatter plot.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+samples[:3]
+array([[15.26  , 14.84  ,  0.871 ,  5.763 ,  3.312 ,  2.221 ,  5.22  ],
+       [14.88  , 14.57  ,  0.8811,  5.554 ,  3.333 ,  1.018 ,  4.956 ],
+       [14.29  , 14.09  ,  0.905 ,  5.291 ,  3.337 ,  2.699 ,  4.825 ]])
+
+ variety_numbers[:3]
+ [1, 1, 1]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import TSNE
+</span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+
+<span class="c1"># Create a TSNE instance: model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+
+<span class="c1"># Apply fit_transform to samples: tsne_features
+</span><span class="n">tsne_features</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+
+<span class="c1"># Select the 0th feature: xs
+</span><span class="n">xs</span> <span class="o">=</span> <span class="n">tsne_features</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Select the 1st feature: ys
+</span><span class="n">ys</span> <span class="o">=</span> <span class="n">tsne_features</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Scatter plot, coloring by variety_numbers
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="n">variety_numbers</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture.png?w=1024" alt="Desktop View" /></p>
+
+<p>As you can see, the t-SNE visualization manages to separate the 3 varieties of grain samples.</p>
+
+<p>####
+<strong>A t-SNE map of the stock market</strong></p>
+
+<p>t-SNE provides great visualizations when the individual samples can be labeled. In this exercise, you’ll apply t-SNE to the company stock price data. A scatter plot of the resulting t-SNE features, labeled by the company names, gives you a map of the stock market!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import TSNE
+</span><span class="kn">from</span> <span class="nn">sklearn.manifold</span> <span class="kn">import</span> <span class="n">TSNE</span>
+
+<span class="c1"># Create a TSNE instance: model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="c1"># Apply fit_transform to normalized_movements: tsne_features
+</span><span class="n">tsne_features</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">normalized_movements</span><span class="p">)</span>
+
+<span class="c1"># Select the 0th feature: xs
+</span><span class="n">xs</span> <span class="o">=</span> <span class="n">tsne_features</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Select the 1th feature: ys
+</span><span class="n">ys</span> <span class="o">=</span> <span class="n">tsne_features</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Scatter plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># Annotate the points
+</span><span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">company</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">,</span> <span class="n">companies</span><span class="p">):</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">company</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.75</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture1.png?w=1024" alt="Desktop View" /></p>
+
+<p>It’s visualizations such as this that make t-SNE such a powerful tool for extracting quick insights from high dimensional data.</p>
+
+<hr />
+
+<h1 id="3-decorrelating-your-data-and-dimension-reduction"><strong>3. Decorrelating your data and dimension reduction</strong></h1>
+<hr />
+
+<p>###
+<strong>Visualizing the PCA(</strong>
+ principal component analysis
+ <strong>) transformation</strong></p>
+
+<p>####
+<strong>Correlated data in nature</strong></p>
+
+<p>You are given an array
+ <code class="language-plaintext highlighter-rouge">grains</code>
+ giving the width and length of samples of grain. You suspect that width and length will be correlated. To confirm this, make a scatter plot of width vs length and measure their Pearson correlation.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Perform the necessary imports
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">pearsonr</span>
+
+<span class="c1"># Assign the 0th column of grains: width
+</span><span class="n">width</span> <span class="o">=</span> <span class="n">grains</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Assign the 1st column of grains: length
+</span><span class="n">length</span> <span class="o">=</span> <span class="n">grains</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Scatter plot width vs length
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'grains width'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'grains length'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Calculate the Pearson correlation
+</span><span class="n">correlation</span><span class="p">,</span> <span class="n">pvalue</span> <span class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">length</span><span class="p">)</span>
+
+<span class="c1"># Display the correlation
+</span><span class="k">print</span><span class="p">(</span><span class="n">correlation</span><span class="p">)</span>
+
+<span class="c1">#  0.8604149377143467
+</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture2.png?w=1024" alt="Desktop View" /></p>
+
+<p>The width and length of the grain samples are highly correlated.</p>
+
+<p>####
+<strong>Decorrelating the grain measurements with PCA</strong></p>
+
+<p>You’ll use PCA to decorrelate these measurements, then plot the decorrelated points and measure their Pearson correlation.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import PCA
+</span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+
+<span class="c1"># Create PCA instance: model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">()</span>
+
+<span class="c1"># Apply the fit_transform method of model to grains: pca_features
+</span><span class="n">pca_features</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">grains</span><span class="p">)</span>
+
+<span class="c1"># Assign 0th column of pca_features: xs
+</span><span class="n">xs</span> <span class="o">=</span> <span class="n">pca_features</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Assign 1st column of pca_features: ys
+</span><span class="n">ys</span> <span class="o">=</span> <span class="n">pca_features</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Scatter plot xs vs ys
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'pca_features 0'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'pca_features 1'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Calculate the Pearson correlation of xs and ys
+</span><span class="n">correlation</span><span class="p">,</span> <span class="n">pvalue</span> <span class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">xs</span><span class="p">,</span> <span class="n">ys</span><span class="p">)</span>
+
+<span class="c1"># Display the correlation
+</span><span class="k">print</span><span class="p">(</span><span class="n">correlation</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture3-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>###
+<strong>Intrinsic dimension</strong></p>
+
+<p>####
+<strong>The first principal component</strong></p>
+
+<p>The first principal component of the data is the direction in which the data varies the most. In this exercise, your job is to use PCA to find the first principal component of the length and width measurements of the grain samples, and represent it as an arrow on the scatter plot.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Make a scatter plot of the untransformed points
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">grains</span><span class="p">[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">grains</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Add labels
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'width'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'length'</span><span class="p">)</span>
+
+<span class="c1"># Create a PCA instance: model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">()</span>
+
+<span class="c1"># Fit model to points
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">grains</span><span class="p">)</span>
+
+<span class="c1"># Get the mean of the grain samples: mean
+</span><span class="n">mean</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">mean_</span>
+
+<span class="c1"># Get the first principal component: first_pc
+</span><span class="n">first_pc</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">components_</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+
+<span class="c1"># Plot first_pc as an arrow, starting at mean
+</span><span class="n">plt</span><span class="p">.</span><span class="n">arrow</span><span class="p">(</span><span class="n">mean</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mean</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">first_pc</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">first_pc</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mf">0.01</span><span class="p">)</span>
+
+<span class="c1"># Keep axes on same scale
+</span><span class="n">plt</span><span class="p">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture4-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>This is the direction in which the grain data varies the most.</p>
+
+<p>####
+<strong>Variance of the PCA features</strong></p>
+
+<p>The fish dataset is 6-dimensional. But what is its
+ <em>intrinsic</em>
+ dimension? Make a plot of the variances of the PCA features to find out. As before,
+ <code class="language-plaintext highlighter-rouge">samples</code>
+ is a 2D array, where each row represents a fish. You’ll need to standardize the features first.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+samples[:3]
+array([[242. ,  23.2,  25.4,  30. ,  38.4,  13.4],
+       [290. ,  24. ,  26.3,  31.2,  40. ,  13.8],
+       [340. ,  23.9,  26.5,  31.1,  39.8,  15.1]])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Perform the necessary imports
+</span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">make_pipeline</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Create scaler: scaler
+</span><span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+
+<span class="c1"># Create a PCA instance: pca
+</span><span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">()</span>
+
+<span class="c1"># Create pipeline: pipeline
+</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">scaler</span><span class="p">,</span> <span class="n">pca</span><span class="p">)</span>
+
+<span class="c1"># Fit the pipeline to 'samples'
+</span><span class="n">pipeline</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+
+<span class="c1"># Plot the explained variances
+</span><span class="n">features</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">pca</span><span class="p">.</span><span class="n">n_components_</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">bar</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">pca</span><span class="p">.</span><span class="n">explained_variance_</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'PCA feature'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'variance'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture5-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>It looks like PCA features 0 and 1 have significant variance.</p>
+
+<hr />
+
+<p>###
+<strong>Dimension reduction with PCA</strong></p>
+
+<p>Use PCA for dimensionality reduction of the fish measurements, retaining only the 2 most important components.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+scaled_samples[:3]
+array([[-0.50109735, -0.36878558, -0.34323399, -0.23781518,  1.0032125 ,
+         0.25373964],
+       [-0.37434344, -0.29750241, -0.26893461, -0.14634781,  1.15869615,
+         0.44376493],
+       [-0.24230812, -0.30641281, -0.25242364, -0.15397009,  1.13926069,
+         1.0613471 ]])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import PCA
+</span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+
+<span class="c1"># Create a PCA model with 2 components: pca
+</span><span class="n">pca</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Fit the PCA instance to the scaled samples
+</span><span class="n">pca</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">scaled_samples</span><span class="p">)</span>
+
+<span class="c1"># Transform the scaled samples: pca_features
+</span><span class="n">pca_features</span> <span class="o">=</span> <span class="n">pca</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">scaled_samples</span><span class="p">)</span>
+
+<span class="c1"># Print the shape of pca_features
+</span><span class="k">print</span><span class="p">(</span><span class="n">pca_features</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="p">(</span><span class="mi">85</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+pca_features[:3]
+array([[-0.57640502, -0.94649159],
+       [-0.36852393, -1.17103598],
+       [-0.28028168, -1.59709224]])
+
+</code></pre></div></div>
+
+<p>You’ve successfully reduced the dimensionality from 6 to 2.</p>
+
+<p>####
+<strong>A tf-idf word-frequency array</strong></p>
+
+<p>In this exercise, you’ll create a tf-idf word frequency array for a toy collection of documents. For this, use the
+ <code class="language-plaintext highlighter-rouge">TfidfVectorizer</code>
+ from sklearn. It transforms a list of documents into a word frequency array, which it outputs as a csr_matrix. It has
+ <code class="language-plaintext highlighter-rouge">fit()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">transform()</code>
+ methods like other sklearn objects.</p>
+
+<p><strong><a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">term frequency–inverse document frequency</a></strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+documents
+['cats say meow', 'dogs say woof', 'dogs chase cats']
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import TfidfVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">TfidfVectorizer</span>
+
+<span class="c1"># Create a TfidfVectorizer: tfidf
+</span><span class="n">tfidf</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">()</span>
+
+<span class="c1"># Apply fit_transform to document: csr_mat
+</span><span class="n">csr_mat</span> <span class="o">=</span> <span class="n">tfidf</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">documents</span><span class="p">)</span>
+
+<span class="c1"># Print result of toarray() method
+</span><span class="k">print</span><span class="p">(</span><span class="n">csr_mat</span><span class="p">.</span><span class="n">toarray</span><span class="p">())</span>
+
+<span class="c1"># Get the words: words
+</span><span class="n">words</span> <span class="o">=</span> <span class="n">tfidf</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">()</span>
+
+<span class="c1"># Print words
+</span><span class="k">print</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[[0.51785612 0.         0.         0.68091856 0.51785612 0.        ]
+ [0.         0.         0.51785612 0.         0.51785612 0.68091856]
+ [0.51785612 0.68091856 0.51785612 0.         0.         0.        ]]
+['cats', 'chase', 'dogs', 'meow', 'say', 'woof']
+
+</code></pre></div></div>
+
+<hr />
+
+<p>####
+<strong>Clustering Wikipedia part I</strong></p>
+
+<p>You saw in the video that
+ <code class="language-plaintext highlighter-rouge">TruncatedSVD</code>
+ is able to perform PCA on sparse arrays in csr_matrix format, such as word-frequency arrays. Combine your knowledge of TruncatedSVD and k-means to cluster some popular pages from Wikipedia. In this exercise, build the pipeline. In the next exercise, you’ll apply it to the word-frequency array of some Wikipedia articles.</p>
+
+<p>Create a Pipeline object consisting of a TruncatedSVD followed by KMeans. (This time, we’ve precomputed the word-frequency matrix for you, so there’s no need for a TfidfVectorizer).</p>
+
+<p>The Wikipedia dataset you will be working with was obtained from
+ <a href="https://blog.lateral.io/2015/06/the-unknown-perils-of-mining-wikipedia/">here</a>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Perform the necessary imports
+</span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">TruncatedSVD</span>
+<span class="kn">from</span> <span class="nn">sklearn.cluster</span> <span class="kn">import</span> <span class="n">KMeans</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">make_pipeline</span>
+
+<span class="c1"># Create a TruncatedSVD instance: svd
+</span><span class="n">svd</span> <span class="o">=</span> <span class="n">TruncatedSVD</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="c1"># Create a KMeans instance: kmeans
+</span><span class="n">kmeans</span> <span class="o">=</span> <span class="n">KMeans</span><span class="p">(</span><span class="n">n_clusters</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="c1"># Create a pipeline: pipeline
+</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">svd</span><span class="p">,</span> <span class="n">kmeans</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<p>####
+<strong>Clustering Wikipedia part II</strong></p>
+
+<p>You are given an array
+ <code class="language-plaintext highlighter-rouge">articles</code>
+ of tf-idf word-frequencies of some popular Wikipedia articles, and a list
+ <code class="language-plaintext highlighter-rouge">titles</code>
+ of their titles. Use your pipeline to cluster the Wikipedia articles.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+type(articles)
+scipy.sparse.csr.csr_matrix
+
+articles
+&lt;60x13125 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
+	with 42091 stored elements in Compressed Sparse Row format&gt;
+
+ titles[:3]
+['HTTP 404', 'Alexa Internet', 'Internet Explorer']
+
+df.shape
+(13125, 60)
+
+df.head(1)
+   HTTP 404  Alexa Internet  Internet Explorer  HTTP cookie  Google Search  \
+0       0.0             0.0                0.0          0.0            0.0
+
+   Tumblr  Hypertext Transfer Protocol  Social search  Firefox  LinkedIn  \
+0     0.0                          0.0            0.0      0.0       0.0
+
+      ...       Chad Kroeger  Nate Ruess  The Wanted  Stevie Nicks  \
+0     ...                0.0         0.0         0.0      0.008878
+
+   Arctic Monkeys  Black Sabbath  Skrillex  Red Hot Chili Peppers  Sepsis  \
+0             0.0            0.0  0.049502                    0.0     0.0
+
+   Adam Levine
+0          0.0
+
+[1 rows x 60 columns]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pandas
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># Fit the pipeline to articles
+</span><span class="n">pipeline</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">articles</span><span class="p">)</span>
+
+<span class="c1"># Calculate the cluster labels: labels
+</span><span class="n">labels</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">articles</span><span class="p">)</span>
+
+<span class="c1"># Create a DataFrame aligning labels and titles: df
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s">'label'</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span> <span class="s">'article'</span><span class="p">:</span> <span class="n">titles</span><span class="p">})</span>
+
+<span class="c1"># Display df sorted by cluster label
+</span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s">'label'</span><span class="p">))</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                                          article  label
+59                                    Adam Levine      0
+57                          Red Hot Chili Peppers      0
+56                                       Skrillex      0
+55                                  Black Sabbath      0
+54                                 Arctic Monkeys      0
+53                                   Stevie Nicks      0
+52                                     The Wanted      0
+51                                     Nate Ruess      0
+50                                   Chad Kroeger      0
+58                                         Sepsis      0
+30                  France national football team      1
+31                              Cristiano Ronaldo      1
+32                                   Arsenal F.C.      1
+33                                 Radamel Falcao      1
+37                                       Football      1
+35                Colombia national football team      1
+36              2014 FIFA World Cup qualification      1
+38                                         Neymar      1
+39                                  Franck Ribéry      1
+34                             Zlatan Ibrahimović      1
+26                                     Mila Kunis      2
+28                                  Anne Hathaway      2
+27                                 Dakota Fanning      2
+25                                  Russell Crowe      2
+29                               Jennifer Aniston      2
+23                           Catherine Zeta-Jones      2
+22                              Denzel Washington      2
+21                             Michael Fassbender      2
+20                                 Angelina Jolie      2
+24                                   Jessica Biel      2
+
+</code></pre></div></div>
+
+<hr />
+
+<h1 id="4-discovering-interpretable-features"><strong>4. Discovering interpretable features</strong></h1>
+<hr />
+
+<p>###
+<strong>Non-negative matrix factorization (NMF)</strong></p>
+
+<p>####
+<strong>NMF applied to Wikipedia articles</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+articles
+&lt;60x13125 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
+	with 42091 stored elements in Compressed Sparse Row format&gt;
+
+print(articles)
+  (0, 16)	0.024688249778400003
+  (0, 32)	0.0239370711117
+  (0, 33)	0.0210896267411
+  (0, 137)	0.012295430569100001
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import NMF
+</span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">NMF</span>
+
+<span class="c1"># Create an NMF instance: model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">NMF</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="c1"># Fit the model to articles
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">articles</span><span class="p">)</span>
+
+<span class="c1"># Transform the articles: nmf_features
+</span><span class="n">nmf_features</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">articles</span><span class="p">)</span>
+
+<span class="c1"># Print the NMF features
+</span><span class="k">print</span><span class="p">(</span><span class="n">nmf_features</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[[0.00000000e+00 0.00000000e+00 0.00000000e+00 0.00000000e+00
+  0.00000000e+00 4.40531625e-01]
+ [0.00000000e+00 0.00000000e+00 0.00000000e+00 0.00000000e+00
+  0.00000000e+00 5.66689786e-01]
+...
+ [3.78224082e-01 1.43978958e-02 0.00000000e+00 9.84935436e-02
+  1.35904928e-02 0.00000000e+00]]
+
+</code></pre></div></div>
+
+<p>these NMF features don’t make much sense at this point, but you will explore them in the next exercise!</p>
+
+<p>####
+<strong>NMF features of the Wikipedia articles</strong></p>
+
+<p>When investigating the features, notice that for both actors, the NMF feature 3 has by far the highest value. This means that both articles are reconstructed using mainly the 3rd NMF component.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pandas
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># Create a pandas DataFrame: df
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">nmf_features</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">titles</span><span class="p">)</span>
+
+<span class="c1"># Print the row for 'Anne Hathaway'
+</span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'Anne Hathaway'</span><span class="p">])</span>
+
+<span class="c1"># Print the row for 'Denzel Washington'
+</span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'Denzel Washington'</span><span class="p">])</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+0    0.003845
+1    0.000000
+2    0.000000
+3    0.575711
+4    0.000000
+5    0.000000
+Name: Anne Hathaway, dtype: float64
+
+0    0.000000
+1    0.005601
+2    0.000000
+3    0.422380
+4    0.000000
+5    0.000000
+Name: Denzel Washington, dtype: float64
+
+
+df.head()
+                          0    1    2    3    4         5
+HTTP 404           0.000000  0.0  0.0  0.0  0.0  0.440465
+Alexa Internet     0.000000  0.0  0.0  0.0  0.0  0.566605
+Internet Explorer  0.003821  0.0  0.0  0.0  0.0  0.398646
+HTTP cookie        0.000000  0.0  0.0  0.0  0.0  0.381740
+Google Search      0.000000  0.0  0.0  0.0  0.0  0.485517
+
+</code></pre></div></div>
+
+<p>Notice that for both actors, the NMF feature 3 has by far the highest value. This means that both articles are reconstructed using mainly the 3rd NMF component. Because NMF components represent topics (for instance, acting!).</p>
+
+<p>###
+<strong>NMF learns interpretable parts</strong></p>
+
+<p>####
+<strong>NMF learns topics of documents</strong></p>
+
+<p>When NMF is applied to documents, the components correspond to topics of documents, and the NMF features reconstruct the documents from the topics.</p>
+
+<p>Verify this for yourself for the NMF model that you built earlier using the Wikipedia articles. Previously, you saw that the 3rd NMF feature value was high for the articles about actors Anne Hathaway and Denzel Washington.</p>
+
+<p>In this exercise, identify the topic of the corresponding NMF component.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+model.components_
+array([[1.13754523e-02, 1.20974422e-03, 0.00000000e+00, ...,
+        0.00000000e+00, 4.23594130e-04, 0.00000000e+00],
+       [0.00000000e+00, 9.57177268e-06, 5.66343849e-03, ...,
+        2.81289906e-03, 2.97179984e-04, 0.00000000e+00],
+       [0.00000000e+00, 8.30814049e-06, 0.00000000e+00, ...,
+        0.00000000e+00, 1.43192324e-04, 0.00000000e+00],
+       [4.14811200e-03, 0.00000000e+00, 3.05595648e-03, ...,
+        1.74191620e-03, 6.71969911e-03, 0.00000000e+00],
+       [0.00000000e+00, 5.68399302e-04, 4.91797182e-03, ...,
+        1.91632504e-04, 1.35146218e-03, 0.00000000e+00],
+       [1.38501597e-04, 0.00000000e+00, 8.74840829e-03, ...,
+        2.40081634e-03, 1.68211026e-03, 0.00000000e+00]])
+
+words[:3]
+['aaron', 'abandon', 'abandoned']
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pandas
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># Create a DataFrame: components_df
+</span><span class="n">components_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model</span><span class="p">.</span><span class="n">components_</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">words</span><span class="p">)</span>
+
+<span class="c1"># Print the shape of the DataFrame
+</span><span class="k">print</span><span class="p">(</span><span class="n">components_df</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (6, 13125)
+</span>
+<span class="c1"># Select row 3: component
+</span><span class="n">component</span> <span class="o">=</span> <span class="n">components_df</span><span class="p">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">3</span><span class="p">,:]</span>
+
+<span class="c1"># Print result of nlargest
+</span><span class="k">print</span><span class="p">(</span><span class="n">component</span><span class="p">.</span><span class="n">nlargest</span><span class="p">())</span>
+
+
+<span class="n">film</span>       <span class="mf">0.627877</span>
+<span class="n">award</span>      <span class="mf">0.253131</span>
+<span class="n">starred</span>    <span class="mf">0.245284</span>
+<span class="n">role</span>       <span class="mf">0.211451</span>
+<span class="n">actress</span>    <span class="mf">0.186398</span>
+<span class="n">Name</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="n">float64</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+components_df
+      aaron   abandon  abandoned  abandoning  abandonment  abbas  abbey  \
+0  0.011375  0.001210   0.000000    0.001739     0.000136    0.0    0.0
+1  0.000000  0.000010   0.005663    0.000000     0.000002    0.0    0.0
+2  0.000000  0.000008   0.000000    0.000000     0.004692    0.0    0.0
+3  0.004148  0.000000   0.003056    0.000000     0.000614    0.0    0.0
+4  0.000000  0.000568   0.004918    0.000000     0.000000    0.0    0.0
+5  0.000139  0.000000   0.008748    0.000000     0.000185    0.0    0.0
+
+   abbreviated  abbreviation       abc ...    zealand  zenith  zeppelin  \
+0     0.002463  2.445684e-07  0.000834 ...   0.025781     0.0  0.008324
+1     0.000566  5.002620e-04  0.000000 ...   0.008106     0.0  0.000000
+2     0.000758  1.604283e-05  0.000000 ...   0.008730     0.0  0.000000
+3     0.002436  8.143270e-05  0.003985 ...   0.012594     0.0  0.000000
+4     0.000089  4.259695e-05  0.000000 ...   0.001809     0.0  0.000000
+5     0.008629  1.530385e-05  0.000000 ...   0.000000     0.0  0.000000
+
+       zero  zeus  zimbabwe  zinc      zone     zones  zoo
+0  0.000000   0.0       0.0   0.0  0.000000  0.000424  0.0
+1  0.001710   0.0       0.0   0.0  0.002813  0.000297  0.0
+2  0.001317   0.0       0.0   0.0  0.000000  0.000143  0.0
+3  0.000000   0.0       0.0   0.0  0.001742  0.006720  0.0
+4  0.000017   0.0       0.0   0.0  0.000192  0.001351  0.0
+5  0.000000   0.0       0.0   0.0  0.002401  0.001682  0.0
+
+[6 rows x 13125 columns]
+
+</code></pre></div></div>
+
+<hr />
+
+<p>####
+<strong>Explore the LED digits dataset</strong></p>
+
+<p>In the following exercises, you’ll use NMF to decompose grayscale images into their commonly occurring patterns.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+samples
+array([[0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       ...,
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.],
+       [0., 0., 0., ..., 0., 0., 0.]])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pyplot
+</span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Select the 0th row: digit
+</span><span class="n">digit</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+
+<span class="c1"># Print digit
+</span><span class="k">print</span><span class="p">(</span><span class="n">digit</span><span class="p">)</span>
+
+<span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">1.</span> <span class="mf">1.</span> <span class="mf">1.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span>
+ <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span>
+ <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span>
+ <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span>
+ <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span><span class="p">]</span>
+
+<span class="c1"># Reshape digit to a 13x8 array: bitmap
+</span><span class="n">bitmap</span> <span class="o">=</span> <span class="n">digit</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span><span class="mi">8</span><span class="p">)</span>
+
+<span class="c1"># Print bitmap
+</span><span class="k">print</span><span class="p">(</span><span class="n">bitmap</span><span class="p">)</span>
+<span class="p">[[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">1.</span> <span class="mf">1.</span> <span class="mf">1.</span> <span class="mf">0.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span><span class="p">]]</span>
+
+<span class="c1"># Use plt.imshow to display bitmap
+</span><span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">bitmap</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'gray'</span><span class="p">,</span> <span class="n">interpolation</span><span class="o">=</span><span class="s">'nearest'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">colorbar</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture6-1.png?w=849" alt="Desktop View" /></p>
+
+<p>You’ll explore this dataset further in the next exercise and see for yourself how NMF can learn the parts of images.</p>
+
+<p>####
+<strong>NMF learns the parts of images</strong></p>
+
+<p>Now use what you’ve learned about NMF to decompose the digits dataset. You are again given the digit images as a 2D array
+ <code class="language-plaintext highlighter-rouge">samples</code>
+ . This time, you are also provided with a function
+ <code class="language-plaintext highlighter-rouge">show_as_image()</code>
+ that displays the image encoded by any 1D array:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def show_as_image(sample):
+    bitmap = sample.reshape((13, 8))
+    plt.figure()
+    plt.imshow(bitmap, cmap='gray', interpolation='nearest')
+    plt.colorbar()
+    plt.show()
+
+</code></pre></div></div>
+
+<p>After you are done, take a moment to look through the plots and notice how NMF has expressed the digit as a sum of the components!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import NMF
+</span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">NMF</span>
+
+<span class="c1"># Create an NMF model: model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">NMF</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+
+<span class="c1"># Apply fit_transform to samples: features
+</span><span class="n">features</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+
+<span class="c1"># Call show_as_image on each component
+</span><span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">model</span><span class="p">.</span><span class="n">components_</span><span class="p">:</span>
+    <span class="n">show_as_image</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+
+<span class="c1"># Assign the 0th row of features: digit_features
+</span><span class="n">digit_features</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+
+<span class="c1"># Print digit_features
+</span><span class="k">print</span><span class="p">(</span><span class="n">digit_features</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+features
+Out[3]:
+array([[4.76823559e-01, 0.00000000e+00, 0.00000000e+00, 5.90605054e-01,
+        4.81559442e-01, 0.00000000e+00, 7.37557191e-16],
+...
+       [0.00000000e+00, 0.00000000e+00, 5.21027460e-01, 0.00000000e+00,
+        4.81559442e-01, 4.93832117e-01, 0.00000000e+00]])
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture16-1.png?w=470" alt="Desktop View" />
+<img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture15-1.png?w=470" alt="Desktop View" />
+<img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture14-1.png?w=479" alt="Desktop View" />
+<img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture13-1.png?w=465" alt="Desktop View" />
+<img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture12-1.png?w=471" alt="Desktop View" />
+<img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture11-1.png?w=466" alt="Desktop View" />
+<img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture10-1.png?w=470" alt="Desktop View" /></p>
+
+<hr />
+
+<p>####
+<strong>PCA doesn’t learn parts</strong></p>
+
+<p>Unlike NMF, PCA
+ <em>doesn’t</em>
+ learn the parts of things. Its components do not correspond to topics (in the case of documents) or to parts of images, when trained on images. Verify this for yourself by inspecting the components of a PCA model fit to the dataset of LED digit images from the previous exercise.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import PCA
+</span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">PCA</span>
+
+<span class="c1"># Create a PCA instance: model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">7</span><span class="p">)</span>
+
+<span class="c1"># Apply fit_transform to samples: features
+</span><span class="n">features</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span>
+
+<span class="c1"># Call show_as_image on each component
+</span><span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">model</span><span class="p">.</span><span class="n">components_</span><span class="p">:</span>
+    <span class="n">show_as_image</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture26.png?w=346" alt="Desktop View" />
+<img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture25.png?w=346" alt="Desktop View" />
+<img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture24.png?w=350" alt="Desktop View" />
+<img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture23.png?w=350" alt="Desktop View" />
+<img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture22.png?w=353" alt="Desktop View" />
+<img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture21.png?w=348" alt="Desktop View" />
+<img src="/blog/assets/datacamp/unsupervised-learning-in-python/capture20.png?w=352" alt="Desktop View" /></p>
+
+<p>Notice that the components of PCA do not represent meaningful parts of images of LED digits!</p>
+
+<p>###
+<strong>Building recommender systems using NMF</strong></p>
+
+<p>####
+<strong>Which articles are similar to ‘Cristiano Ronaldo’?</strong></p>
+
+<p>You learned how to use NMF features and the cosine similarity to find similar articles. Apply this to your NMF model for popular Wikipedia articles, by finding the articles most similar to the article about the footballer Cristiano Ronaldo.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Perform the necessary imports
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">normalize</span>
+
+<span class="c1"># Normalize the NMF features: norm_features
+</span><span class="n">norm_features</span> <span class="o">=</span> <span class="n">normalize</span><span class="p">(</span><span class="n">nmf_features</span><span class="p">)</span>
+
+<span class="c1"># Create a DataFrame: df
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">norm_features</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">titles</span><span class="p">)</span>
+
+<span class="c1"># Select the row corresponding to 'Cristiano Ronaldo': article
+</span><span class="n">article</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'Cristiano Ronaldo'</span><span class="p">,:]</span>
+
+<span class="c1"># Compute the dot products: similarities
+</span><span class="n">similarities</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">article</span><span class="p">)</span>
+
+<span class="c1"># Display those with the largest cosine similarity
+</span><span class="k">print</span><span class="p">(</span><span class="n">similarities</span><span class="p">.</span><span class="n">nlargest</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Cristiano Ronaldo                1.000000
+Franck Ribéry                    0.999972
+Radamel Falcao                   0.999942
+Zlatan Ibrahimović               0.999942
+France national football team    0.999923
+dtype: float64
+
+
+df.head()
+                          0    1    2    3    4         5
+HTTP 404           0.000000  0.0  0.0  0.0  0.0  1.000000
+Alexa Internet     0.000000  0.0  0.0  0.0  0.0  1.000000
+Internet Explorer  0.009583  0.0  0.0  0.0  0.0  0.999954
+HTTP cookie        0.000000  0.0  0.0  0.0  0.0  1.000000
+Google Search      0.000000  0.0  0.0  0.0  0.0  1.000000
+
+
+article
+0    0.002523
+1    0.999942
+2    0.000859
+3    0.010274
+4    0.001947
+5    0.000724
+Name: Cristiano Ronaldo, dtype: float64
+
+similarities
+Out[15]:
+HTTP 404                                         0.000724
+Alexa Internet                                   0.000724
+Internet Explorer                                0.000748
+...
+France national football team                    0.999923
+Cristiano Ronaldo                                1.000000
+Arsenal F.C.                                     0.997739
+Radamel Falcao                                   0.999942
+Zlatan Ibrahimović                               0.999942
+Colombia national football team                  0.999897
+2014 FIFA World Cup qualification                0.998443
+Football                                         0.974915
+Neymar                                           0.999021
+Franck Ribéry                                    0.999972
+...
+Sepsis                                           0.041880
+Adam Levine                                      0.041873
+dtype: float64
+
+</code></pre></div></div>
+
+<p>Although you may need to know a little about football (or soccer, depending on where you’re from!) to be able to evaluate for yourself the quality of the computed similarities!</p>
+
+<hr />
+
+<p>####
+<strong>Recommend musical artists part I</strong></p>
+
+<p>In this exercise and the next, you’ll use what you’ve learned about NMF to recommend popular music artists! You are given a sparse array
+ <code class="language-plaintext highlighter-rouge">artists</code>
+ whose rows correspond to artists and whose column correspond to users. The entries give the number of times each artist was listened to by each user.</p>
+
+<p>In this exercise, build a pipeline and transform the array into normalized NMF features. The first step in the pipeline,
+ <code class="language-plaintext highlighter-rouge">MaxAbsScaler</code>
+ , transforms the data so that all users have the same influence on the model, regardless of how many different artists they’ve listened to. In the next exercise, you’ll use the resulting normalized NMF features for recommendation!</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+ artists
+&lt;111x500 sparse matrix of type '&lt;class 'numpy.float64'&gt;'
+	with 2894 stored elements in Compressed Sparse Row format&gt;
+
+print(artists)
+  (0, 2)	105.0
+  (0, 15)	165.0
+  (0, 20)	91.0
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Perform the necessary imports
+</span><span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">NMF</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Normalizer</span><span class="p">,</span> <span class="n">MaxAbsScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">make_pipeline</span>
+
+<span class="c1"># Create a MaxAbsScaler: scaler
+</span><span class="n">scaler</span> <span class="o">=</span> <span class="n">MaxAbsScaler</span><span class="p">()</span>
+
+<span class="c1"># Create an NMF model: nmf
+</span><span class="n">nmf</span> <span class="o">=</span> <span class="n">NMF</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="c1"># Create a Normalizer: normalizer
+</span><span class="n">normalizer</span> <span class="o">=</span> <span class="n">Normalizer</span><span class="p">()</span>
+
+<span class="c1"># Create a pipeline: pipeline
+</span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">make_pipeline</span><span class="p">(</span><span class="n">scaler</span><span class="p">,</span> <span class="n">nmf</span><span class="p">,</span> <span class="n">normalizer</span><span class="p">)</span>
+
+<span class="c1"># Apply fit_transform to artists: norm_features
+</span><span class="n">norm_features</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">artists</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<p>####
+<strong>Recommend musical artists part II</strong></p>
+
+<p>Suppose you were a big fan of Bruce Springsteen – which other musicial artists might you like? Use your NMF features from the previous exercise and the cosine similarity to find similar musical artists.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pandas
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># Create a DataFrame: df
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">norm_features</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">artist_names</span><span class="p">)</span>
+
+<span class="c1"># Select row of 'Bruce Springsteen': artist
+</span><span class="n">artist</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'Bruce Springsteen'</span><span class="p">]</span>
+
+<span class="c1"># Compute cosine similarities: similarities
+</span><span class="n">similarities</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">artist</span><span class="p">)</span>
+
+<span class="c1"># Display those with highest cosine similarity
+</span><span class="k">print</span><span class="p">(</span><span class="n">similarities</span><span class="p">.</span><span class="n">nlargest</span><span class="p">())</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Bruce Springsteen    1.000000
+Neil Young           0.955896
+Van Morrison         0.872452
+Leonard Cohen        0.864763
+Bob Dylan            0.859047
+dtype: float64
+
+</code></pre></div></div>
+
+<p>The End.</p>
+
+<p>Thank you for reading.</p>
+

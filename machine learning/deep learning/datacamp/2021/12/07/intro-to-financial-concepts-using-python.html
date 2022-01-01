@@ -1,0 +1,1620 @@
+<h1 id="intro-to-financial-concepts-using-python">Intro to Financial Concepts using Python</h1>
+
+<p>This is a memo. This course does not have a track yet.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/intro-to-financial-concepts-using-python">HERE</a></strong>
+ .</p>
+
+<hr />
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture-8.png?w=668" alt="Desktop View" /></p>
+
+<h1 id="1-the-time-value-of-money"><strong>1. The Time Value of Money</strong></h1>
+<hr />
+
+<h3 id="11-fundamental-financial-concepts"><strong>1.1 Fundamental Financial Concepts</strong></h3>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture1-10.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture2-14.png?w=614" alt="Desktop View" /></p>
+
+<p>####
+<strong>Growth and Rate of Return</strong></p>
+
+<p><strong>Growth</strong>
+ and
+ <strong>Rate of Return</strong>
+ are two concepts that are ubiquitous throughout the financial world.</p>
+
+<p>Calculate the future value (cumulative return) of a $100 investment which grows at a rate of 6% per year for 30 years in a row and assign it to
+ <code class="language-plaintext highlighter-rouge">future_value</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate the future value of the investment and print it out
+</span><span class="n">future_value</span> <span class="o">=</span> <span class="mi">100</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">0.06</span><span class="p">)</span> <span class="o">**</span> <span class="mi">30</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Future Value of Investment: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">future_value</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+<span class="c1">#  Future Value of Investment: 574.35
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Compound Interest</strong></p>
+
+<p>As you saw in the previous exercise, both time and the rate of return are very important variables when forecasting the future value of an investment.</p>
+
+<p>Another important variable is the number of compounding periods, which can greatly affect compounded returns over time.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Predefined variables
+</span><span class="n">initial_investment</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">growth_periods</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">growth_rate</span> <span class="o">=</span> <span class="mf">0.06</span>
+
+<span class="c1"># Calculate the value for the investment compounded once per year
+</span><span class="n">compound_periods_1</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">investment_1</span> <span class="o">=</span> <span class="n">initial_investment</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">growth_rate</span> <span class="o">/</span> <span class="n">compound_periods_1</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">compound_periods_1</span><span class="o">*</span><span class="n">growth_periods</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Investment 1: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">investment_1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="c1"># Calculate the value for the investment compounded quarterly
+</span><span class="n">compound_periods_2</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">investment_2</span> <span class="o">=</span> <span class="n">initial_investment</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">growth_rate</span> <span class="o">/</span> <span class="n">compound_periods_2</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">compound_periods_2</span><span class="o">*</span><span class="n">growth_periods</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Investment 2: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">investment_2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="c1"># Calculate the value for the investment compounded monthly
+</span><span class="n">compound_periods_3</span> <span class="o">=</span> <span class="mi">12</span>
+<span class="n">investment_3</span> <span class="o">=</span> <span class="n">initial_investment</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">growth_rate</span> <span class="o">/</span> <span class="n">compound_periods_3</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">compound_periods_3</span><span class="o">*</span><span class="n">growth_periods</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Investment 3: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">investment_3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="c1"># Investment 1: 574.35
+# Investment 2: 596.93
+# Investment 3: 602.26
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Discount Factors and Depreciation</strong></p>
+
+<p>Unfortunately, not everything grows in value over time.</p>
+
+<p>In fact, many assets
+ <strong>depreciate</strong>
+ , or lose value over time. To simulate this, you can simply assume a negative expected rate of return.</p>
+
+<p>Calculate the future value of a $100 investment that depreciates in value by 5% per year for 10 years and assign it to
+ <code class="language-plaintext highlighter-rouge">future_value</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate the future value
+</span><span class="n">initial_investment</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">growth_rate</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.05</span>
+<span class="n">growth_periods</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">future_value</span> <span class="o">=</span> <span class="n">initial_investment</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">growth_rate</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">growth_periods</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Future value: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">future_value</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="c1"># Calculate the discount factor
+</span><span class="n">discount_factor</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">growth_rate</span><span class="p">)</span><span class="o">**</span><span class="p">(</span><span class="n">growth_periods</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Discount factor: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">discount_factor</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="c1"># Derive the initial value of the investment
+</span><span class="n">initial_investment_again</span> <span class="o">=</span> <span class="n">future_value</span> <span class="o">*</span> <span class="n">discount_factor</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Initial value: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">initial_investment_again</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+
+<span class="c1"># Future value: 59.87
+# Discount factor: 1.67
+# Initial value: 100.0
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="12-present-and-future-value"><strong>1.2 Present and Future Value</strong></h2>
+
+<p>####
+<strong>Present Value</strong></p>
+
+<p>Luckily for you, there is a module called
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ which contains many functions which will make your life much easier when working with financial values.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">.pv(rate, nper, pmt, fv)</code>
+ function, for example, allows you to calculate the present value of an investment as before with a few simple parameters:</p>
+
+<ul>
+  <li><strong>rate:</strong>
+ The rate of return of the investment</li>
+  <li><strong>nper:</strong>
+ The lifespan of the investment</li>
+  <li><strong>pmt:</strong>
+ The (fixed) payment at the beginning or end of each period (which is 0 in our example)</li>
+  <li><strong>fv:</strong>
+ The future value of the investment</li>
+</ul>
+
+<p>You can use this formula in many ways. For example, you can calculate the present value of future investments in today’s dollars.</p>
+
+<p>Compute the present value of an investment which will yield $10,000 15 years from now at an inflation rate of 3% per year and assign it to
+ <code class="language-plaintext highlighter-rouge">investment_1</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import numpy as np
+</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="c1"># Calculate investment_1
+</span><span class="n">investment_1</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">pv</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="mf">0.03</span><span class="p">,</span> <span class="n">nper</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">pmt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fv</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Note that the present value returned is negative, so we multiply the result by -1
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Investment 1 is worth "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="o">-</span><span class="n">investment_1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="s">" in today's dollars"</span><span class="p">)</span>
+
+<span class="c1"># Calculate investment_2
+</span><span class="n">investment_2</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">pv</span><span class="p">(</span><span class="n">rate</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">nper</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">pmt</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">fv</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Investment 2 is worth "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="o">-</span><span class="n">investment_2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="s">" in today's dollars"</span><span class="p">)</span>
+
+<span class="c1"># Investment 1 is worth 6418.62 in today's dollars
+# Investment 2 is worth 6139.13 in today's dollars
+</span>
+</code></pre></div></div>
+
+<p>Notice how a higher inflation rate leads to a lower present value.</p>
+
+<p>####
+<strong>Future Value</strong></p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ module also contains a similar function,
+ <code class="language-plaintext highlighter-rouge">.fv(rate, nper, pmt, pv)</code>
+ , which allows you to calculate the future value of an investment as before with a few simple parameters:</p>
+
+<ul>
+  <li><strong>rate:</strong>
+ The rate of return of the investment</li>
+  <li><strong>nper:</strong>
+ The lifespan of the investment</li>
+  <li><strong>pmt:</strong>
+ The (fixed) payment at the beginning or end of each period (which is 0 in our example)</li>
+  <li><strong>pv:</strong>
+ The present value of the investment</li>
+</ul>
+
+<p>It is important to note that in this function call, you must pass a
+ <strong>negative</strong>
+ value into the
+ <code class="language-plaintext highlighter-rouge">pv</code>
+ parameter if it represents a
+ <strong>negative cash flow</strong>
+ (cash going out). In other words, if you were to compute the future value of an investment, requiring an up-front cash payment, you would need to pass a negative value to the
+ <code class="language-plaintext highlighter-rouge">pv</code>
+ parameter in the
+ <code class="language-plaintext highlighter-rouge">.fv()</code>
+ function.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Calculate investment_1
+investment_1 = np.fv(rate=0.05, nper=15, pmt=0, pv=-10000)
+print("Investment 1 will yield a total of $" + str(round(investment_1, 2)) + " in 15 years")
+
+# Calculate investment_2
+investment_2 = np.fv(rate=0.08, nper=15, pmt=0, pv=-10000)
+print("Investment 2 will yield a total of $" + str(round(investment_2, 2)) + " in 15 years")
+
+# Investment 1 will yield a total of $20789.28 in 15 years
+# Investment 2 will yield a total of $31721.69 in 15 years
+
+</code></pre></div></div>
+
+<p>Note how the growth rate dramatically affects the future value.</p>
+
+<p>####
+<strong>Adjusting Future Values for Inflation</strong></p>
+
+<p>You can now put together what you learned in the previous exercises by following a simple methodology:</p>
+
+<ul>
+  <li>First, forecast the future value of an investment given a rate of return</li>
+  <li>Second, discount the future value of the investment by a projected inflation rate</li>
+</ul>
+
+<p>The methodology above will use both the
+ <code class="language-plaintext highlighter-rouge">.fv()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">.pv()</code>
+ functions to arrive at the projected value of a given investment in today’s dollars, adjusted for inflation.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Calculate investment_1
+investment_1 = np.fv(rate=0.08, nper=10, pmt=0, pv=-10000)
+print("Investment 1 will yield a total of $" + str(round(investment_1, 2)) + " in 10 years")
+
+# Calculate investment_2
+investment_1_discounted = np.pv(rate=0.03, nper=10, pmt=0, fv=investment_1)
+print("After adjusting for inflation, investment 1 is worth $" + str(round(-investment_1_discounted, 2)) + " in today's dollars")
+
+# Investment 1 will yield a total of $21589.25 in 10 years
+# After adjusting for inflation, investment 1 is worth $16064.43 in today's dollars
+
+</code></pre></div></div>
+
+<p>You now know how to project the value of investments and adjust for inflation.</p>
+
+<h2 id="13-net-present-value-and-cash-flows"><strong>1.3 Net Present Value and Cash Flows</strong></h2>
+
+<p>####
+<strong>Discounting Cash Flows</strong></p>
+
+<p>You can use numpy’s net present value function
+ <code class="language-plaintext highlighter-rouge">numpy.npv(rate, values)</code>
+ to calculate the net present value of a series of cash flows.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Predefined array of cash flows
+cash_flows = np.array([100, 100, 100, 100, 100])
+
+# Calculate investment_1
+investment_1 = np.npv(rate=0.03, values=cash_flows)
+print("Investment 1's net present value is $" + str(round(investment_1, 2)) + " in today's dollars")
+
+# Calculate investment_2
+investment_2 = np.npv(rate=0.05, values=cash_flows)
+print("Investment 2's net present value is $" + str(round(investment_2, 2)) + " in today's dollars")
+
+# Calculate investment_3
+investment_3 = np.npv(rate=0.07, values=cash_flows)
+print("Investment 3's net present value is $" + str(round(investment_3, 2)) + " in today's dollars")
+
+# Investment 1's net present value is $471.71 in today's dollars
+# Investment 2's net present value is $454.6 in today's dollars
+# Investment 3's net present value is $438.72 in today's dollars
+
+</code></pre></div></div>
+
+<p>Notice how the higher discount rate leads to a lower NPV.</p>
+
+<p>####
+<strong>Initial Project Costs</strong></p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">numpy.npv(rate, values)</code>
+ function is very powerful because it allows you to pass in both positive and negative values.</p>
+
+<p>For this exercise, you will calculate the net present value of two potential projects with different cash flows:</p>
+
+<p>|
+ Year
+  |
+ Project 1
+  |
+ Project 2
+  |
+| — | — | — |
+|
+ 1
+  |
+ -$250 (initial investment)
+  |
+ -$250 (initial investment)
+  |
+|
+ 2
+  |
+ $100 cash flow
+  |
+ $300 cash flow
+  |
+|
+ 3
+  |
+ $200 cash flow
+  |
+ -$250 (net investment)
+  |
+|
+ 4
+  |
+ $300 cash flow
+  |
+ $300 cash flow
+  |
+|
+ 5
+  |
+ $400 cash flow
+  |
+ $300 cash flow
+  |</p>
+
+<p>In this example, project 1 only requires an initial investment of $250, generating a slowly increasing series of cash flows over the next 4 years.</p>
+
+<p>Project 2, on the other hand, requires an initial investment of $250 and an additional investment of $250 in year 3. However, project 2 continues to generate larger cash flows.</p>
+
+<p>Assuming both projects don’t generate any more cash flows after the fifth year, which project would you decide to undertake? The best way to decide is by comparing the NPV of both projects.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Create an array of cash flows for project 1
+cash_flows_1 = np.array([-250, 100, 200, 300, 400])
+
+# Create an array of cash flows for project 2
+cash_flows_2 = np.array([-250, 300, -250, 300, 300])
+
+# Calculate the net present value of project 1
+investment_1 = np.npv(rate=0.03, values=cash_flows_1)
+print("The net present value of Investment 1 is worth $" + str(round(investment_1, 2)) + " in today's dollars")
+
+# Calculate the net present value of project 2
+investment_2 = np.npv(rate=0.03, values=cash_flows_2)
+print("The net present value of Investment 2 is worth $" + str(round(investment_2, 2)) + " in today's dollars")
+
+# The net present value of Investment 1 is worth $665.54 in today's dollars
+# The net present value of Investment 2 is worth $346.7 in today's dollars
+
+</code></pre></div></div>
+
+<p>####
+<strong>Diminishing Cash Flows</strong></p>
+
+<p>Remember how compounded returns grow rapidly over time? Well, it works in the reverse, too. Compounded discount factors over time will quickly shrink a number towards zero.</p>
+
+<p>For example, $100 at a 3% annual discount for 1 year is still worth roughly $97.08:</p>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture3-14.png?w=808" alt="Desktop View" /></p>
+
+<p>This means that the longer in the future your cash flows will be received (or paid), the close to 0 that number will be.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Calculate investment_1
+investment_1 = np.pv(rate=0.03, nper=30, pmt=0, fv=100)
+print("Investment 1 is worth $" + str(round(-investment_1, 2)) + " in today's dollars")
+
+# Calculate investment_2
+investment_2 = np.pv(rate=0.03, nper=50, pmt=0, fv=100)
+print("Investment 2 is worth $" + str(round(-investment_2, 2)) + " in today's dollars")
+
+# Calculate investment_3
+investment_3 = np.pv(rate=0.03, nper=100, pmt=0, fv=100)
+print("Investment 3 is worth $" + str(round(-investment_3, 2)) + " in today's dollars")
+
+
+# Investment 1 is worth $41.2 in today's dollars
+# Investment 2 is worth $22.81 in today's dollars
+# Investment 3 is worth $5.2 in today's dollars
+
+</code></pre></div></div>
+
+<p>The moral of the story? It’s generally better to have money now rather than later.</p>
+
+<h1 id="2-making-data-driven-financial-decisions"><strong>2. Making Data-Driven Financial Decisions</strong></h1>
+<hr />
+
+<h2 id="21-a-tale-of-two-project-proposals"><strong>2.1 A Tale of Two Project Proposals</strong></h2>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture4-14.png?w=981" alt="Desktop View" />
+<img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture5-17.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture6-14.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Project Proposals and Cash Flows Projections</strong></p>
+
+<p>Your project managers have projected the cash flows for each of the proposals.</p>
+
+<p>Project 1 provides higher short term cash flows, but Project 2 becomes more profitable over time.</p>
+
+<p>The cash flow projections for both projects are as follows:</p>
+
+<p>|
+ Year
+  |
+ Project 1
+  |
+ Project 2
+  |
+| — | — | — |
+|
+ 1
+  |
+ -$1,000 (initial investment)
+  |
+ -$1,000 (initial investment)
+  |
+|
+ 2
+  |
+ $200 (cash flow)
+  |
+ $150 (cash flow)
+  |
+|
+ 3
+  |
+ $250
+  |
+ $225
+  |
+|
+ 4
+  |
+ $300
+  |
+ $300
+  |
+|
+ 5
+  |
+ $350
+  |
+ $375
+  |
+|
+ 6
+  |
+ $400
+  |
+ $425
+  |
+|
+ 7
+  |
+ $450
+  |
+ $500
+  |
+|
+ 8
+  |
+ $500
+  |
+ $575
+  |
+|
+ 9
+  |
+ $550
+  |
+ $600
+  |
+|
+ 10
+  |
+ $600
+  |
+ $625
+  |</p>
+
+<p>Note: The projections are provided in thousands. For example, $1,000 = $1,000,000. We will use the smaller denominations to make everything easier to read. This is also commonly done in financial statements with thousands or even millions in order to represent millions or billions.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Create a numpy array of cash flows for Project 1
+cf_project_1 = np.array([-1000, 200, 250, 300, 350, 400, 450, 500, 550, 600])
+
+# Create a numpy array of cash flows for Project 2
+cf_project_2 = np.array([-1000, 150, 225, 300, 375, 425, 500, 575, 600, 625])
+
+# Scale the original objects by 1000x
+cf_project1 = cf_project_1 * 1000
+cf_project2 = cf_project_2 * 1000
+
+</code></pre></div></div>
+
+<p>####
+<strong>Internal Rate of Return</strong></p>
+
+<p>Now that you have the cash flow projections ready to go for each project, you want to compare the
+ <strong>internal rate of return</strong>
+ (IRR) of each project to help you decide which project would be most beneficial for your company in terms of yield (rate of return).</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Calculate the internal rate of return for Project 1
+irr_project1 = np.irr(cf_project1)
+print("Project 1 IRR: " + str(round(100*irr_project1, 2)) + "%")
+
+# Calculate the internal rate of return for Project 2
+irr_project2 = np.irr(cf_project2)
+print("Project 2 IRR: " + str(round(100*irr_project2, 2)) + "%")
+
+# Project 1 IRR: 28.92%
+# Project 2 IRR: 28.78%
+
+</code></pre></div></div>
+
+<p>####
+<strong>Make a Decision Based on IRR</strong></p>
+
+<p>If you were making the decision solely based on internal rate of return, which project would you be more interested in (assuming the IRR is greater than your required rate of return)?</p>
+
+<p>Assume your required rate of return is 10% for this example.</p>
+
+<p>Project 1! Because higher internal rates of return are preferable!</p>
+
+<hr />
+
+<h2 id="22-the-weighted-average-cost-of-capital"><strong>2.2 The Weighted Average Cost of Capital</strong></h2>
+<p>(WACC)</p>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture7-11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture8-9.png?w=954" alt="Desktop View" />
+<img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture9-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture10-9.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Debt and Equity Financing</strong></p>
+
+<p>In the previous chapter, you were able to assume that your discount rate for the NPV calculation was solely based on a measure such as inflation.</p>
+
+<p>However, in this chapter, you are the CEO of a new company that has outstanding debt and financing costs, which you will have to adjust for.</p>
+
+<p>You will use the WACC as your discount rate in upcoming exercises.</p>
+
+<p>For this exercise, assume you take out a $1,000,000 loan to finance the project, which will be your company’s only outstanding debt. This loan will represent 50% of your company’s total financing of $2,000,000. The remaining funding comes from the market value of equity.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Set the market value of debt
+</span><span class="n">mval_debt</span> <span class="o">=</span> <span class="mi">1000000</span>
+
+<span class="c1"># Set the market value of equity
+</span><span class="n">mval_equity</span> <span class="o">=</span> <span class="mi">1000000</span>
+
+<span class="c1"># Compute the total market value of your company's financing
+</span><span class="n">mval_total</span> <span class="o">=</span> <span class="n">mval_debt</span> <span class="o">+</span> <span class="n">mval_equity</span>
+
+<span class="c1"># Compute the proportion of your company's financing via debt
+</span><span class="n">percent_debt</span> <span class="o">=</span> <span class="n">mval_debt</span> <span class="o">/</span> <span class="n">mval_total</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Debt Financing: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="n">percent_debt</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="s">"%"</span><span class="p">)</span>
+
+<span class="c1"># Compute the proportion of your company's financing via equity
+</span><span class="n">percent_equity</span> <span class="o">=</span> <span class="n">mval_equity</span> <span class="o">/</span> <span class="n">mval_total</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Equity Financing: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="n">percent_equity</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="s">"%"</span><span class="p">)</span>
+
+<span class="c1"># Debt Financing: 50.0%
+# Equity Financing: 50.0%
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Calculating WACC</strong></p>
+
+<p>In addition to determining the proportion of both equity and debt financing, you will need to estimate the cost of financing via both debt and equity in order to estimate your WACC.</p>
+
+<p>The
+ <strong>cost of debt</strong>
+ financing can be estimated as the amount you will have to pay on a new loan. This can be estimated by looking at the interest rates of loans of similar sizes to similar companies, or could be based on previous loans your company may already have been issued.</p>
+
+<p>The
+ <strong>cost of equity</strong>
+ financing can be estimated as the return on equity of similar companies. Calculating the return on equity is a simple accounting exercise, but all you need to know is that essentially, investors will require a rate of return that is close to what could be earned by a similar investment.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># The proportion of debt vs equity financing is predefined
+</span><span class="n">percent_debt</span> <span class="o">=</span> <span class="mf">0.50</span>
+<span class="n">percent_equity</span> <span class="o">=</span> <span class="mf">0.50</span>
+
+<span class="c1"># Set the cost of equity
+</span><span class="n">cost_equity</span> <span class="o">=</span> <span class="mf">0.18</span>
+
+<span class="c1"># Set the cost of debt
+</span><span class="n">cost_debt</span> <span class="o">=</span> <span class="mf">0.12</span>
+
+<span class="c1"># Set the corporate tax rate
+</span><span class="n">tax_rate</span> <span class="o">=</span> <span class="mf">0.35</span>
+
+<span class="c1"># Calculate the WACC
+</span><span class="n">wacc</span> <span class="o">=</span> <span class="n">percent_equity</span> <span class="o">*</span> <span class="n">cost_equity</span> <span class="o">+</span> <span class="n">percent_debt</span> <span class="o">*</span> <span class="n">cost_debt</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">tax_rate</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"WACC: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="mi">100</span><span class="o">*</span><span class="n">wacc</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">+</span> <span class="s">"%"</span><span class="p">)</span>
+
+<span class="c1"># WACC: 12.9%
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Comparing Project NPV with IRR</strong></p>
+
+<p>Companies use their WACC as the discount rate when calculating the net present value of potential projects.</p>
+
+<p>In the same way that you discounted values by inflation in the previous chapter to account for costs over time, companies adjust the cash flows of potential projects by their cost of financing (the WACC) to account for their investor’s required rate of return based on market conditions.</p>
+
+<p>Now that you calculated the WACC, you can determine the net present value (NPV) of each project’s cash flows. The cash flows for projects 1 and 2 are available as
+ <code class="language-plaintext highlighter-rouge">cf_project1</code>
+ and
+ <code class="language-plaintext highlighter-rouge">cf_project2</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Set your weighted average cost of capital equal to 12.9%
+wacc = 0.129
+
+# Calculate the net present value for Project 1
+npv_project1 = np.npv(rate=wacc, values=cf_project1)
+print("Project 1 NPV: " + str(round(npv_project1, 2)))
+
+# Calculate the net present value for Project 2
+npv_project2 = np.npv(rate=wacc, values=cf_project2)
+print("Project 2 NPV: " + str(round(npv_project2, 2)))
+
+# Project 1 NPV: 856073.18
+# Project 2 NPV: 904741.35
+
+</code></pre></div></div>
+
+<p>If you were making the decision solely based on net present value, which project would you be more interested in?</p>
+
+<p>Project 2! Higher net present value is a good thing.</p>
+
+<p>####
+<strong>Two Project With Different Lifespans</strong></p>
+
+<p>The board of the company has decided to go a different direction, involving slightly shorter term projects and lower initial investments.</p>
+
+<p>Your project managers have come up with two new ideas, and projected the cash flows for each of the proposals.</p>
+
+<p>Project 1 has a lifespan of 8 years, but Project 2 only has a lifespan of 7 years. Project 1 requires an initial investment of $700,000, but Project 2 only requires $400,000.</p>
+
+<p>The cash flow projections for both projects are as follows:</p>
+
+<p>|
+ Year
+  |
+ Project 1
+  |
+ Project 2
+  |
+| — | — | — |
+|
+ 1
+  |
+ -$700 (initial investment)
+  |
+ -$400 (initial investment)
+  |
+|
+ 2
+  |
+ $100 (cash flow)
+  |
+ $50 (cash flow)
+  |
+|
+ 3
+  |
+ $150
+  |
+ $100
+  |
+|
+ 4
+  |
+ $200
+  |
+ $150
+  |
+|
+ 5
+  |
+ $250
+  |
+ $200
+  |
+|
+ 6
+  |
+ $300
+  |
+ $250
+  |
+|
+ 7
+  |
+ $350
+  |
+ $300
+  |
+|
+ 8
+  |
+ $400
+  |
+ N / A
+  |</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Create a numpy array of cash flows for Project 1
+cf_project_1 = np.array([-700, 100, 150, 200, 250, 300, 350, 400])
+
+# Create a numpy array of cash flows for Project 2
+cf_project_2 = np.array([-400, 50, 100, 150, 200, 250, 300])
+
+# Scale the original objects by 1000x
+cf_project1 = cf_project_1 * 1000
+cf_project2 = cf_project_2 * 1000
+
+</code></pre></div></div>
+
+<p>####
+<strong>Calculating IRR and NPV With Different Project Lifespans</strong></p>
+
+<p>Now that you calculated the WACC, you can calculate and compare the IRRs and NPVs of each project.</p>
+
+<p>While the IRR remains relatively comparable across projects, the NPV, on the other hand, will be much more difficult to compare given the additional year required for project 1.</p>
+
+<p>Luckily, in the next exercise, we will introduce another method to compare the NPVs of the projects, but we will first need to compute the NPVs as before.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Calculate the IRR for Project 1
+irr_project1 = np.irr(cf_project1)
+print("Project 1 IRR: " + str(round(100*irr_project1, 2)) + "%")
+
+# Calculate the IRR for Project 2
+irr_project2 = np.irr(cf_project2)
+print("Project 2 IRR: " + str(round(100*irr_project2, 2)) + "%")
+
+# Set the wacc equal to 12.9%
+wacc = 0.129
+
+# Calculate the NPV for Project 1
+npv_project1 = np.npv(rate=wacc, values=cf_project1)
+print("Project 1 NPV: " + str(round(npv_project1, 2)))
+
+# Calculate the NPV for Project 2
+npv_project2 = np.npv(rate=wacc, values=cf_project2)
+print("Project 2 NPV: " + str(round(npv_project2, 2)))
+
+# Project 1 IRR: 22.94%
+# Project 2 IRR: 26.89%
+# Project 1 NPV: 302744.98
+# Project 2 NPV: 231228.39
+
+</code></pre></div></div>
+
+<p>The NPVs really aren’t comparable.</p>
+
+<p>####
+<strong>Using the Equivalent Annual Annuity Approach</strong></p>
+
+<p>Since the net present values of each project are not directly comparable given the different lifespans of each project, you will have to consider a different approach.</p>
+
+<p>The
+ <strong>equivalent annual annuity</strong>
+ (EAA) approach allows us to compare two projects by essentially assuming that each project is an investment generating a flat interest rate each year (an annuity), and calculating the annual payment you would receive from each project, discounted to present value.</p>
+
+<p>You can compute the EAA of each project using the
+ <code class="language-plaintext highlighter-rouge">.pmt(rate, nper, pv, fv)</code>
+ function in
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Calculate the EAA for Project 1
+eaa_project1 = np.pmt(rate=wacc, nper=8, pv=-npv_project1, fv=0)
+print("Project 1 EAA: " + str(round(eaa_project1, 2)))
+
+# Calculate the EAA for Project 2
+eaa_project2 = np.pmt(rate=wacc, nper=7, pv=-npv_project2, fv=0)
+print("Project 2 EAA: " + str(round(eaa_project2, 2)))
+
+# Project 1 EAA: 62872.2
+# Project 2 EAA: 52120.61
+
+</code></pre></div></div>
+
+<p>This is one of a few ways to deal with this problem.</p>
+
+<p>####
+<strong>Making a Data-Driven Decision on Projects of Different Lifespans</strong></p>
+
+<p>If you were making the decision solely based on the equivalent annual annuity analysis, which project would you be more interested in?</p>
+
+<p>Project 1!</p>
+
+<p>Higher EAA means higher annual returns.</p>
+
+<h1 id="3-simulating-a-mortgage-loan"><strong>3. Simulating a Mortgage Loan</strong></h1>
+<hr />
+
+<h2 id="31-mortgage-basics"><strong>3.1 Mortgage Basics</strong></h2>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture-9.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture1-11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture2-15.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Taking Out a Mortgage Loan</strong></p>
+
+<p>You’re expecting a child soon, and its time to start looking for a home.</p>
+
+<p>You’re currently living out of an apartment in New York City, but your blossoming career as a Data Scientist has allowed you to save up a sizable sum and purchase a home in neighboring Hoboken, New Jersey.</p>
+
+<p>You have decided to purchase a beautiful brownstone home in the $800,000 range. While you do have a considerable amount of cash on hand, you don’t have enough to purchase the entire home outright, which means you will have to take the remaining balance out as a
+ <strong>mortgage loan</strong>
+ . From the sound of it, you’ll have to put about 20% down up-front to a mortgage loan of that size.</p>
+
+<p>This up-front payment is known as a
+ <strong>down payment</strong>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Set the value of the home you are looking to buy
+home_value = 800000
+
+# What percentage are you paying up-front?
+down_payment_percent = 0.2
+
+# Calculate the dollar value of the down payment
+down_payment = home_value * down_payment_percent
+print("Initial Down Payment: " + str(down_payment))
+
+# Calculate the value of the mortgage loan required after the down payment
+mortgage_loan = home_value - down_payment
+print("Mortgage Loan: " + str(mortgage_loan))
+
+# Initial Down Payment: 160000.0
+# Mortgage Loan: 640000.0
+
+</code></pre></div></div>
+
+<p>####
+<strong>Calculating the Monthly Mortgage Payment</strong></p>
+
+<p>In order to make sure you can afford the home, you will have to calculate the monthly mortgage payment you will have to make on a loan that size.</p>
+
+<p>Now, since you will be paying a monthly mortgage, you will have to convert each of the parameters into their monthly equivalents. Be careful when adjusting the interest rate, which is compounding!</p>
+
+<p>In order to calculate the monthly mortgage payment, you will use the
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ function
+ <code class="language-plaintext highlighter-rouge">.pmt(rate, nper, pv)</code>
+ where:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">rate</code>
+ = The periodic (monthly) interest rate</li>
+  <li><code class="language-plaintext highlighter-rouge">nper</code>
+ = The number of payment periods (months) in the lifespan of the mortgage loan</li>
+  <li><code class="language-plaintext highlighter-rouge">pv</code>
+ = The total value of the mortgage loan</li>
+</ul>
+
+<p>You have been given a 30-year mortgage loan quote for your desired amount at 3.75%. The value of the mortgage loan is available as
+ <code class="language-plaintext highlighter-rouge">mortgage_loan</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Derive the equivalent monthly mortgage rate from the annual rate
+mortgage_rate_periodic = (1 + mortgage_rate) ** (1/12) - 1
+
+# How many monthly payment periods will there be over 30 years?
+mortgage_payment_periods = 30 * 12
+
+# Calculate the monthly mortgage payment (multiply by -1 to keep it positive)
+periodic_mortgage_payment = -1*np.pmt(mortgage_rate_periodic, mortgage_payment_periods, mortgage_loan)
+print("Monthly Mortgage Payment: " + str(round(periodic_mortgage_payment, 2)))
+
+# Monthly Mortgage Payment: 2941.13
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="32-amortization-interest-and-principal"><strong>3.2 Amortization, Interest and Principal</strong></h2>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture3-15.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Calculating Interest and Principal Payments</strong></p>
+
+<p>Due to the size of the mortgage loan, you begin the mortgage in the initial period by paying mostly interest and retaining very little
+ <strong>principal</strong>
+ , or
+ <strong>equity</strong>
+ that goes towards the ownership of your home.</p>
+
+<p>This means that if you were to stop paying your mortgage and sell your home after only a few years, the bank would actually own most of the home because what you paid was mostly interest, and very little principal.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+mortgage_loan
+640000.0
+
+periodic_mortgage_payment
+2941.125363188976
+
+mortgage_rate_periodic
+0.003072541703255549
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate the amount of the first loan payment that will go towards interest
+</span><span class="n">initial_interest_payment</span> <span class="o">=</span> <span class="n">mortgage_loan</span> <span class="o">*</span> <span class="n">mortgage_rate_periodic</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Initial Interest Payment: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">initial_interest_payment</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="c1"># Calculate the amount of the first loan payment that will go towards principal
+</span><span class="n">initial_principal_payment</span> <span class="o">=</span> <span class="n">periodic_mortgage_payment</span> <span class="o">-</span> <span class="n">initial_interest_payment</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Initial Principal Payment: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">initial_principal_payment</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="c1"># Initial Interest Payment: 1966.43
+# Initial Principal Payment: 974.7
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Simulating Periodic Payments (I)</strong></p>
+
+<p>You have all the tools you’ll need to simulate the mortgage payments over time.</p>
+
+<p>Every time a mortgage payment is made, the following payment will have a slightly lower percentage, which is used to pay off interest. This means that more of the remainder will go towards the portion of the home that you own instead of the bank. This is important to determine how much you will gain from selling the home before paying off your mortgage, or to determine when your mortgage is underwater. But more on that later.</p>
+
+<p>You will now write a simple program to calculate the interest and mortgage portions of each payment over time.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+principal_remaining
+array([0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0.,
+       0., 0., 0.])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Loop through each mortgage payment period
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mortgage_payment_periods</span><span class="p">):</span>
+
+    <span class="c1"># Handle the case for the first iteration
+</span>    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">previous_principal_remaining</span> <span class="o">=</span> <span class="n">mortgage_loan</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">previous_principal_remaining</span> <span class="o">=</span> <span class="n">principal_remaining</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Calculate the interest and principal payments
+</span>    <span class="n">interest_payment</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">previous_principal_remaining</span><span class="o">*</span><span class="n">mortgage_rate_periodic</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">principal_payment</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">periodic_mortgage_payment</span><span class="o">-</span><span class="n">interest_payment</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Catch the case where all principal is paid off in the final period
+</span>    <span class="k">if</span> <span class="n">previous_principal_remaining</span> <span class="o">-</span> <span class="n">principal_payment</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">principal_payment</span> <span class="o">=</span> <span class="n">previous_principal_remaining</span>
+
+    <span class="c1"># Collect the principal remaining values in an array
+</span>    <span class="n">principal_remaining</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">previous_principal_remaining</span> <span class="o">-</span> <span class="n">principal_payment</span>
+
+    <span class="c1"># Print the payments for the first few periods
+</span>    <span class="n">print_payments</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">interest_payment</span><span class="p">,</span> <span class="n">principal_payment</span><span class="p">,</span> <span class="n">principal_remaining</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Period 0: Interest Paid: 1966.43 | Principal Paid: 974.7 | Remaining Balance: 639025.3
+Period 1: Interest Paid: 1963.43 | Principal Paid: 977.7 | Remaining Balance: 638047.6000000001
+Period 2: Interest Paid: 1960.43 | Principal Paid: 980.7 | Remaining Balance: 637066.9000000001
+Period 3: Interest Paid: 1957.41 | Principal Paid: 983.72 | Remaining Balance: 636083.1800000002
+Period 4: Interest Paid: 1954.39 | Principal Paid: 986.74 | Remaining Balance: 635096.4400000002
+Period 5: Interest Paid: 1951.36 | Principal Paid: 989.77 | Remaining Balance: 634106.6700000002
+
+</code></pre></div></div>
+
+<p>####
+<strong>Simulating Periodic Payments (II)</strong></p>
+
+<p>You have decided to extend your program from the previous exercise to store the principal and interest payments made at each period, and to plot the results instead of simply printing them.</p>
+
+<p>For this example, the plotting code is already done, so you just need to finish the logic inside the for loop and the initialization of the variables which will be updated at each iteration.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Loop through each mortgage payment period
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">mortgage_payment_periods</span><span class="p">):</span>
+
+    <span class="c1"># Handle the case for the first iteration
+</span>    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">previous_principal_remaining</span> <span class="o">=</span> <span class="n">mortgage_loan</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">previous_principal_remaining</span> <span class="o">=</span> <span class="n">principal_remaining</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Calculate the interest based on the previous principal
+</span>    <span class="n">interest_payment</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">previous_principal_remaining</span><span class="o">*</span><span class="n">mortgage_rate_periodic</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">principal_payment</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">periodic_mortgage_payment</span> <span class="o">-</span> <span class="n">interest_payment</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="c1"># Catch the case where all principal is paid off in the final period
+</span>    <span class="k">if</span> <span class="n">previous_principal_remaining</span> <span class="o">-</span> <span class="n">principal_payment</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">principal_payment</span> <span class="o">=</span> <span class="n">previous_principal_remaining</span>
+
+    <span class="c1"># Collect the historical values
+</span>    <span class="n">interest_paid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">interest_payment</span>
+    <span class="n">principal_paid</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">principal_payment</span>
+    <span class="n">principal_remaining</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">previous_principal_remaining</span> <span class="o">-</span> <span class="n">principal_payment</span>
+
+<span class="c1"># Plot the interest vs principal
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">interest_paid</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">"red"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">principal_paid</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">"blue"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">handles</span><span class="o">=</span><span class="p">[</span><span class="n">interest_plot</span><span class="p">,</span> <span class="n">principal_plot</span><span class="p">],</span> <span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture4-15.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="33-home-ownership-home-prices-and-recessions"><strong>3.3 Home Ownership, Home Prices and Recessions</strong></h2>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture5-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture6-15.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture7-12.png?w=830" alt="Desktop View" /></p>
+
+<p>####
+<strong>Cumulative Payments and Home Equity</strong></p>
+
+<p>You are faithfully paying your mortgage each month, but it’s difficult to tell how much of the house you actually own and how much interest you have paid in total over the years.</p>
+
+<p><code class="language-plaintext highlighter-rouge">principal_paid</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">interest_paid</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">home_value</code>
+ and
+ <code class="language-plaintext highlighter-rouge">down_payment_percent</code>
+ from the previous exercise are available.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+principal_paid
+array([ 974.7 ,  977.7 ,  980.7 ,  983.72,  986.74,  989.77,  992.81,
+...
+       2914.19, 2923.15, 2929.2 ])
+
+interest_paid
+array([1966.43, 1963.43, 1960.43, 1957.41, 1954.39, 1951.36, 1948.32,
+...
+         26.94,   17.98,    9.  ])
+
+home_value
+800000
+
+down_payment_percent
+0.2
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Calculate the cumulative home equity (principal) over time
+cumulative_home_equity = np.cumsum(principal_paid)
+
+# Calculate the cumulative interest paid over time
+cumulative_interest_paid = np.cumsum(interest_paid)
+
+# Calculate your percentage home equity over time
+cumulative_percent_owned = down_payment_percent + (cumulative_home_equity/home_value)
+
+# Plot the cumulative interest paid vs equity accumulated
+plt.plot(cumulative_interest_paid, color='red')
+plt.plot(cumulative_home_equity, color='blue')
+plt.legend(handles=[interest_plot, principal_plot], loc=2)
+plt.show()
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+print(cumulative_percent_owned)
+
+[0.20121838 0.2024405  0.20366638 0.20489603 0.20612945 0.20736666
+...
+ 0.98178978 0.98541024 0.98904183 0.99268456 0.9963385  1.        ]
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture8-10.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Rising Housing Prices</strong></p>
+
+<p>Home values have been rising steadily each year, and this is a rather large investment for you.</p>
+
+<p>Calculate your home equity value over time given a steady growth rate of 0.25% per month. A repeated array of this growth rate (with a length equal to the number of mortgage payment periods) is already stored for you in an object called
+ <code class="language-plaintext highlighter-rouge">growth_array</code>
+ .</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">home_value</code>
+ and
+ <code class="language-plaintext highlighter-rouge">cumulative_percent_owned</code>
+ variables from the previous exercise are available.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+growth_array
+array([0.0025, 0.0025, 0.0025, 0.0025, 0.0025, 0.0025, 0.0025, 0.0025,
+...
+       0.0025, 0.0025, 0.0025, 0.0025, 0.0025, 0.0025, 0.0025, 0.0025])
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Calculate the cumulative growth over time
+cumulative_growth_forecast = np.cumprod(1 + growth_array)
+
+# Forecast the home value over time
+home_value_forecast = home_value * cumulative_growth_forecast
+
+# Forecast the home equity value owned over time
+cumulative_home_value_owned = home_value_forecast * cumulative_percent_owned
+
+# Plot the home value vs equity accumulated
+plt.plot(home_value_forecast, color='red')
+plt.plot(cumulative_home_value_owned, color='blue')
+plt.legend(handles=[homevalue_plot, homeequity_plot], loc=2)
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture9-9.png?w=1024" alt="Desktop View" /></p>
+
+<p>Turned out to be a good investment. Now unfortunately, housing prices don’t always go up…</p>
+
+<p>####
+<strong>Falling Housing Prices and Underwater Mortgages</strong></p>
+
+<p>Unfortunately, you are also well aware that home prices don’t always rise.</p>
+
+<p>An
+ <strong>underwater</strong>
+ mortgage is when the remaining amount you owe on your mortgage is actually higher than the value of the house itself.</p>
+
+<p>In this exercise, you will calculate the worst case scenario where home prices drop steadily at the rate of 0.45% per month. To speed things up, the cumulative drop in home prices has already been forecasted and stored for you in a variable called
+ <code class="language-plaintext highlighter-rouge">cumulative_decline_forecast</code>
+ , which is an array of multiplicative discount factors compared to today’s price – no need to add 1 to the rate array.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+principal_remaining
+array([639025.3 , 638047.6 , 637066.9 , 636083.18, 635096.44, 634106.67,
+...
+        14568.18,  11671.81,   8766.54,   5852.35,   2929.2 ,      0.  ])
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+import pandas as pd
+
+# Cumulative drop in home value over time as a ratio
+cumulative_decline_forecast = np.cumprod(1+decline_array)
+
+# Forecast the home value over time
+home_value_forecast = home_value * cumulative_decline_forecast
+
+# Find all periods where your mortgage is underwater
+underwater = home_value_forecast &lt; principal_remaining
+pd.value_counts(underwater)
+
+# Plot the home value vs principal remaining
+plt.plot(home_value_forecast, color='red')
+plt.plot(principal_remaining, color='blue')
+plt.legend(handles=[homevalue_plot, principal_plot], loc=2)
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture10-10.png?w=1024" alt="Desktop View" /></p>
+
+<p>When the blue line is above the red line, you are ‘underwater’. Putting more money down and taking a smaller mortgage in the first place will help you avoid this situation.</p>
+
+<h1 id="4-budgeting-application"><strong>4. Budgeting Application</strong></h1>
+<hr />
+
+<h2 id="41-budgeting-project-proposal"><strong>4.1 Budgeting Project Proposal</strong></h2>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture11-7.png?w=892" alt="Desktop View" /></p>
+
+<p>####
+<strong>Salary and Taxes</strong></p>
+
+<p>You just got a new job as an entry-level Data Scientist at a technology company in New York City with a decent starting salary of $85,000 per year.</p>
+
+<p>Unfortunately, after state and local taxes, you can expect to be sending roughly 30% back to the government each year.</p>
+
+<p>You will need to calculate your monthly take home pay after taxes in order to begin budgeting.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Enter your annual salary
+</span><span class="n">salary</span> <span class="o">=</span> <span class="mi">85000</span>
+
+<span class="c1"># Assume a tax rate of 30%
+</span><span class="n">tax_rate</span> <span class="o">=</span> <span class="mf">0.3</span>
+
+<span class="c1"># Calculate your salary after taxes
+</span><span class="n">salary_after_taxes</span> <span class="o">=</span> <span class="n">salary</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">tax_rate</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Salary after taxes: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">salary_after_taxes</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="c1"># Calculate your monthly salary after taxes
+</span><span class="n">monthly_takehome_salary</span> <span class="o">=</span> <span class="n">salary_after_taxes</span> <span class="o">/</span> <span class="mi">12</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Monthly takehome salary: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">monthly_takehome_salary</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="c1"># Salary after taxes: 59500.0
+# Monthly takehome salary: 4958.33
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Monthly Expenses and Savings</strong></p>
+
+<p>In order to make it in New York City, you have decided to split a two-bedroom apartment with a friend. You will have to budget for rent, food and entertainment, but it’s also a good idea to allocate an amount for unforeseen expenses each month. This unforeseen expenses budget could be used for anything ranging from new clothes or electronics to doctor appointments.</p>
+
+<p>Set up your monthly budget as follows:</p>
+
+<ul>
+  <li>Rent: $1200 / month (Includes utilities)</li>
+  <li>Food: $30 / day (On average. Includes groceries and eating out.)</li>
+  <li>Entertainment: $200 / month (Movies, drinks, museums, parties…)</li>
+  <li>Unforeseen Expenses: 250 / month (Stay safe, and don’t drop your phone!)</li>
+</ul>
+
+<p>For this application, assume an average of 30 days per month. Whatever is left after your paying your monthly expenses will go into your savings account each month.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Enter your monthly rent
+</span><span class="n">monthly_rent</span> <span class="o">=</span> <span class="mi">1200</span>
+
+<span class="c1"># Enter your daily food budget
+</span><span class="n">daily_food_budget</span> <span class="o">=</span> <span class="mi">30</span>
+
+<span class="c1"># Calculate your monthly food budget assuming 30 days per month
+</span><span class="n">monthly_food_budget</span> <span class="o">=</span> <span class="mi">30</span> <span class="o">*</span> <span class="mi">30</span>
+
+<span class="c1"># Set your monthly entertainment budget
+</span><span class="n">monthly_entertainment_budget</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="c1"># Allocate funds for unforeseen expenses, just in case
+</span><span class="n">monthly_unforeseen_expenses</span> <span class="o">=</span> <span class="mi">250</span>
+
+<span class="c1"># Next, calculate your total monthly expenses
+</span><span class="n">monthly_expenses</span> <span class="o">=</span> <span class="n">monthly_rent</span> <span class="o">+</span> <span class="n">monthly_food_budget</span> <span class="o">+</span> <span class="n">monthly_entertainment_budget</span> <span class="o">+</span> <span class="n">monthly_unforeseen_expenses</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Monthly expenses: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">monthly_expenses</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="c1"># Finally, calculate your monthly take-home savings
+</span><span class="n">monthly_savings</span> <span class="o">=</span> <span class="n">monthly_takehome_salary</span> <span class="o">-</span> <span class="n">monthly_expenses</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Monthly savings: "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">monthly_savings</span><span class="p">,</span> <span class="mi">2</span><span class="p">)))</span>
+
+<span class="c1"># Monthly expenses: 2550
+# Monthly savings: 2408.33
+</span>
+</code></pre></div></div>
+
+<p>Expenses add up quickly, don’t they?</p>
+
+<p>####
+<strong>Forecast Salary Growth and Cost of Living</strong></p>
+
+<p>Due to both inflation and increased productivity from experience, you can expect your salary to grow at different rates depending on your job. Now, since you are working in a growing and in-demand career field as a Data Scientist, you can assume a steady growth in your annual salary every year based on performance.</p>
+
+<p>You can assume an annual salary growth rate of 5%, which means if you start at $85,000 per year, you can expect to earn over $176,000 per year after 15 years. After taxes, assuming your tax rate hasn’t changed, that works out to roughly $125,000 per year, which is not unreasonable for a Data Scientist. In fact, you might even make it to that level in a few years! But just to be safe, you should be conservative with your projections.</p>
+
+<p>For this application, assume all inflation and salary growth happens in smaller increments on a monthly basis instead of just one large increase at the end of each year.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Create monthly forecasts up to 15 years from now
+forecast_months = 12*15
+
+# Set your annual salary growth rate
+annual_salary_growth = 0.05
+
+# Calculate your equivalent monthly salary growth rate
+monthly_salary_growth = (1 + annual_salary_growth) ** (1/12) - 1
+
+# Forecast the cumulative growth of your salary
+cumulative_salary_growth_forecast = np.cumprod(np.repeat(1 + monthly_salary_growth, forecast_months))
+
+# Calculate the actual salary forecast
+salary_forecast = monthly_takehome_salary * cumulative_salary_growth_forecast
+
+# Plot the forecasted salary
+plt.plot(salary_forecast, color='blue')
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture12-7.png?w=1024" alt="Desktop View" /></p>
+
+<p>That’s becomes a mighty fine salary very quickly.</p>
+
+<p>####
+<strong>Forecast Growing Expenses Due to Inflation</strong></p>
+
+<p>You will also assume your monthly expenses will rise by an average of 2.5% per year due to
+ <strong>inflation</strong>
+ . This will lead to higher
+ <strong>cost of living</strong>
+ over time, paying for the same expenses each year but at a higher price. Luckily, your salary is growing faster than inflation, which means you should have more money going into savings each month.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Set the annual inflation rate
+annual_inflation = 0.025
+
+# Calculate the equivalent monthly inflation rate
+monthly_inflation = (1+annual_inflation)**(1/12) - 1
+
+# Forecast cumulative inflation over time
+cumulative_inflation_forecast = np.cumprod(np.repeat(1 + monthly_inflation, forecast_months))
+
+# Calculate your forecasted expenses
+expenses_forecast = monthly_expenses*cumulative_inflation_forecast
+
+# Plot the forecasted expenses
+plt.plot(expenses_forecast, color='red')
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture13-6.png?w=1024" alt="Desktop View" /></p>
+
+<p>Even though you’re making more money, you’re spending more, too!</p>
+
+<hr />
+
+<h2 id="42-net-worth-saving-and-investing"><strong>4.2 Net Worth, Saving, and Investing</strong></h2>
+
+<p>####
+<strong>Calculate Your Net Worth</strong></p>
+
+<p>Now that you have forecasted your savings and salary over time while taking career progression and inflation into account, you have constructed a time-series which you can use to calculate your cash flows, just like in Chapter 1.</p>
+
+<p>For this example, all you need to do is subtract your forecasted monthly expenses from your forecasted monthly salary. The remaining cash flow will go straight into your savings account for each month.</p>
+
+<p>You want to project your cumulative savings over time to see how effective your budgeting process will be given your projections.</p>
+
+<p><code class="language-plaintext highlighter-rouge">salary_forecast</code>
+ and
+ <code class="language-plaintext highlighter-rouge">expenses_forecast</code>
+ from the previous exercises are available.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Calculate your savings for each month
+savings_forecast = salary_forecast - expenses_forecast
+
+# Calculate your cumulative savings over time
+cumulative_savings = np.cumsum(savings_forecast)
+
+# Print the final cumulative savings after 15 years
+final_net_worth = cumulative_savings[-1]
+print("Your final net worth: " + str(round(final_net_worth, 2)))
+
+# Plot the forecasted savings
+plt.plot(cumulative_savings, color='blue')
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture18-4.png?w=1024" alt="Desktop View" /></p>
+
+<p>Not bad! But there’s a better way to accumulate wealth over time.</p>
+
+<p>####
+<strong>So You Want to Be a Millionaire?</strong></p>
+
+<p>Your projections show that you can accumulate over $700,000 in just 15 years by following a strict budget and growing your salary steadily over time.</p>
+
+<p>But you want to be a millionaire in 15 years, retire young, sip margaritas and travel for the rest of your life. In order to do that, you’re going to need to invest.</p>
+
+<p>Remember the
+ <code class="language-plaintext highlighter-rouge">.pmt()</code>
+ function from
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ ? You can use this function to calculate how much you need to save each month in order to accumulate your desired wealth over time.</p>
+
+<p>You still have a lot to learn about the stock market, but your financial advisor told you that you can earn anywhere from 5-10% per year on your capital on average by investing in a low cost index fund.</p>
+
+<p>You know that the stock market doesn’t always go up, but you will assume a modest 7% return per year, which has been the average annual return in the US stock market from 1950-2009.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Set the annual investment return to 7%
+investment_rate_annual = 0.07
+
+# Calculate the monthly investment return
+investment_rate_monthly = (1 + investment_rate_annual) ** (1/12) - 1
+
+# Calculate your required monthly investment to amass $1M
+required_investment_monthly = np.pmt(rate=investment_rate_monthly, nper=forecast_months, pv=0, fv=-1000000)
+print("You will have to invest $" + str(round(required_investment_monthly, 2)) + " per month to amass $1M over 15 years")
+
+# You will have to invest $3214.35 per month to amass $1M over 15 years
+
+</code></pre></div></div>
+
+<p>$3000 per month?! Let’s start slow, and build it up over time.</p>
+
+<p>####
+<strong>Investing a Percentage of Your Income (I)</strong></p>
+
+<p>Unfortunately, you really can’t afford to save $3,000 per month in order to amass $1,000,000 after only 15 years.</p>
+
+<p>But what you can do is start slowly, investing a small percentage of your take-home income each month, which should grow over time as your income grows as well.</p>
+
+<p>In this exercise, you will lay the foundations to simulate this investing process over time.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">salary_forecast</code>
+ and
+ <code class="language-plaintext highlighter-rouge">expenses_forecast</code>
+ variables are available from the previous exercise.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">cash_flow_forecast</code>
+ is also available, and is an array of your forecasted salary minus your forecasted expenses. The
+ <code class="language-plaintext highlighter-rouge">monthly_investment_percentage</code>
+ variable is already set to 0.30.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Calculate your monthly deposit into your investment account
+investment_deposit_forecast = cash_flow_forecast * monthly_investment_percentage
+
+# The rest goes into your savings account
+savings_forecast_new = cash_flow_forecast * (1 - monthly_investment_percentage)
+
+# Calculate your cumulative savings over time
+cumulative_savings_new = np.cumsum(savings_forecast_new)
+
+# Plot your forecasted monthly savings vs investments
+plt.plot(investment_deposit_forecast, color='red')
+plt.plot(savings_forecast_new, color='blue')
+plt.legend(handles=[investments_plot, savings_plot], loc=2)
+plt.show()
+
+</code></pre></div></div>
+
+<p>####
+<strong>Investing a Percentage of Your Income (II)</strong></p>
+
+<p>To finish up your investment simulation, you will need to loop through each time period, calculate the growth of any investments you have already made, add your new monthly deposit, and calculate your net worth at each point in time.</p>
+
+<p>Cumulative savings (
+ <code class="language-plaintext highlighter-rouge">cumulative_savings_new</code>
+ ) from the previous exercise is available, and
+ <code class="language-plaintext highlighter-rouge">investment_portfolio</code>
+ and
+ <code class="language-plaintext highlighter-rouge">net_worth</code>
+ are pre-allocated empty numpy arrays of length equal to
+ <code class="language-plaintext highlighter-rouge">forecast_months</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Loop through each forecast period
+for i in range(forecast_months):
+
+    # Find the previous investment deposit amount
+    if i == 0:
+        previous_investment = 0
+    else:
+        previous_investment = investment_portfolio[i-1]
+
+    # Calculate the value of your previous investments, which have grown
+    previous_investment_growth = previous_investment*(1 + investment_rate_monthly)
+
+    # Add your new deposit to your investment portfolio
+    investment_portfolio[i] =  previous_investment_growth + investment_deposit_forecast[i]
+
+    # Calculate your net worth at each point in time
+    net_worth[i] = np.cumsum(cumulative_savings_new[i] + investment_portfolio[i])
+
+# Plot your forecasted cumulative savings vs investments and net worth
+plot_investments(investment_portfolio, cumulative_savings_new, net_worth)
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture20-4.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="43-the-power-of-time-and-compound-interest"><strong>4.3 The Power of Time and Compound Interest</strong></h2>
+
+<p><img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture21-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture22-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/intro-to-financial-concepts-using-python/capture23-2.png?w=819" alt="Desktop View" /></p>
+
+<p>####
+<strong>Investing Over Time</strong></p>
+
+<p>If you would like to accumulate $1,000,000 over 15 years, at 7% per year, you will have to invest $3214.35 per month:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+np.pmt(rate=((1+0.07)**(1/12) - 1),
+       nper=15*12, pv=0, fv=1000000)
+# -3214.351338524575
+
+</code></pre></div></div>
+
+<p>But what if you were willing to wait an extra 15 years, for a total of 30 years? How much will you need to invest each month?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+np.pmt(rate=((1+0.07)**(1/12) - 1),
+       nper=30*12, pv=0, fv=1000000)
+
+# -855.1009225937204
+
+</code></pre></div></div>
+
+<p>Compounded returns mean you only need to save $855.10 per month.</p>
+
+<p>####
+<strong>Inflation-Adjusted Net Worth</strong></p>
+
+<p>By saving 30% per year, your simulation shows that you can accumulate $896,962.66. Not quite a millionaire, but not bad at all!</p>
+
+<p>For the sake of simplicity, let’s assume you were able to save $900,000 by following your budget.</p>
+
+<p>But what if you retire 15 years from now? What is $900,000 going to be truly worth 15 years from now?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import numpy as np
+
+# Set your future net worth
+future_net_worth = 900000
+
+# Set the annual inflation rate to 2.5%
+annual_inflation = 0.025
+
+# Calculate the present value of your terminal wealth over 15 years
+inflation_adjusted_net_worth = np.pv(rate=annual_inflation, nper=15, pmt=0, fv=-1*future_net_worth)
+print("Your inflation-adjusted net worth: $" + str(round(inflation_adjusted_net_worth, 2)))
+
+# Your inflation-adjusted net worth: $621419.0
+
+</code></pre></div></div>
+
+<p>The End.</p>
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

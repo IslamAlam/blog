@@ -1,0 +1,1749 @@
+<h1 id="machine-learning-with-the-experts-school-budgets-fromdatacamp">Machine Learning with the Experts: School Budgets from Datacamp</h1>
+
+<p>This is the memo of the 22th course of ‘Data Scientist with Python’ track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/machine-learning-with-the-experts-school-budgets">HERE</a></strong>
+ .</p>
+
+<hr />
+
+<h1 id="1-exploring-the-raw-data"><strong>1. Exploring the raw data</strong></h1>
+<hr />
+
+<p>You’re going to be working with school district budget data. This data can be classified in many ways according to certain labels, e.g.
+ <code class="language-plaintext highlighter-rouge">Function: Career &amp; Academic Counseling</code>
+ , or
+ <code class="language-plaintext highlighter-rouge">Position_Type: Librarian</code>
+ .</p>
+
+<p>Your goal is to develop a model that predicts the probability for each possible label by relying on some correctly labeled examples.</p>
+
+<p>This is a supervised Learning, because the model will be trained using labeled examples.</p>
+
+<p>####
+<strong>What is the goal of the algorithm?</strong></p>
+
+<p>Your goal is to correctly label budget line items by training a supervised model to predict the probability of each possible label, taking most probable label as the correct label.</p>
+
+<p>It’s a classification problem, because predicted probabilities will be used to select a label class.</p>
+
+<p>Specifically, we have ourselves a multi-class-multi-label classification problem (quite a mouthful!), because there are 9 broad categories that each take on many possible sub-label instances.</p>
+
+<p>###
+<strong>Exploring the data</strong></p>
+
+<p>####
+<strong>Loading the data</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+df = pd.read_csv('TrainingData.csv', index_col=0)
+
+df.head(3)
+                   Function          Use          Sharing   Reporting  \
+198                NO_LABEL     NO_LABEL         NO_LABEL    NO_LABEL
+209  Student Transportation     NO_LABEL  Shared Services  Non-School
+750    Teacher Compensation  Instruction  School Reported      School
+
+    Student_Type Position_Type               Object_Type     Pre_K  \
+198     NO_LABEL      NO_LABEL                  NO_LABEL  NO_LABEL
+209     NO_LABEL      NO_LABEL    Other Non-Compensation  NO_LABEL
+750  Unspecified       Teacher  Base Salary/Compensation  Non PreK
+
+      Operating_Status               Object_Description         ...          \
+198      Non-Operating                   Supplemental *         ...
+209  PreK-12 Operating  REPAIR AND MAINTENANCE SERVICES         ...
+750  PreK-12 Operating     Personal Services - Teachers         ...
+
+                  Sub_Object_Description Location_Description  FTE  \
+198  Non-Certificated Salaries And Wages                  NaN  NaN
+209                                  NaN      ADMIN. SERVICES  NaN
+750                                  NaN                  NaN  1.0
+
+                     Function_Description Facility_or_Department  \
+198  Care and Upkeep of Building Services                    NaN
+209             STUDENT TRANSPORT SERVICE                    NaN
+750                                   NaN                    NaN
+
+    Position_Extra     Total    Program_Description  \
+198            NaN  -8291.86                    NaN
+209            NaN    618.29   PUPIL TRANSPORTATION
+750        TEACHER  49768.82  Instruction - Regular
+
+                                      Fund_Description              Text_1
+198  Title I - Disadvantaged Children/Targeted Assi...  TITLE I CARRYOVER
+209                                       General Fund                 NaN
+750                             General Purpose School                 NaN
+
+[3 rows x 25 columns]
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+df.info()
+&lt;class 'pandas.core.frame.DataFrame'&gt;
+Int64Index: 1560 entries, 198 to 101861
+Data columns (total 25 columns):
+Function                  1560 non-null object
+Use                       1560 non-null object
+Sharing                   1560 non-null object
+Reporting                 1560 non-null object
+Student_Type              1560 non-null object
+Position_Type             1560 non-null object
+Object_Type               1560 non-null object
+Pre_K                     1560 non-null object
+Operating_Status          1560 non-null object
+Object_Description        1461 non-null object
+Text_2                    382 non-null object
+SubFund_Description       1183 non-null object
+Job_Title_Description     1131 non-null object
+Text_3                    677 non-null object
+Text_4                    193 non-null object
+Sub_Object_Description    364 non-null object
+Location_Description      874 non-null object
+FTE                       449 non-null float64
+Function_Description      1340 non-null object
+Facility_or_Department    252 non-null object
+Position_Extra            1026 non-null object
+Total                     1542 non-null float64
+Program_Description       1192 non-null object
+Fund_Description          819 non-null object
+Text_1                    1132 non-null object
+dtypes: float64(2), object(23)
+memory usage: 316.9+ KB
+
+</code></pre></div></div>
+
+<p>####
+<strong>Summarizing the data</strong></p>
+
+<p>There are two numeric columns, called
+ <code class="language-plaintext highlighter-rouge">FTE</code>
+ and
+ <code class="language-plaintext highlighter-rouge">Total</code>
+ .</p>
+
+<ul>
+  <li>
+    <dl>
+      <dt><code class="language-plaintext highlighter-rouge">FTE</code></dt>
+      <dd>Stands for “full-time equivalent”. If the budget item is associated to an employee, this number tells us the percentage of full-time that the employee works. A value of 1 means the associated employee works for the school full-time. A value close to 0 means the item is associated to a part-time or contracted employee.</dd>
+    </dl>
+  </li>
+  <li>
+    <dl>
+      <dt><code class="language-plaintext highlighter-rouge">Total</code></dt>
+      <dd>Stands for the total cost of the expenditure. This number tells us how much the budget item cost.</dd>
+    </dl>
+  </li>
+</ul>
+
+<p>After printing summary statistics for the numeric data, your job is to plot a histogram of the non-null
+ <code class="language-plaintext highlighter-rouge">FTE</code>
+ column to see the distribution of part-time and full-time employees in the dataset.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the summary statistics
+</span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">describe</span><span class="p">())</span>
+
+<span class="c1"># Import matplotlib.pyplot as plt
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Create the histogram
+</span><span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">FTE</span><span class="p">.</span><span class="n">dropna</span><span class="p">())</span>
+
+<span class="c1"># Add title and labels
+</span><span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Distribution of %full-time </span><span class="se">\n</span><span class="s"> employee works'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'% of full-time'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'num employees'</span><span class="p">)</span>
+
+<span class="c1"># Display the histogram
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+              FTE         Total
+count  449.000000  1.542000e+03
+mean     0.493532  1.446867e+04
+std      0.452844  7.916752e+04
+min     -0.002369 -1.044084e+06
+25%           NaN           NaN
+50%           NaN           NaN
+75%           NaN           NaN
+max      1.047222  1.367500e+06
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-the-experts:-school-budgets-from datacamp/capture-23.png?w=1024" alt="Desktop View" /></p>
+
+<p>The high variance in expenditures makes sense (some purchases are cheap some are expensive). Also, it looks like the FTE column is bimodal. That is, there are some part-time and some full-time employees.</p>
+
+<p>###
+<strong>Covert object data to category</strong></p>
+
+<p>####
+<strong>Count the data type and value</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+df.dtypes.value_counts()
+object     23
+float64     2
+dtype: int64
+
+</code></pre></div></div>
+
+<p>####
+<strong>Encode the labels as categorical variables</strong></p>
+
+<p>There are 9 columns of labels in the dataset. Each of these columns is a category that has
+ <a href="https://www.drivendata.org/competitions/4/box-plots-for-education/page/15/#labels_list">many possible values it can take</a>
+ . The 9 labels have been loaded into a list called
+ <code class="language-plaintext highlighter-rouge">LABELS</code>
+ .</p>
+
+<p>You will notice that every label is encoded as an object datatype. Because
+ <code class="language-plaintext highlighter-rouge">category</code>
+ datatypes are
+ <a href="http://matthewrocklin.com/blog/work/2015/06/18/Categoricals">much more efficient</a>
+ your task is to convert the labels to category types using the
+ <code class="language-plaintext highlighter-rouge">.astype()</code>
+ method.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+LABELS
+['Function',
+ 'Use',
+ 'Sharing',
+ 'Reporting',
+ 'Student_Type',
+ 'Position_Type',
+ 'Object_Type',
+ 'Pre_K',
+ 'Operating_Status']
+
+
+df[LABELS].dtypes
+Function            object
+Use                 object
+Sharing             object
+Reporting           object
+Student_Type        object
+Position_Type       object
+Object_Type         object
+Pre_K               object
+Operating_Status    object
+dtype: object
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define the lambda function: categorize_label
+</span><span class="n">categorize_label</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">.</span><span class="n">astype</span><span class="p">(</span><span class="s">'category'</span><span class="p">)</span>
+
+<span class="c1"># Convert df[LABELS] to a categorical type
+</span><span class="n">df</span><span class="p">[</span><span class="n">LABELS</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">LABELS</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="n">categorize_label</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Print the converted dtypes
+</span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">LABELS</span><span class="p">].</span><span class="n">dtypes</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Function            category
+Use                 category
+Sharing             category
+Reporting           category
+Student_Type        category
+Position_Type       category
+Object_Type         category
+Pre_K               category
+Operating_Status    category
+dtype: object
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+'''
+https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.apply.html
+apply
+axis : {0 or ‘index’, 1 or ‘columns’}, default 0
+Axis along which the function is applied:
+
+0 or ‘index’: apply function to each column.
+1 or ‘columns’: apply function to each row.
+'''
+
+</code></pre></div></div>
+
+<p>####
+**Counting unique labels</p>
+
+<p>.apply(pd.Series.nunique)**</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import matplotlib.pyplot
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Calculate number of unique values for each label: num_unique_labels
+</span><span class="n">num_unique_labels</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">LABELS</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="n">pd</span><span class="p">.</span><span class="n">Series</span><span class="p">.</span><span class="n">nunique</span><span class="p">)</span>
+
+<span class="c1"># Plot number of unique values for each label
+</span><span class="n">num_unique_labels</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'bar'</span><span class="p">)</span>
+
+<span class="c1"># Label the axes
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Labels'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Number of unique values'</span><span class="p">)</span>
+
+<span class="c1"># Display the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-the-experts:-school-budgets-from datacamp/capture1-22.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<p>###
+<strong>How do we measure success?</strong></p>
+
+<p>We can use a loss function.</p>
+
+<p><a href="https://www.kaggle.com/dansbecker/what-is-log-loss">What is Log Loss?</a></p>
+
+<p><img src="/blog/assets/datacamp/machine-learning-with-the-experts:-school-budgets-from datacamp/capture2-21.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Penalizing highly confident wrong answers</strong></p>
+
+<p>Log loss provides a steep penalty for predictions that are both wrong and confident, i.e., a high probability is assigned to the incorrect class.</p>
+
+<p>Suppose you have the following 3 examples:</p>
+
+<ul>
+  <li>A:y=1,p=0.85</li>
+  <li>B:y=0,p=0.99</li>
+  <li>C:y=0,p=0.51</li>
+</ul>
+
+<p>Select the ordering of the examples which corresponds to the lowest to highest log loss scores.
+ <code class="language-plaintext highlighter-rouge">y</code>
+ is an indicator of whether the example was classified correctly. You shouldn’t need to crunch any numbers!</p>
+
+<p>Of the two incorrect predictions,
+ <code class="language-plaintext highlighter-rouge">B</code>
+ will have a higher log loss because it is confident
+ <em>and</em>
+ wrong.</p>
+
+<p>Lowest: A, Middle: C, Highest: B</p>
+
+<p><strong>The lower loss score is ,the better the prediction is.</strong></p>
+
+<p>####
+<strong>Computing log loss with NumPy</strong></p>
+
+<p>To see how the log loss metric handles the trade-off between accuracy and confidence, we will use some sample data generated with NumPy and compute the log loss using the provided function
+ <code class="language-plaintext highlighter-rouge">compute_log_loss()</code>
+ .</p>
+
+<p>Your job is to compute the log loss for each sample set provided using the
+ <code class="language-plaintext highlighter-rouge">compute_log_loss(predicted_values, actual_values)</code>
+ . It takes the predicted values as the first argument and the actual values as the second argument.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+actual_labels
+# array([1., 1., 1., 1., 1., 0., 0., 0., 0., 0.])
+
+correct_confident
+# array([0.95, 0.95, 0.95, 0.95, 0.95, 0.05, 0.05, 0.05, 0.05, 0.05])
+
+correct_not_confident
+# array([0.65, 0.65, 0.65, 0.65, 0.65, 0.35, 0.35, 0.35, 0.35, 0.35])
+
+wrong_not_confident
+# array([0.35, 0.35, 0.35, 0.35, 0.35, 0.65, 0.65, 0.65, 0.65, 0.65])
+
+wrong_confident
+# array([0.05, 0.05, 0.05, 0.05, 0.05, 0.95, 0.95, 0.95, 0.95, 0.95])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute and print log loss for 1st case
+</span><span class="n">correct_confident_loss</span> <span class="o">=</span> <span class="n">compute_log_loss</span><span class="p">(</span><span class="n">correct_confident</span><span class="p">,</span> <span class="n">actual_labels</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Log loss, correct and confident: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">correct_confident_loss</span><span class="p">))</span>
+
+<span class="c1"># Compute log loss for 2nd case
+</span><span class="n">correct_not_confident_loss</span> <span class="o">=</span> <span class="n">compute_log_loss</span><span class="p">(</span><span class="n">correct_not_confident</span><span class="p">,</span> <span class="n">actual_labels</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Log loss, correct and not confident: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">correct_not_confident_loss</span><span class="p">))</span>
+
+<span class="c1"># Compute and print log loss for 3rd case
+</span><span class="n">wrong_not_confident_loss</span> <span class="o">=</span> <span class="n">compute_log_loss</span><span class="p">(</span><span class="n">wrong_not_confident</span><span class="p">,</span> <span class="n">actual_labels</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Log loss, wrong and not confident: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">wrong_not_confident_loss</span><span class="p">))</span>
+
+<span class="c1"># Compute and print log loss for 4th case
+</span><span class="n">wrong_confident_loss</span> <span class="o">=</span> <span class="n">compute_log_loss</span><span class="p">(</span><span class="n">wrong_confident</span><span class="p">,</span> <span class="n">actual_labels</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Log loss, wrong and confident: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">wrong_confident_loss</span><span class="p">))</span>
+
+<span class="c1"># Compute and print log loss for actual labels
+</span><span class="n">actual_labels_loss</span> <span class="o">=</span> <span class="n">compute_log_loss</span><span class="p">(</span><span class="n">actual_labels</span><span class="p">,</span> <span class="n">actual_labels</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Log loss, actual labels: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">actual_labels_loss</span><span class="p">))</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Log loss, correct and confident: 0.05129329438755058
+Log loss, correct and not confident: 0.4307829160924542
+Log loss, wrong and not confident: 1.049822124498678
+Log loss, wrong and confident: 2.9957322735539904
+Log loss, actual labels: 9.99200722162646e-15
+
+</code></pre></div></div>
+
+<p>Log loss penalizes highly confident wrong answers much more than any other type. This will be a good metric to use on your models.</p>
+
+<hr />
+
+<h1 id="2-creating-a-simple-first-model"><strong>2. Creating a simple first model</strong></h1>
+<hr />
+
+<p>###
+<strong>It’s time to build a model</strong></p>
+
+<p>####
+<strong>Setting up a train-test split in scikit-learn</strong></p>
+
+<p>It’s finally time to start training models!</p>
+
+<p>The first step is to split the data into a training set and a test set. Some labels don’t occur very often, but we want to make sure that they appear in both the training and the test sets. We provide a function that will make sure at least
+ <code class="language-plaintext highlighter-rouge">min_count</code>
+ examples of each label appear in each split:
+ <code class="language-plaintext highlighter-rouge">multilabel_train_test_split</code>
+ .</p>
+
+<p>Feel free to check out the full code for
+ <code class="language-plaintext highlighter-rouge">multilabel_train_test_split</code>
+<a href="https://github.com/drivendataorg/box-plots-sklearn/blob/master/src/data/multilabel.py">here</a>
+ .</p>
+
+<p>You’ll start with a simple model that uses
+ <strong>just the numeric columns</strong>
+ of your DataFrame when calling
+ <code class="language-plaintext highlighter-rouge">multilabel_train_test_split</code>
+ . The data has been read into a DataFrame
+ <code class="language-plaintext highlighter-rouge">df</code>
+ and a list consisting of just the numeric columns is available as
+ <code class="language-plaintext highlighter-rouge">NUMERIC_COLUMNS</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># X
+</span><span class="n">df</span><span class="p">[</span><span class="n">NUMERIC_COLUMNS</span><span class="p">].</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+     <span class="n">FTE</span>     <span class="n">Total</span>
+<span class="mi">198</span>  <span class="n">NaN</span>  <span class="o">-</span><span class="mf">8291.86</span>
+<span class="mi">209</span>  <span class="n">NaN</span>    <span class="mf">618.29</span>
+<span class="mi">750</span>  <span class="mf">1.0</span>  <span class="mf">49768.82</span>
+
+<span class="n">df</span><span class="p">[</span><span class="n">NUMERIC_COLUMNS</span><span class="p">].</span><span class="n">shape</span>
+<span class="p">(</span><span class="mi">1560</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+
+<span class="c1"># y
+</span><span class="n">label_dummies</span><span class="p">.</span><span class="n">columns</span>
+<span class="n">Out</span><span class="p">[</span><span class="mi">16</span><span class="p">]:</span>
+<span class="n">Index</span><span class="p">([</span><span class="s">'Function_Aides Compensation'</span><span class="p">,</span> <span class="s">'Function_Career &amp; Academic Counseling'</span><span class="p">,</span>
+       <span class="s">'Function_Communications'</span><span class="p">,</span> <span class="s">'Function_Curriculum Development'</span><span class="p">,</span>
+       <span class="s">'Function_Data Processing &amp; Information Services'</span><span class="p">,</span>
+       <span class="p">...</span>
+       <span class="s">'Operating_Status_Non-Operating'</span><span class="p">,</span>
+       <span class="s">'Operating_Status_Operating, Not PreK-12'</span><span class="p">,</span>
+       <span class="s">'Operating_Status_PreK-12 Operating'</span><span class="p">],</span>
+      <span class="n">dtype</span><span class="o">=</span><span class="s">'object'</span><span class="p">,</span> <span class="n">length</span><span class="o">=</span><span class="mi">104</span><span class="p">)</span>
+
+<span class="n">label_dummies</span><span class="p">.</span><span class="n">shape</span>
+<span class="p">(</span><span class="mi">1560</span><span class="p">,</span> <span class="mi">104</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create the new DataFrame: numeric_data_only
+</span><span class="n">numeric_data_only</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">NUMERIC_COLUMNS</span><span class="p">].</span><span class="n">fillna</span><span class="p">(</span><span class="o">-</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="c1"># Get labels and convert to dummy variables: label_dummies
+</span><span class="n">label_dummies</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">LABELS</span><span class="p">])</span>
+
+<span class="c1"># Create training and test sets
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">multilabel_train_test_split</span><span class="p">(</span><span class="n">numeric_data_only</span><span class="p">,</span>
+                                                               <span class="n">label_dummies</span><span class="p">,</span>
+                                                               <span class="n">size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                               <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+
+<span class="c1"># Print the info
+</span><span class="k">print</span><span class="p">(</span><span class="s">"X_train info:"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">X_train</span><span class="p">.</span><span class="n">info</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">X_test info:"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">X_test</span><span class="p">.</span><span class="n">info</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">y_train info:"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">y_train</span><span class="p">.</span><span class="n">info</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">y_test info:"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">y_test</span><span class="p">.</span><span class="n">info</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X_train info:
+&lt;class 'pandas.core.frame.DataFrame'&gt;
+Int64Index: 1040 entries, 198 to 101861
+Data columns (total 2 columns):
+FTE      1040 non-null float64
+Total    1040 non-null float64
+dtypes: float64(2)
+memory usage: 24.4 KB
+None
+
+X_test info:
+&lt;class 'pandas.core.frame.DataFrame'&gt;
+Int64Index: 520 entries, 209 to 448628
+Data columns (total 2 columns):
+FTE      520 non-null float64
+Total    520 non-null float64
+dtypes: float64(2)
+memory usage: 12.2 KB
+None
+
+y_train info:
+&lt;class 'pandas.core.frame.DataFrame'&gt;
+Int64Index: 1040 entries, 198 to 101861
+Columns: 104 entries, Function_Aides Compensation to Operating_Status_PreK-12 Operating
+dtypes: float64(104)
+memory usage: 853.1 KB
+None
+
+y_test info:
+&lt;class 'pandas.core.frame.DataFrame'&gt;
+Int64Index: 520 entries, 209 to 448628
+Columns: 104 entries, Function_Aides Compensation to Operating_Status_PreK-12 Operating
+dtypes: float64(104)
+memory usage: 426.6 KB
+None
+
+</code></pre></div></div>
+
+<p>####
+<strong>Training a model</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import classifiers
+</span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.multiclass</span> <span class="kn">import</span> <span class="n">OneVsRestClassifier</span>
+
+<span class="c1"># Create the DataFrame: numeric_data_only
+</span><span class="n">numeric_data_only</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">NUMERIC_COLUMNS</span><span class="p">].</span><span class="n">fillna</span><span class="p">(</span><span class="o">-</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="c1"># Get labels and convert to dummy variables: label_dummies
+</span><span class="n">label_dummies</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">LABELS</span><span class="p">])</span>
+
+<span class="c1"># Create training and test sets
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">multilabel_train_test_split</span><span class="p">(</span><span class="n">numeric_data_only</span><span class="p">,</span>
+                                                               <span class="n">label_dummies</span><span class="p">,</span>
+                                                               <span class="n">size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
+                                                               <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+
+<span class="c1"># Instantiate the classifier: clf
+</span><span class="n">clf</span> <span class="o">=</span> <span class="n">OneVsRestClassifier</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">())</span>
+
+<span class="c1"># Fit the classifier to the training data
+</span><span class="n">clf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Print the accuracy
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Accuracy: {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">clf</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Accuracy: 0.0
+
+</code></pre></div></div>
+
+<p>The good news is that your workflow didn’t cause any errors. The bad news is that your model scored the
+ <strong>lowest possible accuracy: 0.0</strong>
+ !</p>
+
+<p>But hey, you just threw away ALL of the text data in the budget. Later, you won’t. Before you add the text data, let’s see how the model does when scored by log loss.</p>
+
+<p>###
+<strong>Making predictions</strong></p>
+
+<p>####
+<strong>Use your model to predict values on holdout data</strong></p>
+
+<p>You’re ready to make some predictions! Remember, the train-test-split you’ve carried out so far is for model development. The original competition provides an additional test set, for which you’ll never actually
+ <em>see</em>
+ the correct labels. This is called the “holdout data.”</p>
+
+<p>Remember that the original goal is to predict the
+ <strong>probability of each label</strong>
+ . In this exercise you’ll do just that by using the
+ <code class="language-plaintext highlighter-rouge">.predict_proba()</code>
+ method on your trained model.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Instantiate the classifier: clf
+</span><span class="n">clf</span> <span class="o">=</span> <span class="n">OneVsRestClassifier</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">())</span>
+
+<span class="c1"># Fit it to the training data
+</span><span class="n">clf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Load the holdout data: holdout
+</span><span class="n">holdout</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'HoldoutData.csv'</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">holdout</span> <span class="o">=</span> <span class="n">holdout</span><span class="p">[</span><span class="n">NUMERIC_COLUMNS</span><span class="p">].</span><span class="n">fillna</span><span class="p">(</span><span class="o">-</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="c1"># Generate predictions: predictions
+</span><span class="n">predictions</span> <span class="o">=</span> <span class="n">clf</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">holdout</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Writing out your results to a csv for submission</strong></p>
+
+<p>At last, you’re ready to submit some predictions for scoring. In this exercise, you’ll write your predictions to a
+ <code class="language-plaintext highlighter-rouge">.csv</code>
+ using the
+ <code class="language-plaintext highlighter-rouge">.to_csv()</code>
+ method on a pandas DataFrame. Then you’ll evaluate your performance according to the LogLoss metric!</p>
+
+<p>You’ll need to make sure your submission obeys the
+ <a href="https://www.drivendata.org/competitions/4/page/15/#sub_values">correct format</a>
+ .</p>
+
+<p><strong>Interpreting LogLoss &amp; Beating the Benchmark:</strong></p>
+
+<p>When interpreting your log loss score, keep in mind that the score will change based on the number of samples tested. To get a sense of how this
+ <em>very basic</em>
+ model performs, compare your score to the
+ <strong>DrivenData benchmark model performance: 2.0455</strong>
+ , which merely submitted uniform probabilities for each class.</p>
+
+<p>Remember, the lower the log loss the better. Is your model’s log loss lower than 2.0455?</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Generate predictions: predictions
+</span><span class="n">predictions</span> <span class="o">=</span> <span class="n">clf</span><span class="p">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">holdout</span><span class="p">[</span><span class="n">NUMERIC_COLUMNS</span><span class="p">].</span><span class="n">fillna</span><span class="p">(</span><span class="o">-</span><span class="mi">1000</span><span class="p">))</span>
+
+<span class="c1"># Format predictions in DataFrame: prediction_df
+</span><span class="n">prediction_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">LABELS</span><span class="p">]).</span><span class="n">columns</span><span class="p">,</span>
+                             <span class="n">index</span><span class="o">=</span><span class="n">holdout</span><span class="p">.</span><span class="n">index</span><span class="p">,</span>
+                             <span class="n">data</span><span class="o">=</span><span class="n">predictions</span><span class="p">)</span>
+
+
+<span class="c1"># Save prediction_df to csv
+</span><span class="n">prediction_df</span><span class="p">.</span><span class="n">to_csv</span><span class="p">(</span><span class="s">'predictions.csv'</span><span class="p">)</span>
+
+<span class="c1"># Submit the predictions for scoring: score
+</span><span class="n">score</span> <span class="o">=</span> <span class="n">score_submission</span><span class="p">(</span><span class="n">pred_path</span><span class="o">=</span><span class="s">'predictions.csv'</span><span class="p">)</span>
+
+<span class="c1"># Print score
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Your model, trained with numeric data only, yields logloss score: {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">score</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+predictions
+array([[0.108789  , 0.04790553, 0.02505001, ..., 0.13005936, 0.03531605,
+        0.87679861],
+       ...,
+       [0.10169308, 0.04809784, 0.02423019, ..., 0.12078767, 0.03686144,
+        0.88204561]])
+
+predictions.shape
+(2000, 104)
+
+
+Your model, trained with numeric data only, yields logloss score: 1.9067227623381413
+
+</code></pre></div></div>
+
+<p>Even though your basic model scored 0.0 accuracy, it nevertheless performs better than the benchmark score of 2.0455. You’ve now got the basics down and have made a first pass at this complicated supervised learning problem. It’s time to step up your game and incorporate the text data.</p>
+
+<hr />
+
+<p>###
+<strong>A very brief introduction to NLP(Natural Language Processing)</strong></p>
+
+<p>####
+<strong>Tokenizing text</strong></p>
+
+<p><a href="http://nlp.stanford.edu/IR-book/html/htmledition/tokenization-1.html">Tokenization</a>
+ is the process of chopping up a character sequence into pieces called
+ <em>tokens</em>
+ .</p>
+
+<p>How do we determine what constitutes a token? Often, tokens are separated by whitespace. But we can specify other delimiters as well. For example, if we decided to tokenize on punctuation, then any punctuation mark would be treated like a whitespace. How we tokenize text in our DataFrame can affect the statistics we use in our model.</p>
+
+<p>A particular cell in our budget DataFrame may have the string content
+ <code class="language-plaintext highlighter-rouge">Title I - Disadvantaged Children/Targeted Assistance</code>
+ . The number of n-grams generated by this text data is sensitive to whether or not we tokenize on punctuation.</p>
+
+<p>How many tokens (1-grams) are in the string</p>
+
+<p>Title I – Disadvantaged Children/Targeted Assistance</p>
+
+<p>if we tokenize on punctuation?</p>
+
+<p>6 tokens(1-grams)</p>
+
+<ul>
+  <li>Title</li>
+  <li>I</li>
+  <li>Disadvantaged</li>
+  <li>Children</li>
+  <li>Targeted</li>
+  <li>Assistance</li>
+</ul>
+
+<p>####
+<strong>n_grams token</strong></p>
+
+<ul>
+  <li>one_grams = [‘petro’, ‘vend’, ‘fuel’, ‘and’, ‘fluids’]</li>
+  <li>two _grams = [‘petro vend’, ‘vend fuel’, ‘fuel and’, ‘and fluids’]</li>
+  <li>three _grams = [‘petro vend fuel’, ‘vend fuel and’, ‘ fuel and fluids’]</li>
+</ul>
+
+<p>###
+<strong>Representing text numerically</strong></p>
+
+<p>####
+<strong>Creating a bag-of-words in scikit-learn</strong></p>
+
+<p>In this exercise, you’ll study the effects of tokenizing in different ways by comparing the bag-of-words representations resulting from different token patterns.</p>
+
+<p>You will focus on one feature only, the
+ <code class="language-plaintext highlighter-rouge">Position_Extra</code>
+ column, which describes any additional information not captured by the
+ <code class="language-plaintext highlighter-rouge">Position_Type</code>
+ label.</p>
+
+<p>Your task is to turn the raw text in this column into a bag-of-words representation by creating tokens that contain
+ <em>only</em>
+ alphanumeric characters.</p>
+
+<p>For comparison purposes, the first 15 tokens of
+ <code class="language-plaintext highlighter-rouge">vec_basic</code>
+ , which splits
+ <code class="language-plaintext highlighter-rouge">df.Position_Extra</code>
+ into tokens when it encounters only
+ <em>whitespace</em>
+ characters, have been printed along with the length of the representation.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import CountVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+
+<span class="c1"># Create the token pattern: TOKENS_ALPHANUMERIC
+</span><span class="n">TOKENS_ALPHANUMERIC</span> <span class="o">=</span> <span class="s">'[A-Za-z0-9]+(?=</span><span class="se">\\</span><span class="s">s+)'</span>
+
+<span class="c1"># Fill missing values in df.Position_Extra
+</span><span class="n">df</span><span class="p">.</span><span class="n">Position_Extra</span><span class="p">.</span><span class="n">fillna</span><span class="p">(</span><span class="s">''</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Instantiate the CountVectorizer: vec_alphanumeric
+</span><span class="n">vec_alphanumeric</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">token_pattern</span><span class="o">=</span><span class="n">TOKENS_ALPHANUMERIC</span><span class="p">)</span>
+
+<span class="c1"># Fit to the data
+</span><span class="n">vec_alphanumeric</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">Position_Extra</span><span class="p">)</span>
+
+<span class="c1"># Print the number of tokens and first 15 tokens
+</span><span class="n">msg</span> <span class="o">=</span> <span class="s">"There are {} tokens in Position_Extra if we split on non-alpha numeric"</span>
+<span class="k">print</span><span class="p">(</span><span class="n">msg</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vec_alphanumeric</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">())))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">vec_alphanumeric</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">()[:</span><span class="mi">15</span><span class="p">])</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+There are 123 tokens in Position_Extra if we split on non-alpha numeric
+['1st', '2nd', '3rd', 'a', 'ab', 'additional', 'adm', 'administrative', 'and', 'any', 'art', 'assessment', 'assistant', 'asst', 'athletic']
+
+</code></pre></div></div>
+
+<p>Treating only alpha-numeric characters as tokens gives you a smaller number of more meaningful tokens. You’ve got bag-of-words in the bag!</p>
+
+<p>####
+<strong>Combining text columns for tokenization</strong></p>
+
+<p>In order to get a bag-of-words representation for all of the text data in our DataFrame, you must first convert the text data in each row of the DataFrame into a single string.</p>
+
+<p>In the previous exercise, this wasn’t necessary because you only looked at one column of data, so each row was already just a single string.
+ <code class="language-plaintext highlighter-rouge">CountVectorizer</code>
+ expects each row to just be a single string, so in order to use all of the text columns, you’ll need a method to turn a list of strings into a single string.</p>
+
+<p>In this exercise, you’ll complete the function definition
+ <code class="language-plaintext highlighter-rouge">combine_text_columns()</code>
+ . When completed, this function will convert all training text data in your DataFrame to a single string per row that can be passed to the vectorizer object and made into a bag-of-words using the
+ <code class="language-plaintext highlighter-rouge">.fit_transform()</code>
+ method.</p>
+
+<p>Note that the function uses
+ <code class="language-plaintext highlighter-rouge">NUMERIC_COLUMNS</code>
+ and
+ <code class="language-plaintext highlighter-rouge">LABELS</code>
+ to determine which columns to drop. These lists have been loaded into the workspace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define combine_text_columns()
+</span><span class="k">def</span> <span class="nf">combine_text_columns</span><span class="p">(</span><span class="n">data_frame</span><span class="p">,</span> <span class="n">to_drop</span><span class="o">=</span><span class="n">NUMERIC_COLUMNS</span> <span class="o">+</span> <span class="n">LABELS</span><span class="p">):</span>
+    <span class="s">""" converts all text in each row of data_frame to single vector """</span>
+
+    <span class="c1"># Drop non-text columns that are in the df
+</span>    <span class="n">to_drop</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">to_drop</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">data_frame</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">tolist</span><span class="p">())</span>
+    <span class="n">text_data</span> <span class="o">=</span> <span class="n">data_frame</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="n">to_drop</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Replace nans with blanks
+</span>    <span class="n">text_data</span><span class="p">.</span><span class="n">fillna</span><span class="p">(</span><span class="s">''</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c1"># Join all text items in a row that have a space in between
+</span>    <span class="k">return</span> <span class="n">text_data</span><span class="p">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s">" "</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>What’s in a token?</strong></p>
+
+<p>Now you will use
+ <code class="language-plaintext highlighter-rouge">combine_text_columns</code>
+ to convert all training text data in your DataFrame to a single vector that can be passed to the vectorizer object and made into a bag-of-words using the
+ <code class="language-plaintext highlighter-rouge">.fit_transform()</code>
+ method.</p>
+
+<p>You’ll compare the effect of tokenizing using any non-whitespace characters as a token and using only alphanumeric characters as a token.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the CountVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+
+<span class="c1"># Create the basic token pattern
+</span><span class="n">TOKENS_BASIC</span> <span class="o">=</span> <span class="s">'</span><span class="se">\\</span><span class="s">S+(?=</span><span class="se">\\</span><span class="s">s+)'</span>
+
+<span class="c1"># Create the alphanumeric token pattern
+</span><span class="n">TOKENS_ALPHANUMERIC</span> <span class="o">=</span> <span class="s">'[A-Za-z0-9]+(?=</span><span class="se">\\</span><span class="s">s+)'</span>
+
+<span class="c1"># Instantiate basic CountVectorizer: vec_basic
+</span><span class="n">vec_basic</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">token_pattern</span><span class="o">=</span><span class="n">TOKENS_BASIC</span><span class="p">)</span>
+
+<span class="c1"># Instantiate alphanumeric CountVectorizer: vec_alphanumeric
+</span><span class="n">vec_alphanumeric</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">token_pattern</span><span class="o">=</span><span class="n">TOKENS_ALPHANUMERIC</span><span class="p">)</span>
+
+<span class="c1"># Create the text vector
+</span><span class="n">text_vector</span> <span class="o">=</span> <span class="n">combine_text_columns</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+<span class="c1"># Fit and transform vec_basic
+</span><span class="n">vec_basic</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">text_vector</span><span class="p">)</span>
+
+<span class="c1"># Print number of tokens of vec_basic
+</span><span class="k">print</span><span class="p">(</span><span class="s">"There are {} tokens in the dataset"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vec_basic</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">())))</span>
+
+<span class="c1"># Fit and transform vec_alphanumeric
+</span><span class="n">vec_alphanumeric</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">text_vector</span><span class="p">)</span>
+
+<span class="c1"># Print number of tokens of vec_alphanumeric
+</span><span class="k">print</span><span class="p">(</span><span class="s">"There are {} alpha-numeric tokens in the dataset"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vec_alphanumeric</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">())))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+There are 1405 tokens in the dataset
+There are 1117 alpha-numeric tokens in the dataset
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+text_vector
+198       Supplemental *  Operation and Maintenance of P...
+209       REPAIR AND MAINTENANCE SERVICES  PUPIL TRANSPO...
+                                ...
+305347    Extra Duty Pay/Overtime For Support Personnel ...
+101861    SALARIES OF REGULAR EMPLOYEES  FEDERAL GDPG FU...
+dtype: object
+
+</code></pre></div></div>
+
+<p>Notice that tokenizing on alpha-numeric tokens reduced the number of tokens. We’ll keep this in mind when building a better model with the Pipeline object next.</p>
+
+<hr />
+
+<h1 id="3-improving-your-model"><strong>3. Improving your model</strong></h1>
+<hr />
+
+<p>###
+<strong>Pipelines, feature &amp; text preprocessing</strong></p>
+
+<p><strong>What is pipeline?</strong></p>
+
+<p>You can look up at document
+ <a href="https://scikit-learn.org/stable/modules/generated/sklearn.pipeline.Pipeline.html#sklearn.pipeline.Pipeline">here</a>
+ . And
+ <a href="https://scikit-learn.org/stable/auto_examples/model_selection/grid_search_text_feature_extraction.html">here</a>
+ is an example.</p>
+
+<p>Simply speaking, pipeline just put several machine learning steps(like scaling data, parameter tuning) together.</p>
+
+<p><strong>Why should you use pipeline?</strong></p>
+
+<ul>
+  <li>Your code will be much easier to read</li>
+  <li>You can easily modify the parameters</li>
+</ul>
+
+<p>####
+<strong>Instantiate pipeline</strong></p>
+
+<p>For the next few exercises, you’ll reacquaint yourself with pipelines and train a classifier on some synthetic (sample) data of multiple datatypes before using the same techniques on the main dataset.</p>
+
+<p>In this exercise, your job is to instantiate a pipeline that trains using the
+ <code class="language-plaintext highlighter-rouge">numeric</code>
+ column of the sample data.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+     numeric     text  with_missing label
+0 -10.856306               4.433240     b
+1   9.973454      foo      4.310229     b
+2   2.829785  foo bar      2.469828     a
+3 -15.062947               2.852981     b
+4  -5.786003  foo bar      1.826475     a
+
+
+pd.get_dummies(sample_df['label'])
+       a    b
+0    0.0  1.0
+1    0.0  1.0
+2    1.0  0.0
+3    0.0  1.0
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import Pipeline
+</span><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="c1"># Import other necessary modules
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.multiclass</span> <span class="kn">import</span> <span class="n">OneVsRestClassifier</span>
+
+<span class="c1"># Split and select numeric data only, no nans
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">sample_df</span><span class="p">[[</span><span class="s">'numeric'</span><span class="p">]],</span>
+                                                    <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">sample_df</span><span class="p">[</span><span class="s">'label'</span><span class="p">]),</span>
+                                                    <span class="n">random_state</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
+
+<span class="c1"># Instantiate Pipeline object: pl
+</span><span class="n">pl</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="s">'clf'</span><span class="p">,</span> <span class="n">OneVsRestClassifier</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">()))</span>
+    <span class="p">])</span>
+
+<span class="c1"># Fit the pipeline to the training data
+</span><span class="n">pl</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Compute and print accuracy
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">pl</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Accuracy on sample data - numeric, no nans: "</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+
+<span class="c1"># Accuracy on sample data - numeric, no nans:  0.62
+</span>
+</code></pre></div></div>
+
+<p>Now it’s time to incorporate numeric data with missing values by adding a preprocessing step!</p>
+
+<p>####
+<strong>Preprocessing numeric features</strong></p>
+
+<p>In this exercise you’ll improve your pipeline a bit by using the
+ <code class="language-plaintext highlighter-rouge">Imputer()</code>
+ imputation transformer from scikit-learn to fill in missing values in your sample data.</p>
+
+<p>By default, the
+ <a href="http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.Imputer.html">imputer transformer</a>
+ replaces NaNs with the mean value of the column. That’s a good enough imputation strategy for the sample data, so you won’t need to pass anything extra to the imputer.</p>
+
+<p>After importing the transformer, you will edit the steps list used in the previous exercise by inserting a
+ <code class="language-plaintext highlighter-rouge">(name, transform)</code>
+ tuple. Recall that steps are processed sequentially, so make sure the new tuple encoding your
+ <em>preprocessing</em>
+ step is put in the right place.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the Imputer object
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Imputer</span>
+
+<span class="c1"># Create training and test sets using only numeric data
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">sample_df</span><span class="p">[[</span><span class="s">'numeric'</span><span class="p">,</span> <span class="s">'with_missing'</span><span class="p">]],</span>
+                                                    <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">sample_df</span><span class="p">[</span><span class="s">'label'</span><span class="p">]),</span>
+                                                    <span class="n">random_state</span><span class="o">=</span><span class="mi">456</span><span class="p">)</span>
+
+<span class="c1"># Insantiate Pipeline object: pl
+</span><span class="n">pl</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="s">'imp'</span><span class="p">,</span> <span class="n">Imputer</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s">'clf'</span><span class="p">,</span> <span class="n">OneVsRestClassifier</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">()))</span>
+    <span class="p">])</span>
+
+<span class="c1"># Fit the pipeline to the training data
+</span><span class="n">pl</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Compute and print accuracy
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">pl</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Accuracy on sample data - all numeric, incl nans: "</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+
+<span class="c1"># Accuracy on sample data - all numeric, incl nans:  0.636
+</span>
+</code></pre></div></div>
+
+<p>Now you know how to use preprocessing in pipelines with numeric data, and it looks like the accuracy has improved because of it! Text data preprocessing is next!</p>
+
+<hr />
+
+<p>###
+<strong>Text features and feature unions</strong></p>
+
+<p>####
+<strong>Preprocessing text features</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+sample_df['text']
+0
+1          foo
+2      foo bar
+3
+4      foo bar
+5
+6      foo bar
+7          foo
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the CountVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+
+<span class="c1"># Split out only the text data
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">sample_df</span><span class="p">[</span><span class="s">'text'</span><span class="p">],</span>
+                                                    <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">sample_df</span><span class="p">[</span><span class="s">'label'</span><span class="p">]),</span>
+                                                    <span class="n">random_state</span><span class="o">=</span><span class="mi">456</span><span class="p">)</span>
+
+<span class="c1"># Instantiate Pipeline object: pl
+</span><span class="n">pl</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="s">'vec'</span><span class="p">,</span> <span class="n">CountVectorizer</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s">'clf'</span><span class="p">,</span> <span class="n">OneVsRestClassifier</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">()))</span>
+    <span class="p">])</span>
+
+<span class="c1"># Fit to the training data
+</span><span class="n">pl</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Compute and print accuracy
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">pl</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Accuracy on sample data - just text data: "</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+
+<span class="c1"># Accuracy on sample data - just text data:  0.808
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Multiple types of processing: FunctionTransformer</strong></p>
+
+<p>The next two exercises will introduce new topics you’ll need to make your pipeline truly excel.</p>
+
+<p>Any step in the pipeline
+ <em>must</em>
+ be an object that implements the
+ <code class="language-plaintext highlighter-rouge">fit</code>
+ and
+ <code class="language-plaintext highlighter-rouge">transform</code>
+ methods. The
+ <a href="http://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.FunctionTransformer.html"><code class="language-plaintext highlighter-rouge">FunctionTransformer</code></a>
+ creates an object with these methods out of any Python function that you pass to it. We’ll use it to help select subsets of data in a way that plays nicely with pipelines.</p>
+
+<p>You are working with numeric data that needs imputation, and text data that needs to be converted into a bag-of-words. You’ll create functions that separate the text from the numeric variables and see how the
+ <code class="language-plaintext highlighter-rouge">.fit()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">.transform()</code>
+ methods work.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import FunctionTransformer
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">FunctionTransformer</span>
+
+<span class="c1"># Obtain the text data: get_text_data
+</span><span class="n">get_text_data</span> <span class="o">=</span> <span class="n">FunctionTransformer</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s">'text'</span><span class="p">],</span> <span class="n">validate</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># Obtain the numeric data: get_numeric_data
+</span><span class="n">get_numeric_data</span> <span class="o">=</span> <span class="n">FunctionTransformer</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[[</span><span class="s">'numeric'</span><span class="p">,</span> <span class="s">'with_missing'</span><span class="p">]],</span> <span class="n">validate</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># Fit and transform the text data: just_text_data
+</span><span class="n">just_text_data</span> <span class="o">=</span> <span class="n">get_text_data</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">sample_df</span><span class="p">)</span>
+
+<span class="c1"># Fit and transform the numeric data: just_numeric_data
+</span><span class="n">just_numeric_data</span> <span class="o">=</span> <span class="n">get_numeric_data</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">sample_df</span><span class="p">)</span>
+
+<span class="c1"># Print head to check results
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Text Data'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">just_text_data</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">Numeric Data'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">just_numeric_data</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Text Data
+0
+1        foo
+2    foo bar
+3
+4    foo bar
+Name: text, dtype: object
+
+Numeric Data
+     numeric  with_missing
+0 -10.856306      4.433240
+1   9.973454      4.310229
+2   2.829785      2.469828
+3 -15.062947      2.852981
+4  -5.786003      1.826475
+
+</code></pre></div></div>
+
+<p>####
+<strong>Multiple types of processing: FeatureUnion</strong></p>
+
+<p>Now that you can separate text and numeric data in your pipeline, you’re ready to perform separate steps on each by nesting pipelines and using
+ <code class="language-plaintext highlighter-rouge">FeatureUnion()</code>
+ .</p>
+
+<p>These tools will allow you to streamline all preprocessing steps for your model, even when multiple datatypes are involved. Here, for example, you don’t want to impute our text data, and you don’t want to create a bag-of-words with our numeric data. Instead, you want to deal with these separately and then join the results together using
+ <code class="language-plaintext highlighter-rouge">FeatureUnion()</code>
+ .</p>
+
+<p>In the end, you’ll still have only two high-level steps in your pipeline: preprocessing and model instantiation. The difference is that the first preprocessing step actually consists of a pipeline for numeric data and a pipeline for text data. The results of those pipelines are joined using
+ <code class="language-plaintext highlighter-rouge">FeatureUnion()</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import FeatureUnion
+</span><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">FeatureUnion</span>
+
+<span class="c1"># Split using ALL data in sample_df
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">sample_df</span><span class="p">[[</span><span class="s">'numeric'</span><span class="p">,</span> <span class="s">'with_missing'</span><span class="p">,</span> <span class="s">'text'</span><span class="p">]],</span>
+                                                    <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">sample_df</span><span class="p">[</span><span class="s">'label'</span><span class="p">]),</span>
+                                                    <span class="n">random_state</span><span class="o">=</span><span class="mi">22</span><span class="p">)</span>
+
+<span class="c1"># Create a FeatureUnion with nested pipeline: process_and_join_features
+</span><span class="n">process_and_join_features</span> <span class="o">=</span> <span class="n">FeatureUnion</span><span class="p">(</span>
+            <span class="n">transformer_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s">'numeric_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_numeric_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'imputer'</span><span class="p">,</span> <span class="n">Imputer</span><span class="p">())</span>
+                <span class="p">])),</span>
+                <span class="p">(</span><span class="s">'text_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_text_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'vectorizer'</span><span class="p">,</span> <span class="n">CountVectorizer</span><span class="p">())</span>
+                <span class="p">]))</span>
+             <span class="p">]</span>
+        <span class="p">)</span>
+
+<span class="c1"># Instantiate nested pipeline: pl
+</span><span class="n">pl</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="s">'union'</span><span class="p">,</span> <span class="n">process_and_join_features</span><span class="p">),</span>
+        <span class="p">(</span><span class="s">'clf'</span><span class="p">,</span> <span class="n">OneVsRestClassifier</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">()))</span>
+    <span class="p">])</span>
+
+
+<span class="c1"># Fit pl to the training data
+</span><span class="n">pl</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Compute and print accuracy
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">pl</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Accuracy on sample data - all data: "</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+
+<span class="c1"># Accuracy on sample data - all data:  0.928
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<p>###
+<strong>Choosing a classification model</strong></p>
+
+<p>####
+<strong>Using FunctionTransformer on the main dataset</strong></p>
+
+<p>In this exercise you’re going to use
+ <code class="language-plaintext highlighter-rouge">FunctionTransformer</code>
+ on the primary budget data, before instantiating a multiple-datatype pipeline in the next exercise.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import FunctionTransformer
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">FunctionTransformer</span>
+
+<span class="c1"># Get the dummy encoding of the labels
+</span><span class="n">dummy_labels</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">LABELS</span><span class="p">])</span>
+
+<span class="c1"># Get the columns that are features in the original df
+</span><span class="n">NON_LABELS</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="p">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">LABELS</span><span class="p">]</span>
+
+<span class="c1"># Split into training and test sets
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">multilabel_train_test_split</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">NON_LABELS</span><span class="p">],</span>
+                                                               <span class="n">dummy_labels</span><span class="p">,</span>
+                                                               <span class="mf">0.2</span><span class="p">,</span>
+                                                               <span class="n">seed</span><span class="o">=</span><span class="mi">123</span><span class="p">)</span>
+
+<span class="c1"># Preprocess the text data: get_text_data
+</span><span class="n">get_text_data</span> <span class="o">=</span> <span class="n">FunctionTransformer</span><span class="p">(</span><span class="n">combine_text_columns</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># Preprocess the numeric data: get_numeric_data
+</span><span class="n">get_numeric_data</span> <span class="o">=</span> <span class="n">FunctionTransformer</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">NUMERIC_COLUMNS</span><span class="p">],</span> <span class="n">validate</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<p>####
+<strong>Add a model to the pipeline</strong></p>
+
+<p>You’re about to take everything you’ve learned so far and implement it in a
+ <code class="language-plaintext highlighter-rouge">Pipeline</code>
+ that works with the real,
+ <a href="https://www.drivendata.org/">DrivenData</a>
+ budget line item data you’ve been exploring.</p>
+
+<p><strong>Surprise!</strong>
+ The structure of the pipeline is exactly the same as earlier in this chapter:</p>
+
+<ul>
+  <li>the
+ <strong>preprocessing step</strong>
+ uses
+ <code class="language-plaintext highlighter-rouge">FeatureUnion</code>
+ to join the results of nested pipelines that each rely on
+ <code class="language-plaintext highlighter-rouge">FunctionTransformer</code>
+ to select multiple datatypes</li>
+  <li>the
+ <strong>model step</strong>
+ stores the model object</li>
+</ul>
+
+<p>You can then call familiar methods like
+ <code class="language-plaintext highlighter-rouge">.fit()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">.score()</code>
+ on the
+ <code class="language-plaintext highlighter-rouge">Pipeline</code>
+ object
+ <code class="language-plaintext highlighter-rouge">pl</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Complete the pipeline: pl
+</span><span class="n">pl</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="s">'union'</span><span class="p">,</span> <span class="n">FeatureUnion</span><span class="p">(</span>
+            <span class="n">transformer_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s">'numeric_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_numeric_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'imputer'</span><span class="p">,</span> <span class="n">Imputer</span><span class="p">())</span>
+                <span class="p">])),</span>
+                <span class="p">(</span><span class="s">'text_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_text_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'vectorizer'</span><span class="p">,</span> <span class="n">CountVectorizer</span><span class="p">())</span>
+                <span class="p">]))</span>
+             <span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="p">(</span><span class="s">'clf'</span><span class="p">,</span> <span class="n">OneVsRestClassifier</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">()))</span>
+    <span class="p">])</span>
+
+<span class="c1"># Fit to the training data
+</span><span class="n">pl</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Compute and print accuracy
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">pl</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Accuracy on budget dataset: "</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+
+<span class="c1"># Accuracy on budget dataset:  0.20384615384615384
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Try a different class of model</strong></p>
+
+<p>Now you’re cruising. One of the great strengths of pipelines is how easy they make the process of testing different models.</p>
+
+<p>Until now, you’ve been using the model step
+ <code class="language-plaintext highlighter-rouge">('clf', OneVsRestClassifier(LogisticRegression()))</code>
+ in your pipeline.</p>
+
+<p>But what if you want to try a different model? Do you need to build an entirely new pipeline? New nests? New FeatureUnions? Nope! You just have a simple one-line change, as you’ll see in this exercise.</p>
+
+<p>In particular, you’ll swap out the logistic-regression model and replace it with a
+ <a href="https://en.wikipedia.org/wiki/Random_forest">random forest</a>
+ classifier, which uses the statistics of an ensemble of decision trees to generate predictions.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import random forest classifer
+</span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+
+<span class="c1"># Edit model step in pipeline
+</span><span class="n">pl</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="s">'union'</span><span class="p">,</span> <span class="n">FeatureUnion</span><span class="p">(</span>
+            <span class="n">transformer_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s">'numeric_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_numeric_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'imputer'</span><span class="p">,</span> <span class="n">Imputer</span><span class="p">())</span>
+                <span class="p">])),</span>
+                <span class="p">(</span><span class="s">'text_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_text_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'vectorizer'</span><span class="p">,</span> <span class="n">CountVectorizer</span><span class="p">())</span>
+                <span class="p">]))</span>
+             <span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="p">(</span><span class="s">'clf'</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">())</span>
+    <span class="p">])</span>
+
+<span class="c1"># Fit to the training data
+</span><span class="n">pl</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Compute and print accuracy
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">pl</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Accuracy on budget dataset: "</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+
+<span class="c1"># Accuracy on budget dataset:  0.2826923076923077
+</span>
+</code></pre></div></div>
+
+<p>An accuracy improvement- amazing! All your work building the pipeline is paying off. It’s now very simple to test different models!</p>
+
+<p>####
+<strong>Can you adjust the model or parameters to improve accuracy?</strong></p>
+
+<p>You just saw a substantial improvement in accuracy by swapping out the model. Pipelines are amazing!</p>
+
+<p>Can you make it better? Try changing the parameter
+ <code class="language-plaintext highlighter-rouge">n_estimators</code>
+ of
+ <code class="language-plaintext highlighter-rouge">RandomForestClassifier()</code>
+ , whose default value is
+ <code class="language-plaintext highlighter-rouge">10</code>
+ , to
+ <code class="language-plaintext highlighter-rouge">15</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import RandomForestClassifier
+</span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+
+<span class="c1"># Add model step to pipeline: pl
+</span><span class="n">pl</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="s">'union'</span><span class="p">,</span> <span class="n">FeatureUnion</span><span class="p">(</span>
+            <span class="n">transformer_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s">'numeric_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_numeric_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'imputer'</span><span class="p">,</span> <span class="n">Imputer</span><span class="p">())</span>
+                <span class="p">])),</span>
+                <span class="p">(</span><span class="s">'text_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_text_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'vectorizer'</span><span class="p">,</span> <span class="n">CountVectorizer</span><span class="p">())</span>
+                <span class="p">]))</span>
+             <span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="p">(</span><span class="s">'clf'</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">15</span><span class="p">))</span>
+    <span class="p">])</span>
+
+<span class="c1"># Fit to the training data
+</span><span class="n">pl</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Compute and print accuracy
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">pl</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Accuracy on budget dataset: "</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+
+<span class="c1"># Accuracy on budget dataset:  0.3211538461538462
+</span>
+</code></pre></div></div>
+
+<p>Wow, you’re becoming a master! It’s time to get serious and work with the log loss metric. You’ll learn expert techniques in the next chapter to take the model to the next level.</p>
+
+<hr />
+
+<h1 id="4-learning-from-the-experts"><strong>4. Learning from the experts</strong></h1>
+<hr />
+
+<p>###
+<strong>Learning from the expert: processing</strong></p>
+
+<p>####
+<strong>Deciding what’s a word</strong></p>
+
+<p>Before you build up to the winning pipeline, it will be useful to look a little deeper into how the text features will be processed.</p>
+
+<p>In this exercise, you will use
+ <code class="language-plaintext highlighter-rouge">CountVectorizer</code>
+ on the training data
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ (preloaded into the workspace) to see the effect of tokenization on punctuation.</p>
+
+<p>Remember, since
+ <code class="language-plaintext highlighter-rouge">CountVectorizer</code>
+ expects a vector, you’ll need to use the preloaded function,
+ <code class="language-plaintext highlighter-rouge">combine_text_columns</code>
+ before fitting to the training data.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the CountVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+
+<span class="c1"># Create the text vector
+</span><span class="n">text_vector</span> <span class="o">=</span> <span class="n">combine_text_columns</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+<span class="c1"># Create the token pattern: TOKENS_ALPHANUMERIC
+</span><span class="n">TOKENS_ALPHANUMERIC</span> <span class="o">=</span> <span class="s">'[A-Za-z0-9]+(?=</span><span class="se">\\</span><span class="s">s+)'</span>
+
+<span class="c1"># Instantiate the CountVectorizer: text_features
+</span><span class="n">text_features</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">token_pattern</span><span class="o">=</span><span class="n">TOKENS_ALPHANUMERIC</span><span class="p">)</span>
+
+<span class="c1"># Fit text_features to the text vector
+</span><span class="n">text_features</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">text_vector</span><span class="p">)</span>
+
+<span class="c1"># Print the first 10 tokens
+</span><span class="k">print</span><span class="p">(</span><span class="n">text_features</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">()[:</span><span class="mi">10</span><span class="p">])</span>
+
+<span class="c1"># ['00a', '12', '1st', '2nd', '3rd', '5th', '70', '70h', '8', 'a']
+</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+text_features.get_feature_names()
+['00a',
+ '12',
+ '1st',
+ '2nd',
+ '3rd',
+ '5th',
+ '70',
+ '70h',
+ '8',
+ 'a',
+ 'aaps',
+ 'ab',
+ 'acad',
+ 'academ',
+ 'academic',
+ 'accelerated',
+ 'access',
+...
+
+</code></pre></div></div>
+
+<hr />
+
+<p>####
+<strong>N-gram range in scikit-learn</strong></p>
+
+<p>In this exercise you’ll insert a
+ <code class="language-plaintext highlighter-rouge">CountVectorizer</code>
+ instance into your pipeline for the main dataset, and compute multiple n-gram features to be used in the model.</p>
+
+<p>In order to look for ngram relationships at multiple scales, you will use the
+ <code class="language-plaintext highlighter-rouge">ngram_range</code>
+ parameter as Peter discussed in the video.</p>
+
+<p><strong>Special functions:</strong>
+ You’ll notice a couple of new steps provided in the pipeline in this and many of the remaining exercises. Specifically, the
+ <code class="language-plaintext highlighter-rouge">dim_red</code>
+ step following the
+ <code class="language-plaintext highlighter-rouge">vectorizer</code>
+ step , and the
+ <code class="language-plaintext highlighter-rouge">scale</code>
+ step preceeding the
+ <code class="language-plaintext highlighter-rouge">clf</code>
+ (classification) step.</p>
+
+<p>These have been added in order to account for the fact that you’re using a reduced-size sample of the full dataset in this course. To make sure the models perform as the expert competition winner intended, we have to apply a
+ <a href="https://en.wikipedia.org/wiki/Dimensionality_reduction">dimensionality reduction</a>
+ technique, which is what the
+ <code class="language-plaintext highlighter-rouge">dim_red</code>
+ step does, and we have to
+ <a href="https://en.wikipedia.org/wiki/Feature_scaling">scale the features</a>
+ to lie between -1 and 1, which is what the
+ <code class="language-plaintext highlighter-rouge">scale</code>
+ step does.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">dim_red</code>
+ step uses a scikit-learn function called
+ <code class="language-plaintext highlighter-rouge">SelectKBest()</code>
+ , applying something called the
+ <a href="https://en.wikipedia.org/wiki/Chi-squared_test">chi-squared test</a>
+ to select the K “best” features. The
+ <code class="language-plaintext highlighter-rouge">scale</code>
+ step uses a scikit-learn function called
+ <code class="language-plaintext highlighter-rouge">MaxAbsScaler()</code>
+ in order to squash the relevant features into the interval -1 to 1.</p>
+
+<p>You won’t need to do anything extra with these functions here, just complete the vectorizing pipeline steps below. However, notice how easy it was to add more processing steps to our pipeline!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pipeline
+</span><span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="c1"># Import classifiers
+</span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.multiclass</span> <span class="kn">import</span> <span class="n">OneVsRestClassifier</span>
+
+<span class="c1"># Import CountVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+
+<span class="c1"># Import other preprocessing modules
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Imputer</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="kn">import</span> <span class="n">chi2</span><span class="p">,</span> <span class="n">SelectKBest</span>
+
+<span class="c1"># Select 300 best features
+</span><span class="n">chi_k</span> <span class="o">=</span> <span class="mi">300</span>
+
+<span class="c1"># Import functional utilities
+</span><span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">FunctionTransformer</span><span class="p">,</span> <span class="n">MaxAbsScaler</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">FeatureUnion</span>
+
+<span class="c1"># Perform preprocessing
+</span><span class="n">get_text_data</span> <span class="o">=</span> <span class="n">FunctionTransformer</span><span class="p">(</span><span class="n">combine_text_columns</span><span class="p">,</span> <span class="n">validate</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">get_numeric_data</span> <span class="o">=</span> <span class="n">FunctionTransformer</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">NUMERIC_COLUMNS</span><span class="p">],</span> <span class="n">validate</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># Create the token pattern: TOKENS_ALPHANUMERIC
+</span><span class="n">TOKENS_ALPHANUMERIC</span> <span class="o">=</span> <span class="s">'[A-Za-z0-9]+(?=</span><span class="se">\\</span><span class="s">s+)'</span>
+
+<span class="c1"># Instantiate pipeline: pl
+</span><span class="n">pl</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="s">'union'</span><span class="p">,</span> <span class="n">FeatureUnion</span><span class="p">(</span>
+            <span class="n">transformer_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s">'numeric_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_numeric_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'imputer'</span><span class="p">,</span> <span class="n">Imputer</span><span class="p">())</span>
+                <span class="p">])),</span>
+                <span class="p">(</span><span class="s">'text_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_text_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'vectorizer'</span><span class="p">,</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">token_pattern</span><span class="o">=</span><span class="n">TOKENS_ALPHANUMERIC</span><span class="p">,</span>
+                                                   <span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))),</span>
+                    <span class="p">(</span><span class="s">'dim_red'</span><span class="p">,</span> <span class="n">SelectKBest</span><span class="p">(</span><span class="n">chi2</span><span class="p">,</span> <span class="n">chi_k</span><span class="p">))</span>
+                <span class="p">]))</span>
+             <span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="p">(</span><span class="s">'scale'</span><span class="p">,</span> <span class="n">MaxAbsScaler</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s">'clf'</span><span class="p">,</span> <span class="n">OneVsRestClassifier</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">()))</span>
+    <span class="p">])</span>
+
+</code></pre></div></div>
+
+<p>Log loss score: 1.2681. Great work! You’ll now add some additional tricks to make the pipeline even better.</p>
+
+<hr />
+
+<p>###
+<strong>Learning from the expert: a stats trick</strong></p>
+
+<p>####
+<strong>Implement interaction modeling in scikit-learn</strong></p>
+
+<p>It’s time to add interaction features to your model. The
+ <code class="language-plaintext highlighter-rouge">PolynomialFeatures</code>
+ object in scikit-learn does just that, but here you’re going to use a custom interaction object,
+ <code class="language-plaintext highlighter-rouge">SparseInteractions</code>
+ . Interaction terms are a statistical tool that lets your model express what happens if two features appear together in the same row.</p>
+
+<p><code class="language-plaintext highlighter-rouge">SparseInteractions</code>
+ does the same thing as
+ <code class="language-plaintext highlighter-rouge">PolynomialFeatures</code>
+ , but it uses sparse matrices to do so. You can get the code for
+ <code class="language-plaintext highlighter-rouge">SparseInteractions</code>
+ at
+ <a href="https://github.com/drivendataorg/box-plots-sklearn/blob/master/src/features/SparseInteractions.py">this GitHub Gist</a>
+ .</p>
+
+<p><code class="language-plaintext highlighter-rouge">PolynomialFeatures</code>
+ and
+ <code class="language-plaintext highlighter-rouge">SparseInteractions</code>
+ both take the argument
+ <code class="language-plaintext highlighter-rouge">degree</code>
+ , which tells them what polynomial degree of interactions to compute.</p>
+
+<p>You’re going to consider interaction terms of
+ <code class="language-plaintext highlighter-rouge">degree=2</code>
+ in your pipeline. You will insert these steps
+ <em>after</em>
+ the preprocessing steps you’ve built out so far, but
+ <em>before</em>
+ the classifier steps.</p>
+
+<p>Pipelines with interaction terms take a while to train (since you’re making n features into n-squared features!), so as long as you set it up right, we’ll do the heavy lifting and tell you what your score is!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Instantiate pipeline: pl
+</span><span class="n">pl</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="s">'union'</span><span class="p">,</span> <span class="n">FeatureUnion</span><span class="p">(</span>
+            <span class="n">transformer_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s">'numeric_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_numeric_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'imputer'</span><span class="p">,</span> <span class="n">Imputer</span><span class="p">())</span>
+                <span class="p">])),</span>
+                <span class="p">(</span><span class="s">'text_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_text_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'vectorizer'</span><span class="p">,</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">token_pattern</span><span class="o">=</span><span class="n">TOKENS_ALPHANUMERIC</span><span class="p">,</span>
+                                                   <span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))),</span>
+                    <span class="p">(</span><span class="s">'dim_red'</span><span class="p">,</span> <span class="n">SelectKBest</span><span class="p">(</span><span class="n">chi2</span><span class="p">,</span> <span class="n">chi_k</span><span class="p">))</span>
+                <span class="p">]))</span>
+             <span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="p">(</span><span class="s">'int'</span><span class="p">,</span> <span class="n">SparseInteractions</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s">'scale'</span><span class="p">,</span> <span class="n">MaxAbsScaler</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s">'clf'</span><span class="p">,</span> <span class="n">OneVsRestClassifier</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">()))</span>
+    <span class="p">])</span>
+
+</code></pre></div></div>
+
+<p>Log loss score: 1.2256. Nice improvement from 1.2681! The student is becoming the master!</p>
+
+<p>###
+<strong>Learning from the expert: a computational trick and the winning model</strong></p>
+
+<p>####
+<strong>Why is hashing a useful trick?</strong></p>
+
+<p>A
+ <a href="https://en.wikipedia.org/wiki/Feature_hashing#Feature_vectorization_using_the_hashing_trick">hash</a>
+ function takes an input, in your case a token, and outputs a hash value. For example, the input may be a string and the hash value may be an integer.</p>
+
+<p>We’ve loaded a familiar python datatype, a dictionary called
+ <code class="language-plaintext highlighter-rouge">hash_dict</code>
+ , that makes this mapping concept a bit more explicit. In fact,
+ <a href="http://stackoverflow.com/questions/114830/is-a-python-dictionary-an-example-of-a-hash-table">python dictionaries ARE hash tables</a>
+ !</p>
+
+<p>Print
+ <code class="language-plaintext highlighter-rouge">hash_dict</code>
+ in the IPython Shell to get a sense of how strings can be mapped to integers.</p>
+
+<p>By explicitly stating how many possible outputs the hashing function may have, we limit the size of the objects that need to be processed. With these limits known, computation can be made more efficient and we can get results faster, even on large datasets.</p>
+
+<p><strong>Some problems are memory-bound and not easily parallelizable, and hashing enforces a fixed length computation instead of using a mutable datatype (like a dictionary).</strong></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+hash_dict
+{'and': 780, 'fluids': 354, 'fuel': 895, 'petro': 354, 'vend': 785}
+
+</code></pre></div></div>
+
+<p>####
+<strong>Implementing the hashing trick in scikit-learn</strong></p>
+
+<p>In this exercise you will check out the scikit-learn implementation of
+ <code class="language-plaintext highlighter-rouge">HashingVectorizer</code>
+ before adding it to your pipeline later.</p>
+
+<p>As you saw in the video,
+ <code class="language-plaintext highlighter-rouge">HashingVectorizer</code>
+ acts just like
+ <code class="language-plaintext highlighter-rouge">CountVectorizer</code>
+ in that it can accept
+ <code class="language-plaintext highlighter-rouge">token_pattern</code>
+ and
+ <code class="language-plaintext highlighter-rouge">ngram_range</code>
+ parameters. The important difference is that it creates hash values from the text, so that we get all the computational advantages of hashing!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import HashingVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">HashingVectorizer</span>
+
+<span class="c1"># Get text data: text_data
+</span><span class="n">text_data</span> <span class="o">=</span> <span class="n">combine_text_columns</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+<span class="c1"># Create the token pattern: TOKENS_ALPHANUMERIC
+</span><span class="n">TOKENS_ALPHANUMERIC</span> <span class="o">=</span> <span class="s">'[A-Za-z0-9]+(?=</span><span class="se">\\</span><span class="s">s+)'</span>
+
+<span class="c1"># Instantiate the HashingVectorizer: hashing_vec
+</span><span class="n">hashing_vec</span> <span class="o">=</span> <span class="n">HashingVectorizer</span><span class="p">(</span><span class="n">token_pattern</span><span class="o">=</span><span class="n">TOKENS_ALPHANUMERIC</span><span class="p">)</span>
+
+<span class="c1"># Fit and transform the Hashing Vectorizer
+</span><span class="n">hashed_text</span> <span class="o">=</span> <span class="n">hashing_vec</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">text_data</span><span class="p">)</span>
+
+<span class="c1"># Create DataFrame and print the head
+</span><span class="n">hashed_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">hashed_text</span><span class="p">.</span><span class="n">data</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">hashed_df</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<p>As you can see, some text is hashed to the same value, but this doesn’t neccessarily hurt performance.</p>
+
+<p>####
+<strong>Build the winning model</strong></p>
+
+<p>You have arrived! This is where all of your hard work pays off. It’s time to build the model that won DrivenData’s competition.</p>
+
+<p>You’ve constructed a robust, powerful pipeline capable of processing training
+ <em>and</em>
+ testing data. Now that you understand the data and know all of the tools you need, you can essentially solve the whole problem in a relatively small number of lines of code. Wow!</p>
+
+<p>All you need to do is add the
+ <code class="language-plaintext highlighter-rouge">HashingVectorizer</code>
+ step to the pipeline to replace the
+ <code class="language-plaintext highlighter-rouge">CountVectorizer</code>
+ step.</p>
+
+<p>The parameters
+ <code class="language-plaintext highlighter-rouge">non_negative=True</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">norm=None</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">binary=False</code>
+ make the
+ <code class="language-plaintext highlighter-rouge">HashingVectorizer</code>
+ perform similarly to the default settings on the
+ <code class="language-plaintext highlighter-rouge">CountVectorizer</code>
+ so you can just replace one with the other.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the hashing vectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">HashingVectorizer</span>
+
+<span class="c1"># Instantiate the winning model pipeline: pl
+</span><span class="n">pl</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="s">'union'</span><span class="p">,</span> <span class="n">FeatureUnion</span><span class="p">(</span>
+            <span class="n">transformer_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">(</span><span class="s">'numeric_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_numeric_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'imputer'</span><span class="p">,</span> <span class="n">Imputer</span><span class="p">())</span>
+                <span class="p">])),</span>
+                <span class="p">(</span><span class="s">'text_features'</span><span class="p">,</span> <span class="n">Pipeline</span><span class="p">([</span>
+                    <span class="p">(</span><span class="s">'selector'</span><span class="p">,</span> <span class="n">get_text_data</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s">'vectorizer'</span><span class="p">,</span> <span class="n">HashingVectorizer</span><span class="p">(</span><span class="n">token_pattern</span><span class="o">=</span><span class="n">TOKENS_ALPHANUMERIC</span><span class="p">,</span>
+                                                     <span class="n">non_negative</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                                                     <span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))),</span>
+                    <span class="p">(</span><span class="s">'dim_red'</span><span class="p">,</span> <span class="n">SelectKBest</span><span class="p">(</span><span class="n">chi2</span><span class="p">,</span> <span class="n">chi_k</span><span class="p">))</span>
+                <span class="p">]))</span>
+             <span class="p">]</span>
+        <span class="p">)),</span>
+        <span class="p">(</span><span class="s">'int'</span><span class="p">,</span> <span class="n">SparseInteractions</span><span class="p">(</span><span class="n">degree</span><span class="o">=</span><span class="mi">2</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s">'scale'</span><span class="p">,</span> <span class="n">MaxAbsScaler</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s">'clf'</span><span class="p">,</span> <span class="n">OneVsRestClassifier</span><span class="p">(</span><span class="n">LogisticRegression</span><span class="p">()))</span>
+    <span class="p">])</span>
+
+</code></pre></div></div>
+
+<p>Log loss: 1.2258. Looks like the performance is about the same, but this is expected since the HashingVectorizer should work the same as the CountVectorizer. Try this pipeline out on the whole dataset on your local machine to see its full power!</p>
+
+<p>####
+<strong>What tactics got the winner the best score?</strong></p>
+
+<p>The winner used skillful NLP, efficient computation, and simple but powerful stats tricks to master the budget data.</p>
+
+<p>Often times simpler is better, and understanding the problem in depth leads to simpler solutions!</p>
+
+<p><a href="https://github.com/datacamp/course-resources-ml-with-experts-budgets/blob/master/notebooks/1.0-full-model.ipynb">Full solution code url</a></p>
+
+<p>The End.</p>
+
+<p>Thank you for reading.</p>
+

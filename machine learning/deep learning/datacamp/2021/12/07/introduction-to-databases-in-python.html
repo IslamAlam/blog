@@ -1,0 +1,2479 @@
+<h1 id="introduction-to-databases-in-python">Introduction to Databases in Python</h1>
+
+<p>This is the memo of the 3rd course (4 courses in all) of ‘Importing &amp; Cleaning Data with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/introduction-to-relational-databases-in-python">HERE</a></strong>
+ .</p>
+
+<hr />
+
+<h1 id="1-basics-of-relational-databases"><strong>1. Basics of Relational Databases</strong></h1>
+<hr />
+
+<h2 id="11-introduction-to-databases"><strong>1.1 Introduction to Databases</strong></h2>
+
+<p>####
+<strong>Relational model</strong></p>
+
+<p>Tables, Columns, Rows, and Relationships are part of the relational model.</p>
+
+<hr />
+
+<h2 id="12-connecting-to-your-database"><strong>1.2 Connecting to your database</strong></h2>
+
+<p>Database types:</p>
+
+<ul>
+  <li>SQLite</li>
+  <li>PostgreSQL</li>
+  <li>MySQL</li>
+  <li>MS SQL</li>
+  <li>Oracle</li>
+  <li>etc.</li>
+</ul>
+
+<p><img src="/blog/assets/datacamp/introduction-to-databases-in-python/capture3-9.png?w=1011" alt="Desktop View" /></p>
+
+<p>####
+<strong>Engines and connection strings</strong></p>
+
+<p>Alright, it’s time to create your first engine! An engine is just a common interface to a database, and the information it requires to connect to one is contained in a connection string, for example
+ <code class="language-plaintext highlighter-rouge">sqlite:///example.sqlite</code>
+ . Here,
+ <code class="language-plaintext highlighter-rouge">sqlite</code>
+ in
+ <code class="language-plaintext highlighter-rouge">sqlite:///</code>
+ is the database driver, while
+ <code class="language-plaintext highlighter-rouge">example.sqlite</code>
+ is a SQLite file contained in the local directory.</p>
+
+<p>You can learn a lot more about connection strings in the
+ <a href="http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls">SQLAlchemy documentation</a>
+ .</p>
+
+<p>Your job in this exercise is to create an engine that connects to a local SQLite file named
+ <code class="language-plaintext highlighter-rouge">census.sqlite</code>
+ . Then, print the names of the tables the engine contains using the
+ <code class="language-plaintext highlighter-rouge">.table_names()</code>
+ method.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import create_engine
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+
+<span class="c1"># Create an engine that connects to the census.sqlite file: engine
+</span><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s">'sqlite:///census.sqlite'</span><span class="p">)</span>
+
+<span class="c1"># Print table names
+</span><span class="k">print</span><span class="p">(</span><span class="n">engine</span><span class="p">.</span><span class="n">table_names</span><span class="p">())</span>
+
+<span class="c1"># ['census', 'state_fact']
+</span>
+</code></pre></div></div>
+
+<p>This database has two tables, as you can see:
+ <code class="language-plaintext highlighter-rouge">'census'</code>
+ and
+ <code class="language-plaintext highlighter-rouge">'state_fact'</code>
+ . You’ll be exploring both of these and more throughout this course!</p>
+
+<p>####
+<strong>Autoloading Tables from a database</strong></p>
+
+<p>SQLAlchemy can be used to automatically load tables from a database using something called reflection. Reflection is the process of reading the database and building the metadata based on that information. It’s the opposite of creating a Table by hand and is very useful for working with existing databases.</p>
+
+<p>To perform reflection, you will first need to import and initialize a
+ <code class="language-plaintext highlighter-rouge">MetaData</code>
+ object.
+ <code class="language-plaintext highlighter-rouge">MetaData</code>
+ objects contain information about tables stored in a database. During reflection, the
+ <code class="language-plaintext highlighter-rouge">MetaData</code>
+ object will be populated with information about the reflected table automatically, so we only need to initialize it before reflecting by calling
+ <code class="language-plaintext highlighter-rouge">MetaData()</code>
+ .</p>
+
+<dl>
+  <dt>You will also need to import the</dt>
+  <dt> <code class="language-plaintext highlighter-rouge">Table</code></dt>
+  <dt> object from the SQLAlchemy package. Then, you use this</dt>
+  <dt> <code class="language-plaintext highlighter-rouge">Table</code></dt>
+  <dt> object to read your table from the engine, autoload the columns, and populate the metadata. This can be done with a single call to</dt>
+  <dt> <code class="language-plaintext highlighter-rouge">Table()</code></dt>
+  <dd>using the
+ <code class="language-plaintext highlighter-rouge">Table</code>
+ object in this manner is a lot like passing arguments to a function. For example, to autoload the columns with the engine, you have to specify the keyword arguments
+ <code class="language-plaintext highlighter-rouge">autoload=True</code>
+ and
+ <code class="language-plaintext highlighter-rouge">autoload_with=engine</code>
+ to
+ <code class="language-plaintext highlighter-rouge">Table()</code>
+ .</dd>
+</dl>
+
+<p>Finally, to view information about the object you just created, you will use the
+ <code class="language-plaintext highlighter-rouge">repr()</code>
+ function. For any Python object,
+ <code class="language-plaintext highlighter-rouge">repr()</code>
+ returns a text representation of that object. For SQLAlchemy
+ <code class="language-plaintext highlighter-rouge">Table</code>
+ objects, it will return the information about that table contained in the metadata.</p>
+
+<p>In this exercise, your job is to reflect the
+ <code class="language-plaintext highlighter-rouge">"census"</code>
+ table available on your
+ <code class="language-plaintext highlighter-rouge">engine</code>
+ into a variable called
+ <code class="language-plaintext highlighter-rouge">census</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import create_engine, MetaData, and Table
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span><span class="p">,</span> <span class="n">MetaData</span><span class="p">,</span> <span class="n">Table</span>
+
+<span class="c1"># Create engine: engine
+</span><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s">'sqlite:///census.sqlite'</span><span class="p">)</span>
+
+<span class="c1"># Create a metadata object: metadata
+</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">()</span>
+
+<span class="c1"># Reflect census table from the engine: census
+</span><span class="n">census</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s">'census'</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">autoload</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">autoload_with</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="c1"># Print census table metadata
+</span><span class="k">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">census</span><span class="p">))</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Table('census', MetaData(bind=None), Column('state', VARCHAR(length=30), table=&lt;census&gt;), Column('sex', VARCHAR(length=1), table=&lt;census&gt;), Column('age', INTEGER(), table=&lt;census&gt;), Column('pop2000', INTEGER(), table=&lt;census&gt;), Column('pop2008', INTEGER(), table=&lt;census&gt;), schema=None)
+
+</code></pre></div></div>
+
+<p>Reflecting a table allows you to work with it in Python.</p>
+
+<p>####
+<strong>Viewing Table details</strong></p>
+
+<p>Now you can begin to learn more about the columns and structure of your table. It is important to get an understanding of your database by examining the column names. This can be done by using the
+ <code class="language-plaintext highlighter-rouge">.columns</code>
+ attribute and accessing the
+ <code class="language-plaintext highlighter-rouge">.keys()</code>
+ method. For example,
+ <code class="language-plaintext highlighter-rouge">census.columns.keys()</code>
+ would return a list of column names of the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table.</p>
+
+<p>Following this, we can use the metadata container to find out more details about the reflected table such as the columns and their types. For example, information about the table objects are stored in the
+ <code class="language-plaintext highlighter-rouge">metadata.tables</code>
+ dictionary, so you can get the metadata of your
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table with
+ <code class="language-plaintext highlighter-rouge">metadata.tables['census']</code>
+ . This is similar to your use of the
+ <code class="language-plaintext highlighter-rouge">repr()</code>
+ function on the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table from the previous exercise.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sqlalchemy import create_engine, MetaData, Table
+
+engine = create_engine('sqlite:///census.sqlite')
+
+metadata = MetaData()
+
+# Reflect the census table from the engine: census
+census = Table('census', metadata, autoload=True, autoload_with=engine)
+
+# Print the column names
+print(census.columns.keys())
+
+# Print full metadata of census
+print(repr(metadata.tables['census']))
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+['state', 'sex', 'age', 'pop2000', 'pop2008']
+
+Table('census', MetaData(bind=None), Column('state', VARCHAR(length=30), table=&lt;census&gt;), Column('sex', VARCHAR(length=1), table=&lt;census&gt;), Column('age', INTEGER(), table=&lt;census&gt;), Column('pop2000', INTEGER(), table=&lt;census&gt;), Column('pop2008', INTEGER(), table=&lt;census&gt;), schema=None)
+
+</code></pre></div></div>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table, as you can see, has five columns. Knowing the names of these columns and their data types will make it easier for you to structure your queries.</p>
+
+<hr />
+
+<h2 id="13-introduction-to-sql"><strong>1.3 Introduction to SQL</strong></h2>
+
+<p><strong>raw SQL vs SQLAlchemy</strong></p>
+
+<p><img src="/blog/assets/datacamp/introduction-to-databases-in-python/capture4-8.png?w=1017" alt="Desktop View" /></p>
+
+<p>####
+<strong>Selecting data from a Table: raw SQL</strong></p>
+
+<p>As you have seen in the video, to access and manipulate the data in the database, we will first need to establish a connection to it by using the
+ <code class="language-plaintext highlighter-rouge">.connect()</code>
+ method on the engine. This is because the
+ <code class="language-plaintext highlighter-rouge">create_engine()</code>
+ function that you have used before returns an instance of an engine, but it does not actually open a connection until an action is called that would require a connection, such as a query.</p>
+
+<p>Using what we just learned about SQL and applying the
+ <code class="language-plaintext highlighter-rouge">.execute()</code>
+ method on our connection, we can leverage a raw SQL query to query all the records in our
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table. The object returned by the
+ <code class="language-plaintext highlighter-rouge">.execute()</code>
+ method is a
+ <strong>ResultProxy</strong>
+ . On this ResultProxy, we can then use the
+ <code class="language-plaintext highlighter-rouge">.fetchall()</code>
+ method to get our results – that is, the
+ <strong>ResultSet</strong>
+ .</p>
+
+<p>In this exercise, you’ll use a traditional SQL query. Notice that when you execute a query using raw SQL, you will query the table
+ <em>in the database directly</em>
+ . In particular, no reflection step is needed.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sqlalchemy import create_engine
+engine = create_engine('sqlite:///census.sqlite')
+
+# Create a connection on engine
+connection = engine.connect()
+
+# Build select statement for census table: stmt
+stmt = 'SELECT * FROM census'
+
+# Execute the statement and fetch the results: results
+results = connection.execute(stmt).fetchall()
+
+connection.execute(stmt)
+# &lt;sqlalchemy.engine.result.ResultProxy at 0x7f19c77ec0b8&gt;
+
+# Print results
+print(results)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[('Illinois', 'M', 0, 89600, 95012), ('Illinois', 'M', 1, 88445, 91829), ('Illinois', 'M', 2, 88729, 89547), ('Illinois', 'M', 3, 88868, 90037), ('Illinois', 'M', 4, 91947, 91111), ('Illinois', 'M', 5, 93894, 89802), ('Illinois', 'M', 6, 93676, 88931), ('Illinois', 'M', 7, 94818, 90940), ('Illinois', 'M', 8, 95035, 86943), ('Illinois', 'M', 9, 96436, 86055), ('Illinois', 'M', 10, 97280, 86565), ('Illinois', 'M', 11, 94029, 86606), ('Illinois', 'M', 12, 92402, 89596), ('Illinois', 'M', 13, 89926, 91661), ('Illinois', 'M', 14, 90717, 91256), ('Illinois', 'M', 15, 92178, 92729), ('Illinois', 'M', 16, 90587, 93083),
+...
+
+</code></pre></div></div>
+
+<p>Notice that the stmt converts into a SQL statement listing all the records for all the columns in the table.This output is quite unwieldy though, and fetching all the records in the table might take a long time, so in the next exercises, you will learn how to fetch only the first few records of a ResultProxy.</p>
+
+<p>####
+<strong>Selecting data from a Table with SQLAlchemy</strong></p>
+
+<p>It’s now time to build your first select statement using SQLAlchemy. SQLAlchemy provides a nice “Pythonic” way of interacting with databases. When you used raw SQL in the last exercise, you queried the database directly. When using SQLAlchemy, you will go through a
+ <code class="language-plaintext highlighter-rouge">Table</code>
+ object instead, and SQLAlchemy will take case of translating your query to an appropriate SQL statement for you. So rather than dealing with the differences between specific dialects of traditional SQL such as MySQL or PostgreSQL, you can leverage the Pythonic framework of SQLAlchemy to streamline your workflow and more efficiently query your data. For this reason, it is worth learning even if you may already be familiar with traditional SQL.</p>
+
+<p>In this exercise, you’ll once again build a statement to query all records from the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table. This time, however, you’ll make use of the
+ <code class="language-plaintext highlighter-rouge">select()</code>
+ function of the
+ <code class="language-plaintext highlighter-rouge">sqlalchemy</code>
+ module. This function requires a
+ <strong>list</strong>
+ of tables or columns as the only required argument: for example,
+ <code class="language-plaintext highlighter-rouge">select([my_table])</code>
+ .</p>
+
+<p>You will also fetch only a few records of the ResultProxy by using
+ <code class="language-plaintext highlighter-rouge">.fetchmany()</code>
+ with a
+ <code class="language-plaintext highlighter-rouge">size</code>
+ argument specifying the number of records to fetch.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import select
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">select</span>
+
+<span class="c1"># Reflect census table via engine: census
+</span><span class="n">census</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s">'census'</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span> <span class="n">autoload</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">autoload_with</span><span class="o">=</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="c1"># Build select statement for census table: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">])</span>
+
+<span class="c1"># Print the emitted statement to see the SQL string
+</span><span class="k">print</span><span class="p">(</span><span class="n">stmt</span><span class="p">)</span>
+<span class="c1"># SELECT census.state, census.sex, census.age, census.pop2000, census.pop2008
+</span><span class="n">FROM</span> <span class="n">census</span>
+
+<span class="c1"># Execute the statement on connection and fetch 10 records: result
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">).</span><span class="n">fetchmany</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Execute the statement and print the results
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[('Illinois', 'M', 0, 89600, 95012), ('Illinois', 'M', 1, 88445, 91829), ('Illinois', 'M', 2, 88729, 89547), ('Illinois', 'M', 3, 88868, 90037), ('Illinois', 'M', 4, 91947, 91111), ('Illinois', 'M', 5, 93894, 89802), ('Illinois', 'M', 6, 93676, 88931), ('Illinois', 'M', 7, 94818, 90940), ('Illinois', 'M', 8, 95035, 86943), ('Illinois', 'M', 9, 96436, 86055)]
+
+</code></pre></div></div>
+
+<p>####
+<strong>Handling a ResultSet</strong></p>
+
+<p>Recall the differences between a ResultProxy and a ResultSet:</p>
+
+<ul>
+  <li>ResultProxy: The object returned by the
+ <code class="language-plaintext highlighter-rouge">.execute()</code>
+ method. It can be used in a variety of ways to get the data returned by the query.</li>
+  <li>ResultSet: The actual data asked for in the query when using a fetch method such as
+ <code class="language-plaintext highlighter-rouge">.fetchall()</code>
+ on a ResultProxy.</li>
+</ul>
+
+<p>This separation between the ResultSet and ResultProxy allows us to fetch as much or as little data as we desire.</p>
+
+<p>Once we have a ResultSet, we can use Python to access all the data within it by column name and by list style indexes. For example, you can get the first row of the results by using
+ <code class="language-plaintext highlighter-rouge">results[0]</code>
+ . With that first row then assigned to a variable
+ <code class="language-plaintext highlighter-rouge">first_row</code>
+ , you can get data from the first column by either using
+ <code class="language-plaintext highlighter-rouge">first_row[0]</code>
+ or by column name such as
+ <code class="language-plaintext highlighter-rouge">first_row['column_name']</code>
+ . You’ll now practice exactly this using the ResultSet you obtained from the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table in the previous exercise.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Get the first row of the results by using an index: first_row
+</span><span class="n">first_row</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Print the first row of the results
+</span><span class="k">print</span><span class="p">(</span><span class="n">first_row</span><span class="p">)</span>
+
+<span class="c1"># Print the first column of the first row by accessing it by its index
+</span><span class="k">print</span><span class="p">(</span><span class="n">first_row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># Print the 'state' column of the first row by using its name
+</span><span class="k">print</span><span class="p">(</span><span class="n">first_row</span><span class="p">[</span><span class="s">'state'</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">'state'</span><span class="p">])</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+results[:3]
+[('Illinois', 'M', 0, 89600, 95012),
+ ('Illinois', 'M', 1, 88445, 91829),
+ ('Illinois', 'M', 2, 88729, 89547)]
+
+results[:3][0]
+('Illinois', 'M', 0, 89600, 95012)
+
+results[:3][0][3]
+89600
+
+</code></pre></div></div>
+
+<hr />
+
+<h1 id="2-applying-filtering-ordering-and-grouping-to-queries"><strong>2. Applying Filtering, Ordering and Grouping to Queries</strong></h1>
+<hr />
+
+<h2 id="21-filtering-and-targeting-data"><strong>2.1 Filtering and targeting data</strong></h2>
+
+<p>####
+<strong>Connecting to a PostgreSQL database</strong></p>
+
+<p>In these exercises, you will be working with real databases hosted on the cloud via Amazon Web Services (AWS)!</p>
+
+<p>Let’s begin by connecting to a PostgreSQL database. When connecting to a PostgreSQL database, many prefer to use the psycopg2 database driver as it supports practically all of PostgreSQL’s features efficiently and is the standard dialect for PostgreSQL in SQLAlchemy.</p>
+
+<p>You might recall from Chapter 1 that we use the
+ <code class="language-plaintext highlighter-rouge">create_engine()</code>
+ function and a connection string to connect to a database. In general, connection strings have the form
+ <code class="language-plaintext highlighter-rouge">"dialect+driver://username:password@host:port/database"</code></p>
+
+<p>There are three components to the connection string in this exercise: the dialect and driver (
+ <code class="language-plaintext highlighter-rouge">'postgresql+psycopg2://'</code>
+ ), followed by the username and password (
+ <code class="language-plaintext highlighter-rouge">'</code>
+ username:password
+ <code class="language-plaintext highlighter-rouge">'</code>
+ ), followed by the host and port (
+ <code class="language-plaintext highlighter-rouge">'@postgresql.csrrinzqubik.us-east-1.rds.amazonaws.com:1234/'</code>
+ ), and finally, the database name (
+ <code class="language-plaintext highlighter-rouge">'census'</code>
+ ). You will have to pass this string as an argument to
+ <code class="language-plaintext highlighter-rouge">create_engine()</code>
+ in order to connect to the database.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import create_engine function
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+
+<span class="c1"># Create an engine to the census database
+</span><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s">'postgresql+psycopg2://username:password@postgresql.csrrinzqubik.us-east-1.rds.amazonaws.com:1234/census'</span><span class="p">)</span>
+
+<span class="c1"># Use the .table_names() method on the engine to print the table names
+</span><span class="k">print</span><span class="p">(</span><span class="n">engine</span><span class="p">.</span><span class="n">table_names</span><span class="p">())</span>
+
+<span class="c1"># ['census', 'state_fact', 'vrska', 'census1', 'data', 'data1', 'employees3', 'users', 'employees', 'employees_2']
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Filter data selected from a Table – Simple</strong></p>
+
+<p>Having connected to the database, it’s now time to practice filtering your queries!</p>
+
+<p>As mentioned in the video, a
+ <code class="language-plaintext highlighter-rouge">where()</code>
+ clause is used to filter the data that a statement returns. For example, to select all the records from the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table where the sex is Female (or
+ <code class="language-plaintext highlighter-rouge">'F'</code>
+ ) we would do the following:</p>
+
+<p><code class="language-plaintext highlighter-rouge">select([census]).where(census.columns.sex == 'F')</code></p>
+
+<p>In addition to
+ <code class="language-plaintext highlighter-rouge">==</code>
+ we can use basically any python comparison operator (such as
+ <code class="language-plaintext highlighter-rouge">&lt;=</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">!=</code>
+ , etc) in the
+ <code class="language-plaintext highlighter-rouge">where()</code>
+ clause.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a select query: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">])</span>
+
+<span class="c1"># Add a where clause to filter the results to only those for New York : stmt_filtered
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span> <span class="o">==</span> <span class="s">'New York'</span><span class="p">)</span>
+
+<span class="c1"># Execute the query to retrieve all the data returned: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Loop over the results and print the age, sex, and pop2000
+</span><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">sex</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">pop2000</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+0 M 126237
+1 M 124008
+2 M 124725
+...
+83 M 21687
+84 M 18873
+85 M 88366
+0 F 120355
+1 F 118219
+2 F 119577
+...
+84 F 37436
+85 F 226378
+
+</code></pre></div></div>
+
+<p>####
+<strong>Filter data selected from a Table – Expressions</strong></p>
+
+<p>In addition to standard Python comparators, we can also use methods such as
+ <code class="language-plaintext highlighter-rouge">in_()</code>
+ to create more powerful
+ <code class="language-plaintext highlighter-rouge">where()</code>
+ clauses. You can see a full list of expressions in the
+ <a href="http://docs.sqlalchemy.org/en/latest/core/sqlelement.html#module-sqlalchemy.sql.expression">SQLAlchemy Documentation</a>
+ .</p>
+
+<p>Method
+ <code class="language-plaintext highlighter-rouge">in_()</code>
+ , when used on a column, allows us to include records where the value of a column is among a list of possible values. For example,
+ <code class="language-plaintext highlighter-rouge">where(census.columns.age.in_([20, 30, 40]))</code>
+ will return only records for people who are exactly 20, 30, or 40 years old.</p>
+
+<p>In this exercise, you will continue working with the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table, and select the records for people from the three most densely populated states.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define a list of states for which we want results
+</span><span class="n">states</span> <span class="o">=</span> <span class="p">[</span><span class="s">'New York'</span><span class="p">,</span> <span class="s">'California'</span><span class="p">,</span> <span class="s">'Texas'</span><span class="p">]</span>
+
+<span class="c1"># Create a query for the census table: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">])</span>
+
+<span class="c1"># Append a where clause to match all the states in_ the list states
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">.</span><span class="n">in_</span><span class="p">(</span><span class="n">states</span><span class="p">))</span>
+
+<span class="c1"># Loop over the ResultProxy and print the state and its population in 2000
+</span><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">state</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">pop2000</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+California 252494
+California 247978
+..
+New York 122770
+New York 123978
+...
+Texas 27961
+Texas 171538
+
+
+</code></pre></div></div>
+
+<p>Along with
+ <code class="language-plaintext highlighter-rouge">in_</code>
+ , you can also use methods like
+ <code class="language-plaintext highlighter-rouge">and_</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">any_</code>
+ to create more powerful
+ <code class="language-plaintext highlighter-rouge">where()</code>
+ clauses. You might have noticed that we did not use any of the fetch methods to retrieve a ResultSet like in the previous exercises. Indeed, if you are only interested in manipulating one record at a time, you can iterate over the ResultProxy directly!</p>
+
+<p>####
+<strong>Filter data selected from a Table – Advanced</strong></p>
+
+<p>SQLAlchemy also allows users to use conjunctions such as
+ <code class="language-plaintext highlighter-rouge">and_()</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">or_()</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">not_()</code>
+ to build more complex filtering. For example, we can get a set of records for people in New York who are 21 or 37 years old with the following code:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+select([census]).where(
+  and_(census.columns.state == 'New York',
+       or_(census.columns.age == 21,
+          census.columns.age == 37
+         )
+      )
+  )
+
+</code></pre></div></div>
+
+<p>An equivalent SQL statement would be,for example,</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+SELECT * FROM census WHERE state = 'New York' AND (age = 21 OR age = 37)
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import and_
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">and_</span>
+
+<span class="c1"># Build a query for the census table: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">])</span>
+
+<span class="c1"># Append a where clause to select only non-male records from California using and_
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">where</span><span class="p">(</span>
+    <span class="c1"># The state of California with a non-male sex
+</span>    <span class="n">and_</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span> <span class="o">==</span> <span class="s">'California'</span><span class="p">,</span>
+         <span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">sex</span> <span class="o">!=</span> <span class="s">'M'</span>
+         <span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Loop over the ResultProxy printing the age and sex
+</span><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">age</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">sex</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+0 F
+1 F
+2 F
+...
+84 F
+85 F
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="22-overview-of-ordering"><strong>2.2 Overview of ordering</strong></h2>
+
+<p>####
+<strong>Ordering by a single column</strong></p>
+
+<p>To sort the result output by a field, we use the
+ <code class="language-plaintext highlighter-rouge">.order_by()</code>
+ method. By default, the
+ <code class="language-plaintext highlighter-rouge">.order_by()</code>
+ method sorts from lowest to highest on the supplied column.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build a query to select the state column: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">])</span>
+
+<span class="c1"># Order stmt by the state column
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c1"># Execute the query and store the results: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Print the first 10 results
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+
+<span class="c1"># [('Alabama',), ('Alabama',), ('Alabama',), ('Alabama',), ('Alabama',), ('Alabama',), ('Alabama',), ('Alabama',), ('Alabama',), ('Alabama',)]
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Ordering in descending order by a single column</strong></p>
+
+<p>You can also use
+ <code class="language-plaintext highlighter-rouge">.order_by()</code>
+ to sort from highest to lowest by wrapping a column in the
+ <code class="language-plaintext highlighter-rouge">desc()</code>
+ function. Although you haven’t seen this function in action, it generalizes what you have already learned.</p>
+
+<p>Pass
+ <code class="language-plaintext highlighter-rouge">desc()</code>
+ (for “descending”) inside an
+ <code class="language-plaintext highlighter-rouge">.order_by()</code>
+ with the name of the column you want to sort by. For instance,
+ <code class="language-plaintext highlighter-rouge">stmt.order_by(desc(table.columns.column_name))</code>
+ sorts
+ <code class="language-plaintext highlighter-rouge">column_name</code>
+ in descending order.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import desc
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">desc</span>
+
+<span class="c1"># Build a query to select the state column: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">])</span>
+
+<span class="c1"># Order stmt by state in descending order: rev_stmt
+</span><span class="n">rev_stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">))</span>
+
+<span class="c1"># Execute the query and store the results: rev_results
+</span><span class="n">rev_results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">rev_stmt</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Print the first 10 rev_results
+</span><span class="k">print</span><span class="p">(</span><span class="n">rev_results</span><span class="p">[:</span><span class="mi">10</span><span class="p">])</span>
+
+<span class="c1"># [('Wyoming',), ('Wyoming',), ('Wyoming',), ('Wyoming',), ('Wyoming',), ('Wyoming',), ('Wyoming',), ('Wyoming',), ('Wyoming',), ('Wyoming',)]
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Ordering by multiple columns</strong></p>
+
+<p>We can pass multiple arguments to the
+ <code class="language-plaintext highlighter-rouge">.order_by()</code>
+ method to order by multiple columns. In fact, we can also sort in ascending or descending order for each individual column.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build a query to select state and age: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">,</span> <span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">age</span><span class="p">])</span>
+
+<span class="c1"># Append order by to ascend by state and descend by age
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">,</span> <span class="n">desc</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">age</span><span class="p">))</span>
+
+<span class="c1"># Execute the statement and store all the records: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Print the first 20 results
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">[:</span><span class="mi">20</span><span class="p">])</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[('Alabama', 85), ('Alabama', 85), ('Alabama', 84), ('Alabama', 84), ('Alabama', 83), ('Alabama', 83), ('Alabama', 82), ('Alabama', 82), ('Alabama', 81), ('Alabama', 81), ('Alabama', 80), ('Alabama', 80), ('Alabama', 79), ('Alabama', 79), ('Alabama', 78), ('Alabama', 78), ('Alabama', 77), ('Alabama', 77), ('Alabama', 76), ('Alabama', 76)]
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="23-counting-summing-and-grouping-data"><strong>2.3 Counting, summing and grouping data</strong></h2>
+
+<p>####
+<strong>Counting distinct data</strong></p>
+
+<p>SQLAlchemy’s
+ <code class="language-plaintext highlighter-rouge">func</code>
+ module provides access to built-in SQL functions that can make operations like counting and summing faster and more efficient.</p>
+
+<p>We can use
+ <code class="language-plaintext highlighter-rouge">func.sum()</code>
+ to get a
+ <strong>sum</strong>
+ of the
+ <code class="language-plaintext highlighter-rouge">pop2008</code>
+ column of
+ <code class="language-plaintext highlighter-rouge">census</code>
+ as shown below:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+select([func.sum(census.columns.pop2008)])
+
+</code></pre></div></div>
+
+<p>If instead you want to
+ <strong>count</strong>
+ the number of values in
+ <code class="language-plaintext highlighter-rouge">pop2008</code>
+ , you could use
+ <code class="language-plaintext highlighter-rouge">func.count()</code>
+ like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+select([func.count(census.columns.pop2008)])
+
+</code></pre></div></div>
+
+<p>Furthermore, if you only want to count the
+ <strong>distinct</strong>
+ values of
+ <code class="language-plaintext highlighter-rouge">pop2008</code>
+ , you can use the
+ <code class="language-plaintext highlighter-rouge">.distinct()</code>
+ method:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+select([func.count(census.columns.pop2008.distinct())])
+
+</code></pre></div></div>
+
+<p>In this exercise, you will practice using
+ <code class="language-plaintext highlighter-rouge">func.count()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">.distinct()</code>
+ to get a count of the distinct number of states in
+ <code class="language-plaintext highlighter-rouge">census</code>
+ .</p>
+
+<p>So far, you’ve seen
+ <code class="language-plaintext highlighter-rouge">.fetchall()</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">.fetchmany()</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">.first()</code>
+ used on a ResultProxy to get the results. The ResultProxy also has a method called
+ <code class="language-plaintext highlighter-rouge">.scalar()</code>
+ for getting just the value of a query that returns only one row and column.</p>
+
+<p>This can be very useful when you are querying for just a count or sum.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build a query to count the distinct states values: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">func</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">.</span><span class="n">distinct</span><span class="p">())])</span>
+
+<span class="c1"># Execute the query and store the scalar result: distinct_state_count
+</span><span class="n">distinct_state_count</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">).</span><span class="n">scalar</span><span class="p">()</span>
+
+<span class="c1"># Print the distinct_state_count
+</span><span class="k">print</span><span class="p">(</span><span class="n">distinct_state_count</span><span class="p">)</span>
+
+<span class="c1"># 51
+</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+connection.execute(stmt).fetchall()
+# [(51,)]
+
+</code></pre></div></div>
+
+<p>Notice the use of the
+ <code class="language-plaintext highlighter-rouge">.scalar()</code>
+ method: This is useful when you want to get just the value of a query that returns only one row and column, like in this case.</p>
+
+<p>####
+<strong>Count of records by state</strong></p>
+
+<p>Often, we want to get a count for each record with a particular value in another column. The
+ <code class="language-plaintext highlighter-rouge">.group_by()</code>
+ method helps answer this type of query. You can pass a column to the
+ <code class="language-plaintext highlighter-rouge">.group_by()</code>
+ method and use in an aggregate function like
+ <code class="language-plaintext highlighter-rouge">sum()</code>
+ or
+ <code class="language-plaintext highlighter-rouge">count()</code>
+ . Much like the
+ <code class="language-plaintext highlighter-rouge">.order_by()</code>
+ method,
+ <code class="language-plaintext highlighter-rouge">.group_by()</code>
+ can take multiple columns as arguments.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import func
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">func</span>
+
+<span class="c1"># Build a query to select the state and count of ages by state: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">,</span> <span class="n">func</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">age</span><span class="p">)])</span>
+
+<span class="c1"># Group stmt by state
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c1"># Execute the statement and store all the records: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Print results
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<span class="c1"># Print the keys/column names of the results returned
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">keys</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[('Alabama', 172), ('Alaska', 172), ('Arizona', 172), ('Arkansas', 172), ('California', 172),
+...
+('Wisconsin', 172), ('Wyoming', 172)]
+
+['state', 'count_1']
+
+</code></pre></div></div>
+
+<p>Notice that the key for the count method just came out as
+ <code class="language-plaintext highlighter-rouge">count_1</code>
+ . This can make it hard in complex queries to tell what column is being referred to: In the next exercise, you’ll practice assigning more descriptive labels when performing such calculations.</p>
+
+<p>####
+<strong>Determining the population sum by state</strong></p>
+
+<p>To avoid confusion with query result column names like
+ <code class="language-plaintext highlighter-rouge">count_1</code>
+ , we can use the
+ <code class="language-plaintext highlighter-rouge">.label()</code>
+ method to provide a name for the resulting column. This gets appended to the function method we are using, and its argument is the name we want to use.</p>
+
+<p>We can pair
+ <code class="language-plaintext highlighter-rouge">func.sum()</code>
+ with
+ <code class="language-plaintext highlighter-rouge">.group_by()</code>
+ to get a sum of the population by
+ <code class="language-plaintext highlighter-rouge">State</code>
+ and use the
+ <code class="language-plaintext highlighter-rouge">label()</code>
+ method to name the output.</p>
+
+<p>We can also create the
+ <code class="language-plaintext highlighter-rouge">func.sum()</code>
+ expression before using it in the select statement. We do it the same way we would inside the select statement and store it in a variable. Then we use that variable in the select statement where the
+ <code class="language-plaintext highlighter-rouge">func.sum()</code>
+ would normally be.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import func
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">func</span>
+
+<span class="c1"># Build an expression to calculate the sum of pop2008 labeled as population
+</span><span class="n">pop2008_sum</span> <span class="o">=</span> <span class="n">func</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2008</span><span class="p">).</span><span class="n">label</span><span class="p">(</span><span class="s">'population'</span><span class="p">)</span>
+
+<span class="c1"># Build a query to select the state and sum of pop2008: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">,</span> <span class="n">pop2008_sum</span><span class="p">])</span>
+
+<span class="c1"># Group stmt by state
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c1"># Execute the statement and store all the records: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Print results
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<span class="c1"># Print the keys/column names of the results returned
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">keys</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[('Alabama', 4649367), ('Alaska', 664546), ('Arizona', 6480767), ('Arkansas', 2848432),
+...
+('Wisconsin', 5625013), ('Wyoming', 529490)]
+
+['state', 'population']
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="24-use-pandas-and-matplotlib-to-visualize-our-data"><strong>2.4 Use pandas and matplotlib to visualize our data</strong></h2>
+
+<p>####
+<strong>ResultsSets and pandas dataframes</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># import pandas
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># Create a DataFrame from the results: df
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<span class="c1"># Set column names
+</span><span class="n">df</span><span class="p">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">keys</span><span class="p">()</span>
+
+<span class="c1"># Print the Dataframe
+</span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+        state  population
+0  California    36609002
+1       Texas    24214127
+2    New York    19465159
+3     Florida    18257662
+4    Illinois    12867077
+
+</code></pre></div></div>
+
+<p>If you enjoy using pandas for your data scientific needs, you’ll want to always feed ResultProxies into pandas DataFrames!</p>
+
+<p>####
+<strong>From SQLAlchemy results to a plot</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pyplot as plt from matplotlib
+</span><span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Create a DataFrame from the results: df
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<span class="c1"># Set Column names
+</span><span class="n">df</span><span class="p">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">keys</span><span class="p">()</span>
+
+<span class="c1"># Print the DataFrame
+</span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+<span class="c1"># Plot the DataFrame
+</span><span class="n">df</span><span class="p">.</span><span class="n">plot</span><span class="p">.</span><span class="n">bar</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+        state  population
+0  California    36609002
+1       Texas    24214127
+2    New York    19465159
+3     Florida    18257662
+4    Illinois    12867077
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-databases-in-python/capture5-8.png?w=642" alt="Desktop View" /></p>
+
+<p>You’re ready to learn about more advanced SQLAlchemy Queries!</p>
+
+<hr />
+
+<h1 id="3-advanced-sqlalchemy-queries"><strong>3. Advanced SQLAlchemy Queries</strong></h1>
+<hr />
+
+<h2 id="31-calculating-values-in-a-query"><strong>3.1 Calculating values in a query</strong></h2>
+
+<p>####
+<strong>Connecting to a MySQL database</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import create_engine function
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span>
+
+<span class="c1"># Create an engine to the census database
+</span><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s">'mysql+pymysql://username:password@courses.csrrinzqubik.us-east-1.rds.amazonaws.com:3306/census'</span><span class="p">)</span>
+
+<span class="c1"># Print the table names
+</span><span class="k">print</span><span class="p">(</span><span class="n">engine</span><span class="p">.</span><span class="n">table_names</span><span class="p">())</span>
+
+<span class="c1">#  ['census', 'state_fact']
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Calculating a difference between two columns</strong></p>
+
+<p>Often, you’ll need to perform math operations as part of a query, such as if you wanted to calculate the change in population from 2000 to 2008. For math operations on numbers, the operators in SQLAlchemy work the same way as they do in Python.</p>
+
+<p>You can use these operators to perform addition (
+ <code class="language-plaintext highlighter-rouge">+</code>
+ ), subtraction (
+ <code class="language-plaintext highlighter-rouge">-</code>
+ ), multiplication (
+ <code class="language-plaintext highlighter-rouge">*</code>
+ ), division (
+ <code class="language-plaintext highlighter-rouge">/</code>
+ ), and modulus (
+ <code class="language-plaintext highlighter-rouge">%</code>
+ ) operations. Note: They behave differently when used with non-numeric column types.</p>
+
+<p>Let’s now find the top 5 states by population growth between 2000 and 2008.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+census.columns.keys()
+['state', 'sex', 'age', 'pop2000', 'pop2008']
+
+connection.execute(select([census])).fetchmany(3)
+[('Illinois', 'M', 0, 89600, 95012),
+ ('Illinois', 'M', 1, 88445, 91829),
+ ('Illinois', 'M', 2, 88729, 89547)]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build query to return state names by population difference from 2008 to 2000: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">,</span> <span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2008</span><span class="o">-</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2000</span><span class="p">).</span><span class="n">label</span><span class="p">(</span><span class="s">'pop_change'</span><span class="p">)])</span>
+
+<span class="c1"># Append group by for the state: stmt_grouped
+</span><span class="n">stmt_grouped</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c1"># Append order by for pop_change descendingly: stmt_ordered
+</span><span class="n">stmt_ordered</span> <span class="o">=</span> <span class="n">stmt_grouped</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="s">'pop_change'</span><span class="p">))</span>
+
+<span class="c1"># Return only 5 results: stmt_top5
+</span><span class="n">stmt_top5</span> <span class="o">=</span> <span class="n">stmt_ordered</span><span class="p">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># Use connection to execute stmt_top5 and fetch all results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt_top5</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Print the state and population change for each record
+</span><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'{}:{}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">state</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">pop_change</span><span class="p">))</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+California:105705
+Florida:100984
+Texas:51901
+New York:47098
+Pennsylvania:42387
+
+</code></pre></div></div>
+
+<p>####
+<strong>Determining the overall percentage of women</strong></p>
+
+<p>It’s possible to combine functions and operators in a single select statement as well. These combinations can be exceptionally handy when we want to calculate percentages or averages, and we can also use the
+ <code class="language-plaintext highlighter-rouge">case()</code>
+ expression to operate on data that meets specific criteria while not affecting the query as a whole. The
+ <code class="language-plaintext highlighter-rouge">case()</code>
+ expression accepts a list of conditions to match and the column to return if the condition matches, followed by an
+ <code class="language-plaintext highlighter-rouge">else_</code>
+ if none of the conditions match. We can wrap this entire expression in any function or math operation we like.</p>
+
+<p>Often when performing integer division, we want to get a float back. While some databases will do this automatically, you can use the
+ <code class="language-plaintext highlighter-rouge">cast()</code>
+ function to convert an expression to a particular type.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># import case, cast and Float from sqlalchemy
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">case</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">Float</span>
+
+<span class="c1"># Build an expression to calculate female population in 2000
+</span><span class="n">female_pop2000</span> <span class="o">=</span> <span class="n">func</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span>
+    <span class="n">case</span><span class="p">([</span>
+        <span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">sex</span> <span class="o">==</span> <span class="s">'F'</span><span class="p">,</span> <span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2000</span><span class="p">)</span>
+    <span class="p">],</span> <span class="n">else_</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
+
+<span class="c1"># Cast an expression to calculate total population in 2000 to Float
+</span><span class="n">total_pop2000</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">func</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2000</span><span class="p">),</span> <span class="n">Float</span><span class="p">)</span>
+
+<span class="c1"># Build a query to calculate the percentage of women in 2000: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">female_pop2000</span> <span class="o">/</span> <span class="n">total_pop2000</span> <span class="o">*</span> <span class="mi">100</span><span class="p">])</span>
+
+<span class="c1"># Execute the query and store the scalar result: percent_female
+</span><span class="n">percent_female</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">).</span><span class="n">scalar</span><span class="p">()</span>
+
+<span class="c1"># Print the percentage
+</span><span class="k">print</span><span class="p">(</span><span class="n">percent_female</span><span class="p">)</span>
+
+<span class="c1"># 51.0946743229
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="32-sql-relationships"><strong>3.2 SQL relationships</strong></h2>
+
+<p>####
+<strong>Automatic joins with an established relationship</strong></p>
+
+<p>If you have two tables that already have an established relationship, you can automatically use that relationship by just adding the columns we want from each table to the select statement. Recall that Jason constructed the following query:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+stmt = select([census.columns.pop2008, state_fact.columns.abbreviation])
+
+</code></pre></div></div>
+
+<p>in order to join the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ and
+ <code class="language-plaintext highlighter-rouge">state_fact</code>
+ tables and select the
+ <code class="language-plaintext highlighter-rouge">pop2008</code>
+ column from the first and the
+ <code class="language-plaintext highlighter-rouge">abbreviation</code>
+ column from the second. In this case, the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ and
+ <code class="language-plaintext highlighter-rouge">state_fact</code>
+ tables had a pre-defined relationship: the
+ <code class="language-plaintext highlighter-rouge">state</code>
+ column of the former corresponded to the
+ <code class="language-plaintext highlighter-rouge">name</code>
+ column of the latter.</p>
+
+<p>In this exercise, you’ll use the same predefined relationship to select the
+ <code class="language-plaintext highlighter-rouge">pop2000</code>
+ and
+ <code class="language-plaintext highlighter-rouge">abbreviation</code>
+ columns!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build a statement to join census and state_fact tables: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2000</span><span class="p">,</span> <span class="n">state_fact</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">abbreviation</span><span class="p">])</span>
+
+<span class="c1"># Execute the statement and get the first result: result
+</span><span class="n">result</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">).</span><span class="n">first</span><span class="p">()</span>
+
+<span class="c1"># Loop over the keys in the result object and print the key and value
+</span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">result</span><span class="p">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+
+<span class="n">pop2000</span> <span class="mi">89600</span>
+<span class="n">abbreviation</span> <span class="n">IL</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+result
+# (89600, 'IL')
+
+</code></pre></div></div>
+
+<p>####
+<strong>Joins</strong></p>
+
+<p>If you aren’t selecting columns from both tables or the two tables don’t have a defined relationship, you can still use the
+ <code class="language-plaintext highlighter-rouge">.join()</code>
+ method on a table to join it with another table and get extra data related to our query.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">join()</code>
+ takes the table object you want to join in as the first argument and a condition that indicates how the tables are related to the second argument.</p>
+
+<p>Finally, you use the
+ <code class="language-plaintext highlighter-rouge">.select_from()</code>
+ method on the select statement to wrap the join clause.</p>
+
+<p>For example, the following code joins the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table to the
+ <code class="language-plaintext highlighter-rouge">state_fact</code>
+ table such that the
+ <code class="language-plaintext highlighter-rouge">state</code>
+ column of the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table corresponded to the
+ <code class="language-plaintext highlighter-rouge">name</code>
+ column of the
+ <code class="language-plaintext highlighter-rouge">state_fact</code>
+ table.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+stmt = stmt.select_from(
+    census.join(
+        state_fact, census.columns.state ==
+        state_fact.columns.name)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+connection.execute(select([state_fact])).keys()
+['id',
+ 'name',
+ 'abbreviation',
+ 'country',
+ 'type',
+ 'sort',
+ 'status',
+ 'occupied',
+ 'notes',
+ 'fips_state',
+ 'assoc_press',
+ 'standard_federal_region',
+ 'census_region',
+ 'census_region_name',
+ 'census_division',
+ 'census_division_name',
+ 'circuit_court']
+
+
+connection.execute(select([state_fact])).fetchmany(2)
+[('13', 'Illinois', 'IL', 'USA', 'state', '10', 'current', 'occupied', '', '17', 'Ill.', 'V', '2', 'Midwest', '3', 'East North Central', '7'),
+ ('30', 'New Jersey', 'NJ', 'USA', 'state', '10', 'current', 'occupied', '', '34', 'N.J.', 'II', '1', 'Northeast', '2', 'Mid-Atlantic', '3')]
+
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build a statement to select the census and state_fact tables: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">,</span> <span class="n">state_fact</span><span class="p">])</span>
+
+<span class="c1"># Add a select_from clause that wraps a join for the census and state_fact
+# tables where the census state column and state_fact name column match
+</span><span class="n">stmt_join</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">select_from</span><span class="p">(</span>
+    <span class="n">census</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">state_fact</span><span class="p">,</span> <span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">state_fact</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">name</span><span class="p">))</span>
+
+<span class="c1"># Execute the statement and get the first result: result
+</span><span class="n">result</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt_join</span><span class="p">).</span><span class="n">first</span><span class="p">()</span>
+
+<span class="c1"># Loop over the keys in the result object and print the key and value
+</span><span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">result</span><span class="p">.</span><span class="n">keys</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+state Illinois
+sex M
+age 0
+pop2000 89600
+pop2008 95012
+id 13
+name Illinois
+abbreviation IL
+country USA
+type state
+sort 10
+status current
+occupied occupied
+notes
+fips_state 17
+assoc_press Ill.
+standard_federal_region V
+census_region 2
+census_region_name Midwest
+census_division 3
+census_division_name East North Central
+circuit_court 7
+
+
+</code></pre></div></div>
+
+<p>####
+<strong>More practice with joins</strong></p>
+
+<p>You can use the same select statement you built in the last exercise, however, let’s add a twist and only return a few columns and use the other table in a
+ <code class="language-plaintext highlighter-rouge">group_by()</code>
+ clause.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+stmt = select([
+            census.columns.state,
+            func.sum(census.columns.pop2008),
+            state_fact.columns.census_division_name
+        ])
+
+connection.execute(stmt).fetchmany(3)
+# [('Texas', 15446707263, 'South Atlantic')]
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+stmt_joined = stmt.select_from(
+            census.join(state_fact, census.columns.state == state_fact.columns.name)
+        )
+
+connection.execute(stmt_joined).fetchmany(3)
+# [('Texas', 302287703, 'West South Central')]
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+stmt_grouped = stmt_joined.group_by(state_fact.columns.name)
+
+connection.execute(stmt_grouped).fetchmany(3)
+# [('Alabama', 4649367, 'East South Central'),
+ ('Alaska', 664546, 'Pacific'),
+ ('Arizona', 6480767, 'Mountain')]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build a statement to select the state, sum of 2008 population and census
+# division name: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span>
+    <span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">,</span>
+    <span class="n">func</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2008</span><span class="p">),</span>
+    <span class="n">state_fact</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">census_division_name</span>
+<span class="p">])</span>
+
+<span class="c1"># Append select_from to join the census and state_fact tables by the census state and state_fact name columns
+</span><span class="n">stmt_joined</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">select_from</span><span class="p">(</span>
+    <span class="n">census</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">state_fact</span><span class="p">,</span> <span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">state_fact</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Append a group by for the state_fact name column
+</span><span class="n">stmt_grouped</span> <span class="o">=</span> <span class="n">stmt_joined</span><span class="p">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">state_fact</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># Execute the statement and get the results: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt_grouped</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Loop over the results object and print each record.
+</span><span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+('Alabama', 4649367, 'East South Central')
+('Alaska', 664546, 'Pacific')
+...
+('Wisconsin', 5625013, 'East North Central')
+('Wyoming', 529490, 'Mountain')
+
+</code></pre></div></div>
+
+<p>The ability to join tables like this is what makes relational databases so powerful.</p>
+
+<hr />
+
+<h2 id="33-working-with-hierarchical-tables"><strong>3.3 Working with hierarchical tables</strong></h2>
+
+<p>####
+<strong>Using alias to handle same table joined queries</strong></p>
+
+<p>Often, you’ll have tables that contain hierarchical data, such as employees and managers who are also employees. For this reason, you may wish to join a table to itself on different columns. The
+ <code class="language-plaintext highlighter-rouge">.alias()</code>
+ method, which creates a copy of a table, helps accomplish this task. Because it’s the same table, you only need a where clause to specify the join condition.</p>
+
+<p>Here, you’ll use the
+ <code class="language-plaintext highlighter-rouge">.alias()</code>
+ method to build a query to join the
+ <code class="language-plaintext highlighter-rouge">employees</code>
+ table against itself to determine to whom everyone reports.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+employees.columns.keys()
+# ['id', 'name', 'job', 'mgr', 'hiredate', 'sal', 'comm', 'dept']
+
+connection.execute(select([employees.columns.name, employees.columns.mgr])).fetchmany(5)
+# [('JOHNSON', 6), ('HARDING', 9), ('TAFT', 2), ('HOOVER', 2), ('LINCOLN', 6)]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Make an alias of the employees table: managers
+</span><span class="n">managers</span> <span class="o">=</span> <span class="n">employees</span><span class="p">.</span><span class="n">alias</span><span class="p">()</span>
+
+<span class="c1"># Build a query to select names of managers and their employees: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">managers</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">name</span><span class="p">.</span><span class="n">label</span><span class="p">(</span><span class="s">'manager'</span><span class="p">),</span>
+     <span class="n">employees</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">name</span><span class="p">.</span><span class="n">label</span><span class="p">(</span><span class="s">'employee'</span><span class="p">)]</span>
+<span class="p">)</span>
+
+<span class="c1"># Match managers id with employees mgr: stmt_matched
+</span><span class="n">stmt_matched</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="n">managers</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="nb">id</span> <span class="o">==</span> <span class="n">employees</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">mgr</span><span class="p">)</span>
+
+<span class="c1"># Order the statement by the managers name: stmt_ordered
+</span><span class="n">stmt_ordered</span> <span class="o">=</span> <span class="n">stmt_matched</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">managers</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># Execute statement: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt_ordered</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Print records
+</span><span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+('FILLMORE', 'GRANT')
+('FILLMORE', 'ADAMS')
+('FILLMORE', 'MONROE')
+('GARFIELD', 'JOHNSON')
+('GARFIELD', 'LINCOLN')
+('GARFIELD', 'POLK')
+('GARFIELD', 'WASHINGTON')
+('HARDING', 'TAFT')
+('HARDING', 'HOOVER')
+('JACKSON', 'HARDING')
+('JACKSON', 'GARFIELD')
+('JACKSON', 'FILLMORE')
+('JACKSON', 'ROOSEVELT')
+
+
+</code></pre></div></div>
+
+<p>####
+<strong>Leveraging functions and group_bys with hierarchical data</strong></p>
+
+<p>It’s also common to want to roll up data which is in a hierarchical table. Rolling up data requires making sure you’re careful which alias you use to perform the group_bys and which table you use for the function.</p>
+
+<p>Here, your job is to get a count of employees for each manager.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+connection.execute(select([func.count(employees.columns.id)])).fetchmany(3)
+[(14,)]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Make an alias of the employees table: managers
+</span><span class="n">managers</span> <span class="o">=</span> <span class="n">employees</span><span class="p">.</span><span class="n">alias</span><span class="p">()</span>
+
+<span class="c1"># Build a query to select names of managers and counts of their employees: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">managers</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">name</span><span class="p">,</span> <span class="n">func</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="n">employees</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="nb">id</span><span class="p">)])</span>
+
+<span class="c1"># Append a where clause that ensures the manager id and employee mgr are equal
+</span><span class="n">stmt_matched</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="n">managers</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="nb">id</span> <span class="o">==</span> <span class="n">employees</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">mgr</span><span class="p">)</span>
+
+<span class="c1"># Group by Managers Name
+</span><span class="n">stmt_grouped</span> <span class="o">=</span> <span class="n">stmt_matched</span><span class="p">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">managers</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+
+<span class="c1"># Execute statement: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt_grouped</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># print manager
+</span><span class="k">for</span> <span class="n">record</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+('FILLMORE', 3)
+('GARFIELD', 4)
+('HARDING', 2)
+('JACKSON', 4)
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="34-dealing-with-large-resultsets"><strong>3.4 Dealing with large ResultSets</strong></h2>
+
+<p>####
+<strong>Working on blocks of records</strong></p>
+
+<p>Sometimes you may have the need to work on a large ResultProxy, and you may not have the memory to load all the results at once.</p>
+
+<p>To work around that issue, you can get blocks of rows from the ResultProxy by using the
+ <code class="language-plaintext highlighter-rouge">.fetchmany()</code>
+ method inside a loop. With
+ <code class="language-plaintext highlighter-rouge">.fetchmany()</code>
+ , give it an argument of the number of records you want. When you reach an empty list, there are no more rows left to fetch, and you have processed all the results of the query.</p>
+
+<p>Then you need to use the
+ <code class="language-plaintext highlighter-rouge">.close()</code>
+ method to close out the connection to the database.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+results_proxy
+ &lt;sqlalchemy.engine.result.ResultProxy at 0x7f4b7dc70160&gt;
+
+results_proxy.fetchmany(3)
+[('Illinois', 'M', 0, 89600, 95012),
+ ('Illinois', 'M', 1, 88445, 91829),
+ ('Illinois', 'M', 2, 88729, 89547)]
+
+results_proxy.fetchmany(3)
+[('Illinois', 'M', 3, 88868, 90037),
+ ('Illinois', 'M', 4, 91947, 91111),
+ ('Illinois', 'M', 5, 93894, 89802)]
+
+
+results_proxy.fetchmany(1)[0]
+('Illinois', 'M', 9, 96436, 86055)
+
+results_proxy.fetchmany(1)[0]['state']
+'Illinois'
+
+state_count
+{}
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Start a while loop checking for more results
+</span><span class="k">while</span> <span class="n">more_results</span><span class="p">:</span>
+    <span class="c1"># Fetch the first 50 results from the ResultProxy: partial_results
+</span>    <span class="n">partial_results</span> <span class="o">=</span> <span class="n">results_proxy</span><span class="p">.</span><span class="n">fetchmany</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+
+    <span class="c1"># if empty list, set more_results to False
+</span>    <span class="k">if</span> <span class="n">partial_results</span> <span class="o">==</span> <span class="p">[]:</span>
+        <span class="n">more_results</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="c1"># Loop over the fetched records and increment the count for the state
+</span>    <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">partial_results</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">row</span><span class="p">.</span><span class="n">state</span> <span class="ow">in</span> <span class="n">state_count</span><span class="p">:</span>
+            <span class="n">state_count</span><span class="p">[</span><span class="n">row</span><span class="p">.</span><span class="n">state</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">state_count</span><span class="p">[</span><span class="n">row</span><span class="p">.</span><span class="n">state</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># Close the ResultProxy, and thus the connection
+</span><span class="n">results_proxy</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="c1"># Print the count by state
+</span><span class="k">print</span><span class="p">(</span><span class="n">state_count</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+{'Illinois': 172, 'New Jersey': 172, 'District of Columbia': 172, 'North Dakota': 75, 'Florida': 172, 'Maryland': 49, 'Idaho': 172, 'Massachusetts': 16}
+
+</code></pre></div></div>
+
+<p>As a data scientist, you’ll inevitably come across huge databases, and being able to work on them in blocks is a vital skill.</p>
+
+<hr />
+
+<h1 id="4-creating-and-manipulating-your-own-databases"><strong>4. Creating and Manipulating your own Databases</strong></h1>
+<hr />
+
+<h2 id="41-creating-databases-and-tables"><strong>4.1 Creating databases and tables</strong></h2>
+
+<p>####
+<strong>Creating tables with SQLAlchemy</strong></p>
+
+<p>Previously, you used the
+ <code class="language-plaintext highlighter-rouge">Table</code>
+ object to reflect a table from an
+ <em>existing</em>
+ database, but what if you wanted to create a
+ <em>new</em>
+ table? You’d still use the
+ <code class="language-plaintext highlighter-rouge">Table</code>
+ object; however, you’d need to replace the
+ <code class="language-plaintext highlighter-rouge">autoload</code>
+ and
+ <code class="language-plaintext highlighter-rouge">autoload_with</code>
+ parameters with Column objects.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">Column</code>
+ object takes a name, a SQLAlchemy type with an optional format, and optional keyword arguments for different constraints.</p>
+
+<p>When defining the table, recall how in the video Jason passed in
+ <code class="language-plaintext highlighter-rouge">255</code>
+ as the maximum length of a String by using
+ <code class="language-plaintext highlighter-rouge">Column('name', String(255))</code>
+ . Checking out the slides from the video may help: you can download them by clicking on ‘Slides’ next to the IPython Shell.</p>
+
+<p>After defining the table, you can create the table in the database by using the
+ <code class="language-plaintext highlighter-rouge">.create_all()</code>
+ method on metadata and supplying the engine as the only parameter. Go for it!</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+metadata
+MetaData(bind=None)
+
+engine
+Engine(sqlite:///:memory:)
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import Table, Column, String, Integer, Float, Boolean from sqlalchemy
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">Boolean</span>
+
+<span class="c1"># Define a new table with a name, count, amount, and valid column: data
+</span><span class="n">data</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s">'data'</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+             <span class="n">Column</span><span class="p">(</span><span class="s">'name'</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">255</span><span class="p">)),</span>
+             <span class="n">Column</span><span class="p">(</span><span class="s">'count'</span><span class="p">,</span> <span class="n">Integer</span><span class="p">()),</span>
+             <span class="n">Column</span><span class="p">(</span><span class="s">'amount'</span><span class="p">,</span> <span class="n">Float</span><span class="p">()),</span>
+             <span class="n">Column</span><span class="p">(</span><span class="s">'valid'</span><span class="p">,</span> <span class="n">Boolean</span><span class="p">())</span>
+<span class="p">)</span>
+
+<span class="c1"># Use the metadata to create the table
+</span><span class="n">metadata</span><span class="p">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="c1"># Print table details
+</span><span class="k">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Table('data', MetaData(bind=None), Column('name', String(length=255), table=&lt;data&gt;), Column('count', Integer(), table=&lt;data&gt;), Column('amount', Float(), table=&lt;data&gt;), Column('valid', Boolean(), table=&lt;data&gt;), schema=None)
+
+</code></pre></div></div>
+
+<p>When creating a table, it’s important to carefully think about what data types each column should be.</p>
+
+<p>####
+<strong>Constraints and data defaults</strong></p>
+
+<p>You’re now going to practice creating a table with some constraints! Often, you’ll need to make sure that a column is unique, nullable, a positive value, or related to a column in another table. This is where constraints come in.</p>
+
+<p>You can also set a default value for the column if no data is passed to it via the
+ <code class="language-plaintext highlighter-rouge">default</code>
+ keyword on the column.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import Table, Column, String, Integer, Float, Boolean from sqlalchemy
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Integer</span><span class="p">,</span> <span class="n">Float</span><span class="p">,</span> <span class="n">Boolean</span>
+
+<span class="c1"># Define a new table with a name, count, amount, and valid column: data
+</span><span class="n">data</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s">'data'</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+             <span class="n">Column</span><span class="p">(</span><span class="s">'name'</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span> <span class="n">unique</span><span class="o">=</span><span class="bp">True</span><span class="p">),</span>
+             <span class="n">Column</span><span class="p">(</span><span class="s">'count'</span><span class="p">,</span> <span class="n">Integer</span><span class="p">(),</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+             <span class="n">Column</span><span class="p">(</span><span class="s">'amount'</span><span class="p">,</span> <span class="n">Float</span><span class="p">()),</span>
+             <span class="n">Column</span><span class="p">(</span><span class="s">'valid'</span><span class="p">,</span> <span class="n">Boolean</span><span class="p">(),</span> <span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Use the metadata to create the table
+</span><span class="n">metadata</span><span class="p">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="c1"># Print the table details
+</span><span class="k">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">tables</span><span class="p">[</span><span class="s">'data'</span><span class="p">]))</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Table('data', MetaData(bind=None), Column('name', String(length=255), table=&lt;data&gt;), Column('count', Integer(), table=&lt;data&gt;, default=ColumnDefault(1)), Column('amount', Float(), table=&lt;data&gt;), Column('valid', Boolean(), table=&lt;data&gt;, default=ColumnDefault(False)), schema=None)
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="42-inserting-data-into-a-table"><strong>4.2 Inserting data into a table</strong></h2>
+
+<p>####
+<strong>Inserting a single row</strong></p>
+
+<p>There are several ways to perform an insert with SQLAlchemy; however, we are going to focus on the one that follows the same pattern as the
+ <code class="language-plaintext highlighter-rouge">select</code>
+ statement.</p>
+
+<p>It uses an
+ <code class="language-plaintext highlighter-rouge">insert</code>
+ statement where you specify the table as an argument, and supply the data you wish to insert into the value via the
+ <code class="language-plaintext highlighter-rouge">.values()</code>
+ method as keyword arguments</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+data
+Table('data', MetaData(bind=None), Column('name', String(length=255), table=&lt;data&gt;), Column('count', Integer(), table=&lt;data&gt;), Column('amount', Float(), table=&lt;data&gt;), Column('valid', Boolean(), table=&lt;data&gt;), schema=None)
+
+type(data)
+sqlalchemy.sql.schema.Table
+
+
+repr(data)
+"Table('data', MetaData(bind=None), Column('name', String(length=255), table=&lt;data&gt;), Column('count', Integer(), table=&lt;data&gt;), Column('amount', Float(), table=&lt;data&gt;), Column('valid', Boolean(), table=&lt;data&gt;), schema=None)"
+
+type(repr(data))
+str
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import insert and select from sqlalchemy
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">insert</span><span class="p">,</span> <span class="n">select</span>
+
+<span class="c1"># Build an insert statement to insert a record into the data table: insert_stmt
+</span><span class="n">insert_stmt</span> <span class="o">=</span> <span class="n">insert</span><span class="p">(</span><span class="n">data</span><span class="p">).</span><span class="n">values</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'Anna'</span><span class="p">,</span> <span class="n">count</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">amount</span><span class="o">=</span><span class="mf">1000.00</span><span class="p">,</span> <span class="n">valid</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Execute the insert statement via the connection: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">insert_stmt</span><span class="p">)</span>
+
+<span class="c1"># Print result rowcount
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">.</span><span class="n">rowcount</span><span class="p">)</span>
+<span class="c1"># 1
+</span>
+<span class="c1"># Build a select statement to validate the insert: select_stmt
+</span><span class="n">select_stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">data</span><span class="p">]).</span><span class="n">where</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">'Anna'</span><span class="p">)</span>
+
+<span class="c1"># Print the result of executing the query.
+</span><span class="k">print</span><span class="p">(</span><span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">select_stmt</span><span class="p">).</span><span class="n">first</span><span class="p">())</span>
+<span class="c1"># ('Anna', 1, 1000.0, True)
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Inserting multiple records at once</strong></p>
+
+<p>When inserting multiple records at once, you do not use the
+ <code class="language-plaintext highlighter-rouge">.values()</code>
+ method. Instead, you’ll want to first build a
+ <strong>list of dictionaries</strong>
+ that represents the data you want to insert, with keys being the names of the columns.</p>
+
+<p>In the
+ <code class="language-plaintext highlighter-rouge">.execute()</code>
+ method, you can pair this list of dictionaries with an
+ <code class="language-plaintext highlighter-rouge">insert</code>
+ statement, which will insert all the records in your list of dictionaries.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build a list of dictionaries: values_list
+</span><span class="n">values_list</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'Anna'</span><span class="p">,</span> <span class="s">'count'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">'amount'</span><span class="p">:</span> <span class="mf">1000.00</span><span class="p">,</span> <span class="s">'valid'</span><span class="p">:</span> <span class="bp">True</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">'name'</span><span class="p">:</span> <span class="s">'Taylor'</span><span class="p">,</span> <span class="s">'count'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">'amount'</span><span class="p">:</span> <span class="mf">750.00</span><span class="p">,</span> <span class="s">'valid'</span><span class="p">:</span> <span class="bp">False</span><span class="p">}]</span>
+
+<span class="c1"># Build an insert statement for the data table: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">insert</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Execute stmt with the values_list: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="n">values_list</span><span class="p">)</span>
+
+<span class="c1"># Print rowcount
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">.</span><span class="n">rowcount</span><span class="p">)</span>
+<span class="c1"># 2
+</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+connection.execute(select([data])).fetchmany(3)
+# [('Anna', 1, 1000.0, True), ('Taylor', 1, 750.0, False)]
+
+</code></pre></div></div>
+
+<p>####
+<strong>Loading a CSV into a table</strong></p>
+
+<p>You’re now going to learn how to load the contents of a CSV file into a table.</p>
+
+<p>One way to do that would be to read a CSV file line by line, create a dictionary from each line, and then use
+ <code class="language-plaintext highlighter-rouge">insert()</code>
+ , like you did in the previous exercise.</p>
+
+<p>But there is a faster way using
+ <code class="language-plaintext highlighter-rouge">pandas</code>
+ . You can read a CSV file into a DataFrame using the
+ <code class="language-plaintext highlighter-rouge">read_csv()</code>
+ function (this function should be familiar to you, but you can run
+ <code class="language-plaintext highlighter-rouge">help(pd.read_csv)</code>
+ in the console to refresh your memory!). Then, you can call the
+ <a href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_sql.html"><code class="language-plaintext highlighter-rouge">.to_sql()</code></a>
+ method on the DataFrame to load it into a SQL table in a database. The columns of the DataFrame should match the columns of the SQL table.</p>
+
+<p><code class="language-plaintext highlighter-rouge">.to_sql()</code>
+ has many parameters, but in this exercise we will use the following:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">name</code>
+ is the name of the SQL table (as a string).</li>
+  <li><code class="language-plaintext highlighter-rouge">con</code>
+ is the connection to the database that you will use to upload the data.</li>
+  <li><code class="language-plaintext highlighter-rouge">if_exists</code>
+ specifies how to behave if the table already exists in the database; possible values are
+ <code class="language-plaintext highlighter-rouge">"fail"</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">"replace"</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">"append"</code>
+ .</li>
+  <li><code class="language-plaintext highlighter-rouge">index</code>
+ (
+ <code class="language-plaintext highlighter-rouge">True</code>
+ or
+ <code class="language-plaintext highlighter-rouge">False</code>
+ ) specifies whether to write the DataFrame’s index as a column.</li>
+</ul>
+
+<p>In this exercise, you will upload the data contained in the
+ <code class="language-plaintext highlighter-rouge">census.csv</code>
+ file into an existing table
+ <code class="language-plaintext highlighter-rouge">"census"</code>
+ . The
+ <code class="language-plaintext highlighter-rouge">connection</code>
+ to the database has already been created for you.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># import pandas
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># read census.csv into a dataframe : census_df
+</span><span class="n">census_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">"census.csv"</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+
+<span class="c1"># rename the columns of the census dataframe
+</span><span class="n">census_df</span><span class="p">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'state'</span><span class="p">,</span> <span class="s">'sex'</span><span class="p">,</span> <span class="s">'age'</span><span class="p">,</span> <span class="s">'pop2000'</span><span class="p">,</span> <span class="s">'pop2008'</span><span class="p">]</span>
+
+<span class="n">census_df</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+      state sex  age  pop2000  pop2008
+0  Illinois   M    0    89600    95012
+1  Illinois   M    1    88445    91829
+2  Illinois   M    2    88729    89547
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+connection
+&lt;sqlalchemy.engine.base.Connection at 0x7feca8d64e10&gt;
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># append the data from census_df to the "census" table via connection
+</span><span class="n">census_df</span><span class="p">.</span><span class="n">to_sql</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s">'census'</span><span class="p">,</span> <span class="n">con</span><span class="o">=</span><span class="n">connection</span><span class="p">,</span> <span class="n">if_exists</span><span class="o">=</span><span class="s">'append'</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+connection.execute(select([func.count(census)])).fetchmany(3)
+[(8772,)]
+
+census_df.shape
+(8772, 5)
+
+</code></pre></div></div>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">pandas</code>
+ package provides us with an efficient way to load a DataFrames into a SQL table. If you would create and execute a statement to select all records
+ <code class="language-plaintext highlighter-rouge">from</code>
+ census, you would see that there are 8772 rows in the table.</p>
+
+<hr />
+
+<h2 id="43-updating-data-in-a-database"><strong>4.3 Updating data in a database</strong></h2>
+
+<p>####
+<strong>Updating individual records</strong></p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">update</code>
+ statement is very similar to an
+ <code class="language-plaintext highlighter-rouge">insert</code>
+ statement. For example, you can update all wages in the
+ <code class="language-plaintext highlighter-rouge">employees</code>
+ table as follows:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+stmt = update(employees).values(wage=100.00)
+
+</code></pre></div></div>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">update</code>
+ statement also typically uses a
+ <code class="language-plaintext highlighter-rouge">where</code>
+ clause to help us determine what data to update. For example, to only update the record for the employee with ID 15, you would append the previous statement as follows:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+stmt = stmt.where(employees.columns.id == 15)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+repr(state_fact)
+#  "Table('state_fact', MetaData(bind=None), Column('id', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('name', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('abbreviation', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('country', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('type', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('sort', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('status', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('occupied', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('notes', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('fips_state', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('assoc_press', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('standard_federal_region', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('census_region', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('census_region_name', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('census_division', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('census_division_name', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('circuit_court', VARCHAR(length=256), table=&lt;state_fact&gt;), schema=None)"
+
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build a select statement: select_stmt
+</span><span class="n">select_stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">state_fact</span><span class="p">]).</span><span class="n">where</span><span class="p">(</span><span class="n">state_fact</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">'New York'</span><span class="p">)</span>
+
+<span class="c1"># Execute select_stmt and fetch the results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">select_stmt</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Print the results of executing the select_stmt
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="c1"># [('32', 'New York', 'NY', 'USA', 'state', '10', 'current', 'occupied', '', '0', 'N.Y.', 'II', '1', 'Northeast', '2', 'Mid-Atlantic', '2')]
+</span>
+<span class="c1"># Print the FIPS code for the first row of the result
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">'fips_state'</span><span class="p">])</span>
+<span class="c1"># 0
+</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+select_stmt = select([state_fact]).where(state_fact.columns.name == 'New York')
+results = connection.execute(select_stmt).fetchall()
+print(results)
+print(results[0]['fips_state'])
+
+# Build a statement to update the fips_state to 36: update_stmt
+update_stmt = update(state_fact).values(fips_state = 36)
+
+# Append a where clause to limit it to records for New York state
+update_stmt = update_stmt.where(state_fact.columns.name == 'New York')
+
+# Execute the statement: update_results
+update_results = connection.execute(update_stmt)
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Execute select_stmt again and fetch the new results
+</span><span class="n">new_results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">select_stmt</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Print the new_results
+</span><span class="k">print</span><span class="p">(</span><span class="n">new_results</span><span class="p">)</span>
+<span class="c1"># [('32', 'New York', 'NY', 'USA', 'state', '10', 'current', 'occupied', '', '36', 'N.Y.', 'II', '1', 'Northeast', '2', 'Mid-Atlantic', '2')]
+</span>
+<span class="c1"># Print the FIPS code for the first row of the new_results
+</span><span class="k">print</span><span class="p">(</span><span class="n">new_results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s">'fips_state'</span><span class="p">])</span>
+<span class="c1"># 36
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Updating multiple records</strong></p>
+
+<p>By using a
+ <code class="language-plaintext highlighter-rouge">where</code>
+ clause that selects more records, you can update multiple records at once.</p>
+
+<p>Unlike inserting, updating multiple records works exactly the same way as updating a single record (as long as you are updating them with the same value).</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build a statement to update the notes to 'The Wild West': stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="n">state_fact</span><span class="p">).</span><span class="n">values</span><span class="p">(</span><span class="n">notes</span><span class="o">=</span><span class="s">'The Wild West'</span><span class="p">)</span>
+
+<span class="c1"># Append a where clause to match the West census region records: stmt_west
+</span><span class="n">stmt_west</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="n">state_fact</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">census_region_name</span> <span class="o">==</span> <span class="s">'West'</span><span class="p">)</span>
+
+<span class="c1"># Execute the statement: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt_west</span><span class="p">)</span>
+
+<span class="c1"># Print rowcount
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">.</span><span class="n">rowcount</span><span class="p">)</span>
+<span class="c1"># 13
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Correlated updates</strong></p>
+
+<p>You can also update records with data from a select statement. This is called a correlated update. It works by defining a
+ <code class="language-plaintext highlighter-rouge">select</code>
+ statement that returns the value you want to update the record with and assigning that select statement as the value in
+ <code class="language-plaintext highlighter-rouge">update</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+state_fact.columns.keys()
+['id',
+ 'name',
+...
+ 'fips_state',
+...]
+
+connection.execute(select([state_fact])).fetchmany(3)
+# [('13', 'Illinois', 'IL', 'USA', 'state', '10', 'current', 'occupied', '', '17', 'Ill.', 'V', '2', 'Midwest', '3', 'East North Central', '7'),
+ ('30', 'New Jersey', 'NJ', 'USA', 'state', '10', 'current', 'occupied', '', '34', 'N.J.', 'II', '1', 'Northeast', '2', 'Mid-Atlantic', '3'),
+ ('34', 'North Dakota', 'ND', 'USA', 'state', '10', 'current', 'occupied', '', '38', 'N.D.', 'VIII', '2', 'Midwest', '4', 'West North Central', '8')]
+
+
+flat_census.columns.keys()
+# ['state_name', 'fips_code']
+
+connection.execute(select([flat_census])).fetchmany(3)
+#  [(None, '17'), (None, '34'), (None, '38')]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build a statement to select name from state_fact: fips_stmt
+</span><span class="n">fips_stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">state_fact</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">name</span><span class="p">])</span>
+
+<span class="c1"># Append a where clause to match the fips_state to flat_census fips_code: fips_stmt
+</span><span class="n">fips_stmt</span> <span class="o">=</span> <span class="n">fips_stmt</span><span class="p">.</span><span class="n">where</span><span class="p">(</span>
+    <span class="n">state_fact</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">fips_state</span> <span class="o">==</span> <span class="n">flat_census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">fips_code</span><span class="p">)</span>
+
+<span class="c1"># Build an update statement to set the name to fips_stmt_where: update_stmt
+</span><span class="n">update_stmt</span> <span class="o">=</span> <span class="n">update</span><span class="p">(</span><span class="n">flat_census</span><span class="p">).</span><span class="n">values</span><span class="p">(</span><span class="n">state_name</span><span class="o">=</span><span class="n">fips_stmt</span><span class="p">)</span>
+
+<span class="c1"># Execute update_stmt: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">update_stmt</span><span class="p">)</span>
+
+<span class="c1"># Print rowcount
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">.</span><span class="n">rowcount</span><span class="p">)</span>
+<span class="c1"># 51
+</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+connection.execute(select([flat_census])).fetchmany(3)
+[('Illinois', '17'), ('New Jersey', '34'), ('North Dakota', '38')]
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="44-removing-data-from-a-database"><strong>4.4 Removing data from a database</strong></h2>
+
+<p>####
+<strong>Deleting all the records from a table</strong></p>
+
+<p>Often, you’ll need to empty a table of all of its records so you can reload the data. You can do this with a
+ <code class="language-plaintext highlighter-rouge">delete</code>
+ statement with just the table as an argument. For example, delete the table
+ <code class="language-plaintext highlighter-rouge">extra_employees</code>
+ by executing as follows:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+delete_stmt = delete(extra_employees)
+result_proxy = connection.execute(delete_stmt)
+
+</code></pre></div></div>
+
+<p><strong>Do be careful, though, as deleting cannot be undone!</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import delete, select
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">delete</span><span class="p">,</span> <span class="n">select</span>
+
+<span class="c1"># Build a statement to empty the census table: stmt
+</span><span class="n">delete_stmt</span> <span class="o">=</span> <span class="n">delete</span><span class="p">(</span><span class="n">census</span><span class="p">)</span>
+
+<span class="c1"># Execute the statement: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">delete_stmt</span><span class="p">)</span>
+
+<span class="c1"># Print affected rowcount
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">.</span><span class="n">rowcount</span><span class="p">)</span>
+<span class="c1"># 8772
+</span>
+<span class="c1"># Build a statement to select all records from the census table : select_stmt
+</span><span class="n">select_stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">])</span>
+
+<span class="c1"># Print the results of executing the statement to verify there are no rows
+</span><span class="k">print</span><span class="p">(</span><span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">select_stmt</span><span class="p">).</span><span class="n">fetchall</span><span class="p">())</span>
+<span class="c1"># []
+</span>
+</code></pre></div></div>
+
+<p>As you can see, there are no records left in the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table after executing the delete statement!</p>
+
+<p>####
+<strong>Deleting specific records</strong></p>
+
+<p>By using a
+ <code class="language-plaintext highlighter-rouge">where()</code>
+ clause, you can target the
+ <code class="language-plaintext highlighter-rouge">delete</code>
+ statement to remove only certain records. For example, delete all rows from the
+ <code class="language-plaintext highlighter-rouge">employees</code>
+ table that had
+ <code class="language-plaintext highlighter-rouge">id</code>
+ 3 with the following delete statement:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+delete(employees).where(employees.columns.id == 3)
+
+</code></pre></div></div>
+
+<p>Here you’ll delete ALL rows which have
+ <code class="language-plaintext highlighter-rouge">'M'</code>
+ in the
+ <code class="language-plaintext highlighter-rouge">sex</code>
+ column and
+ <code class="language-plaintext highlighter-rouge">36</code>
+ in the
+ <code class="language-plaintext highlighter-rouge">age</code>
+ column.</p>
+
+<p>We have included code at the start which computes the total number of these rows. It is important to make sure that this is the number of rows that you actually delete.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build a statement to count records using the sex column for Men ('M') age 36: count_stmt
+</span><span class="n">count_stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">func</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">sex</span><span class="p">)]).</span><span class="n">where</span><span class="p">(</span>
+    <span class="n">and_</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">sex</span> <span class="o">==</span> <span class="s">'M'</span><span class="p">,</span>
+         <span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">age</span> <span class="o">==</span> <span class="mi">36</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="c1"># Execute the select statement and use the scalar() fetch method to save the record count
+</span><span class="n">to_delete</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">count_stmt</span><span class="p">).</span><span class="n">scalar</span><span class="p">()</span>
+
+<span class="c1"># Build a statement to delete records from the census table: delete_stmt
+</span><span class="n">delete_stmt</span> <span class="o">=</span> <span class="n">delete</span><span class="p">(</span><span class="n">census</span><span class="p">)</span>
+
+<span class="c1"># Append a where clause to target Men ('M') age 36: delete_stmt
+</span><span class="n">delete_stmt</span> <span class="o">=</span> <span class="n">delete_stmt</span><span class="p">.</span><span class="n">where</span><span class="p">(</span>
+    <span class="n">and_</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">sex</span> <span class="o">==</span> <span class="s">'M'</span><span class="p">,</span>
+         <span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">age</span> <span class="o">==</span> <span class="mi">36</span><span class="p">))</span>
+
+<span class="c1"># Execute the statement: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">delete_stmt</span><span class="p">)</span>
+
+<span class="c1"># Print affected rowcount and to_delete record count, make sure they match
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">.</span><span class="n">rowcount</span><span class="p">,</span> <span class="n">to_delete</span><span class="p">)</span>
+<span class="c1"># 51 51
+</span>
+</code></pre></div></div>
+
+<p>You may frequently be required to remove specific records from a table, like in this case.</p>
+
+<p>####
+<strong>Deleting a table completely</strong></p>
+
+<p>You’re now going to practice dropping individual tables from a database with the
+ <code class="language-plaintext highlighter-rouge">.drop()</code>
+ method, as well as
+ <em>all</em>
+ tables in a database with the
+ <code class="language-plaintext highlighter-rouge">.drop_all()</code>
+ method!</p>
+
+<p>As Spider-Man’s Uncle Ben said:
+ <strong>With great power, comes great responsibility.</strong>
+ Do be careful when deleting tables, as it’s not simple or fast to restore large databases!</p>
+
+<p>Remember, you can check to see if a table exists on an
+ <code class="language-plaintext highlighter-rouge">engine</code>
+ with the
+ <code class="language-plaintext highlighter-rouge">.exists(engine)</code>
+ method.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+engine
+# Engine(sqlite:///census.sqlite)
+
+repr(state_fact)
+# "Table('state_fact', MetaData(bind=None), Column('id', VARCHAR(length=256), table=&lt;state_fact&gt;),
+...
+Column('circuit_court', VARCHAR(length=256), table=&lt;state_fact&gt;), schema=None)"
+
+state_fact.exists(engine)
+# True
+
+repr(metadata.tables)
+#  "immutabledict({'census': Table('census', MetaData(bind=None), Column('state', VARCHAR(length=30), table=&lt;census&gt;), ... , Column('pop2008', INTEGER(), table=&lt;census&gt;), schema=None), 'state_fact': Table('state_fact', MetaData(bind=None), Column('id', VARCHAR(length=256), table=&lt;state_fact&gt;), Column('circuit_court', VARCHAR(length=256), ... , table=&lt;state_fact&gt;), schema=None)})"
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Drop the state_fact table
+</span><span class="n">state_fact</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="c1"># Check to see if state_fact exists
+</span><span class="k">print</span><span class="p">(</span><span class="n">state_fact</span><span class="p">.</span><span class="n">exists</span><span class="p">(</span><span class="n">engine</span><span class="p">))</span>
+<span class="c1"># False
+</span>
+<span class="c1"># Drop all tables
+</span><span class="n">metadata</span><span class="p">.</span><span class="n">drop_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+<span class="c1"># Check to see if census exists
+</span><span class="k">print</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">exists</span><span class="p">(</span><span class="n">engine</span><span class="p">))</span>
+<span class="c1"># False
+</span>
+
+</code></pre></div></div>
+
+<hr />
+
+<h1 id="5-putting-it-all-together"><strong>5. Putting it all together</strong></h1>
+<hr />
+
+<h2 id="51-census-case-study"><strong>5.1 Census case study</strong></h2>
+
+<p>####
+<strong>Setup the engine and metadata</strong></p>
+
+<p>In this exercise, your job is to create an engine to the database that will be used in this chapter. Then, you need to initialize its metadata.</p>
+
+<p>Recall how you did this in Chapter 1 by leveraging
+ <code class="language-plaintext highlighter-rouge">create_engine()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">MetaData()</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import create_engine, MetaData
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">create_engine</span><span class="p">,</span> <span class="n">MetaData</span>
+
+<span class="c1"># Define an engine to connect to chapter5.sqlite: engine
+</span><span class="n">engine</span> <span class="o">=</span> <span class="n">create_engine</span><span class="p">(</span><span class="s">'sqlite:///chapter5.sqlite'</span><span class="p">)</span>
+
+<span class="c1"># Initialize MetaData: metadata
+</span><span class="n">metadata</span> <span class="o">=</span> <span class="n">MetaData</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+engine
+# Engine(sqlite:///chapter5.sqlite)
+
+type(engine)
+# sqlalchemy.engine.base.Engine
+
+metadata
+# MetaData(bind=None)
+
+type(metadata)
+# sqlalchemy.sql.schema.MetaData
+
+</code></pre></div></div>
+
+<p>####
+<strong>Create the table to the database</strong></p>
+
+<p>Having setup the engine and initialized the metadata, you will now define the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ table object and then create it in the database using the
+ <code class="language-plaintext highlighter-rouge">metadata</code>
+ and
+ <code class="language-plaintext highlighter-rouge">engine</code>
+ from the previous exercise.</p>
+
+<p>To create it in the database, you will have to use the
+ <code class="language-plaintext highlighter-rouge">.create_all()</code>
+ method on the
+ <code class="language-plaintext highlighter-rouge">metadata</code>
+ with
+ <code class="language-plaintext highlighter-rouge">engine</code>
+ as the argument.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import Table, Column, String, and Integer
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Column</span><span class="p">,</span> <span class="n">String</span><span class="p">,</span> <span class="n">Integer</span>
+
+<span class="c1"># Build a census table: census
+</span><span class="n">census</span> <span class="o">=</span> <span class="n">Table</span><span class="p">(</span><span class="s">'census'</span><span class="p">,</span> <span class="n">metadata</span><span class="p">,</span>
+               <span class="n">Column</span><span class="p">(</span><span class="s">'state'</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">30</span><span class="p">)),</span>
+               <span class="n">Column</span><span class="p">(</span><span class="s">'sex'</span><span class="p">,</span> <span class="n">String</span><span class="p">(</span><span class="mi">1</span><span class="p">)),</span>
+               <span class="n">Column</span><span class="p">(</span><span class="s">'age'</span><span class="p">,</span> <span class="n">Integer</span><span class="p">()),</span>
+               <span class="n">Column</span><span class="p">(</span><span class="s">'pop2000'</span><span class="p">,</span> <span class="n">Integer</span><span class="p">()),</span>
+               <span class="n">Column</span><span class="p">(</span><span class="s">'pop2008'</span><span class="p">,</span> <span class="n">Integer</span><span class="p">()))</span>
+
+<span class="c1"># Create the table in the database
+</span><span class="n">metadata</span><span class="p">.</span><span class="n">create_all</span><span class="p">(</span><span class="n">engine</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<p>When creating columns of type
+ <code class="language-plaintext highlighter-rouge">String()</code>
+ , it’s important to spend some time thinking about what their maximum lengths should be.</p>
+
+<hr />
+
+<h2 id="52-populating-the-database"><strong>5.2 Populating the database</strong></h2>
+
+<p>####
+<strong>Reading the data from the CSV</strong></p>
+
+<p>Leverage the Python CSV module from the standard library and load the data into a list of dictionaries.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+csv_reader
+&lt;_csv.reader at 0x7f3e282604a8&gt;
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create an empty list: values_list
+</span><span class="n">values_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># Iterate over the rows
+</span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">csv_reader</span><span class="p">:</span>
+    <span class="c1"># Create a dictionary with the values
+</span>    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s">'state'</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">'sex'</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s">'age'</span><span class="p">:</span><span class="n">row</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s">'pop2000'</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+            <span class="s">'pop2008'</span><span class="p">:</span> <span class="n">row</span><span class="p">[</span><span class="mi">4</span><span class="p">]}</span>
+    <span class="c1"># Append the dictionary to the values list
+</span>    <span class="n">values_list</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="n">values_list</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[{'age': '0',
+  'pop2000': '89600',
+  'pop2008': '95012',
+  'sex': 'M',
+  'state': 'Illinois'},
+ {'age': '1',
+  'pop2000': '88445',
+  'pop2008': '91829',
+  'sex': 'M',
+  'state': 'Illinois'}]
+
+</code></pre></div></div>
+
+<p>####
+<strong>Load data from a list into the Table</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import insert
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">insert</span>
+
+<span class="c1"># Build insert statement: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">insert</span><span class="p">(</span><span class="n">census</span><span class="p">)</span>
+
+<span class="c1"># Use values_list to insert data: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">,</span> <span class="n">values_list</span><span class="p">)</span>
+
+<span class="c1"># Print rowcount
+</span><span class="k">print</span><span class="p">(</span><span class="n">results</span><span class="p">.</span><span class="n">rowcount</span><span class="p">)</span>
+<span class="c1"># 8772
+</span>
+<span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">select</span>
+<span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">])).</span><span class="n">fetchmany</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="p">[(</span><span class="s">'Illinois'</span><span class="p">,</span> <span class="s">'M'</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">89600</span><span class="p">,</span> <span class="mi">95012</span><span class="p">),</span>
+ <span class="p">(</span><span class="s">'Illinois'</span><span class="p">,</span> <span class="s">'M'</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">88445</span><span class="p">,</span> <span class="mi">91829</span><span class="p">),</span>
+ <span class="p">(</span><span class="s">'Illinois'</span><span class="p">,</span> <span class="s">'M'</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">88729</span><span class="p">,</span> <span class="mi">89547</span><span class="p">)]</span>
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="53-example-queries"><strong>5.3 Example queries</strong></h2>
+
+<p>####
+<strong>Determine the average age by population</strong></p>
+
+<p>To calculate a weighted average, we first find the total sum of weights multiplied by the values we’re averaging, then divide by the sum of all the weights.</p>
+
+<p>In this exercise, however, you will make use of
+ <strong><code class="language-plaintext highlighter-rouge">func.sum()</code></strong>
+ together with
+ <code class="language-plaintext highlighter-rouge">select</code>
+ to select the weighted average of a column from a table. You will still work with the
+ <code class="language-plaintext highlighter-rouge">census</code>
+ data, and you will compute the average of age weighted by state population in the year 2000, and then group this weighted average by sex.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import select and func
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">select</span><span class="p">,</span> <span class="n">func</span>
+
+<span class="c1"># Select sex and average age weighted by 2000 population
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([(</span><span class="n">func</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2000</span> <span class="o">*</span> <span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">age</span><span class="p">)</span>
+  					<span class="o">/</span> <span class="n">func</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2000</span><span class="p">)).</span><span class="n">label</span><span class="p">(</span><span class="s">'average_age'</span><span class="p">),</span>
+               <span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">sex</span><span class="p">])</span>
+
+<span class="c1"># Group by sex
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">sex</span><span class="p">)</span>
+
+<span class="c1"># Execute the query and fetch all the results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Print the sex and average age column for each result
+</span><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">sex</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">average_age</span><span class="p">)</span>
+
+<span class="c1"># F 37
+# M 34
+</span>
+<span class="n">results</span>
+<span class="c1"># [(37, 'F'), (34, 'M')]
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Determine the percentage of population by gender and state</strong></p>
+
+<p>In this exercise, you will write a query to determine the percentage of the population in 2000 that comprised of women. You will group this query by state.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># import case, cast and Float from sqlalchemy
+</span><span class="kn">from</span> <span class="nn">sqlalchemy</span> <span class="kn">import</span> <span class="n">case</span><span class="p">,</span> <span class="n">cast</span><span class="p">,</span> <span class="n">Float</span>
+
+<span class="c1"># Build a query to calculate the percentage of women in 2000: stmt
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">,</span>
+    <span class="p">(</span><span class="n">func</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span>
+        <span class="n">case</span><span class="p">([</span>
+            <span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">sex</span> <span class="o">==</span> <span class="s">'F'</span><span class="p">,</span> <span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2000</span><span class="p">)</span>
+        <span class="p">],</span> <span class="n">else_</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span> <span class="o">/</span>
+     <span class="n">cast</span><span class="p">(</span><span class="n">func</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2000</span><span class="p">),</span> <span class="n">Float</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span><span class="p">).</span><span class="n">label</span><span class="p">(</span><span class="s">'percent_female'</span><span class="p">)</span>
+<span class="p">])</span>
+
+<span class="c1"># Group By state
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c1"># Execute the query and store the results: results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Print the percentage
+</span><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">state</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">percent_female</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Alabama 51.8324077702
+Alaska 49.3014978935
+...
+Wisconsin 50.6148645265
+Wyoming 49.9459554265
+
+</code></pre></div></div>
+
+<p>####
+<strong>Determine the difference by state from the 2000 and 2008 censuses</strong></p>
+
+<p>In this final exercise, you will write a query to calculate the states that changed the most in population. You will limit your query to display only the top 10 states.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build query to return state name and population difference from 2008 to 2000
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">select</span><span class="p">([</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">,</span>
+     <span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2008</span><span class="o">-</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">pop2000</span><span class="p">).</span><span class="n">label</span><span class="p">(</span><span class="s">'pop_change'</span><span class="p">)</span>
+<span class="p">])</span>
+
+<span class="c1"># Group by State
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">group_by</span><span class="p">(</span><span class="n">census</span><span class="p">.</span><span class="n">columns</span><span class="p">.</span><span class="n">state</span><span class="p">)</span>
+
+<span class="c1"># Order by Population Change
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">desc</span><span class="p">(</span><span class="s">'pop_change'</span><span class="p">))</span>
+
+<span class="c1"># Limit to top 10
+</span><span class="n">stmt</span> <span class="o">=</span> <span class="n">stmt</span><span class="p">.</span><span class="n">limit</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Use connection to execute the statement and fetch all results
+</span><span class="n">results</span> <span class="o">=</span> <span class="n">connection</span><span class="p">.</span><span class="n">execute</span><span class="p">(</span><span class="n">stmt</span><span class="p">).</span><span class="n">fetchall</span><span class="p">()</span>
+
+<span class="c1"># Print the state and population change for each record
+</span><span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'{}:{}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">state</span><span class="p">,</span> <span class="n">result</span><span class="p">.</span><span class="n">pop_change</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+California:105705
+Florida:100984
+Texas:51901
+New York:47098
+Pennsylvania:42387
+Arizona:29509
+Ohio:29392
+Illinois:26221
+Michigan:25126
+North Carolina:24108
+
+</code></pre></div></div>
+
+<p>The End.</p>
+
+<p>Thank you for reading.</p>
+

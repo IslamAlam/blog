@@ -1,0 +1,1229 @@
+<h1 id="feature-engineering-for-nlp-in-python">Feature Engineering for NLP in Python</h1>
+
+<p>This is the memo of the 13th course (23 courses in all) of ‘Machine Learning Scientist with Python’ skill track.</p>
+
+<p><strong>You can find the original course</strong> <a href="https://www.datacamp.com/courses/feature-engineering-for-nlp-in-python"><strong>HERE</strong></a> .</p>
+
+<p>####</p>
+
+<p><strong>Course Description</strong></p>
+
+<p>In this course, you will learn techniques that will allow you to extract useful information from text and process them into a format suitable for applying ML models. More specifically, you will learn about POS tagging, named entity recognition, readability scores, the n-gram and tf-idf models, and how to implement them using scikit-learn and spaCy. You will also learn to compute how similar two documents are to each other. In the process, you will predict the sentiment of movie reviews and build movie and Ted Talk recommenders. Following the course, you will be able to engineer critical features out of any text and solve some of the most challenging problems in data science!</p>
+
+<p>####</p>
+
+<p><strong>Table of contents</strong></p>
+
+<ul>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/19/feature-engineering-for-nlp-in-python-from-datacamp/">Basic features and readability scores</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/19/feature-engineering-for-nlp-in-python-from-datacamp/2/">Text preprocessing, POS tagging and NER</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/19/feature-engineering-for-nlp-in-python-from-datacamp/3/">N-Gram models</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/19/feature-engineering-for-nlp-in-python-from-datacamp/4/">TF-IDF and similarity scores</a></li>
+</ul>
+
+<h2 id="1-basic-features-and-readability-scores"><strong>1. Basic features and readability scores</strong></h2>
+
+<h3 id="11-introduction-to-nlp-feature-engineering"><strong>1.1 Introduction to NLP feature engineering</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/7-9.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/8-9.png?w=764" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/9-9.png?w=897" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/10-9.png?w=851" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/11-9.png?w=696" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/12-9.png?w=580" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/13-8.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/14-8.png?w=379" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/15-8.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/16-7.png?w=542" alt="" /></li>
+</ul>
+
+<h4 id="111-data-format-for-ml-algorithms"><strong>1.1.1 Data format for ML algorithms</strong></h4>
+
+<p>In this exercise, you have been given four dataframes <code class="language-plaintext highlighter-rouge">df1</code> , <code class="language-plaintext highlighter-rouge">df2</code> , <code class="language-plaintext highlighter-rouge">df3</code> and <code class="language-plaintext highlighter-rouge">df4</code> . The final column of each dataframe is the predictor variable and the rest of the columns are training features.</p>
+
+<p>Using the console, determine which dataframe is in a suitable format to be trained by a classifier.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">df3</span>
+    <span class="n">feature</span> <span class="mi">1</span>  <span class="n">feature</span> <span class="mi">2</span>  <span class="n">feature</span> <span class="mi">3</span>  <span class="n">feature</span> <span class="mi">4</span>  <span class="n">feature</span> <span class="mi">5</span>  <span class="n">label</span>
+<span class="mi">0</span>           <span class="mi">1</span>         <span class="mi">85</span>         <span class="mi">66</span>         <span class="mi">29</span>          <span class="mi">0</span>      <span class="mi">0</span>
+<span class="mi">1</span>           <span class="mi">8</span>        <span class="mi">183</span>         <span class="mi">64</span>          <span class="mi">0</span>          <span class="mi">0</span>      <span class="mi">1</span>
+<span class="mi">2</span>           <span class="mi">1</span>         <span class="mi">89</span>         <span class="mi">66</span>         <span class="mi">23</span>         <span class="mi">94</span>      <span class="mi">0</span>
+<span class="mi">3</span>           <span class="mi">0</span>        <span class="mi">137</span>         <span class="mi">40</span>         <span class="mi">35</span>        <span class="mi">168</span>      <span class="mi">1</span>
+<span class="mi">4</span>           <span class="mi">5</span>        <span class="mi">116</span>         <span class="mi">74</span>          <span class="mi">0</span>          <span class="mi">0</span>      <span class="mi">0</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<h4 id="112-one-hot-encoding"><strong>1.1.2 One-hot encoding</strong></h4>
+
+<p>In the previous exercise, we encountered a dataframe <code class="language-plaintext highlighter-rouge">df1</code> which contained categorical features and therefore, was unsuitable for applying ML algorithms to.</p>
+
+<p>In this exercise, your task is to convert <code class="language-plaintext highlighter-rouge">df1</code> into a format that is suitable for machine learning.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Print the features of df1
+</span><span class="k">print</span><span class="p">(</span><span class="n">df1</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+
+<span class="c1"># Perform one-hot encoding
+</span><span class="n">df1</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">get_dummies</span><span class="p">(</span><span class="n">df1</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'feature 5'</span><span class="p">])</span>
+
+<span class="c1"># Print the new features of df1
+</span><span class="k">print</span><span class="p">(</span><span class="n">df1</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+
+<span class="c1"># Print first five rows of df1
+</span><span class="k">print</span><span class="p">(</span><span class="n">df1</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Index</span><span class="p">([</span><span class="s">'feature 1'</span><span class="p">,</span> <span class="s">'feature 2'</span><span class="p">,</span> <span class="s">'feature 3'</span><span class="p">,</span> <span class="s">'feature 4'</span><span class="p">,</span> <span class="s">'feature 5'</span><span class="p">,</span> <span class="s">'label'</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">'object'</span><span class="p">)</span>
+<span class="n">Index</span><span class="p">([</span><span class="s">'feature 1'</span><span class="p">,</span> <span class="s">'feature 2'</span><span class="p">,</span> <span class="s">'feature 3'</span><span class="p">,</span> <span class="s">'feature 4'</span><span class="p">,</span> <span class="s">'label'</span><span class="p">,</span> <span class="s">'feature 5_female'</span><span class="p">,</span> <span class="s">'feature 5_male'</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="s">'object'</span><span class="p">)</span>
+
+   <span class="n">feature</span> <span class="mi">1</span>  <span class="n">feature</span> <span class="mi">2</span>  <span class="n">feature</span> <span class="mi">3</span>  <span class="n">feature</span> <span class="mi">4</span>  <span class="n">label</span>  <span class="n">feature</span> <span class="mi">5</span><span class="n">_female</span>  <span class="n">feature</span> <span class="mi">5</span><span class="n">_male</span>
+<span class="mi">0</span>    <span class="mf">29.0000</span>          <span class="mi">0</span>          <span class="mi">0</span>   <span class="mf">211.3375</span>      <span class="mi">1</span>                 <span class="mi">1</span>               <span class="mi">0</span>
+<span class="mi">1</span>     <span class="mf">0.9167</span>          <span class="mi">1</span>          <span class="mi">2</span>   <span class="mf">151.5500</span>      <span class="mi">1</span>                 <span class="mi">0</span>               <span class="mi">1</span>
+<span class="mi">2</span>     <span class="mf">2.0000</span>          <span class="mi">1</span>          <span class="mi">2</span>   <span class="mf">151.5500</span>      <span class="mi">0</span>                 <span class="mi">1</span>               <span class="mi">0</span>
+<span class="mi">3</span>    <span class="mf">30.0000</span>          <span class="mi">1</span>          <span class="mi">2</span>   <span class="mf">151.5500</span>      <span class="mi">0</span>                 <span class="mi">0</span>               <span class="mi">1</span>
+<span class="mi">4</span>    <span class="mf">25.0000</span>          <span class="mi">1</span>          <span class="mi">2</span>   <span class="mf">151.5500</span>      <span class="mi">0</span>                 <span class="mi">1</span>               <span class="mi">0</span>
+</code></pre></div></div>
+
+<h3 id="12-basic-feature-extraction"><strong>1.2 Basic feature extraction</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/1-11.png?w=653" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/2-11.png?w=612" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/3-10.png?w=744" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/4-10.png?w=931" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/5-10.png?w=821" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/6-10.png?w=1012" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/7-10.png?w=539" alt="" /></li>
+</ul>
+
+<h4 id="121-character-count-of-russian-tweets"><strong>1.2.1 Character count of Russian tweets</strong></h4>
+
+<p>In this exercise, you have been given a dataframe <code class="language-plaintext highlighter-rouge">tweets</code> which contains some tweets associated with Russia’s Internet Research Agency and compiled by FiveThirtyEight.</p>
+
+<p>Your task is to create a new feature ‘char_count’ in <code class="language-plaintext highlighter-rouge">tweets</code> which computes the number of characters for each tweet. Also, compute the average length of each tweet. The tweets are available in the <code class="language-plaintext highlighter-rouge">content</code> feature of <code class="language-plaintext highlighter-rouge">tweets</code> .</p>
+
+<p><em>Be aware that this is real data from Twitter and as such there is always a risk that it may contain profanity or other offensive content (in this exercise, and any following exercises that also use real Twitter data).</em></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">tweets</span>
+                                               <span class="n">content</span>
+<span class="mi">0</span>    <span class="n">LIVE</span> <span class="n">STREAM</span> <span class="n">VIDEO</span><span class="o">=&gt;</span> <span class="n">Donald</span> <span class="n">Trump</span> <span class="n">Rallies</span> <span class="ow">in</span> <span class="n">Co</span><span class="p">...</span>
+<span class="mi">1</span>    <span class="n">Muslim</span> <span class="n">Attacks</span> <span class="n">NYPD</span> <span class="n">Cops</span> <span class="k">with</span> <span class="n">Meat</span> <span class="n">Cleaver</span><span class="p">.</span> <span class="n">Me</span><span class="p">...</span>
+<span class="mi">2</span>    <span class="p">.</span><span class="o">@</span><span class="n">vfpatlas</span> <span class="n">well</span> <span class="n">that</span><span class="s">'s a swella word there (di...
+...
+</span></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a feature char_count
+</span><span class="n">tweets</span><span class="p">[</span><span class="s">'char_count'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="s">'content'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="nb">len</span><span class="p">)</span>
+
+<span class="c1"># Print the average character count
+</span><span class="k">print</span><span class="p">(</span><span class="n">tweets</span><span class="p">[</span><span class="s">'char_count'</span><span class="p">].</span><span class="n">mean</span><span class="p">())</span>
+<span class="c1"># 103.462
+</span></code></pre></div></div>
+
+<p>Great job! Notice that the average character count of these tweets is approximately 104, which is much higher than the overall average tweet length of around 40 characters. Depending on what you’re working on, this may be something worth investigating into. For your information, there is research that indicates that fake news articles tend to have longer titles! Therefore, even extremely basic features such as character counts can prove to be very useful in certain applications.</p>
+
+<h4 id="122-word-count-of-ted-talks"><strong>1.2.2 Word count of TED talks</strong></h4>
+
+<p><code class="language-plaintext highlighter-rouge">ted</code> is a dataframe that contains the transcripts of 500 TED talks. Your job is to compute a new feature <code class="language-plaintext highlighter-rouge">word_count</code> which contains the approximate number of words for each talk. Consequently, you also need to compute the average word count of the talks. The transcripts are available as the <code class="language-plaintext highlighter-rouge">transcript</code> feature in <code class="language-plaintext highlighter-rouge">ted</code> .</p>
+
+<p>In order to complete this task, you will need to define a function <code class="language-plaintext highlighter-rouge">count_words</code> that takes in a string as an argument and returns the number of words in the string. You will then need to apply this function to the <code class="language-plaintext highlighter-rouge">transcript</code> feature of <code class="language-plaintext highlighter-rouge">ted</code> to create the new feature <code class="language-plaintext highlighter-rouge">word_count</code> and compute its mean.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Function that returns number of words in a string
+</span><span class="k">def</span> <span class="nf">count_words</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="c1"># Split the string into words
+</span>    <span class="n">words</span> <span class="o">=</span> <span class="n">string</span><span class="p">.</span><span class="n">split</span><span class="p">()</span>
+
+    <span class="c1"># Return the number of words
+</span>    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+
+<span class="c1"># Create a new feature word_count
+</span><span class="n">ted</span><span class="p">[</span><span class="s">'word_count'</span><span class="p">]</span> <span class="o">=</span> <span class="n">ted</span><span class="p">[</span><span class="s">'transcript'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="n">count_words</span><span class="p">)</span>
+
+<span class="c1"># Print the average word count of the talks
+</span><span class="k">print</span><span class="p">(</span><span class="n">ted</span><span class="p">[</span><span class="s">'word_count'</span><span class="p">].</span><span class="n">mean</span><span class="p">())</span>
+<span class="c1"># 1987.1
+</span></code></pre></div></div>
+
+<p>Amazing work! You now know how to compute the number of words in a given piece of text. Also, notice that the average length of a talk is close to 2000 words. You can use the <code class="language-plaintext highlighter-rouge">word_count</code> feature to compute its correlation with other variables such as number of views, number of comments, etc. and derive extremely interesting insights about TED.</p>
+
+<h4 id="123-hashtags-and-mentions-in-russian-tweets"><strong>1.2.3 Hashtags and mentions in Russian tweets</strong></h4>
+
+<p>Let’s revisit the <code class="language-plaintext highlighter-rouge">tweets</code> dataframe containing the Russian tweets. In this exercise, you will compute the number of hashtags and mentions in each tweet by defining two functions <code class="language-plaintext highlighter-rouge">count_hashtags()</code> and <code class="language-plaintext highlighter-rouge">count_mentions()</code> respectively and applying them to the <code class="language-plaintext highlighter-rouge">content</code> feature of <code class="language-plaintext highlighter-rouge">tweets</code> .</p>
+
+<p>In case you don’t recall, the tweets are contained in the <code class="language-plaintext highlighter-rouge">content</code> feature of <code class="language-plaintext highlighter-rouge">tweets</code> .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Function that returns numner of hashtags in a string
+</span><span class="k">def</span> <span class="nf">count_hashtags</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="c1"># Split the string into words
+</span>    <span class="n">words</span> <span class="o">=</span> <span class="n">string</span><span class="p">.</span><span class="n">split</span><span class="p">()</span>
+
+    <span class="c1"># Create a list of words that are hashtags
+</span>    <span class="n">hashtags</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span> <span class="k">if</span> <span class="n">word</span><span class="p">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">'#'</span><span class="p">)]</span>
+
+    <span class="c1"># Return number of hashtags
+</span>    <span class="k">return</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">hashtags</span><span class="p">))</span>
+
+<span class="c1"># Create a feature hashtag_count and display distribution
+</span><span class="n">tweets</span><span class="p">[</span><span class="s">'hashtag_count'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="s">'content'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="n">count_hashtags</span><span class="p">)</span>
+<span class="n">tweets</span><span class="p">[</span><span class="s">'hashtag_count'</span><span class="p">].</span><span class="n">hist</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Hashtag count distribution'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2020/01/8-10.png?w=1021" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Function that returns number of mentions in a string
+</span><span class="k">def</span> <span class="nf">count_mentions</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
+    <span class="c1"># Split the string into words
+</span>    <span class="n">words</span> <span class="o">=</span> <span class="n">string</span><span class="p">.</span><span class="n">split</span><span class="p">()</span>
+
+    <span class="c1"># Create a list of words that are mentions
+</span>    <span class="n">mentions</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words</span> <span class="k">if</span> <span class="n">word</span><span class="p">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">'@'</span><span class="p">)]</span>
+
+    <span class="c1"># Return number of mentions
+</span>    <span class="k">return</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mentions</span><span class="p">))</span>
+
+<span class="c1"># Create a feature mention_count and display distribution
+</span><span class="n">tweets</span><span class="p">[</span><span class="s">'mention_count'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tweets</span><span class="p">[</span><span class="s">'content'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="n">count_mentions</span><span class="p">)</span>
+<span class="n">tweets</span><span class="p">[</span><span class="s">'mention_count'</span><span class="p">].</span><span class="n">hist</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Mention count distribution'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2020/01/9-10.png?w=1024" alt="" /></p>
+
+<p>Excellent work! You now have a good grasp of how to compute various types of summary features. In the next lesson, we will learn about more advanced features that are capable of capturing more nuanced information beyond simple word and character counts.</p>
+
+<h3 id="13-readability-tests"><strong>1.3 Readability tests</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/10-10.png?w=996" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/11-10.png?w=764" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/12-10.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/13-9.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/14-9.png?w=1008" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/15-9.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/16-8.png?w=679" alt="" /></li>
+</ul>
+
+<h4 id="131-readability-of-the-myth-of-sisyphus"><strong>1.3.1 Readability of ‘The Myth of Sisyphus’</strong></h4>
+
+<p>In this exercise, you will compute the Flesch reading ease score for Albert Camus’ famous essay <em>The Myth of Sisyphus</em> . We will then interpret the value of this score as explained in the video and try to determine the reading level of the essay.</p>
+
+<p>The entire essay is in the form of a string and is available as <code class="language-plaintext highlighter-rouge">sisyphus_essay</code> .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import Textatistic
+</span><span class="kn">from</span> <span class="nn">textatistic</span> <span class="kn">import</span> <span class="n">Textatistic</span>
+
+<span class="c1"># Compute the readability scores
+</span><span class="n">readability_scores</span> <span class="o">=</span> <span class="n">Textatistic</span><span class="p">(</span><span class="n">sisyphus_essay</span><span class="p">).</span><span class="n">scores</span>
+
+<span class="c1"># Print the flesch reading ease score
+</span><span class="n">flesch</span> <span class="o">=</span> <span class="n">readability_scores</span><span class="p">[</span><span class="s">'flesch_score'</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The Flesch Reading Ease is %.2f"</span> <span class="o">%</span> <span class="p">(</span><span class="n">flesch</span><span class="p">))</span>
+<span class="c1"># The Flesch Reading Ease is 81.67
+</span></code></pre></div></div>
+
+<p>Excellent! You now know to compute the Flesch reading ease score for a given body of text. Notice that the score for this essay is approximately 81.67. This indicates that the essay is at the readability level of a 6th grade American student.</p>
+
+<h4 id="132-readability-of-various-publications"><strong>1.3.2 Readability of various publications</strong></h4>
+
+<p>In this exercise, you have been given excerpts of articles from four publications. Your task is to compute the readability of these excerpts using the Gunning fog index and consequently, determine the relative difficulty of reading these publications.</p>
+
+<p>The excerpts are available as the following strings:</p>
+
+<ul>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">forbes</code></p>
+
+    <p>– An excerpt from an article from</p>
+
+    <p><em>Forbes</em></p>
+
+    <p>magazine on the Chinese social credit score system.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">harvard_law</code></p>
+
+    <p>– An excerpt from a book review published in</p>
+
+    <p><em>Harvard Law Review</em></p>
+
+    <p>.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">r_digest</code></p>
+
+    <p>– An excerpt from a</p>
+
+    <p><em>Reader’s Digest</em></p>
+
+    <p>article on flight turbulence.</p>
+  </li>
+  <li>
+    <p><code class="language-plaintext highlighter-rouge">time_kids</code></p>
+
+    <p>– An excerpt from an article on the ill effects of salt consumption published in</p>
+
+    <p><em>TIME for Kids</em></p>
+
+    <p>.</p>
+  </li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import Textatistic
+</span><span class="kn">from</span> <span class="nn">textatistic</span> <span class="kn">import</span> <span class="n">Textatistic</span>
+
+<span class="c1"># List of excerpts
+</span><span class="n">excerpts</span> <span class="o">=</span> <span class="p">[</span><span class="n">forbes</span><span class="p">,</span> <span class="n">harvard_law</span><span class="p">,</span> <span class="n">r_digest</span><span class="p">,</span> <span class="n">time_kids</span><span class="p">]</span>
+
+<span class="c1"># Loop through excerpts and compute gunning fog index
+</span><span class="n">gunning_fog_scores</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">excerpt</span> <span class="ow">in</span> <span class="n">excerpts</span><span class="p">:</span>
+  <span class="n">readability_scores</span> <span class="o">=</span> <span class="n">Textatistic</span><span class="p">(</span><span class="n">excerpt</span><span class="p">).</span><span class="n">scores</span>
+  <span class="n">gunning_fog</span> <span class="o">=</span> <span class="n">readability_scores</span><span class="p">[</span><span class="s">'gunningfog_score'</span><span class="p">]</span>
+  <span class="n">gunning_fog_scores</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">gunning_fog</span><span class="p">)</span>
+
+<span class="c1"># Print the gunning fog indices
+</span><span class="k">print</span><span class="p">(</span><span class="n">gunning_fog_scores</span><span class="p">)</span>
+<span class="c1"># [14.436002482929858, 20.735401069518716, 11.085587583148559, 5.926785009861934]
+</span></code></pre></div></div>
+
+<p>Great job! You are now adept at computing readability scores for various pieces of text. Notice that the Harvard Law Review excerpt has the highest Gunning fog index; indicating that it can be comprehended only by readers who have graduated college. On the other hand, the Time for Kids article, intended for children, has a much lower fog index and can be comprehended by 5th grade students.</p>
+
+<h2 id="2-text-preprocessing-pos-tagging-and-ner"><strong>2. Text preprocessing, POS tagging and NER</strong></h2>
+
+<h3 id="21-tokenization-and-lemmatization"><strong>2.1 Tokenization and Lemmatization</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/1-12.png?w=395" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/2-12.png?w=883" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/3-11.png?w=891" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/4-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/5-11.png?w=983" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/6-11.png?w=1022" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/7-11.png?w=1024" alt="" /></li>
+</ul>
+
+<h4 id="211-tokenizing-the-gettysburg-address"><strong>2.1.1 Tokenizing the Gettysburg Address</strong></h4>
+
+<p>In this exercise, you will be tokenizing one of the most famous speeches of all time: the Gettysburg Address delivered by American President Abraham Lincoln during the American Civil War.</p>
+
+<p>The entire speech is available as a string named <code class="language-plaintext highlighter-rouge">gettysburg</code> .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">gettysburg</span>
+<span class="s">"Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal.
+...
+</span></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">spacy</span>
+
+<span class="c1"># Load the en_core_web_sm model
+</span><span class="n">nlp</span> <span class="o">=</span> <span class="n">spacy</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">'en_core_web_sm'</span><span class="p">)</span>
+
+<span class="c1"># Create a Doc object
+</span><span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">gettysburg</span><span class="p">)</span>
+
+<span class="c1"># Generate the tokens
+</span><span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">token</span><span class="p">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s">'Four'</span><span class="p">,</span> <span class="s">'score'</span><span class="p">,</span> <span class="s">'and'</span><span class="p">,</span> <span class="s">'seven'</span><span class="p">,</span> <span class="s">'years'</span><span class="p">,</span> <span class="s">'ago'</span><span class="p">,</span> <span class="s">'our'</span><span class="p">,</span> <span class="s">'fathers'</span><span class="p">,</span> <span class="s">'brought'</span><span class="p">,</span> <span class="s">'forth'</span><span class="p">,</span> <span class="s">'on'</span><span class="p">,</span> <span class="s">'this'</span><span class="p">,</span> <span class="s">'continent'</span><span class="p">,</span> <span class="s">','</span><span class="p">,</span> <span class="s">'a'</span><span class="p">,</span> <span class="s">'new'</span><span class="p">,</span> <span class="s">'nation'</span><span class="p">,</span> <span class="p">...</span>
+</code></pre></div></div>
+
+<p>Excellent work! You now know how to tokenize a piece of text. In the next exercise, we will perform similar steps and conduct lemmatization.</p>
+
+<h4 id="212-lemmatizing-the-gettysburg-address"><strong>2.1.2 Lemmatizing the Gettysburg address</strong></h4>
+
+<p>In this exercise, we will perform lemmatization on the same <code class="language-plaintext highlighter-rouge">gettysburg</code> address from before.</p>
+
+<p>However, this time, we will also take a look at the speech, before and after lemmatization, and try to adjudge the kind of changes that take place to make the piece more machine friendly.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">spacy</span>
+
+<span class="c1"># Load the en_core_web_sm model
+</span><span class="n">nlp</span> <span class="o">=</span> <span class="n">spacy</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">'en_core_web_sm'</span><span class="p">)</span>
+
+<span class="c1"># Create a Doc object
+</span><span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">gettysburg</span><span class="p">)</span>
+
+<span class="c1"># Generate lemmas
+</span><span class="n">lemmas</span> <span class="o">=</span> <span class="p">[</span><span class="n">token</span><span class="p">.</span><span class="n">lemma_</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">]</span>
+
+<span class="c1"># Convert lemmas into a string
+</span><span class="k">print</span><span class="p">(</span><span class="s">' '</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">lemmas</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">four</span> <span class="n">score</span> <span class="ow">and</span> <span class="n">seven</span> <span class="n">year</span> <span class="n">ago</span> <span class="o">-</span><span class="n">PRON</span><span class="o">-</span> <span class="n">father</span> <span class="n">bring</span> <span class="n">forth</span> <span class="n">on</span> <span class="n">this</span> <span class="n">continent</span> <span class="p">,</span> <span class="n">a</span> <span class="n">new</span> <span class="n">nation</span> <span class="p">,</span> <span class="n">conceive</span> <span class="ow">in</span> <span class="n">liberty</span> <span class="p">,</span> <span class="ow">and</span> <span class="n">dedicate</span> <span class="n">to</span> <span class="n">the</span> <span class="n">proposition</span> <span class="n">that</span> <span class="nb">all</span> <span class="n">man</span> <span class="n">be</span> <span class="n">create</span> <span class="n">equal</span> <span class="p">.</span>
+</code></pre></div></div>
+
+<p>Excellent! You’re now proficient at performing lemmatization using spaCy. Observe the lemmatized version of the speech. It isn’t very readable to humans but it is in a much more convenient format for a machine to process.</p>
+
+<h3 id="22-text-cleaning"><strong>2.2 Text cleaning</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/8-11.png?w=779" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/9-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/10-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/11-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/12-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/13-10.png?w=612" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/14-10.png?w=975" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/15-10.png?w=963" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/16-9.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/17-6.png?w=1024" alt="" /></li>
+</ul>
+
+<h4 id="221-cleaning-a-blog-post"><strong>2.2.1 Cleaning a blog post</strong></h4>
+
+<p>In this exercise, you have been given an excerpt from a blog post. Your task is to clean this text into a more machine friendly format. This will involve converting to lowercase, lemmatization and removing stopwords, punctuations and non-alphabetic characters.</p>
+
+<p>The excerpt is available as a string <code class="language-plaintext highlighter-rouge">blog</code> and has been printed to the console. The list of stopwords are available as <code class="language-plaintext highlighter-rouge">stopwords</code> .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Twenty</span><span class="o">-</span><span class="n">first</span><span class="o">-</span><span class="n">century</span> <span class="n">politics</span> <span class="n">has</span> <span class="n">witnessed</span> <span class="n">an</span> <span class="n">alarming</span> <span class="n">rise</span> <span class="n">of</span> <span class="n">populism</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">U</span><span class="p">.</span><span class="n">S</span><span class="p">.</span> <span class="ow">and</span> <span class="n">Europe</span><span class="p">.</span> <span class="n">The</span> <span class="n">first</span> <span class="n">warning</span> <span class="n">signs</span> <span class="n">came</span> <span class="k">with</span> <span class="n">the</span> <span class="n">UK</span> <span class="n">Brexit</span> <span class="n">Referendum</span> <span class="n">vote</span> <span class="ow">in</span> <span class="mi">2016</span> <span class="n">swinging</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">way</span> <span class="n">of</span> <span class="n">Leave</span><span class="p">.</span> <span class="n">This</span> <span class="n">was</span> <span class="n">followed</span> <span class="n">by</span> <span class="n">a</span> <span class="n">stupendous</span> <span class="n">victory</span> <span class="n">by</span> <span class="n">billionaire</span> <span class="n">Donald</span> <span class="n">Trump</span> <span class="n">to</span> <span class="n">become</span> <span class="n">the</span> <span class="mi">45</span><span class="n">th</span> <span class="n">President</span> <span class="n">of</span> <span class="n">the</span> <span class="n">United</span> <span class="n">States</span> <span class="ow">in</span> <span class="n">November</span> <span class="mf">2016.</span> <span class="n">Since</span> <span class="n">then</span><span class="p">,</span> <span class="n">Europe</span> <span class="n">has</span> <span class="n">seen</span> <span class="n">a</span> <span class="n">steady</span> <span class="n">rise</span> <span class="ow">in</span> <span class="n">populist</span> <span class="ow">and</span> <span class="n">far</span><span class="o">-</span><span class="n">right</span> <span class="n">parties</span> <span class="n">that</span> <span class="n">have</span> <span class="n">capitalized</span> <span class="n">on</span> <span class="n">Europe</span><span class="err">’</span><span class="n">s</span> <span class="n">Immigration</span> <span class="n">Crisis</span> <span class="n">to</span> <span class="k">raise</span> <span class="n">nationalist</span> <span class="ow">and</span> <span class="n">anti</span><span class="o">-</span><span class="n">Europe</span> <span class="n">sentiments</span><span class="p">.</span> <span class="n">Some</span> <span class="n">instances</span> <span class="n">include</span> <span class="n">Alternative</span> <span class="k">for</span> <span class="n">Germany</span> <span class="p">(</span><span class="n">AfD</span><span class="p">)</span> <span class="n">winning</span> <span class="mf">12.6</span><span class="o">%</span> <span class="n">of</span> <span class="nb">all</span> <span class="n">seats</span> <span class="ow">and</span> <span class="n">entering</span> <span class="n">the</span> <span class="n">Bundestag</span><span class="p">,</span> <span class="n">thus</span> <span class="n">upsetting</span> <span class="n">Germany</span><span class="err">’</span><span class="n">s</span> <span class="n">political</span> <span class="n">order</span> <span class="k">for</span> <span class="n">the</span> <span class="n">first</span> <span class="n">time</span> <span class="n">since</span> <span class="n">the</span> <span class="n">Second</span> <span class="n">World</span> <span class="n">War</span><span class="p">,</span> <span class="n">the</span> <span class="n">success</span> <span class="n">of</span> <span class="n">the</span> <span class="n">Five</span> <span class="n">Star</span> <span class="n">Movement</span> <span class="ow">in</span> <span class="n">Italy</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">surge</span> <span class="ow">in</span> <span class="n">popularity</span> <span class="n">of</span> <span class="n">neo</span><span class="o">-</span><span class="n">nazism</span> <span class="ow">and</span> <span class="n">neo</span><span class="o">-</span><span class="n">fascism</span> <span class="ow">in</span> <span class="n">countries</span> <span class="n">such</span> <span class="k">as</span> <span class="n">Hungary</span><span class="p">,</span> <span class="n">Czech</span> <span class="n">Republic</span><span class="p">,</span> <span class="n">Poland</span> <span class="ow">and</span> <span class="n">Austria</span><span class="p">.</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Load model and create Doc object
+</span><span class="n">nlp</span> <span class="o">=</span> <span class="n">spacy</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">'en_core_web_sm'</span><span class="p">)</span>
+<span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">blog</span><span class="p">)</span>
+
+<span class="c1"># Generate lemmatized tokens
+</span><span class="n">lemmas</span> <span class="o">=</span> <span class="p">[</span><span class="n">token</span><span class="p">.</span><span class="n">lemma_</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">]</span>
+
+<span class="c1"># Remove stopwords and non-alphabetic tokens
+</span><span class="n">a_lemmas</span> <span class="o">=</span> <span class="p">[</span><span class="n">lemma</span> <span class="k">for</span> <span class="n">lemma</span> <span class="ow">in</span> <span class="n">lemmas</span>
+            <span class="k">if</span> <span class="n">lemma</span><span class="p">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="ow">and</span> <span class="n">lemma</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stopwords</span><span class="p">]</span>
+
+<span class="c1"># Print string after text cleaning
+</span><span class="k">print</span><span class="p">(</span><span class="s">' '</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">a_lemmas</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">century</span> <span class="n">politic</span> <span class="n">witness</span> <span class="n">alarming</span> <span class="n">rise</span> <span class="n">populism</span> <span class="n">europe</span> <span class="n">warning</span> <span class="n">sign</span> <span class="n">come</span> <span class="n">uk</span> <span class="n">brexit</span> <span class="n">referendum</span> <span class="n">vote</span> <span class="n">swinging</span> <span class="n">way</span> <span class="n">leave</span> <span class="n">follow</span> <span class="n">stupendous</span> <span class="n">victory</span> <span class="n">billionaire</span> <span class="n">donald</span> <span class="n">trump</span> <span class="n">president</span> <span class="n">united</span> <span class="n">states</span> <span class="n">november</span> <span class="n">europe</span> <span class="n">steady</span> <span class="n">rise</span> <span class="n">populist</span> <span class="n">far</span> <span class="n">right</span> <span class="n">party</span> <span class="n">capitalize</span> <span class="n">europe</span> <span class="n">immigration</span> <span class="n">crisis</span> <span class="k">raise</span> <span class="n">nationalist</span> <span class="n">anti</span> <span class="n">europe</span> <span class="n">sentiment</span> <span class="n">instance</span> <span class="n">include</span> <span class="n">alternative</span> <span class="n">germany</span> <span class="n">afd</span> <span class="n">win</span> <span class="n">seat</span> <span class="n">enter</span> <span class="n">bundestag</span> <span class="n">upset</span> <span class="n">germany</span> <span class="n">political</span> <span class="n">order</span> <span class="n">time</span> <span class="n">second</span> <span class="n">world</span> <span class="n">war</span> <span class="n">success</span> <span class="n">star</span> <span class="n">movement</span> <span class="n">italy</span> <span class="n">surge</span> <span class="n">popularity</span> <span class="n">neo</span> <span class="n">nazism</span> <span class="n">neo</span> <span class="n">fascism</span> <span class="n">country</span> <span class="n">hungary</span> <span class="n">czech</span> <span class="n">republic</span> <span class="n">poland</span> <span class="n">austria</span>
+</code></pre></div></div>
+
+<p>Great job! Take a look at the cleaned text; it is lowercased and devoid of numbers, punctuations and commonly used stopwords. Also, note that the word U.S. was present in the original text. Since it had periods in between, our text cleaning process completely removed it. This may not be ideal behavior. It is always advisable to use your custom functions in place of <code class="language-plaintext highlighter-rouge">isalpha()</code> for more nuanced cases.</p>
+
+<h4 id="222-cleaning-ted-talks-in-a-dataframe"><strong>2.2.2 Cleaning TED talks in a dataframe</strong></h4>
+
+<p>In this exercise, we will revisit the TED Talks from the first chapter. You have been a given a dataframe <code class="language-plaintext highlighter-rouge">ted</code> consisting of 5 TED Talks. Your task is to clean these talks using techniques discussed earlier by writing a function <code class="language-plaintext highlighter-rouge">preprocess</code> and applying it to the <code class="language-plaintext highlighter-rouge">transcript</code> feature of the dataframe.</p>
+
+<p>The stopwords list is available as <code class="language-plaintext highlighter-rouge">stopwords</code> .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Function to preprocess text
+</span><span class="k">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+      <span class="c1"># Create Doc object
+</span>    <span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="p">[</span><span class="s">'ner'</span><span class="p">,</span> <span class="s">'parser'</span><span class="p">])</span>
+    <span class="c1"># Generate lemmas
+</span>    <span class="n">lemmas</span> <span class="o">=</span> <span class="p">[</span><span class="n">token</span><span class="p">.</span><span class="n">lemma_</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">]</span>
+    <span class="c1"># Remove stopwords and non-alphabetic characters
+</span>    <span class="n">a_lemmas</span> <span class="o">=</span> <span class="p">[</span><span class="n">lemma</span> <span class="k">for</span> <span class="n">lemma</span> <span class="ow">in</span> <span class="n">lemmas</span>
+            <span class="k">if</span> <span class="n">lemma</span><span class="p">.</span><span class="n">isalpha</span><span class="p">()</span> <span class="ow">and</span> <span class="n">lemma</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stopwords</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="s">' '</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">a_lemmas</span><span class="p">)</span>
+
+<span class="c1"># Apply preprocess to ted['transcript']
+</span><span class="n">ted</span><span class="p">[</span><span class="s">'transcript'</span><span class="p">]</span> <span class="o">=</span> <span class="n">ted</span><span class="p">[</span><span class="s">'transcript'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="n">preprocess</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">ted</span><span class="p">[</span><span class="s">'transcript'</span><span class="p">])</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">0</span>     <span class="n">talk</span> <span class="n">new</span> <span class="n">lecture</span> <span class="n">ted</span> <span class="n">illusion</span> <span class="n">create</span> <span class="n">ted</span> <span class="k">try</span> <span class="n">r</span><span class="p">...</span>
+<span class="mi">1</span>     <span class="n">representation</span> <span class="n">brain</span> <span class="n">brain</span> <span class="k">break</span> <span class="n">left</span> <span class="n">half</span> <span class="n">log</span><span class="p">...</span>
+<span class="mi">2</span>     <span class="n">great</span> <span class="n">honor</span> <span class="n">today</span> <span class="n">share</span> <span class="n">digital</span> <span class="n">universe</span> <span class="n">creat</span><span class="p">...</span>
+<span class="p">...</span>
+</code></pre></div></div>
+
+<p>Excellent job! You have preprocessed all the TED talk transcripts contained in <code class="language-plaintext highlighter-rouge">ted</code> and it is now in a good shape to perform operations such as vectorization (as we will soon see how). You now have a good understanding of how text preprocessing works and why it is important. In the next lessons, we will move on to generating word level features for our texts.</p>
+
+<h3 id="23-part-of-speechpos-tagging"><strong>2.3 Part-of-speech(POS) tagging</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/1-13.png?w=682" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/2-13.png?w=839" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/3-12.png?w=746" alt="" /></li>
+</ul>
+
+<h4 id="231-pos-tagging-in-lord-of-the-flies"><strong>2.3.1 POS tagging in Lord of the Flies</strong></h4>
+
+<p>In this exercise, you will perform part-of-speech tagging on a famous passage from one of the most well-known novels of all time, <em>Lord of the Flies</em> , authored by William Golding.</p>
+
+<p>The passage is available as <code class="language-plaintext highlighter-rouge">lotf</code> and has already been printed to the console.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">He</span> <span class="n">found</span> <span class="n">himself</span> <span class="n">understanding</span> <span class="n">the</span> <span class="n">wearisomeness</span> <span class="n">of</span> <span class="n">this</span> <span class="n">life</span><span class="p">,</span> <span class="n">where</span> <span class="n">every</span> <span class="n">path</span> <span class="n">was</span> <span class="n">an</span> <span class="n">improvisation</span> <span class="ow">and</span> <span class="n">a</span> <span class="n">considerable</span> <span class="n">part</span> <span class="n">of</span> <span class="n">one</span><span class="err">’</span><span class="n">s</span> <span class="n">waking</span> <span class="n">life</span> <span class="n">was</span> <span class="n">spent</span> <span class="n">watching</span> <span class="n">one</span><span class="err">’</span><span class="n">s</span> <span class="n">feet</span><span class="p">.</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Load the en_core_web_sm model
+</span><span class="n">nlp</span> <span class="o">=</span> <span class="n">spacy</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">'en_core_web_sm'</span><span class="p">)</span>
+
+<span class="c1"># Create a Doc object
+</span><span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">lotf</span><span class="p">)</span>
+
+<span class="c1"># Generate tokens and pos tags
+</span><span class="n">pos</span> <span class="o">=</span> <span class="p">[(</span><span class="n">token</span><span class="p">.</span><span class="n">text</span><span class="p">,</span> <span class="n">token</span><span class="p">.</span><span class="n">pos_</span><span class="p">)</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[(</span><span class="s">'He'</span><span class="p">,</span> <span class="s">'PRON'</span><span class="p">),</span> <span class="p">(</span><span class="s">'found'</span><span class="p">,</span> <span class="s">'VERB'</span><span class="p">),</span> <span class="p">(</span><span class="s">'himself'</span><span class="p">,</span> <span class="s">'PRON'</span><span class="p">),</span> <span class="p">(</span><span class="s">'understanding'</span><span class="p">,</span> <span class="s">'VERB'</span><span class="p">),</span> <span class="p">(</span><span class="s">'the'</span><span class="p">,</span> <span class="s">'DET'</span><span class="p">),</span> <span class="p">(</span><span class="s">'wearisomeness'</span><span class="p">,</span> <span class="s">'NOUN'</span><span class="p">),</span> <span class="p">(</span><span class="s">'of'</span><span class="p">,</span> <span class="s">'ADP'</span><span class="p">),</span> <span class="p">(</span><span class="s">'this'</span><span class="p">,</span> <span class="s">'DET'</span><span class="p">),</span> <span class="p">(</span><span class="s">'life'</span><span class="p">,</span> <span class="s">'NOUN'</span><span class="p">),</span> <span class="p">(</span><span class="s">','</span><span class="p">,</span> <span class="s">'PUNCT'</span><span class="p">),</span> <span class="p">(</span><span class="s">'where'</span><span class="p">,</span> <span class="s">'ADV'</span><span class="p">),</span> <span class="p">(</span><span class="s">'every'</span><span class="p">,</span> <span class="s">'DET'</span><span class="p">),</span> <span class="p">(</span><span class="s">'path'</span><span class="p">,</span> <span class="s">'NOUN'</span><span class="p">),</span> <span class="p">(</span><span class="s">'was'</span><span class="p">,</span> <span class="s">'VERB'</span><span class="p">),</span> <span class="p">(</span><span class="s">'an'</span><span class="p">,</span> <span class="s">'DET'</span><span class="p">),</span> <span class="p">(</span><span class="s">'improvisation'</span><span class="p">,</span> <span class="s">'NOUN'</span><span class="p">),</span> <span class="p">(</span><span class="s">'and'</span><span class="p">,</span> <span class="s">'CCONJ'</span><span class="p">),</span> <span class="p">(</span><span class="s">'a'</span><span class="p">,</span> <span class="s">'DET'</span><span class="p">),</span> <span class="p">(</span><span class="s">'considerable'</span><span class="p">,</span> <span class="s">'ADJ'</span><span class="p">),</span> <span class="p">(</span><span class="s">'part'</span><span class="p">,</span> <span class="s">'NOUN'</span><span class="p">),</span> <span class="p">(</span><span class="s">'of'</span><span class="p">,</span> <span class="s">'ADP'</span><span class="p">),</span> <span class="p">(</span><span class="s">'one'</span><span class="p">,</span> <span class="s">'NUM'</span><span class="p">),</span> <span class="p">(</span><span class="s">'’s'</span><span class="p">,</span> <span class="s">'PART'</span><span class="p">),</span> <span class="p">(</span><span class="s">'waking'</span><span class="p">,</span> <span class="s">'NOUN'</span><span class="p">),</span> <span class="p">(</span><span class="s">'life'</span><span class="p">,</span> <span class="s">'NOUN'</span><span class="p">),</span> <span class="p">(</span><span class="s">'was'</span><span class="p">,</span> <span class="s">'VERB'</span><span class="p">),</span> <span class="p">(</span><span class="s">'spent'</span><span class="p">,</span> <span class="s">'VERB'</span><span class="p">),</span> <span class="p">(</span><span class="s">'watching'</span><span class="p">,</span> <span class="s">'VERB'</span><span class="p">),</span> <span class="p">(</span><span class="s">'one'</span><span class="p">,</span> <span class="s">'PRON'</span><span class="p">),</span> <span class="p">(</span><span class="s">'’s'</span><span class="p">,</span> <span class="s">'PART'</span><span class="p">),</span> <span class="p">(</span><span class="s">'feet'</span><span class="p">,</span> <span class="s">'NOUN'</span><span class="p">),</span> <span class="p">(</span><span class="s">'.'</span><span class="p">,</span> <span class="s">'PUNCT'</span><span class="p">)]</span>
+</code></pre></div></div>
+
+<p>Good job! Examine the various POS tags attached to each token and evaluate if they make intuitive sense to you. You will notice that they are indeed labelled correctly according to the standard rules of English grammar.</p>
+
+<h4 id="232-counting-nouns-in-a-piece-of-text"><strong>2.3.2 Counting nouns in a piece of text</strong></h4>
+
+<p>In this exercise, we will write two functions, <code class="language-plaintext highlighter-rouge">nouns()</code> and <code class="language-plaintext highlighter-rouge">proper_nouns()</code> that will count the number of other nouns and proper nouns in a piece of text respectively.</p>
+
+<p>These functions will take in a piece of text and generate a list containing the POS tags for each word. It will then return the number of proper nouns/other nouns that the text contains. We will use these functions in the next exercise to generate interesting insights about fake news.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">en_core_web_sm</code> model has already been loaded as <code class="language-plaintext highlighter-rouge">nlp</code> in this exercise.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">nlp</span> <span class="o">=</span> <span class="n">spacy</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">'en_core_web_sm'</span><span class="p">)</span>
+
+<span class="c1"># Returns number of proper nouns
+</span><span class="k">def</span> <span class="nf">proper_nouns</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">nlp</span><span class="p">):</span>
+      <span class="c1"># Create doc object
+</span>    <span class="n">doc</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="c1"># Generate list of POS tags
+</span>    <span class="n">pos</span> <span class="o">=</span> <span class="p">[</span><span class="n">token</span><span class="p">.</span><span class="n">pos_</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">]</span>
+
+    <span class="c1"># Return number of proper nouns
+</span>    <span class="k">return</span> <span class="n">pos</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="s">'PROPN'</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">proper_nouns</span><span class="p">(</span><span class="s">"Abdul, Bill and Cathy went to the market to buy apples."</span><span class="p">,</span> <span class="n">nlp</span><span class="p">))</span>
+<span class="c1"># 3
+</span></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">nlp</span> <span class="o">=</span> <span class="n">spacy</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">'en_core_web_sm'</span><span class="p">)</span>
+
+<span class="c1"># Returns number of other nouns
+</span><span class="k">def</span> <span class="nf">nouns</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="n">nlp</span><span class="p">):</span>
+      <span class="c1"># Create doc object
+</span>    <span class="n">doc</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="c1"># Generate list of POS tags
+</span>    <span class="n">pos</span> <span class="o">=</span> <span class="p">[</span><span class="n">token</span><span class="p">.</span><span class="n">pos_</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">]</span>
+
+    <span class="c1"># Return number of other nouns
+</span>    <span class="k">return</span> <span class="n">pos</span><span class="p">.</span><span class="n">count</span><span class="p">(</span><span class="s">'NOUN'</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">nouns</span><span class="p">(</span><span class="s">"Abdul, Bill and Cathy went to the market to buy apples."</span><span class="p">,</span> <span class="n">nlp</span><span class="p">))</span>
+<span class="c1"># 2
+</span></code></pre></div></div>
+
+<p>Great job! You now know how to write functions that compute the number of instances of a particulat POS tag in a given piece of text. In the next exercise, we will use these functions to generate features from text in a dataframe.</p>
+
+<h4 id="233-noun-usage-in-fake-news"><strong>2.3.3 Noun usage in fake news</strong></h4>
+
+<p>In this exercise, you have been given a dataframe <code class="language-plaintext highlighter-rouge">headlines</code> that contains news headlines that are either fake or real. Your task is to generate two new features <code class="language-plaintext highlighter-rouge">num_propn</code> and <code class="language-plaintext highlighter-rouge">num_noun</code> that represent the number of proper nouns and other nouns contained in the <code class="language-plaintext highlighter-rouge">title</code> feature of <code class="language-plaintext highlighter-rouge">headlines</code> .</p>
+
+<p>Next, we will compute the mean number of proper nouns and other nouns used in fake and real news headlines and compare the values. If there is a remarkable difference, then there is a good chance that using the <code class="language-plaintext highlighter-rouge">num_propn</code> and <code class="language-plaintext highlighter-rouge">num_noun</code> features in fake news detectors will improve its performance.</p>
+
+<p>To accomplish this task, the functions <code class="language-plaintext highlighter-rouge">proper_nouns</code> and <code class="language-plaintext highlighter-rouge">nouns</code> that you had built in the previous exercise have already been made available to you.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">headlines</span>
+    <span class="n">Unnamed</span><span class="p">:</span> <span class="mi">0</span>                                              <span class="n">title</span> <span class="n">label</span>
+<span class="mi">0</span>            <span class="mi">0</span>                       <span class="n">You</span> <span class="n">Can</span> <span class="n">Smell</span> <span class="n">Hillary</span><span class="err">’</span><span class="n">s</span> <span class="n">Fear</span>  <span class="n">FAKE</span>
+<span class="mi">1</span>            <span class="mi">1</span>  <span class="n">Watch</span> <span class="n">The</span> <span class="n">Exact</span> <span class="n">Moment</span> <span class="n">Paul</span> <span class="n">Ryan</span> <span class="n">Committed</span> <span class="n">Pol</span><span class="p">...</span>  <span class="n">FAKE</span>
+<span class="mi">2</span>            <span class="mi">2</span>        <span class="n">Kerry</span> <span class="n">to</span> <span class="n">go</span> <span class="n">to</span> <span class="n">Paris</span> <span class="ow">in</span> <span class="n">gesture</span> <span class="n">of</span> <span class="n">sympathy</span>  <span class="n">REAL</span>
+<span class="mi">3</span>            <span class="mi">3</span>  <span class="n">Bernie</span> <span class="n">supporters</span> <span class="n">on</span> <span class="n">Twitter</span> <span class="n">erupt</span> <span class="ow">in</span> <span class="n">anger</span> <span class="n">ag</span><span class="p">...</span>  <span class="n">FAKE</span>
+<span class="mi">4</span>            <span class="mi">4</span>   <span class="n">The</span> <span class="n">Battle</span> <span class="n">of</span> <span class="n">New</span> <span class="n">York</span><span class="p">:</span> <span class="n">Why</span> <span class="n">This</span> <span class="n">Primary</span> <span class="n">Matters</span>  <span class="n">REAL</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">headlines</span><span class="p">[</span><span class="s">'num_propn'</span><span class="p">]</span> <span class="o">=</span> <span class="n">headlines</span><span class="p">[</span><span class="s">'title'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="n">proper_nouns</span><span class="p">)</span>
+<span class="n">headlines</span><span class="p">[</span><span class="s">'num_noun'</span><span class="p">]</span> <span class="o">=</span> <span class="n">headlines</span><span class="p">[</span><span class="s">'title'</span><span class="p">].</span><span class="nb">apply</span><span class="p">(</span><span class="n">nouns</span><span class="p">)</span>
+
+<span class="c1"># Compute mean of proper nouns
+</span><span class="n">real_propn</span> <span class="o">=</span> <span class="n">headlines</span><span class="p">[</span><span class="n">headlines</span><span class="p">[</span><span class="s">'label'</span><span class="p">]</span> <span class="o">==</span> <span class="s">'REAL'</span><span class="p">][</span><span class="s">'num_propn'</span><span class="p">].</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">fake_propn</span> <span class="o">=</span> <span class="n">headlines</span><span class="p">[</span><span class="n">headlines</span><span class="p">[</span><span class="s">'label'</span><span class="p">]</span> <span class="o">==</span> <span class="s">'FAKE'</span><span class="p">][</span><span class="s">'num_propn'</span><span class="p">].</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># Compute mean of other nouns
+</span><span class="n">real_noun</span> <span class="o">=</span> <span class="n">headlines</span><span class="p">[</span><span class="n">headlines</span><span class="p">[</span><span class="s">'label'</span><span class="p">]</span> <span class="o">==</span> <span class="s">'REAL'</span><span class="p">][</span><span class="s">'num_noun'</span><span class="p">].</span><span class="n">mean</span><span class="p">()</span>
+<span class="n">fake_noun</span> <span class="o">=</span> <span class="n">headlines</span><span class="p">[</span><span class="n">headlines</span><span class="p">[</span><span class="s">'label'</span><span class="p">]</span> <span class="o">==</span> <span class="s">'FAKE'</span><span class="p">][</span><span class="s">'num_noun'</span><span class="p">].</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># Print results
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Mean no. of proper nouns in real and fake headlines are %.2f and %.2f respectively"</span><span class="o">%</span><span class="p">(</span><span class="n">real_propn</span><span class="p">,</span> <span class="n">fake_propn</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Mean no. of other nouns in real and fake headlines are %.2f and %.2f respectively"</span><span class="o">%</span><span class="p">(</span><span class="n">real_noun</span><span class="p">,</span> <span class="n">fake_noun</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Mean</span> <span class="n">no</span><span class="p">.</span> <span class="n">of</span> <span class="n">proper</span> <span class="n">nouns</span> <span class="ow">in</span> <span class="n">real</span> <span class="ow">and</span> <span class="n">fake</span> <span class="n">headlines</span> <span class="n">are</span> <span class="mf">2.46</span> <span class="ow">and</span> <span class="mf">4.86</span> <span class="n">respectively</span>
+<span class="n">Mean</span> <span class="n">no</span><span class="p">.</span> <span class="n">of</span> <span class="n">other</span> <span class="n">nouns</span> <span class="ow">in</span> <span class="n">real</span> <span class="ow">and</span> <span class="n">fake</span> <span class="n">headlines</span> <span class="n">are</span> <span class="mf">2.30</span> <span class="ow">and</span> <span class="mf">1.44</span> <span class="n">respectively</span>
+</code></pre></div></div>
+
+<p>Excellent work! You now know to construct features using POS tags information. Notice how the mean number of proper nouns is considerably higher for fake news than it is for real news. The opposite seems to be true in the case of other nouns. This fact can be put to great use in desgning fake news detectors.</p>
+
+<h3 id="24-named-entity-recognitionner"><strong>2.4 Named entity recognition(NER)</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/4-12.png?w=439" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/5-12.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/6-12.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/7-12.png?w=1018" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/8-12.png?w=802" alt="" /></li>
+</ul>
+
+<h4 id="241-named-entities-in-a-sentence"><strong>2.4.1 Named entities in a sentence</strong></h4>
+
+<p>In this exercise, we will identify and classify the labels of various named entities in a body of text using one of spaCy’s statistical models. We will also verify the veracity of these labels.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Load the required model
+</span><span class="n">nlp</span> <span class="o">=</span> <span class="n">spacy</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">'en_core_web_sm'</span><span class="p">)</span>
+
+<span class="c1"># Create a Doc instance
+</span><span class="n">text</span> <span class="o">=</span> <span class="s">'Sundar Pichai is the CEO of Google. Its headquarters is in Mountain View.'</span>
+<span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+<span class="c1"># Print all named entities and their labels
+</span><span class="k">for</span> <span class="n">ent</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">.</span><span class="n">ents</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">ent</span><span class="p">.</span><span class="n">text</span><span class="p">,</span> <span class="n">ent</span><span class="p">.</span><span class="n">label_</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Sundar</span> <span class="n">Pichai</span> <span class="n">ORG</span>
+<span class="n">Google</span> <span class="n">ORG</span>
+<span class="n">Mountain</span> <span class="n">View</span> <span class="n">GPE</span>
+</code></pre></div></div>
+
+<p>Good job! Notice how the model correctly predicted the labels of Google and Mountain View but mislabeled Sundar Pichai as an organization. As discussed in the video, the predictions of the model depend strongly on the data it is trained on. It is possible to train spaCy models on your custom data. You will learn to do this in more advanced NLP courses.</p>
+
+<h4 id="242-identifying-people-mentioned-in-a-news-article"><strong>2.4.2 Identifying people mentioned in a news article</strong></h4>
+
+<p>In this exercise, you have been given an excerpt from a news article published in <em>TechCrunch</em> . Your task is to write a function <code class="language-plaintext highlighter-rouge">find_people</code> that identifies the names of people that have been mentioned in a particular piece of text. You will then use <code class="language-plaintext highlighter-rouge">find_people</code> to identify the people of interest in the article.</p>
+
+<p>The article is available as the string <code class="language-plaintext highlighter-rouge">tc</code> and has been printed to the console. The required spacy model has also been already loaded as <code class="language-plaintext highlighter-rouge">nlp</code> .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">find_persons</span><span class="p">(</span><span class="n">text</span><span class="p">):</span>
+  <span class="c1"># Create Doc object
+</span>  <span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+
+  <span class="c1"># Identify the persons
+</span>  <span class="n">persons</span> <span class="o">=</span> <span class="p">[</span><span class="n">ent</span><span class="p">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">ent</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">.</span><span class="n">ents</span> <span class="k">if</span> <span class="n">ent</span><span class="p">.</span><span class="n">label_</span> <span class="o">==</span> <span class="s">'PERSON'</span><span class="p">]</span>
+
+  <span class="c1"># Return persons
+</span>  <span class="k">return</span> <span class="n">persons</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">find_persons</span><span class="p">(</span><span class="n">tc</span><span class="p">))</span>
+<span class="c1"># ['Sheryl Sandberg', 'Mark Zuckerberg']
+</span></code></pre></div></div>
+
+<p>Excellent work! The article was related to Facebook and our function correctly identified both the people mentioned. You can now see how NER could be used in a variety of applications. Publishers may use a technique like this to classify news articles by the people mentioned in them. A question answering system could also use something like this to answer questions such as ‘Who are the people mentioned in this passage?’. With this, we come to an end of this chapter. In the next, we will learn how to conduct vectorization on documents.</p>
+
+<h2 id="3-n-gram-models"><strong>3. N-Gram models</strong></h2>
+
+<h3 id="31-building-a-bag-of-words-model"><strong>3.1 Building a bag of words model</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/1-14.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/2-14.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/3-13.png?w=833" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/4-13.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/5-13.png?w=908" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/6-13.png?w=961" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/7-13.png?w=974" alt="" /></li>
+</ul>
+
+<h4 id="311-word-vectors-with-a-given-vocabulary"><strong>3.1.1 Word vectors with a given vocabulary</strong></h4>
+
+<p>You have been given a corpus of documents and you have computed the vocabulary of the corpus to be the following: <em><strong>V</strong></em> : <em>a, an, and, but, can, come, evening, forever, go, i, men, may, on, the, women</em></p>
+
+<p>Which of the following corresponds to the bag of words vector for the document “men may come and men may go but i go on forever”?</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Good job! That is, indeed, the correct answer. Each value in the vector corresponds to the frequency of the corresponding word in the vocabulary.</p>
+
+<h4 id="312-bow-model-for-movie-taglines"><strong>3.1.2 BoW model for movie taglines</strong></h4>
+
+<p>In this exercise, you have been provided with a <code class="language-plaintext highlighter-rouge">corpus</code> of more than 7000 movie tag lines. Your job is to generate the bag of words representation <code class="language-plaintext highlighter-rouge">bow_matrix</code> for these taglines. For this exercise, we will ignore the text preprocessing step and generate <code class="language-plaintext highlighter-rouge">bow_matrix</code> directly.</p>
+
+<p>We will also investigate the shape of the resultant <code class="language-plaintext highlighter-rouge">bow_matrix</code> . The first five taglines in <code class="language-plaintext highlighter-rouge">corpus</code> have been printed to the console for you to examine.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">corpus</span><span class="p">.</span><span class="n">shape</span>
+<span class="p">(</span><span class="mi">7033</span><span class="p">,)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import CountVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+
+<span class="c1"># Create CountVectorizer object
+</span><span class="n">vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">()</span>
+
+<span class="c1"># Generate matrix of word vectors
+</span><span class="n">bow_matrix</span> <span class="o">=</span> <span class="n">vectorizer</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">corpus</span><span class="p">)</span>
+
+<span class="c1"># Print the shape of bow_matrix
+</span><span class="k">print</span><span class="p">(</span><span class="n">bow_matrix</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (7033, 6614)
+</span></code></pre></div></div>
+
+<p>Excellent! You now know how to generate a bag of words representation for a given corpus of documents. Notice that the word vectors created have more than 6600 dimensions. However, most of these dimensions have a value of zero since most words do not occur in a particular tagline.</p>
+
+<h4 id="313-analyzing-dimensionality-and-preprocessing"><strong>3.1.3 Analyzing dimensionality and preprocessing</strong></h4>
+
+<p>In this exercise, you have been provided with a <code class="language-plaintext highlighter-rouge">lem_corpus</code> which contains the pre-processed versions of the movie taglines from the previous exercise. In other words, the taglines have been lowercased and lemmatized, and stopwords have been removed.</p>
+
+<p>Your job is to generate the bag of words representation <code class="language-plaintext highlighter-rouge">bow_lem_matrix</code> for these lemmatized taglines and compare its shape with that of <code class="language-plaintext highlighter-rouge">bow_matrix</code> obtained in the previous exercise. The first five lemmatized taglines in <code class="language-plaintext highlighter-rouge">lem_corpus</code> have been printed to the console for you to examine.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import CountVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+
+<span class="c1"># Create CountVectorizer object
+</span><span class="n">vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">()</span>
+
+<span class="c1"># Generate matrix of word vectors
+</span><span class="n">bow_lem_matrix</span> <span class="o">=</span> <span class="n">vectorizer</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">lem_corpus</span><span class="p">)</span>
+
+<span class="c1"># Print the shape of bow_lem_matrix
+</span><span class="k">print</span><span class="p">(</span><span class="n">bow_lem_matrix</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (6959, 5223)
+</span></code></pre></div></div>
+
+<p>Good job! Notice how the number of features have reduced significantly from around 6600 to around 5223 for pre-processed movie taglines. The reduced number of dimensions on account of text preprocessing usually leads to better performance when conducting machine learning and it is a good idea to consider it. However, as mentioned in a previous lesson, the final decision always depends on the nature of the application.</p>
+
+<h4 id="314-mapping-feature-indices-with-feature-names"><strong>3.1.4 Mapping feature indices with feature names</strong></h4>
+
+<p>In the lesson video, we had seen that <code class="language-plaintext highlighter-rouge">CountVectorizer</code> doesn’t necessarily index the vocabulary in alphabetical order. In this exercise, we will learn to map each feature index to its corresponding feature name from the vocabulary.</p>
+
+<p>We will use the same three sentences on lions from the video. The sentences are available in a list named <code class="language-plaintext highlighter-rouge">corpus</code> and has already been printed to the console.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="s">'The lion is the king of the jungle'</span><span class="p">,</span> <span class="s">'Lions have lifespans of a decade'</span><span class="p">,</span> <span class="s">'The lion is an endangered species'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create CountVectorizer object
+</span><span class="n">vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">()</span>
+
+<span class="c1"># Generate matrix of word vectors
+</span><span class="n">bow_matrix</span> <span class="o">=</span> <span class="n">vectorizer</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">corpus</span><span class="p">)</span>
+
+<span class="c1"># Convert bow_matrix into a DataFrame
+</span><span class="n">bow_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">bow_matrix</span><span class="p">.</span><span class="n">toarray</span><span class="p">())</span>
+
+<span class="c1"># Map the column names to vocabulary
+</span><span class="n">bow_df</span><span class="p">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">vectorizer</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">()</span>
+
+<span class="c1"># Print bow_df
+</span><span class="k">print</span><span class="p">(</span><span class="n">bow_df</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>   <span class="n">an</span>  <span class="n">decade</span>  <span class="n">endangered</span>  <span class="n">have</span>  <span class="ow">is</span>  <span class="p">...</span>  <span class="n">lion</span>  <span class="n">lions</span>  <span class="n">of</span>  <span class="n">species</span>  <span class="n">the</span>
+<span class="mi">0</span>   <span class="mi">0</span>       <span class="mi">0</span>           <span class="mi">0</span>     <span class="mi">0</span>   <span class="mi">1</span>  <span class="p">...</span>     <span class="mi">1</span>      <span class="mi">0</span>   <span class="mi">1</span>        <span class="mi">0</span>    <span class="mi">3</span>
+<span class="mi">1</span>   <span class="mi">0</span>       <span class="mi">1</span>           <span class="mi">0</span>     <span class="mi">1</span>   <span class="mi">0</span>  <span class="p">...</span>     <span class="mi">0</span>      <span class="mi">1</span>   <span class="mi">1</span>        <span class="mi">0</span>    <span class="mi">0</span>
+<span class="mi">2</span>   <span class="mi">1</span>       <span class="mi">0</span>           <span class="mi">1</span>     <span class="mi">0</span>   <span class="mi">1</span>  <span class="p">...</span>     <span class="mi">1</span>      <span class="mi">0</span>   <span class="mi">0</span>        <span class="mi">1</span>    <span class="mi">1</span>
+
+<span class="p">[</span><span class="mi">3</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">13</span> <span class="n">columns</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>Great job! Observe that the column names refer to the token whose frequency is being recorded. Therefore, since the first column name is <code class="language-plaintext highlighter-rouge">an</code> , the first feature represents the number of times the word ‘an’ occurs in a particular sentence. <code class="language-plaintext highlighter-rouge">get_feature_names()</code> essentially gives us a list which represents the mapping of the feature indices to the feature name in the vocabulary.</p>
+
+<h3 id="32-building-a-bow-naive-bayes-classifier"><strong>3.2 Building a BoW Naive Bayes classifier</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/8-13.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/9-12.png?w=773" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/10-12.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/11-12.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/12-12.png?w=708" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/13-11.png?w=989" alt="" /></li>
+</ul>
+
+<h4 id="321-bow-vectors-for-movie-reviews"><strong>3.2.1 BoW vectors for movie reviews</strong></h4>
+
+<p>In this exercise, you have been given two pandas Series, <code class="language-plaintext highlighter-rouge">X_train</code> and <code class="language-plaintext highlighter-rouge">X_test</code> , which consist of movie reviews. They represent the training and the test review data respectively. Your task is to preprocess the reviews and generate BoW vectors for these two sets using <code class="language-plaintext highlighter-rouge">CountVectorizer</code> .</p>
+
+<p>Once we have generated the BoW vector matrices <code class="language-plaintext highlighter-rouge">X_train_bow</code> and <code class="language-plaintext highlighter-rouge">X_test_bow</code> , we will be in a very good position to apply a machine learning model to it and conduct sentiment analysis.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import CountVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+
+<span class="c1"># Create a CountVectorizer object
+</span><span class="n">vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">lowercase</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">stop_words</span><span class="o">=</span><span class="s">'english'</span><span class="p">)</span>
+
+<span class="c1"># Fit and transform X_train
+</span><span class="n">X_train_bow</span> <span class="o">=</span> <span class="n">vectorizer</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+<span class="c1"># Transform X_test
+</span><span class="n">X_test_bow</span> <span class="o">=</span> <span class="n">vectorizer</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Print shape of X_train_bow and X_test_bow
+</span><span class="k">print</span><span class="p">(</span><span class="n">X_train_bow</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">X_test_bow</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+
+<span class="c1"># (750, 8158)
+# (250, 8158)
+</span></code></pre></div></div>
+
+<p>Great job! You now have a good idea of preprocessing text and transforming them into their bag-of-words representation using <code class="language-plaintext highlighter-rouge">CountVectorizer</code> . In this exercise, you have set the <code class="language-plaintext highlighter-rouge">lowercase</code> argument to <code class="language-plaintext highlighter-rouge">True</code> . However, note that this is the default value of <code class="language-plaintext highlighter-rouge">lowercase</code> and passing it explicitly is not necessary. Also, note that both <code class="language-plaintext highlighter-rouge">X_train_bow</code> and <code class="language-plaintext highlighter-rouge">X_test_bow</code> have 8158 features. There were words present in <code class="language-plaintext highlighter-rouge">X_test</code> that were not in <code class="language-plaintext highlighter-rouge">X_train</code> . <code class="language-plaintext highlighter-rouge">CountVectorizer</code> chose to ignore them in order to ensure that the dimensions of both sets remain the same.</p>
+
+<h4 id="322-predicting-the-sentiment-of-a-movie-review"><strong>3.2.2 Predicting the sentiment of a movie review</strong></h4>
+
+<p>In the previous exercise, you generated the bag-of-words representations for the training and test movie review data. In this exercise, we will use this model to train a Naive Bayes classifier that can detect the sentiment of a movie review and compute its accuracy. Note that since this is a binary classification problem, the model is only capable of classifying a review as either positive (1) or negative (0). It is incapable of detecting neutral reviews.</p>
+
+<p>In case you don’t recall, the training and test BoW vectors are available as <code class="language-plaintext highlighter-rouge">X_train_bow</code> and <code class="language-plaintext highlighter-rouge">X_test_bow</code> respectively. The corresponding labels are available as <code class="language-plaintext highlighter-rouge">y_train</code> and <code class="language-plaintext highlighter-rouge">y_test</code> respectively. Also, for you reference, the original movie review dataset is available as <code class="language-plaintext highlighter-rouge">df</code> .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a MultinomialNB object
+</span><span class="n">clf</span> <span class="o">=</span> <span class="n">MultinomialNB</span><span class="p">()</span>
+
+<span class="c1"># Fit the classifier
+</span><span class="n">clf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_bow</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Measure the accuracy
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">clf</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test_bow</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The accuracy of the classifier on the test set is %.3f"</span> <span class="o">%</span> <span class="n">accuracy</span><span class="p">)</span>
+
+<span class="c1"># Predict the sentiment of a negative review
+</span><span class="n">review</span> <span class="o">=</span> <span class="s">"The movie was terrible. The music was underwhelming and the acting mediocre."</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">clf</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">vectorizer</span><span class="p">.</span><span class="n">transform</span><span class="p">([</span><span class="n">review</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The sentiment predicted by the classifier is %i"</span> <span class="o">%</span> <span class="p">(</span><span class="n">prediction</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Excellent work! You have successfully performed basic sentiment analysis. Note that the accuracy of the classifier is 73.2%. Considering the fact that it was trained on only 750 reviews, this is reasonably good performance. The classifier also correctly predicts the sentiment of a mini negative review which we passed into it.</p>
+
+<h3 id="33-building-n-gram-models"><strong>3.3 Building n-gram models</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/1-15.png?w=820" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/2-15.png?w=993" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/3-14.png?w=462" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/4-14.png?w=513" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/5-14.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/6-14.png?w=478" alt="" /></li>
+</ul>
+
+<h4 id="331-n-gram-models-for-movie-tag-lines"><strong>3.3.1 n-gram models for movie tag lines</strong></h4>
+
+<p>In this exercise, we have been provided with a <code class="language-plaintext highlighter-rouge">corpus</code> of more than 9000 movie tag lines. Our job is to generate n-gram models up to n equal to 1, n equal to 2 and n equal to 3 for this data and discover the number of features for each model.</p>
+
+<p>We will then compare the number of features generated for each model.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Generate n-grams upto n=1
+</span><span class="n">vectorizer_ng1</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">ng1</span> <span class="o">=</span> <span class="n">vectorizer_ng1</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">corpus</span><span class="p">)</span>
+
+<span class="c1"># Generate n-grams upto n=2
+</span><span class="n">vectorizer_ng2</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+<span class="n">ng2</span> <span class="o">=</span> <span class="n">vectorizer_ng2</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">corpus</span><span class="p">)</span>
+
+<span class="c1"># Generate n-grams upto n=3
+</span><span class="n">vectorizer_ng3</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">ng3</span> <span class="o">=</span> <span class="n">vectorizer_ng3</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">corpus</span><span class="p">)</span>
+
+<span class="c1"># Print the number of features for each model
+</span><span class="k">print</span><span class="p">(</span><span class="s">"ng1, ng2 and ng3 have %i, %i and %i features respectively"</span> <span class="o">%</span> <span class="p">(</span><span class="n">ng1</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ng2</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">ng3</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="c1"># ng1, ng2 and ng3 have 6614, 37100 and 76881 features respectively
+</span></code></pre></div></div>
+
+<p>Good job! You now know how to generate n-gram models containing higher order n-grams. Notice that <code class="language-plaintext highlighter-rouge">ng2</code> has over 37,000 features whereas <code class="language-plaintext highlighter-rouge">ng3</code> has over 76,000 features. This is much greater than the 6,000 dimensions obtained for <code class="language-plaintext highlighter-rouge">ng1</code> . As the n-gram range increases, so does the number of features, leading to increased computational costs and a problem known as the curse of dimensionality.</p>
+
+<h4 id="332-higher-order-n-grams-for-sentiment-analysis"><strong>3.3.2 Higher order n-grams for sentiment analysis</strong></h4>
+
+<p>Similar to a previous exercise, we are going to build a classifier that can detect if the review of a particular movie is positive or negative. However, this time, we will use n-grams up to n=2 for the task.</p>
+
+<p>The n-gram training reviews are available as <code class="language-plaintext highlighter-rouge">X_train_ng</code> . The corresponding test reviews are available as <code class="language-plaintext highlighter-rouge">X_test_ng</code> . Finally, use <code class="language-plaintext highlighter-rouge">y_train</code> and <code class="language-plaintext highlighter-rouge">y_test</code> to access the training and test sentiment classes respectively.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Define an instance of MultinomialNB
+</span><span class="n">clf_ng</span> <span class="o">=</span> <span class="n">MultinomialNB</span><span class="p">()</span>
+
+<span class="c1"># Fit the classifier
+</span><span class="n">clf_ng</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_ng</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Measure the accuracy
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">clf_ng</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test_ng</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The accuracy of the classifier on the test set is %.3f"</span> <span class="o">%</span> <span class="n">accuracy</span><span class="p">)</span>
+
+<span class="c1"># Predict the sentiment of a negative review
+</span><span class="n">review</span> <span class="o">=</span> <span class="s">"The movie was not good. The plot had several holes and the acting lacked panache."</span>
+<span class="n">prediction</span> <span class="o">=</span> <span class="n">clf_ng</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">ng_vectorizer</span><span class="p">.</span><span class="n">transform</span><span class="p">([</span><span class="n">review</span><span class="p">]))[</span><span class="mi">0</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The sentiment predicted by the classifier is %i"</span> <span class="o">%</span> <span class="p">(</span><span class="n">prediction</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">The</span> <span class="n">accuracy</span> <span class="n">of</span> <span class="n">the</span> <span class="n">classifier</span> <span class="n">on</span> <span class="n">the</span> <span class="n">test</span> <span class="nb">set</span> <span class="ow">is</span> <span class="mf">0.758</span>
+<span class="n">The</span> <span class="n">sentiment</span> <span class="n">predicted</span> <span class="n">by</span> <span class="n">the</span> <span class="n">classifier</span> <span class="ow">is</span> <span class="mi">0</span>
+</code></pre></div></div>
+
+<p>Excellent job! You’re now adept at performing sentiment analysis using text. Notice how this classifier performs slightly better than the BoW version. Also, it succeeds at correctly identifying the sentiment of the mini-review as negative. In the next chapter, we will learn more complex methods of vectorizing textual data.</p>
+
+<h4 id="333-comparing-performance-of-n-gram-models"><strong>3.3.3 Comparing performance of n-gram models</strong></h4>
+
+<p>You now know how to conduct sentiment analysis by converting text into various n-gram representations and feeding them to a classifier. In this exercise, we will conduct sentiment analysis for the same movie reviews from before using two n-gram models: unigrams and n-grams upto n equal to 3.</p>
+
+<p>We will then compare the performance using three criteria: accuracy of the model on the test set, time taken to execute the program and the number of features created when generating the n-gram representation.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+<span class="c1"># Splitting the data into training and test sets
+</span><span class="n">train_X</span><span class="p">,</span> <span class="n">test_X</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">test_y</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'review'</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s">'sentiment'</span><span class="p">],</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span> <span class="n">stratify</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s">'sentiment'</span><span class="p">])</span>
+
+<span class="c1"># Generating ngrams
+</span><span class="n">vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">train_X</span> <span class="o">=</span> <span class="n">vectorizer</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">train_X</span><span class="p">)</span>
+<span class="n">test_X</span> <span class="o">=</span> <span class="n">vectorizer</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">test_X</span><span class="p">)</span>
+
+<span class="c1"># Fit classifier
+</span><span class="n">clf</span> <span class="o">=</span> <span class="n">MultinomialNB</span><span class="p">()</span>
+<span class="n">clf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_X</span><span class="p">,</span> <span class="n">train_y</span><span class="p">)</span>
+
+<span class="c1"># Print accuracy, time and number of dimensions
+</span><span class="k">print</span><span class="p">(</span><span class="s">"The program took %.3f seconds to complete. The accuracy on the test set is %.2f. The ngram representation had %i features."</span> <span class="o">%</span> <span class="p">(</span><span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">clf</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">test_X</span><span class="p">,</span> <span class="n">test_y</span><span class="p">),</span> <span class="n">train_X</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="c1"># The program took 0.196 seconds to complete. The accuracy on the test set is 0.75. The ngram representation had 12347 features.
+</span></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">ngram_range</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="c1"># The program took 2.933 seconds to complete. The accuracy on the test set is 0.77. The ngram representation had 178240 features.
+</span></code></pre></div></div>
+
+<p>Amazing work! The program took around 0.2 seconds in the case of the unigram model and more than 10 times longer for the higher order n-gram model. The unigram model had over 12,000 features whereas the n-gram model for upto n=3 had over 178,000! Despite taking higher computation time and generating more features, the classifier only performs marginally better in the latter case, producing an accuracy of 77% in comparison to the 75% for the unigram model.</p>
+
+<h2 id="4-tf-idf-and-similarity-scores"><strong>4. TF-IDF and similarity scores</strong></h2>
+
+<h3 id="41-building-tf-idf-document-vectors"><strong>4.1 Building tf-idf document vectors</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/7-14.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/8-14.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/9-13.png?w=878" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/10-13.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/11-13.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/12-13.png?w=928" alt="" /></li>
+</ul>
+
+<h4 id="411-tf-idf-weight-of-commonly-occurring-words"><strong>4.1.1 tf-idf weight of commonly occurring words</strong></h4>
+
+<p>The word <code class="language-plaintext highlighter-rouge">bottle</code> occurs 5 times in a particular document <code class="language-plaintext highlighter-rouge">D</code> and also occurs in every document of the corpus. What is the tf-idf weight of <code class="language-plaintext highlighter-rouge">bottle</code> in <code class="language-plaintext highlighter-rouge">D</code> ?</p>
+
+<p><strong>0</strong></p>
+
+<p>Correct! In fact, the tf-idf weight for <code class="language-plaintext highlighter-rouge">bottle</code> in every document will be 0. This is because the inverse document frequency is constant across documents in a corpus and since <code class="language-plaintext highlighter-rouge">bottle</code> occurs in every document, its value is log(1), which is 0.</p>
+
+<h4 id="412-tf-idf-vectors-for-ted-talks"><strong>4.1.2 tf-idf vectors for TED talks</strong></h4>
+
+<p>In this exercise, you have been given a corpus <code class="language-plaintext highlighter-rouge">ted</code> which contains the transcripts of 500 TED Talks. Your task is to generate the tf-idf vectors for these talks.</p>
+
+<p>In a later lesson, we will use these vectors to generate recommendations of similar talks based on the transcript.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import TfidfVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">TfidfVectorizer</span>
+
+<span class="c1"># Create TfidfVectorizer object
+</span><span class="n">vectorizer</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">()</span>
+
+<span class="c1"># Generate matrix of word vectors
+</span><span class="n">tfidf_matrix</span> <span class="o">=</span> <span class="n">vectorizer</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">ted</span><span class="p">)</span>
+
+<span class="c1"># Print the shape of tfidf_matrix
+</span><span class="k">print</span><span class="p">(</span><span class="n">tfidf_matrix</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (500, 29158)
+</span></code></pre></div></div>
+
+<p>Good job! You now know how to generate tf-idf vectors for a given corpus of text. You can use these vectors to perform predictive modeling just like we did with <code class="language-plaintext highlighter-rouge">CountVectorizer</code> . In the next few lessons, we will see another extremely useful application of the vectorized form of documents: generating recommendations.</p>
+
+<h3 id="42-cosine-similarity"><strong>4.2 Cosine similarity</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/13-12.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/14-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/15-11.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/16-10.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/17-7.png?w=978" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/18-5.png?w=979" alt="" /></li>
+</ul>
+
+<h4 id="421-computing-dot-product"><strong>4.2.1 Computing dot product</strong></h4>
+
+<p>In this exercise, we will learn to compute the dot product between two vectors, A = (1, 3) and B = (-2, 2), using the <code class="language-plaintext highlighter-rouge">numpy</code> library. More specifically, we will use the <code class="language-plaintext highlighter-rouge">np.dot()</code> function to compute the dot product of two numpy arrays.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Initialize numpy vectors
+</span><span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">])</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+
+<span class="c1"># Compute dot product
+</span><span class="n">dot_prod</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+
+<span class="c1"># Print dot product
+</span><span class="k">print</span><span class="p">(</span><span class="n">dot_prod</span><span class="p">)</span>
+<span class="c1"># 4
+</span></code></pre></div></div>
+
+<p>Good job! The dot product of the two vectors is 1  <em>-2 + 3</em>  2 = 4, which is indeed the output produced. We will not be using <code class="language-plaintext highlighter-rouge">np.dot()</code> too much in this course but it can prove to be a helpful function while computing dot products between two standalone vectors.</p>
+
+<h4 id="422-cosine-similarity-matrix-of-a-corpus"><strong>4.2.2 Cosine similarity matrix of a corpus</strong></h4>
+
+<p>In this exercise, you have been given a <code class="language-plaintext highlighter-rouge">corpus</code> , which is a list containing five sentences. The <code class="language-plaintext highlighter-rouge">corpus</code> is printed in the console. You have to compute the cosine similarity matrix which contains the pairwise cosine similarity score for every pair of sentences (vectorized using tf-idf).</p>
+
+<p>Remember, the value corresponding to the ith row and jth column of a similarity matrix denotes the similarity score for the ith and jth vector.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">corpus</span>
+<span class="p">[</span><span class="s">'The sun is the largest celestial body in the solar system'</span><span class="p">,</span>
+ <span class="s">'The solar system consists of the sun and eight revolving planets'</span><span class="p">,</span>
+ <span class="s">'Ra was the Egyptian Sun God'</span><span class="p">,</span>
+ <span class="s">'The Pyramids were the pinnacle of Egyptian architecture'</span><span class="p">,</span>
+ <span class="s">'The quick brown fox jumps over the lazy dog'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Initialize an instance of tf-idf Vectorizer
+</span><span class="n">tfidf_vectorizer</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">()</span>
+
+<span class="c1"># Generate the tf-idf vectors for the corpus
+</span><span class="n">tfidf_matrix</span> <span class="o">=</span> <span class="n">tfidf_vectorizer</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">corpus</span><span class="p">)</span>
+
+<span class="c1"># Compute and print the cosine similarity matrix
+</span><span class="n">cosine_sim</span> <span class="o">=</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">tfidf_matrix</span><span class="p">,</span><span class="n">tfidf_matrix</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">cosine_sim</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[[</span><span class="mf">1.</span>         <span class="mf">0.36413198</span> <span class="mf">0.18314713</span> <span class="mf">0.18435251</span> <span class="mf">0.16336438</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.36413198</span> <span class="mf">1.</span>         <span class="mf">0.15054075</span> <span class="mf">0.21704584</span> <span class="mf">0.11203887</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.18314713</span> <span class="mf">0.15054075</span> <span class="mf">1.</span>         <span class="mf">0.21318602</span> <span class="mf">0.07763512</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.18435251</span> <span class="mf">0.21704584</span> <span class="mf">0.21318602</span> <span class="mf">1.</span>         <span class="mf">0.12960089</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.16336438</span> <span class="mf">0.11203887</span> <span class="mf">0.07763512</span> <span class="mf">0.12960089</span> <span class="mf">1.</span>        <span class="p">]]</span>
+</code></pre></div></div>
+
+<p>Great work! As you will see in a subsequent lesson, computing the cosine similarity matrix lies at the heart of many practical systems such as recommenders. From our similarity matrix, we see that the first and the second sentence are the most similar. Also the fifth sentence has, on average, the lowest pairwise cosine scores. This is intuitive as it contains entities that are not present in the other sentences.</p>
+
+<h3 id="43-building-a-plot-line-based-recommender"><strong>4.3 Building a plot line based recommender</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/19-4.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/20-4.png?w=613" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/21-3.png?w=524" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/22-3.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/23-3.png?w=824" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/24-3.png?w=1020" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/25-2.png?w=904" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/26-2.png?w=1022" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/27-2.png?w=1024" alt="" /></li>
+</ul>
+
+<h4 id="431-comparing-linear_kernel-and-cosine_similarity"><strong>4.3.1 Comparing linear_kernel and cosine_similarity</strong></h4>
+
+<p>In this exercise, you have been given <code class="language-plaintext highlighter-rouge">tfidf_matrix</code> which contains the tf-idf vectors of a thousand documents. Your task is to generate the cosine similarity matrix for these vectors first using <code class="language-plaintext highlighter-rouge">cosine_similarity</code> and then, using <code class="language-plaintext highlighter-rouge">linear_kernel</code> .</p>
+
+<p>We will then compare the computation times for both functions.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Record start time
+</span><span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="c1"># Compute cosine similarity matrix
+</span><span class="n">cosine_sim</span> <span class="o">=</span> <span class="n">cosine_similarity</span><span class="p">(</span><span class="n">tfidf_matrix</span><span class="p">,</span> <span class="n">tfidf_matrix</span><span class="p">)</span>
+
+<span class="c1"># Print cosine similarity matrix
+</span><span class="k">print</span><span class="p">(</span><span class="n">cosine_sim</span><span class="p">)</span>
+
+<span class="c1"># Print time taken
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Time taken: %s seconds"</span> <span class="o">%</span><span class="p">(</span><span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[[</span><span class="mf">1.</span>         <span class="mf">0.</span>         <span class="mf">0.</span>         <span class="p">...</span> <span class="mf">0.</span>         <span class="mf">0.</span>         <span class="mf">0.</span>        <span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span>         <span class="mf">1.</span>         <span class="mf">0.</span>         <span class="p">...</span> <span class="mf">0.</span>         <span class="mf">0.</span>         <span class="mf">0.</span>        <span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span>         <span class="mf">0.</span>         <span class="mf">1.</span>         <span class="p">...</span> <span class="mf">0.</span>         <span class="mf">0.01418221</span> <span class="mf">0.</span>        <span class="p">]</span>
+ <span class="p">...</span>
+ <span class="p">[</span><span class="mf">0.</span>         <span class="mf">0.</span>         <span class="mf">0.</span>         <span class="p">...</span> <span class="mf">1.</span>         <span class="mf">0.01589009</span> <span class="mf">0.</span>        <span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span>         <span class="mf">0.</span>         <span class="mf">0.01418221</span> <span class="p">...</span> <span class="mf">0.01589009</span> <span class="mf">1.</span>         <span class="mf">0.</span>        <span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span>         <span class="mf">0.</span>         <span class="mf">0.</span>         <span class="p">...</span> <span class="mf">0.</span>         <span class="mf">0.</span>         <span class="mf">1.</span>        <span class="p">]]</span>
+<span class="n">Time</span> <span class="n">taken</span><span class="p">:</span> <span class="mf">0.33341264724731445</span> <span class="n">seconds</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Compute cosine similarity matrix
+</span><span class="n">cosine_sim</span> <span class="o">=</span> <span class="n">linear_kernel</span><span class="p">(</span><span class="n">tfidf_matrix</span><span class="p">,</span> <span class="n">tfidf_matrix</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>Good job! Notice how both <code class="language-plaintext highlighter-rouge">linear_kernel</code> and <code class="language-plaintext highlighter-rouge">cosine_similarity</code> produced the same result. However, <code class="language-plaintext highlighter-rouge">linear_kernel</code> took a smaller amount of time to execute. When you’re working with a very large amount of data and your vectors are in the tf-idf representation, it is good practice to default to <code class="language-plaintext highlighter-rouge">linear_kernel</code> to improve performance. (NOTE: In case, you see <code class="language-plaintext highlighter-rouge">linear_kernel</code> taking more time, it’s because the dataset we’re dealing with is extremely small and Python’s <code class="language-plaintext highlighter-rouge">time</code> module is incapable of capture such minute time differences accurately)</p>
+
+<h4 id="432-plot-recommendation-engine"><strong>4.3.2 Plot recommendation engine</strong></h4>
+
+<p>In this exercise, we will build a recommendation engine that suggests movies based on similarity of plot lines. You have been given a <code class="language-plaintext highlighter-rouge">get_recommendations()</code> function that takes in the title of a movie, a similarity matrix and an <code class="language-plaintext highlighter-rouge">indices</code> series as its arguments and outputs a list of most similar movies. <code class="language-plaintext highlighter-rouge">indices</code> has already been provided to you.</p>
+
+<p>You have also been given a <code class="language-plaintext highlighter-rouge">movie_plots</code> Series that contains the plot lines of several movies. Your task is to generate a cosine similarity matrix for the tf-idf vectors of these plots.</p>
+
+<p>Consequently, we will check the potency of our engine by generating recommendations for one of my favorite movies, The Dark Knight Rises.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Initialize the TfidfVectorizer
+</span><span class="n">tfidf</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="n">stop_words</span><span class="o">=</span><span class="s">'english'</span><span class="p">)</span>
+
+<span class="c1"># Construct the TF-IDF matrix
+</span><span class="n">tfidf_matrix</span> <span class="o">=</span> <span class="n">tfidf</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">movie_plots</span><span class="p">)</span>
+
+<span class="c1"># Generate the cosine similarity matrix
+</span><span class="n">cosine_sim</span> <span class="o">=</span> <span class="n">linear_kernel</span><span class="p">(</span><span class="n">tfidf_matrix</span><span class="p">,</span> <span class="n">tfidf_matrix</span><span class="p">)</span>
+
+<span class="c1"># Generate recommendations
+</span><span class="k">print</span><span class="p">(</span><span class="n">get_recommendations</span><span class="p">(</span><span class="s">'The Dark Knight Rises'</span><span class="p">,</span> <span class="n">cosine_sim</span><span class="p">,</span> <span class="n">indices</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">1</span>                              <span class="n">Batman</span> <span class="n">Forever</span>
+<span class="mi">2</span>                                      <span class="n">Batman</span>
+<span class="mi">3</span>                              <span class="n">Batman</span> <span class="n">Returns</span>
+<span class="mi">8</span>                  <span class="n">Batman</span><span class="p">:</span> <span class="n">Under</span> <span class="n">the</span> <span class="n">Red</span> <span class="n">Hood</span>
+<span class="mi">9</span>                            <span class="n">Batman</span><span class="p">:</span> <span class="n">Year</span> <span class="n">One</span>
+<span class="mi">10</span>    <span class="n">Batman</span><span class="p">:</span> <span class="n">The</span> <span class="n">Dark</span> <span class="n">Knight</span> <span class="n">Returns</span><span class="p">,</span> <span class="n">Part</span> <span class="mi">1</span>
+<span class="mi">11</span>    <span class="n">Batman</span><span class="p">:</span> <span class="n">The</span> <span class="n">Dark</span> <span class="n">Knight</span> <span class="n">Returns</span><span class="p">,</span> <span class="n">Part</span> <span class="mi">2</span>
+<span class="mi">5</span>                <span class="n">Batman</span><span class="p">:</span> <span class="n">Mask</span> <span class="n">of</span> <span class="n">the</span> <span class="n">Phantasm</span>
+<span class="mi">7</span>                               <span class="n">Batman</span> <span class="n">Begins</span>
+<span class="mi">4</span>                              <span class="n">Batman</span> <span class="o">&amp;</span> <span class="n">Robin</span>
+<span class="n">Name</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">object</span>
+</code></pre></div></div>
+
+<p>Congratulations! You’ve just built your very first recommendation system. Notice how the recommender correctly identifies <code class="language-plaintext highlighter-rouge">'The Dark Knight Rises'</code> as a Batman movie and recommends other Batman movies as a result. This sytem is, of course, very primitive and there are a host of ways in which it could be improved. One method would be to look at the cast, crew and genre in addition to the plot to generate recommendations. We will not be covering this in this course but you have all the tools necessary to accomplish this. Do give it a try!</p>
+
+<h4 id="433-the-recommender-function"><strong>4.3.3 The recommender function</strong></h4>
+
+<p>In this exercise, we will build a recommender function <code class="language-plaintext highlighter-rouge">get_recommendations()</code> , as discussed in the lesson and the previous exercise. As we know, it takes in a title, a cosine similarity matrix, and a movie title and index mapping as arguments and outputs a list of 10 titles most similar to the original title (excluding the title itself).</p>
+
+<p>You have been given a dataset <code class="language-plaintext highlighter-rouge">metadata</code> that consists of the movie titles and overviews. The head of this dataset has been printed to console.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>               <span class="n">title</span>                                            <span class="n">tagline</span>
+<span class="mi">938</span>  <span class="n">Cinema</span> <span class="n">Paradiso</span>  <span class="n">A</span> <span class="n">celebration</span> <span class="n">of</span> <span class="n">youth</span><span class="p">,</span> <span class="n">friendship</span><span class="p">,</span> <span class="ow">and</span> <span class="n">the</span> <span class="n">ev</span><span class="p">...</span>
+<span class="mi">630</span>         <span class="n">Spy</span> <span class="n">Hard</span>  <span class="n">All</span> <span class="n">the</span> <span class="n">action</span><span class="p">.</span> <span class="n">All</span> <span class="n">the</span> <span class="n">women</span><span class="p">.</span> <span class="n">Half</span> <span class="n">the</span> <span class="n">intell</span><span class="p">...</span>
+<span class="mi">682</span>        <span class="n">Stonewall</span>                    <span class="n">The</span> <span class="n">fight</span> <span class="k">for</span> <span class="n">the</span> <span class="n">right</span> <span class="n">to</span> <span class="n">love</span>
+<span class="mi">514</span>           <span class="n">Killer</span>                    <span class="n">You</span> <span class="n">only</span> <span class="n">hurt</span> <span class="n">the</span> <span class="n">one</span> <span class="n">you</span> <span class="n">love</span><span class="p">.</span>
+<span class="mi">365</span>    <span class="n">Jason</span><span class="s">'s Lyric                                   Love is courage.
+</span></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Generate mapping between titles and index
+</span><span class="n">indices</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">Series</span><span class="p">(</span><span class="n">metadata</span><span class="p">.</span><span class="n">index</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">metadata</span><span class="p">[</span><span class="s">'title'</span><span class="p">]).</span><span class="n">drop_duplicates</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">get_recommendations</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">cosine_sim</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
+    <span class="c1"># Get index of movie that matches title
+</span>    <span class="n">idx</span> <span class="o">=</span> <span class="n">indices</span><span class="p">[</span><span class="n">title</span><span class="p">]</span>
+    <span class="c1"># Sort the movies based on the similarity scores
+</span>    <span class="n">sim_scores</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">cosine_sim</span><span class="p">[</span><span class="n">idx</span><span class="p">]))</span>
+    <span class="n">sim_scores</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sim_scores</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="c1"># Get the scores for 10 most similar movies
+</span>    <span class="n">sim_scores</span> <span class="o">=</span> <span class="n">sim_scores</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">11</span><span class="p">]</span>
+    <span class="c1"># Get the movie indices
+</span>    <span class="n">movie_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sim_scores</span><span class="p">]</span>
+    <span class="c1"># Return the top 10 most similar movies
+</span>    <span class="k">return</span> <span class="n">metadata</span><span class="p">[</span><span class="s">'title'</span><span class="p">].</span><span class="n">iloc</span><span class="p">[</span><span class="n">movie_indices</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>Good job! With this recommender function in our toolkit, we are now in a very good place to build the rest of the components of our recommendation engine.</p>
+
+<h4 id="434-ted-talk-recommender"><strong>4.3.4 TED talk recommender</strong></h4>
+
+<p>In this exercise, we will build a recommendation system that suggests TED Talks based on their transcripts. You have been given a <code class="language-plaintext highlighter-rouge">get_recommendations()</code> function that takes in the title of a talk, a similarity matrix and an <code class="language-plaintext highlighter-rouge">indices</code> series as its arguments, and outputs a list of most similar talks. <code class="language-plaintext highlighter-rouge">indices</code> has already been provided to you.</p>
+
+<p>You have also been given a <code class="language-plaintext highlighter-rouge">transcripts</code> series that contains the transcripts of around 500 TED talks. Your task is to generate a cosine similarity matrix for the tf-idf vectors of the talk transcripts.</p>
+
+<p>Consequently, we will generate recommendations for a talk titled ‘5 ways to kill your dreams’ by Brazilian entrepreneur Bel Pesce.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">transcripts</span>
+<span class="mi">0</span>      <span class="n">I</span><span class="s">'ve noticed something interesting about socie...
+1      Hetain Patel: (In Chinese)Yuyu Rau: Hi, I'</span><span class="n">m</span> <span class="n">He</span><span class="p">...</span>
+<span class="mi">2</span>      <span class="p">(</span><span class="n">Music</span><span class="p">)</span><span class="n">Sophie</span> <span class="n">Hawley</span><span class="o">-</span><span class="n">Weld</span><span class="p">:</span> <span class="n">OK</span><span class="p">,</span> <span class="n">you</span> <span class="n">don</span><span class="s">'t have ...
+</span></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Initialize the TfidfVectorizer
+</span><span class="n">tfidf</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="n">stop_words</span><span class="o">=</span><span class="s">'english'</span><span class="p">)</span>
+
+<span class="c1"># Construct the TF-IDF matrix
+</span><span class="n">tfidf_matrix</span> <span class="o">=</span> <span class="n">tfidf</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">transcripts</span><span class="p">)</span>
+
+<span class="c1"># Generate the cosine similarity matrix
+</span><span class="n">cosine_sim</span> <span class="o">=</span> <span class="n">linear_kernel</span><span class="p">(</span><span class="n">tfidf_matrix</span><span class="p">,</span><span class="n">tfidf_matrix</span><span class="p">)</span>
+
+<span class="c1"># Generate recommendations
+</span><span class="k">print</span><span class="p">(</span><span class="n">get_recommendations</span><span class="p">(</span><span class="s">'5 ways to kill your dreams'</span><span class="p">,</span> <span class="n">cosine_sim</span><span class="p">,</span> <span class="n">indices</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">453</span>             <span class="n">Success</span> <span class="ow">is</span> <span class="n">a</span> <span class="n">continuous</span> <span class="n">journey</span>
+<span class="mi">157</span>                        <span class="n">Why</span> <span class="n">we</span> <span class="n">do</span> <span class="n">what</span> <span class="n">we</span> <span class="n">do</span>
+<span class="mi">494</span>                   <span class="n">How</span> <span class="n">to</span> <span class="n">find</span> <span class="n">work</span> <span class="n">you</span> <span class="n">love</span>
+<span class="mi">149</span>          <span class="n">My</span> <span class="n">journey</span> <span class="n">into</span> <span class="n">movies</span> <span class="n">that</span> <span class="n">matter</span>
+<span class="mi">447</span>                        <span class="n">One</span> <span class="n">Laptop</span> <span class="n">per</span> <span class="n">Child</span>
+<span class="mi">230</span>             <span class="n">How</span> <span class="n">to</span> <span class="n">get</span> <span class="n">your</span> <span class="n">ideas</span> <span class="n">to</span> <span class="n">spread</span>
+<span class="mi">497</span>         <span class="n">Plug</span> <span class="n">into</span> <span class="n">your</span> <span class="n">hard</span><span class="o">-</span><span class="n">wired</span> <span class="n">happiness</span>
+<span class="mi">495</span>    <span class="n">Why</span> <span class="n">you</span> <span class="n">will</span> <span class="n">fail</span> <span class="n">to</span> <span class="n">have</span> <span class="n">a</span> <span class="n">great</span> <span class="n">career</span>
+<span class="mi">179</span>             <span class="n">Be</span> <span class="n">suspicious</span> <span class="n">of</span> <span class="n">simple</span> <span class="n">stories</span>
+<span class="mi">53</span>                          <span class="n">To</span> <span class="n">upgrade</span> <span class="ow">is</span> <span class="n">human</span>
+<span class="n">Name</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="n">dtype</span><span class="p">:</span> <span class="nb">object</span>
+</code></pre></div></div>
+
+<p>Excellent work! You have successfully built a TED talk recommender. This recommender works surprisingly well despite being trained only on a small subset of TED talks. In fact, three of the talks recommended by our system is also recommended by the official TED website as talks to watch next after <code class="language-plaintext highlighter-rouge">'5 ways to kill your dreams'</code> !</p>
+
+<h3 id="44-beyond-n-grams-word-embeddings"><strong>4.4 Beyond n-grams: word embeddings</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/28-1.png?w=976" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/29.png?w=910" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/30.png?w=907" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/31.png?w=883" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/32.png?w=666" alt="" /></li>
+</ul>
+
+<h4 id="441-generating-word-vectors"><strong>4.4.1 Generating word vectors</strong></h4>
+
+<p>In this exercise, we will generate the pairwise similarity scores of all the words in a sentence. The sentence is available as <code class="language-plaintext highlighter-rouge">sent</code> and has been printed to the console for your convenience.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sent</span>
+<span class="s">'I like apples and oranges'</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create the doc object
+</span><span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">sent</span><span class="p">)</span>
+
+<span class="c1"># Compute pairwise similarity scores
+</span><span class="k">for</span> <span class="n">token1</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">:</span>
+  <span class="k">for</span> <span class="n">token2</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">token1</span><span class="p">.</span><span class="n">text</span><span class="p">,</span> <span class="n">token2</span><span class="p">.</span><span class="n">text</span><span class="p">,</span> <span class="n">token1</span><span class="p">.</span><span class="n">similarity</span><span class="p">(</span><span class="n">token2</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">I</span> <span class="n">I</span> <span class="mf">1.0</span>
+<span class="n">I</span> <span class="n">like</span> <span class="mf">0.023032807</span>
+<span class="n">I</span> <span class="n">apples</span> <span class="mf">0.10175116</span>
+<span class="n">I</span> <span class="ow">and</span> <span class="mf">0.047492094</span>
+<span class="n">I</span> <span class="n">oranges</span> <span class="mf">0.10894456</span>
+<span class="n">like</span> <span class="n">I</span> <span class="mf">0.023032807</span>
+<span class="n">like</span> <span class="n">like</span> <span class="mf">1.0</span>
+<span class="n">like</span> <span class="n">apples</span> <span class="mf">0.015370452</span>
+<span class="n">like</span> <span class="ow">and</span> <span class="mf">0.189293</span>
+<span class="n">like</span> <span class="n">oranges</span> <span class="mf">0.021943133</span>
+<span class="n">apples</span> <span class="n">I</span> <span class="mf">0.10175116</span>
+<span class="n">apples</span> <span class="n">like</span> <span class="mf">0.015370452</span>
+<span class="n">apples</span> <span class="n">apples</span> <span class="mf">1.0</span>
+<span class="n">apples</span> <span class="ow">and</span> <span class="o">-</span><span class="mf">0.17736834</span>
+<span class="n">apples</span> <span class="n">oranges</span> <span class="mf">0.6315578</span>
+<span class="ow">and</span> <span class="n">I</span> <span class="mf">0.047492094</span>
+<span class="ow">and</span> <span class="n">like</span> <span class="mf">0.189293</span>
+<span class="ow">and</span> <span class="n">apples</span> <span class="o">-</span><span class="mf">0.17736834</span>
+<span class="ow">and</span> <span class="ow">and</span> <span class="mf">1.0</span>
+<span class="ow">and</span> <span class="n">oranges</span> <span class="mf">0.018627528</span>
+<span class="n">oranges</span> <span class="n">I</span> <span class="mf">0.10894456</span>
+<span class="n">oranges</span> <span class="n">like</span> <span class="mf">0.021943133</span>
+<span class="n">oranges</span> <span class="n">apples</span> <span class="mf">0.6315578</span>
+<span class="n">oranges</span> <span class="ow">and</span> <span class="mf">0.018627528</span>
+<span class="n">oranges</span> <span class="n">oranges</span> <span class="mf">1.0</span>
+</code></pre></div></div>
+
+<p>Good job! Notice how the words <code class="language-plaintext highlighter-rouge">'apples'</code> and <code class="language-plaintext highlighter-rouge">'oranges'</code> have the highest pairwaise similarity score. This is expected as they are both fruits and are more related to each other than any other pair of words.</p>
+
+<h4 id="442-computing-similarity-of-pink-floyd-songs"><strong>4.4.2 Computing similarity of Pink Floyd songs</strong></h4>
+
+<p>In this final exercise, you have been given lyrics of three songs by the British band Pink Floyd, namely ‘High Hopes’, ‘Hey You’ and ‘Mother’. The lyrics to these songs are available as <code class="language-plaintext highlighter-rouge">hopes</code> , <code class="language-plaintext highlighter-rouge">hey</code> and <code class="language-plaintext highlighter-rouge">mother</code> respectively.</p>
+
+<p>Your task is to compute the pairwise similarity between <code class="language-plaintext highlighter-rouge">mother</code> and <code class="language-plaintext highlighter-rouge">hopes</code> , and <code class="language-plaintext highlighter-rouge">mother</code> and <code class="language-plaintext highlighter-rouge">hey</code> .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">mother</span>
+ <span class="s">"</span><span class="se">\n</span><span class="s">Mother do you think they'll drop the bomb?</span><span class="se">\n</span><span class="s">Mother do you think they'll like this song?</span><span class="se">\n</span><span class="s">Mother do you think they'll try to ...
+</span></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create Doc objects
+</span><span class="n">mother_doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">mother</span><span class="p">)</span>
+<span class="n">hopes_doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">hopes</span><span class="p">)</span>
+<span class="n">hey_doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">hey</span><span class="p">)</span>
+
+<span class="c1"># Print similarity between mother and hopes
+</span><span class="k">print</span><span class="p">(</span><span class="n">mother_doc</span><span class="p">.</span><span class="n">similarity</span><span class="p">(</span><span class="n">hopes_doc</span><span class="p">))</span>
+<span class="c1"># 0.6006234924640204
+</span>
+<span class="c1"># Print similarity between mother and hey
+</span><span class="k">print</span><span class="p">(</span><span class="n">mother_doc</span><span class="p">.</span><span class="n">similarity</span><span class="p">(</span><span class="n">hey_doc</span><span class="p">))</span>
+<span class="c1"># 0.9135920924498578
+</span></code></pre></div></div>
+
+<p>Excellent work! Notice that ‘Mother’ and ‘Hey You’ have a similarity score of 0.9 whereas ‘Mother’ and ‘High Hopes’ has a score of only 0.6. This is probably because ‘Mother’ and ‘Hey You’ were both songs from the same album ‘The Wall’ and were penned by Roger Waters. On the other hand, ‘High Hopes’ was a part of the album ‘Division Bell’ with lyrics by David Gilmour and his wife, Penny Samson. Treat yourself by listening to these songs. They’re some of the best!</p>
+
+<h3 id="45-final-thoughts"><strong>4.5 Final thoughts</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/33.png?w=784" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2020/01/34.png?w=547" alt="" /></li>
+</ul>
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

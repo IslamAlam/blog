@@ -1,0 +1,2111 @@
+<h1 id="introduction-to-deep-learning-with-keras">Introduction to Deep Learning with Keras</h1>
+
+<p>This is the memo of the 16th course (23 courses in all) of ‘Machine Learning Scientist with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/deep-learning-with-keras-in-python">HERE</a></strong>
+ .</p>
+
+<p>reference url:
+ <a href="https://tensorspace.org/index.html">https://tensorspace.org/index.html</a></p>
+
+<p>###
+<strong>Course Description</strong></p>
+
+<p>Deep learning is here to stay! It’s the go-to technique to solve complex problems that arise with unstructured data and an incredible tool for innovation. Keras is one of the frameworks that make it easier to start developing deep learning models, and it’s versatile enough to build industry-ready models in no time. In this course, you will learn regression and save the earth by predicting asteroid trajectories, apply binary classification to distinguish between real and fake dollar bills, use multiclass classification to decide who threw which dart at a dart board, learn to use neural networks to reconstruct noisy images and much more. Additionally, you will learn how to better control your models during training and how to tune them to boost their performance.</p>
+
+<p>###
+<strong>Table of contents</strong></p>
+
+<ul>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/31/introduction-to-deep-learning-with-keras-from-datacamp/">Introducing Keras</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/31/introduction-to-deep-learning-with-keras-from-datacamp/3/">Going Deeper</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/31/introduction-to-deep-learning-with-keras-from-datacamp/3/">Improving Your Model Performance</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/31/introduction-to-deep-learning-with-keras-from-datacamp/4/">Advanced Model Architectures</a></li>
+</ul>
+
+<h1 id="1-introducing-keras"><strong>1. Introducing Keras</strong></h1>
+<hr />
+
+<h2 id="11-what-is-keras"><strong>1.1 What is Keras?</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/1-22.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/2-22.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/3-21.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/4-21.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/5-21.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/6-21.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/7-21.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="111-describing-keras"><strong>1.1.1 Describing Keras</strong></h3>
+
+<p>Which of the following statements about Keras is
+ <strong>false</strong>
+ ?</p>
+
+<ul>
+  <li>Keras is integrated into TensorFlow, that means you can call Keras from within TensorFlow and get the best of both worlds.</li>
+  <li><strong>Keras can work well on its own without using a backend, like TensorFlow. (False)</strong></li>
+  <li>Keras is an open source project started by François Chollet.</li>
+</ul>
+
+<p>You’re good at spotting lies! Keras is a wrapper around a backend, so a backend like TensorFlow, Theano, CNTK, etc must be provided.</p>
+
+<h3 id="112-would-you-use-deep-learning"><strong>1.1.2 Would you use deep learning?</strong></h3>
+
+<p>Imagine you’re building an app that allows you to take a picture of your clothes and then shows you a pair of shoes that would match well. This app needs a machine learning module that’s in charge of identifying the type of clothes you are wearing, as well as their color and texture. Would you use deep learning to accomplish this task?</p>
+
+<ul>
+  <li>I’d use deep learning, since we are dealing with tabular data and neural networks work well with images.</li>
+  <li><strong>I’d use deep learning since we are dealing with unstructured data and neural networks work well with images.(True)</strong></li>
+  <li>This task can be easily accomplished with other machine learning algorithms, so deep learning is not required.</li>
+</ul>
+
+<p>You’re right! Using deep learning would be the easiest way. The model would generalize well if enough clothing images are provided.</p>
+
+<hr />
+
+<h2 id="12-your-first-neural-network"><strong>1.2 Your first neural network</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/8-21.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/9-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/10-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/11-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/12-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/13-17.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/14-16.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/15-16.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/16-15.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="121-hello-nets"><strong>1.2.1 Hello nets!</strong></h3>
+
+<p>You’re going to build a simple neural network to get a feeling for how quickly it is to accomplish in Keras.</p>
+
+<p>You will build a network that
+ <strong>takes two numbers as input</strong>
+ , passes them through
+ <strong>a hidden layer of 10 neurons</strong>
+ , and finally
+ <strong>outputs a single non-constrained number</strong>
+ .</p>
+
+<p>A
+ <em>non-constrained output can be obtained by avoiding setting an activation function in the output layer</em>
+ . This is useful for problems like regression, when we want our output to be able to take any value.
+ <img src="https://assets.datacamp.com/production/repositories/4335/datasets/2aa35161b566e1dacd30137a9bf4bcba023ec1e0/hello_nets.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the Sequential model and Dense layer
+</span><span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+
+<span class="c1"># Create a Sequential model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add an input layer and a hidden layer with 10 neurons
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,),</span> <span class="n">activation</span><span class="o">=</span><span class="s">"relu"</span><span class="p">))</span>
+
+<span class="c1"># Add a 1-neuron output layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Summarise your model
+</span><span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Model: "sequential_1"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+dense_1 (Dense)              (None, 10)                30
+_________________________________________________________________
+dense_2 (Dense)              (None, 1)                 11
+=================================================================
+Total params: 41
+Trainable params: 41
+Non-trainable params: 0
+_________________________________________________________________
+
+</code></pre></div></div>
+
+<p>You’ve just build your first neural network with Keras, well done!</p>
+
+<h3 id="122-counting-parameters"><strong>1.2.2 Counting parameters</strong></h3>
+
+<p>You’ve just created a neural network. Create a new one now and take some time to think about the weights of each layer. The Keras
+ <code class="language-plaintext highlighter-rouge">Dense</code>
+ layer and the
+ <code class="language-plaintext highlighter-rouge">Sequential</code>
+ model are already loaded for you to use.</p>
+
+<p>This is the network you will be creating:
+ <img src="https://assets.datacamp.com/production/repositories/4335/datasets/9fd8a453d92bd8004c23ba415373c461f873913d/counting_parameters.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Instantiate a new Sequential model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add a Dense layer with five neurons and three inputs
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,),</span> <span class="n">activation</span><span class="o">=</span><span class="s">"relu"</span><span class="p">))</span>
+
+<span class="c1"># Add a final Dense layer with one neuron and no activation
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Summarize your model
+</span><span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Model: "sequential_1"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+dense_1 (Dense)              (None, 5)                 20
+_________________________________________________________________
+dense_2 (Dense)              (None, 1)                 6
+=================================================================
+Total params: 26
+Trainable params: 26
+Non-trainable params: 0
+_________________________________________________________________
+
+</code></pre></div></div>
+
+<p>Given the
+ <code class="language-plaintext highlighter-rouge">model</code>
+ you just built, which answer is correct regarding the number of weights (parameters) in the
+ <strong>hidden layer</strong>
+ ?</p>
+
+<p><strong>There are 20 parameters, 15 from the connection of our input layer to our hidden layer and 5 from the bias weight of each neuron in the hidden layer.</strong></p>
+
+<p>Great! You certainly know where those parameters come from!</p>
+
+<h3 id="123-build-as-shown"><strong>1.2.3 Build as shown!</strong></h3>
+
+<p>You will take on a final challenge before moving on to the next lesson. Build the network shown in the picture below. Prove your mastered Keras basics in no time!
+ <img src="https://assets.datacamp.com/production/repositories/4335/datasets/cb59acc27b67d00078df48b5ec9d9c24744e50e9/build_as_shown.png" alt="" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from keras.models import Sequential
+from keras.layers import Dense
+
+# Instantiate a Sequential model
+model = Sequential()
+
+# Build the input and hidden layer
+model.add(Dense(3, input_shape=(2,)))
+
+# Add the ouput layer
+model.add(Dense(1))
+
+</code></pre></div></div>
+
+<p>Perfect! You’ve shown you can already translate a visual representation of a neural network into Keras code.</p>
+
+<hr />
+
+<h2 id="13-surviving-a-meteor-strike"><strong>1.3 Surviving a meteor strike</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/17-12.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/18-10.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/19-9.png?w=496" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/20-7.png?w=1005" alt="Desktop View" /></p>
+
+<h3 id="131-specifying-a-model"><strong>1.3.1 Specifying a model</strong></h3>
+
+<p>You will build a simple regression model to forecast the orbit of the meteor!</p>
+
+<p>Your training data consist of measurements taken at time steps from
+ <strong>-10 minutes before the impact region to +10 minutes after</strong>
+ . Each time step can be viewed as an X coordinate in our graph, which has an associated position Y for the meteor at that time step.</p>
+
+<p><em>Note that you can view this problem as approximating a quadratic function via the use of neural networks.</em>
+<img src="https://assets.datacamp.com/production/repositories/4335/datasets/4f15cb3709395af69eee859c892c0775c610c46f/meteor_orbit_3.jpg" alt="" /></p>
+
+<p>This data is stored in two numpy arrays: one called
+ <code class="language-plaintext highlighter-rouge">time_steps</code>
+ , containing the
+ <em>features</em>
+ , and another called
+ <code class="language-plaintext highlighter-rouge">y_positions</code>
+ , with the
+ <em>labels</em>
+ .</p>
+
+<p>Feel free to look at these arrays in the console anytime, then build your model! Keras
+ <code class="language-plaintext highlighter-rouge">Sequential</code>
+ model and
+ <code class="language-plaintext highlighter-rouge">Dense</code>
+ layers are available for you to use.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Instantiate a Sequential model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add a Dense layer with 50 neurons and an input of 1 neuron
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+
+<span class="c1"># Add two Dense layers with 50 neurons and relu activation
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span><span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+
+<span class="c1"># End your model with a Dense layer and no activation
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<p>You are closer to forecasting the meteor orbit! It’s important to note we aren’t using an activation function in our output layer since
+ <code class="language-plaintext highlighter-rouge">y_positions</code>
+ aren’t bounded and they can take any value. Your model is performing regression.</p>
+
+<h3 id="132-training"><strong>1.3.2 Training</strong></h3>
+
+<p>You’re going to train your first model in this course, and for a good cause!</p>
+
+<p>Remember that
+ <strong>before training your Keras models you need to compile them</strong>
+ . This can be done with the
+ <code class="language-plaintext highlighter-rouge">.compile()</code>
+ method. The
+ <code class="language-plaintext highlighter-rouge">.compile()</code>
+ method takes arguments such as the
+ <code class="language-plaintext highlighter-rouge">optimizer</code>
+ , used for weight updating, and the
+ <code class="language-plaintext highlighter-rouge">loss</code>
+ function, which is what we want to minimize. Training your model is as easy as calling the
+ <code class="language-plaintext highlighter-rouge">.fit()</code>
+ method, passing on the
+ <em>features</em>
+ ,
+ <em>labels</em>
+ and number of
+ <em>epochs</em>
+ to train for.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">model</code>
+ you built in the previous exercise is loaded for you to use, along with the
+ <code class="language-plaintext highlighter-rouge">time_steps</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y_positions</code>
+ data.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compile your model
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span> <span class="o">=</span> <span class="s">'adam'</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="s">'mse'</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"Training started..., this can take a while:"</span><span class="p">)</span>
+
+<span class="c1"># Fit your model on your data for 30 epochs
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">time_steps</span><span class="p">,</span><span class="n">y_positions</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">=</span> <span class="mi">30</span><span class="p">)</span>
+
+<span class="c1"># Evaluate your model
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Final lost value:"</span><span class="p">,</span><span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">time_steps</span><span class="p">,</span> <span class="n">y_positions</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Training started..., this can take a while:
+Epoch 1/30
+
+  32/2000 [..............................] - ETA: 14s - loss: 2465.2439
+ 928/2000 [============&gt;.................] - ETA: 0s - loss: 1820.2874
+1856/2000 [==========================&gt;...] - ETA: 0s - loss: 1439.9186
+2000/2000 [==============================] - 0s 177us/step - loss: 1369.6929
+...
+
+Epoch 30/30
+
+  32/2000 [..............................] - ETA: 0s - loss: 0.1844
+ 896/2000 [============&gt;.................] - ETA: 0s - loss: 0.2483
+1696/2000 [========================&gt;.....] - ETA: 0s - loss: 0.2292
+2000/2000 [==============================] - 0s 62us/step - loss: 0.2246
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+  32/2000 [..............................] - ETA: 1s
+1536/2000 [======================&gt;.......] - ETA: 0s
+2000/2000 [==============================] - 0s 44us/step
+Final lost value: 0.14062700100243092
+
+</code></pre></div></div>
+
+<p>Amazing! You can check the console to see how the loss function decreased as epochs went by. Your model is now ready to make predictions.</p>
+
+<h3 id="133-predicting-the-orbit"><strong>1.3.3 Predicting the orbit!</strong></h3>
+
+<p>You’ve already trained a
+ <code class="language-plaintext highlighter-rouge">model</code>
+ that approximates the orbit of the meteor approaching earth and it’s loaded for you to use.</p>
+
+<p>Since you trained your model for values between -10 and 10 minutes, your model hasn’t yet seen any other values for different time steps. You will visualize how your model behaves on unseen data.</p>
+
+<p>To see the source code of
+ <code class="language-plaintext highlighter-rouge">plot_orbit</code>
+ , type the following
+ <code class="language-plaintext highlighter-rouge">print(inspect.getsource(plot_orbit))</code>
+ in the console.</p>
+
+<p><em>Remember
+ <code class="language-plaintext highlighter-rouge">np.arange(x,y)</code>
+ produces a range of values from
+ <strong>x</strong>
+ to
+ <strong>y-1</strong>
+ .</em></p>
+
+<p>Hurry up, you’re running out of time!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Predict the twenty minutes orbit
+</span><span class="n">twenty_min_orbit</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">))</span>
+
+<span class="c1"># Plot the twenty minute orbit
+</span><span class="n">plot_orbit</span><span class="p">(</span><span class="n">twenty_min_orbit</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Predict the twenty minutes orbit
+</span><span class="n">eighty_min_orbit</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mi">40</span><span class="p">,</span> <span class="mi">41</span><span class="p">))</span>
+
+<span class="c1"># Plot the twenty minute orbit
+</span><span class="n">plot_orbit</span><span class="p">(</span><span class="n">eighty_min_orbit</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/24-7.png?w=1018" alt="Desktop View" /></p>
+
+<p>Your model fits perfectly to the scientists trajectory for time values between -10 to +10, the region where the meteor crosses the impact region, so we won’t be hit! However, it starts to diverge when predicting for further values we haven’t trained for. This shows neural networks learn according to the data they are fed with. Data quality and diversity are very important. You’ve barely scratched the surface of what neural networks can do. Are you prepared for the next chapter?</p>
+
+<h1 id="2-going-deeper"><strong>2. Going Deeper</strong></h1>
+<hr />
+
+<h2 id="21-binary-classification"><strong>2.1 Binary classification</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/1-23.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/2-23.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/3-22.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/4-22.png?w=553" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/5-22.png?w=640" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/6-22.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/7-22.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/8-22.png?w=893" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/9-20.png?w=705" alt="Desktop View" /></p>
+
+<h3 id="211-exploring-dollar-bills"><strong>2.1.1 Exploring dollar bills</strong></h3>
+
+<p>You will practice building classification models in Keras with the
+ <strong>Banknote Authentication</strong>
+ dataset.</p>
+
+<p>Your goal is to distinguish between real and fake dollar bills. In order to do this, the dataset comes with 4 variables:
+ <code class="language-plaintext highlighter-rouge">variance</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">skewness</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">curtosis</code>
+ and
+ <code class="language-plaintext highlighter-rouge">entropy</code>
+ . These variables are calculated by applying mathematical operations over the dollar bill images. The labels are found in the
+ <code class="language-plaintext highlighter-rouge">class</code>
+ variable.
+ <img src="https://assets.datacamp.com/production/repositories/4335/datasets/6ce6fd4fdc548ecd6aaa27b033073c5bfc0995da/dollar_bills.png" alt="" /></p>
+
+<p>The dataset is pre-loaded in your workspace as
+ <code class="language-plaintext highlighter-rouge">banknotes</code>
+ , let’s do some data exploration!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import seaborn
+</span><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+
+<span class="c1"># Use pairplot and set the hue to be our class
+</span><span class="n">sns</span><span class="p">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">banknotes</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s">'class'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Describe the data
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Dataset stats: </span><span class="se">\n</span><span class="s">'</span><span class="p">,</span> <span class="n">banknotes</span><span class="p">.</span><span class="n">describe</span><span class="p">())</span>
+
+<span class="c1"># Count the number of observations of each class
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Observations per class: </span><span class="se">\n</span><span class="s">'</span><span class="p">,</span> <span class="n">banknotes</span><span class="p">[</span><span class="s">'class'</span><span class="p">].</span><span class="n">value_counts</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Dataset stats:
+         variance   skewness   curtosis    entropy
+count  96.000000  96.000000  96.000000  96.000000
+mean   -0.057791  -0.102829   0.230412   0.081497
+std     1.044960   1.059236   1.128972   0.975565
+min    -2.084590  -2.621646  -1.482300  -3.034187
+25%    -0.839124  -0.916152  -0.415294  -0.262668
+50%    -0.026748  -0.037559  -0.033603   0.394888
+75%     0.871034   0.813601   0.978766   0.745212
+max     1.869239   1.634072   3.759017   1.343345
+
+Observations per class:
+ real    53
+fake    43
+Name: class, dtype: int64
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/10-20.png?w=1024" alt="Desktop View" /></p>
+
+<p>Your pairplot shows that there are variables for which the classes spread out noticeably. This gives us an intuition about our classes being separable. Let’s build a model to find out what it can do!</p>
+
+<h3 id="212-a-binary-classification-model"><strong>2.1.2 A binary classification model</strong></h3>
+
+<p>Now that you know what the
+ <strong>Banknote Authentication</strong>
+ dataset looks like, we’ll build a simple model to distinguish between real and fake bills.</p>
+
+<p>You will perform binary classification by using a single neuron as an output. The input layer will have 4 neurons since we have 4 features in our dataset. The model output will be a value constrained between 0 and 1.</p>
+
+<p>We will interpret this number as the probability of our input variables coming from a fake dollar bill, with 1 meaning we are certain it’s fake.
+ <img src="https://assets.datacamp.com/production/repositories/4335/datasets/db1c482fd8cb154572c3ce79fe9a406c25ed1a9b/model_chapter2_binary_classification.JPG" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the sequential model and dense layer
+</span><span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Sequential</span>
+<span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Dense</span>
+
+<span class="c1"># Create a sequential model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add a dense layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,),</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">))</span>
+
+<span class="c1"># Compile your model
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">,</span> <span class="n">optimizer</span><span class="o">=</span><span class="s">'sgd'</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># Display a summary of your model
+</span><span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Model: "sequential_2"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+dense_2 (Dense)              (None, 1)                 5
+=================================================================
+Total params: 5
+Trainable params: 5
+Non-trainable params: 0
+_________________________________________________________________
+
+</code></pre></div></div>
+
+<p>That was fast! Let’s use this model to make predictions!</p>
+
+<h3 id="213-is-this-dollar-bill-fake-"><strong>2.1.3 Is this dollar bill fake ?</strong></h3>
+
+<p>You are now ready to train your
+ <code class="language-plaintext highlighter-rouge">model</code>
+ and check how well it performs when classifying new bills! The dataset has already been partitioned as
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Train your model for 20 epochs
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+
+<span class="c1"># Evaluate your model accuracy on the test set
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Print accuracy
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Accuracy:'</span><span class="p">,</span><span class="n">accuracy</span><span class="p">)</span>
+<span class="c1"># Accuracy: 0.8252427167105443
+</span>
+</code></pre></div></div>
+
+<p>Alright! It looks like you are getting a high accuracy with this simple model!</p>
+
+<hr />
+
+<h2 id="22-multi-class-classification"><strong>2.2 Multi-class classification</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/11-20.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/12-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/13-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/14-17.png?w=977" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/15-17.png?w=1007" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/16-16.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/17-13.png?w=937" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/18-11.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="221-a-multi-class-model"><strong>2.2.1 A multi-class model</strong></h3>
+
+<p>You’re going to build a model that predicts who threw which dart only based on where that dart landed! (That is the dart’s x and y coordinates.)</p>
+
+<p>This problem is a multi-class classification problem since each dart can only be thrown by one of 4 competitors. So classes are mutually exclusive, and therefore we can build a neuron with as many output as competitors and use the
+ <code class="language-plaintext highlighter-rouge">softmax</code>
+ activation function to achieve a total sum of probabilities of 1 over all competitors.</p>
+
+<p>Keras
+ <code class="language-plaintext highlighter-rouge">Sequential</code>
+ model and
+ <code class="language-plaintext highlighter-rouge">Dense</code>
+ layer are already loaded for you to use.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Instantiate a sequential model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add 3 dense layers of 128, 64 and 32 neurons each
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,),</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+
+<span class="c1"># Add a dense layer with as many neurons as competitors
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Compile your model using categorical_crossentropy loss
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span>
+              <span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span>
+              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+</code></pre></div></div>
+
+<p>Good job! Your models are getting deeper, just as your knowledge on neural networks!</p>
+
+<h3 id="222-prepare-your-dataset"><strong>2.2.2 Prepare your dataset</strong></h3>
+
+<p>In the console you can check that your labels,
+ <code class="language-plaintext highlighter-rouge">darts.competitor</code>
+ are not yet in a format to be understood by your network. They contain the names of the competitors as strings. You will first turn these competitors into unique numbers,then use the
+ <code class="language-plaintext highlighter-rouge">to_categorical()</code>
+ function from
+ <code class="language-plaintext highlighter-rouge">keras.utils</code>
+ to turn these numbers into their one-hot encoded representation.</p>
+
+<p>This is useful for multi-class classification problems, since there are as many output neurons as classes and for every observation in our dataset we just want one of the neurons to be activated.</p>
+
+<p>The dart’s dataset is loaded as
+ <code class="language-plaintext highlighter-rouge">darts</code>
+ . Pandas is imported as
+ <code class="language-plaintext highlighter-rouge">pd</code>
+ . Let’s prepare this dataset!</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+darts.head()
+     xCoord    yCoord competitor
+0  0.196451 -0.520341      Steve
+1  0.476027 -0.306763      Susan
+2  0.003175 -0.980736    Michael
+3  0.294078  0.267566       Kate
+4 -0.051120  0.598946      Steve
+
+darts.info()
+&lt;class 'pandas.core.frame.DataFrame'&gt;
+RangeIndex: 800 entries, 0 to 799
+Data columns (total 3 columns):
+xCoord        800 non-null float64
+yCoord        800 non-null float64
+competitor    800 non-null object
+dtypes: float64(2), object(1)
+memory usage: 18.8+ KB
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Transform into a categorical variable
+</span><span class="n">darts</span><span class="p">.</span><span class="n">competitor</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">darts</span><span class="p">.</span><span class="n">competitor</span><span class="p">)</span>
+
+<span class="c1"># Assign a number to each category (label encoding)
+</span><span class="n">darts</span><span class="p">.</span><span class="n">competitor</span> <span class="o">=</span> <span class="n">darts</span><span class="p">.</span><span class="n">competitor</span><span class="p">.</span><span class="n">cat</span><span class="p">.</span><span class="n">codes</span>
+
+<span class="c1"># Print the label encoded competitors
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Label encoded competitors: </span><span class="se">\n</span><span class="s">'</span><span class="p">,</span><span class="n">darts</span><span class="p">.</span><span class="n">competitor</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Label encoded competitors:
+ 0    2
+1    3
+2    1
+3    0
+4    2
+Name: competitor, dtype: int8
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Transform into a categorical variable
+</span><span class="n">darts</span><span class="p">.</span><span class="n">competitor</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">Categorical</span><span class="p">(</span><span class="n">darts</span><span class="p">.</span><span class="n">competitor</span><span class="p">)</span>
+
+<span class="c1"># Assign a number to each category (label encoding)
+</span><span class="n">darts</span><span class="p">.</span><span class="n">competitor</span> <span class="o">=</span> <span class="n">darts</span><span class="p">.</span><span class="n">competitor</span><span class="p">.</span><span class="n">cat</span><span class="p">.</span><span class="n">codes</span>
+
+<span class="c1"># Import to_categorical from keras utils module
+</span><span class="kn">from</span> <span class="nn">keras.utils</span> <span class="kn">import</span> <span class="n">to_categorical</span>
+
+<span class="c1"># Use to_categorical on your labels
+</span><span class="n">coordinates</span> <span class="o">=</span> <span class="n">darts</span><span class="p">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'competitor'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">competitors</span> <span class="o">=</span> <span class="n">to_categorical</span><span class="p">(</span><span class="n">darts</span><span class="p">.</span><span class="n">competitor</span><span class="p">)</span>
+
+<span class="c1"># Now print the to_categorical() result
+</span><span class="k">print</span><span class="p">(</span><span class="s">'One-hot encoded competitors: </span><span class="se">\n</span><span class="s">'</span><span class="p">,</span><span class="n">competitors</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+One-hot encoded competitors:
+ [[0. 0. 1. 0.]
+ [0. 0. 0. 1.]
+ [0. 1. 0. 0.]
+ ...
+ [0. 1. 0. 0.]
+ [0. 1. 0. 0.]
+ [0. 0. 0. 1.]]
+
+</code></pre></div></div>
+
+<p>Great! Each competitor is now a vector of length 4, full of zeroes except for the position representing her or himself.</p>
+
+<h3 id="223-training-on-dart-throwers"><strong>2.2.3 Training on dart throwers</strong></h3>
+
+<p>Your model is now ready, just as your dataset. It’s time to train!</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">coordinates</code>
+ and
+ <code class="language-plaintext highlighter-rouge">competitors</code>
+ variables you just transformed have been partitioned into
+ <code class="language-plaintext highlighter-rouge">coord_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">competitors_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">coord_test</code>
+ and
+ <code class="language-plaintext highlighter-rouge">competitors_test</code>
+ . Your
+ <code class="language-plaintext highlighter-rouge">model</code>
+ is also loaded. Feel free to visualize your training data or
+ <code class="language-plaintext highlighter-rouge">model.summary()</code>
+ in the console.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Train your model on the training data for 200 epochs
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">coord_train</span><span class="p">,</span><span class="n">competitors_train</span><span class="p">,</span><span class="n">epochs</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+
+<span class="c1"># Evaluate your model accuracy on the test data
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">coord_test</span><span class="p">,</span> <span class="n">competitors_test</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Print accuracy
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Accuracy:'</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+<span class="c1"># Accuracy: 0.8375
+</span>
+</code></pre></div></div>
+
+<p>Your model just trained for 200 epochs! The accuracy on the test set is quite high. What do the predictions look like?</p>
+
+<h3 id="224-softmax-predictions"><strong>2.2.4 Softmax predictions</strong></h3>
+
+<p>Your recently trained
+ <code class="language-plaintext highlighter-rouge">model</code>
+ is loaded for you. This model is generalizing well!, that’s why you got a high accuracy on the test set.</p>
+
+<p>Since you used the
+ <code class="language-plaintext highlighter-rouge">softmax</code>
+ activation function, for every input of 2 coordinates provided to your model there’s an output vector of 4 numbers. Each of these numbers encodes the probability of a given dart being thrown by one of the 4 possible competitors.</p>
+
+<p>When computing accuracy with the model’s
+ <code class="language-plaintext highlighter-rouge">.evaluate()</code>
+ method, your model takes the class with the highest probability as the prediction.
+ <code class="language-plaintext highlighter-rouge">np.argmax()</code>
+ can help you do this since it returns the index with the highest value in an array.</p>
+
+<p>Use the collection of test throws stored in
+ <code class="language-plaintext highlighter-rouge">coords_small_test</code>
+ and
+ <code class="language-plaintext highlighter-rouge">np.argmax()</code>
+ to check this out!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Predict on coords_small_test
+</span><span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">coords_small_test</span><span class="p">)</span>
+
+<span class="c1"># Print preds vs true values
+</span><span class="k">print</span><span class="p">(</span><span class="s">"{:45} | {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="s">'Raw Model Predictions'</span><span class="p">,</span><span class="s">'True labels'</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">pred</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">preds</span><span class="p">):</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">"{} | {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">competitors_small_test</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Raw Model Predictions                         | True labels
+[0.34438723 0.00842557 0.63167274 0.01551455] | [0. 0. 1. 0.]
+[0.0989717  0.00530467 0.07537904 0.8203446 ] | [0. 0. 0. 1.]
+[0.33512568 0.00785374 0.28132284 0.37569773] | [0. 0. 0. 1.]
+[0.8547263  0.01328656 0.11279515 0.01919206] | [1. 0. 0. 0.]
+[0.3540977  0.00867271 0.6223853  0.01484426] | [0. 0. 1. 0.]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Predict on coords_small_test
+</span><span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">coords_small_test</span><span class="p">)</span>
+
+<span class="c1"># Print preds vs true values
+</span><span class="k">print</span><span class="p">(</span><span class="s">"{:45} | {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="s">'Raw Model Predictions'</span><span class="p">,</span><span class="s">'True labels'</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">pred</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">preds</span><span class="p">):</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">"{} | {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">competitors_small_test</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+<span class="c1"># Extract the indexes of the highest probable predictions
+</span><span class="n">preds</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">pred</span><span class="p">)</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">]</span>
+
+<span class="c1"># Print preds vs true values
+</span><span class="k">print</span><span class="p">(</span><span class="s">"{:10} | {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="s">'Rounded Model Predictions'</span><span class="p">,</span><span class="s">'True labels'</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">pred</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">preds</span><span class="p">):</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">"{:25} | {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">pred</span><span class="p">,</span><span class="n">competitors_small_test</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Rounded Model Predictions | True labels
+                        2 | [0. 0. 1. 0.]
+                        3 | [0. 0. 0. 1.]
+                        3 | [0. 0. 0. 1.]
+                        0 | [1. 0. 0. 0.]
+                        2 | [0. 0. 1. 0.]
+
+</code></pre></div></div>
+
+<p>Well done! As you’ve seen you can easily interpret the softmax output. This can also help you spot those observations where your network is less certain on which class to predict, since you can see the probability distribution among classes.</p>
+
+<hr />
+
+<h2 id="23-multi-label-classification"><strong>2.3 Multi-label classification</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/1-24.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/2-24.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/3-23.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/4-23.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/5-23.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/6-23.png?w=724" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/7-23.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/8-23.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="231-an-irrigation-machine"><strong>2.3.1 An irrigation machine</strong></h3>
+
+<p>You’re going to automate the watering of parcels by making an intelligent irrigation machine. Multi-label classification problems differ from multi-class problems in that each observation can be labeled with zero or more classes. So classes are not mutually exclusive.</p>
+
+<p>To account for this behavior what we do is have an output layer with as many neurons as classes but this time, unlike in multi-class problems, each output neuron has a
+ <code class="language-plaintext highlighter-rouge">sigmoid</code>
+ activation function. This makes the output layer able to output a number between 0 and 1 in any of its neurons.</p>
+
+<p>Keras
+ <code class="language-plaintext highlighter-rouge">Sequential()</code>
+ model and
+ <code class="language-plaintext highlighter-rouge">Dense()</code>
+ layers are preloaded. It’s time to build an intelligent irrigation machine!
+ <img src="https://assets.datacamp.com/production/repositories/4335/datasets/e24040be99106cdb8ed07af937013615d29274ba/mutilabel_dataset.jpg" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Instantiate a Sequential model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add a hidden layer of 64 neurons and a 20 neuron's input
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,),</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+
+<span class="c1"># Add an output layer of 3 neurons with sigmoid activation
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">))</span>
+
+<span class="c1"># Compile your model with adam and binary crossentropy loss
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span>
+              <span class="n">loss</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">,</span>
+              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Model: "sequential_2"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+dense_3 (Dense)              (None, 64)                1344
+_________________________________________________________________
+dense_4 (Dense)              (None, 3)                 195
+=================================================================
+Total params: 1,539
+Trainable params: 1,539
+Non-trainable params: 0
+_________________________________________________________________
+
+</code></pre></div></div>
+
+<p>Great! You’ve already built 3 models for 3 different problems!</p>
+
+<h3 id="232-training-with-multiple-labels"><strong>2.3.2 Training with multiple labels</strong></h3>
+
+<p>An output of your multi-label
+ <code class="language-plaintext highlighter-rouge">model</code>
+ could look like this:
+ <code class="language-plaintext highlighter-rouge">[0.76 , 0.99 , 0.66 ]</code>
+ . If we round up probabilities higher than 0.5, this observation will be classified as containing all 3 possible labels
+ <code class="language-plaintext highlighter-rouge">[1,1,1]</code>
+ . For this particular problem, this would mean watering all 3 parcels in your field is the right thing to do given the input sensor measurements.</p>
+
+<p>You will now train and predict with the
+ <code class="language-plaintext highlighter-rouge">model</code>
+ you just built.
+ <code class="language-plaintext highlighter-rouge">sensors_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">parcels_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">sensors_test</code>
+ and
+ <code class="language-plaintext highlighter-rouge">parcels_test</code>
+ are already loaded for you to use. Let’s see how well your machine performs!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Train for 100 epochs using a validation split of 0.2
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">sensors_train</span><span class="p">,</span> <span class="n">parcels_train</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span> <span class="n">validation_split</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">)</span>
+
+<span class="c1"># Predict on sensors_test and round up the predictions
+</span><span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">sensors_test</span><span class="p">)</span>
+<span class="n">preds_rounded</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">round</span><span class="p">(</span><span class="n">preds</span><span class="p">)</span>
+
+<span class="c1"># Print rounded preds
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Rounded Predictions: </span><span class="se">\n</span><span class="s">'</span><span class="p">,</span> <span class="n">preds_rounded</span><span class="p">)</span>
+
+<span class="c1"># Evaluate your model's accuracy on the test data
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">sensors_test</span><span class="p">,</span> <span class="n">parcels_test</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Print accuracy
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Accuracy:'</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+...
+Epoch 100/100
+
+  32/1120 [..............................] - ETA: 0s - loss: 0.0439 - acc: 0.9896
+1024/1120 [==========================&gt;...] - ETA: 0s - loss: 0.0320 - acc: 0.9935
+1120/1120 [==============================] - 0s 62us/step - loss: 0.0320 - acc: 0.9935 - val_loss: 0.5132 - val_acc: 0.8702
+
+Rounded Predictions:
+ [[1. 1. 0.]
+ [0. 1. 0.]
+ [0. 1. 0.]
+ ...
+ [1. 1. 0.]
+ [0. 1. 0.]
+ [0. 1. 1.]]
+
+ 32/600 [&gt;.............................] - ETA: 0s
+600/600 [==============================] - 0s 26us/step
+
+Accuracy: 0.8844444648424784
+
+</code></pre></div></div>
+
+<p>Great work on automating this farm! You can see how the
+ <code class="language-plaintext highlighter-rouge">validation_split</code>
+ argument is useful for evaluating how your model performs as it trains.</p>
+
+<hr />
+
+<h2 id="24-keras-callbacks"><strong>2.4 Keras callbacks</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/9-21.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/10-21.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/11-21.png?w=894" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/12-20.png?w=903" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/13-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/14-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/15-18.png?w=888" alt="Desktop View" /></p>
+
+<h3 id="241-the-history-callback"><strong>2.4.1 The history callback</strong></h3>
+
+<p>The history callback is returned by default every time you train a model with the
+ <code class="language-plaintext highlighter-rouge">.fit()</code>
+ method. To access these metrics you can access the
+ <code class="language-plaintext highlighter-rouge">history</code>
+ dictionary inside the returned callback object and the corresponding keys.</p>
+
+<p>The irrigation machine
+ <code class="language-plaintext highlighter-rouge">model</code>
+ you built in the previous lesson is loaded for you to train, along with its features and labels (X and y). This time you will store the model’s
+ <code class="language-plaintext highlighter-rouge">history</code>
+ callback and use the
+ <code class="language-plaintext highlighter-rouge">validation_data</code>
+ parameter as it trains.</p>
+
+<p>You will plot the results stored in
+ <code class="language-plaintext highlighter-rouge">history</code>
+ with
+ <code class="language-plaintext highlighter-rouge">plot_accuracy()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">plot_loss()</code>
+ , two simple matplotlib functions. You can check their code in the console by typing
+ <code class="language-plaintext highlighter-rouge">print(inspect.getsource(plot_loss))</code>
+ .</p>
+
+<p>Let’s see the behind the scenes of our training!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Train your model and save it's history
+</span><span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">epochs</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+                    <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
+
+<span class="c1"># Plot train vs test loss during training
+</span><span class="n">plot_loss</span><span class="p">(</span><span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'loss'</span><span class="p">],</span> <span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_loss'</span><span class="p">])</span>
+
+<span class="c1"># Plot train vs test accuracy during training
+</span><span class="n">plot_accuracy</span><span class="p">(</span><span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'acc'</span><span class="p">],</span> <span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_acc'</span><span class="p">])</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/16-17.png?w=652" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/17-14.png?w=644" alt="Desktop View" /></p>
+
+<p>Awesome! These graphs are really useful for detecting overfitting and to know if your neural network would benefit from more training data. More on this on the next chapter!</p>
+
+<h3 id="242-early-stopping-your-model"><strong>2.4.2 Early stopping your model</strong></h3>
+
+<p>The early stopping callback is useful since it allows for you to stop the model training if it no longer improves after a given number of epochs. To make use of this functionality you need to pass the callback inside a list to the model’s callback parameter in the
+ <code class="language-plaintext highlighter-rouge">.fit()</code>
+ method.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">model</code>
+ you built to detect fake dollar bills is loaded for you to train, this time with early stopping.
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ are also available for you to use.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the early stopping callback
+</span><span class="kn">from</span> <span class="nn">keras.callbacks</span> <span class="kn">import</span> <span class="n">EarlyStopping</span>
+
+<span class="c1"># Define a callback to monitor val_acc
+</span><span class="n">monitor_val_acc</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s">'val_acc'</span><span class="p">,</span>
+                                <span class="n">patience</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+
+<span class="c1"># Train your model using the early stopping callback
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>
+          <span class="n">epochs</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+          <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">),</span>
+          <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">monitor_val_acc</span><span class="p">])</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+...
+Epoch 26/1000
+
+ 32/960 [&gt;.............................] - ETA: 0s - loss: 0.2096 - acc: 0.9688
+800/960 [========================&gt;.....] - ETA: 0s - loss: 0.2079 - acc: 0.9563
+960/960 [==============================] - 0s 94us/step - loss: 0.2091 - acc: 0.9531 - val_loss: 0.2116 - val_acc: 0.9417
+
+</code></pre></div></div>
+
+<p>Great! Now you won’t ever fall short of epochs!</p>
+
+<h3 id="243-a-combination-of-callbacks"><strong>2.4.3 A combination of callbacks</strong></h3>
+
+<p>Deep learning models can take a long time to train, especially when you move to deeper architectures and bigger datasets. Saving your model every time it improves as well as stopping it when it no longer does allows you to worry less about choosing the number of epochs to train for. You can also restore a saved model anytime.</p>
+
+<p>The model training and validation data are available in your workspace as
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ .</p>
+
+<p>Use the
+ <code class="language-plaintext highlighter-rouge">EarlyStopping()</code>
+ and the
+ <code class="language-plaintext highlighter-rouge">ModelCheckpoint()</code>
+ callbacks so that you can go eat a jar of cookies while you leave your computer to work!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the EarlyStopping and ModelCheckpoint callbacks
+</span><span class="kn">from</span> <span class="nn">keras.callbacks</span> <span class="kn">import</span> <span class="n">EarlyStopping</span><span class="p">,</span> <span class="n">ModelCheckpoint</span>
+
+<span class="c1"># Early stop on validation accuracy
+</span><span class="n">monitor_val_acc</span> <span class="o">=</span> <span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span> <span class="o">=</span> <span class="s">'val_acc'</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># Save the best model as best_banknote_model.hdf5
+</span><span class="n">modelCheckpoint</span> <span class="o">=</span> <span class="n">ModelCheckpoint</span><span class="p">(</span><span class="s">'best_banknote_model.hdf5'</span><span class="p">,</span> <span class="n">save_best_only</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Fit your model for a stupid amount of epochs
+</span><span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span>
+                    <span class="n">epochs</span> <span class="o">=</span> <span class="mi">10000000</span><span class="p">,</span>
+                    <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">monitor_val_acc</span><span class="p">,</span> <span class="n">modelCheckpoint</span><span class="p">],</span>
+                    <span class="n">validation_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+...
+Epoch 4/10000000
+
+ 32/960 [&gt;.............................] - ETA: 0s - loss: 0.2699 - acc: 0.9688
+960/960 [==============================] - 0s 59us/step - loss: 0.2679 - acc: 0.9312 - val_loss: 0.2870 - val_acc: 0.9126
+
+</code></pre></div></div>
+
+<p>This is a powerful callback combo! Now you always get the model that performed best, even if you early stopped at one that was already performing worse.</p>
+
+<h1 id="3-improving-your-model-performance"><strong>3. Improving Your Model Performance</strong></h1>
+
+<h2 id="31-learning-curves"><strong>3.1 Learning curves</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/1-25.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/2-25.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/3-24.png?w=1018" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/4-24.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/5-24.png?w=917" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/6-24.png?w=999" alt="Desktop View" /></p>
+
+<h3 id="311-learning-the-digits"><strong>3.1.1 Learning the digits</strong></h3>
+
+<p>You’re going to build a model on the <strong>digits dataset</strong> , a sample dataset that comes pre-loaded with scikit learn. The <strong>digits dataset</strong> consist of <strong>8×8 pixel handwritten digits from 0 to 9</strong> : <img src="https://assets.datacamp.com/production/repositories/4335/datasets/a4236d3a85ce1aaf5361ed7549b18b9d4de00860/digits\_dataset\_sample.png" alt="" /> You want to distinguish between each of the 10 possible digits given an image, so we are dealing with <strong>multi-class classification</strong> .</p>
+
+<p>The dataset has already been partitioned into <code class="language-plaintext highlighter-rouge">X_train</code> , <code class="language-plaintext highlighter-rouge">y_train</code> , <code class="language-plaintext highlighter-rouge">X_test</code> , and <code class="language-plaintext highlighter-rouge">y_test</code> using 30% of the data as testing data. The labels are one-hot encoded vectors, so you don’t need to use Keras <code class="language-plaintext highlighter-rouge">to_categorical()</code> function.</p>
+
+<p>Let’s build this new <code class="language-plaintext highlighter-rouge">model</code> !</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Instantiate a Sequential model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Input and hidden layer with input_shape, 16 neurons, and relu
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="o">*</span><span class="mi">8</span><span class="p">,),</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'relu'</span><span class="p">))</span>
+
+<span class="c1"># Output layer with 10 neurons (one per digit) and softmax
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'softmax'</span><span class="p">))</span>
+
+<span class="c1"># Compile your model
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span> <span class="o">=</span> <span class="s">'adam'</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="s">'categorical_crossentropy'</span><span class="p">,</span> <span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># Test if your model works and can process input data
+</span><span class="k">print</span><span class="p">(</span><span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p>Great! Predicting on training data inputs before training can help you quickly check that your model works as expected.</p>
+
+<h3 id="312-is-the-model-overfitting"><strong>3.1.2 Is the model overfitting?</strong></h3>
+
+<p>Let’s train the <code class="language-plaintext highlighter-rouge">model</code> you just built and plot its learning curve to check out if it’s overfitting! You can make use of loaded function <code class="language-plaintext highlighter-rouge">plot_loss()</code> to plot training loss against validation loss, you can get both from the history callback.</p>
+
+<p>If you want to inspect the <code class="language-plaintext highlighter-rouge">plot_loss()</code> function code, paste this in the console: <code class="language-plaintext highlighter-rouge">print(inspect.getsource(plot_loss))</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Train your model for 60 epochs, using X_test and y_test as validation data
+</span><span class="n">h_callback</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span> <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">),</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Extract from the history object loss and val_loss to plot the learning curve
+</span><span class="n">plot_loss</span><span class="p">(</span><span class="n">h_callback</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'loss'</span><span class="p">],</span> <span class="n">h_callback</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_loss'</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/7-24.png?w=1024" alt="Desktop View" /></p>
+
+<p>Just by looking at the overall picture, do you think the learning curve shows this model is overfitting after having trained for 60 epochs?</p>
+
+<p><strong>No, the test loss is not getting higher as the epochs go by.</strong></p>
+
+<p>Awesome choice! This graph doesn’t show overfitting but convergence. It looks like your model has learned all it could from the data and it no longer improves.</p>
+
+<h3 id="313-do-we-need-more-data"><strong>3.1.3 Do we need more data?</strong></h3>
+
+<p>It’s time to check whether the <strong>digits dataset</strong> <code class="language-plaintext highlighter-rouge">model</code> you built benefits from more training examples!</p>
+
+<p>In order to keep code to a minimum, various things are already initialized and ready to use:</p>
+
+<ul>
+  <li>The<code class="language-plaintext highlighter-rouge">model</code>you just built.</li>
+  <li><code class="language-plaintext highlighter-rouge">X_train</code>, <code class="language-plaintext highlighter-rouge">y_train</code>, <code class="language-plaintext highlighter-rouge">X_test</code>, and <code class="language-plaintext highlighter-rouge">y_test</code>.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">initial_weights</code> of your model, saved after using  <code class="language-plaintext highlighter-rouge">model.get_weights()</code>.</li>
+  <li>A defined list of training sizes: <code class="language-plaintext highlighter-rouge">training_sizes</code>.</li>
+  <li>A defined <code class="language-plaintext highlighter-rouge">EarlyStopping</code> callback monitoring loss:  <code class="language-plaintext highlighter-rouge">early_stop</code>.</li>
+  <li>Two empty lists to store the evaluation results:  <code class="language-plaintext highlighter-rouge">train_accs</code> and <code class="language-plaintext highlighter-rouge">test_accs</code>.</li>
+</ul>
+
+<p>Train your model on the different training sizes and evaluate the results on <code class="language-plaintext highlighter-rouge">X_test</code> . End by plotting the results with <code class="language-plaintext highlighter-rouge">plot_results()</code>.</p>
+
+<p>The full code for this exercise can be found on the slides!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train_sizes</span>
+<span class="n">array</span><span class="p">([</span> <span class="mi">125</span><span class="p">,</span>  <span class="mi">502</span><span class="p">,</span>  <span class="mi">879</span><span class="p">,</span> <span class="mi">1255</span><span class="p">])</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for</span> <span class="n">size</span> <span class="ow">in</span> <span class="n">training_sizes</span><span class="p">:</span>
+    <span class="c1"># Get a fraction of training data (we only care about the training data)
+</span>    <span class="n">X_train_frac</span><span class="p">,</span> <span class="n">y_train_frac</span> <span class="o">=</span> <span class="n">X_train</span><span class="p">[:</span><span class="n">size</span><span class="p">],</span> <span class="n">y_train</span><span class="p">[:</span><span class="n">size</span><span class="p">]</span>
+
+    <span class="c1"># Reset the model to the initial weights and train it on the new training data fraction
+</span>    <span class="n">model</span><span class="p">.</span><span class="n">set_weights</span><span class="p">(</span><span class="n">initial_weights</span><span class="p">)</span>
+    <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_frac</span><span class="p">,</span> <span class="n">y_train_frac</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">early_stop</span><span class="p">])</span>
+
+    <span class="c1"># Evaluate and store both: the training data fraction and the complete test set results
+</span>    <span class="n">train_accs</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">X_train_frac</span><span class="p">,</span> <span class="n">y_train_frac</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">test_accs</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Plot train vs test accuracies
+</span><span class="n">plot_results</span><span class="p">(</span><span class="n">train_accs</span><span class="p">,</span> <span class="n">test_accs</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/8-24.png?w=1024" alt="Desktop View" /></p>
+
+<p>Great job, that was a lot of code to understand! The results shows that your model would not benefit a lot from more training data, since the test set is starting to flatten in accuracy already.</p>
+
+<h2 id="32-activation-functions"><strong>3.2 Activation functions</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/9-22.png?w=1020" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/10-22.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/11-22.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/12-21.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/13-20.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/14-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/15-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/16-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/17-15.png?w=1006" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/18-12.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="321-different-activation-functions"><strong>3.2.1 Different activation functions</strong></h3>
+
+<p>tanh(hyperbolic tangent)</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">sigmoid()</code> , <code class="language-plaintext highlighter-rouge">tanh()</code> , <code class="language-plaintext highlighter-rouge">ReLU()</code> , and <code class="language-plaintext highlighter-rouge">leaky_ReLU()</code> functions have been defined and ready for you to use. Each function receives an input number <em>X</em> and returns its corresponding <em>Y</em> value.</p>
+
+<p>Which of the statements below is <strong>false</strong> ?</p>
+
+<ul>
+  <li>The  <code class="language-plaintext highlighter-rouge">sigmoid()</code> takes a value of <em>0.5</em> when <em>X = 0</em> whilst <code class="language-plaintext highlighter-rouge">tanh()</code> takes a value of <em>0</em> .</li>
+  <li>The <code class="language-plaintext highlighter-rouge">leaky-ReLU()</code> takes a value of <em>-0.01</em> when <em>X = -1</em> whilst <code class="language-plaintext highlighter-rouge">ReLU()</code> takes a value of <em>0</em> .</li>
+  <li>**The <code class="language-plaintext highlighter-rouge">sigmoid()</code> and <code class="language-plaintext highlighter-rouge">tanh()</code> both take values close to <em>-1</em> for big negative numbers.(false)**</li>
+</ul>
+
+<p>Great! For big negative numbers the sigmoid approaches <em>0</em> not <em>-1</em> whilst the <code class="language-plaintext highlighter-rouge">tanh()</code> does take values close to <em>-1</em> .</p>
+
+<h3 id="322-comparing-activation-functions"><strong>3.2.2 Comparing activation functions</strong></h3>
+
+<p>Comparing activation functions involves a bit of coding, but nothing you can’t do!</p>
+
+<p>You will try out different activation functions on the <strong>multi-label model</strong> you built for your irrigation machine in chapter 2. The function <code class="language-plaintext highlighter-rouge">get_model()</code> returns a copy of this model and applies the activation function, passed on as a parameter, to its hidden layer.</p>
+
+<p>You will build a loop that goes through several activation functions, generates a new model for each and trains it. Storing the history callback in a dictionary will allow you to compare and visualize which activation function performed best in the next exercise!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Set a seed
+</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">27</span><span class="p">)</span>
+
+<span class="c1"># Activation functions to try
+</span><span class="n">activations</span> <span class="o">=</span> <span class="p">[</span><span class="s">'relu'</span><span class="p">,</span> <span class="s">'leaky_relu'</span><span class="p">,</span> <span class="s">'sigmoid'</span><span class="p">,</span> <span class="s">'tanh'</span><span class="p">]</span>
+
+<span class="c1"># Loop over the activation functions
+</span><span class="n">activation_results</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="k">for</span> <span class="n">act</span> <span class="ow">in</span> <span class="n">activations</span><span class="p">:</span>
+  <span class="c1"># Get a new model with the current activation
+</span>  <span class="n">model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">(</span><span class="n">act_function</span><span class="o">=</span><span class="n">act</span><span class="p">)</span>
+  <span class="c1"># Fit the model and store the history results
+</span>  <span class="n">h_callback</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span><span class="n">y_test</span><span class="p">),</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+  <span class="n">activation_results</span><span class="p">[</span><span class="n">act</span><span class="p">]</span> <span class="o">=</span> <span class="n">h_callback</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Finishing</span> <span class="k">with</span> <span class="n">relu</span> <span class="p">...</span>
+<span class="n">Finishing</span> <span class="k">with</span> <span class="n">leaky_relu</span> <span class="p">...</span>
+<span class="n">Finishing</span> <span class="k">with</span> <span class="n">sigmoid</span> <span class="p">...</span>
+<span class="n">Finishing</span> <span class="k">with</span> <span class="n">tanh</span> <span class="p">...</span>
+</code></pre></div></div>
+
+<p>Awesome job! You’ve trained 4 models with 4 different activation functions, let’s see how well they performed!</p>
+
+<h3 id="323-comparing-activation-functions-ii"><strong>3.2.3 Comparing activation functions II</strong></h3>
+
+<p>The code used in the previous exercise has been executed to obtain the <code class="language-plaintext highlighter-rouge">activation_results</code> with the difference that <strong>100 epochs instead of 20</strong> are used. That way you’ll have more epochs to further compare how the training evolves per activation function.</p>
+
+<p>For every <code class="language-plaintext highlighter-rouge">history</code> callback of each activation function in <code class="language-plaintext highlighter-rouge">activation_results</code> :</p>
+
+<ul>
+  <li>The <code class="language-plaintext highlighter-rouge">history.history['val_loss']</code> has been extracted.</li>
+  <li>The <code class="language-plaintext highlighter-rouge">history.history['val_acc']</code> has been extracted.</li>
+  <li>Both are saved in two dictionaries: <code class="language-plaintext highlighter-rouge">val_loss_per_function</code> and <code class="language-plaintext highlighter-rouge">val_acc_per_function</code> .</li>
+</ul>
+
+<p>Pandas is also loaded for you to use as <code class="language-plaintext highlighter-rouge">pd</code> . Let’s plot some quick comparison validation loss and accuracy charts with pandas!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Create a dataframe from val_loss_per_function
+</span><span class="n">val_loss</span><span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">val_loss_per_function</span><span class="p">)</span>
+
+<span class="c1"># Call plot on the dataframe
+</span><span class="n">val_loss</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Create a dataframe from val_acc_per_function
+</span><span class="n">val_acc</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">val_acc_per_function</span><span class="p">)</span>
+
+<span class="c1"># Call plot on the dataframe
+</span><span class="n">val_acc</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/19-10.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/20-8.png?w=1024" alt="Desktop View" /></p>
+
+<h2 id="33-batch-size-and-batch-normalization"><strong>3.3 Batch size and batch normalization</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/1-26.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/2-26.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/3-25.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/4-25.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/5-25.png?w=996" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/6-25.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/7-25.png?w=776" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/8-25.png?w=951" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/9-23.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="331-changing-batch-sizes"><strong>3.3.1 Changing batch sizes</strong></h3>
+
+<p>You’ve seen models are usually trained in batches of a fixed size. The smaller a batch size, the more weight updates per epoch, but at a cost of a more unstable gradient descent. Specially if the batch size is too small and it’s not representative of the entire training set.</p>
+
+<p>Let’s see how different batch sizes affect the accuracy of a binary classification model that separates red from blue dots.</p>
+
+<p>You’ll use a batch size of one, updating the weights once per sample in your training set for each epoch. Then you will use the entire dataset, updating the weights only once per epoch.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Get a fresh new model with get_model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">()</span>
+
+<span class="c1"># Train your model for 5 epochs with a batch size of 1
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s"> The accuracy when using a batch of size 1 is: "</span><span class="p">,</span>
+      <span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+<span class="c1"># The accuracy when using a batch of size 1 is:  0.9733333333333334
+</span></code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">model</span> <span class="o">=</span> <span class="n">get_model</span><span class="p">()</span>
+
+<span class="c1"># Fit your model for 5 epochs with a batch of size the training set
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">X_train</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s"> The accuracy when using the whole training set as a batch was: "</span><span class="p">,</span>
+      <span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+<span class="c1"># The accuracy when using the whole training set as a batch was:  0.553333334128062
+</span></code></pre></div></div>
+
+<h3 id="332-batch-normalizing-a-familiar-model"><strong>3.3.2 Batch normalizing a familiar model</strong></h3>
+
+<p>Remember the <strong>digits dataset</strong> you trained in the first exercise of this chapter?</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/4335/datasets/a4236d3a85ce1aaf5361ed7549b18b9d4de00860/digits\_dataset\_sample.png" alt="" /></p>
+
+<p>A multi-class classification problem that you solved using <code class="language-plaintext highlighter-rouge">softmax</code> and 10 neurons in your output layer.</p>
+
+<p>You will now build a new deeper model consisting of 3 hidden layers of 50 neurons each, using batch normalization in between layers. The <code class="language-plaintext highlighter-rouge">kernel_initializer</code> parameter is used to initialize weights in a similar way.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import batch normalization from keras layers
+</span><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">BatchNormalization</span>
+
+<span class="c1"># Build your deep network
+</span><span class="n">batchnorm_model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+<span class="n">batchnorm_model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">64</span><span class="p">,),</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s">'normal'</span><span class="p">))</span>
+<span class="n">batchnorm_model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">BatchNormalization</span><span class="p">())</span>
+<span class="n">batchnorm_model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s">'normal'</span><span class="p">))</span>
+<span class="n">batchnorm_model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">BatchNormalization</span><span class="p">())</span>
+<span class="n">batchnorm_model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s">'normal'</span><span class="p">))</span>
+<span class="n">batchnorm_model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">BatchNormalization</span><span class="p">())</span>
+<span class="n">batchnorm_model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">,</span> <span class="n">kernel_initializer</span><span class="o">=</span><span class="s">'normal'</span><span class="p">))</span>
+
+<span class="c1"># Compile your model with sgd
+</span><span class="n">batchnorm_model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'sgd'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'categorical_crossentropy'</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>Congratulations! That was a deep model indeed. Let’s compare how it performs against this very same model without batch normalization!</p>
+
+<h3 id="333-batch-normalization-effects"><strong>3.3.3 Batch normalization effects</strong></h3>
+
+<p>Batch normalization tends to increase the learning speed of our models and make their learning curves more stable. Let’s see how two identical models with and without batch normalization compare.</p>
+
+<p>The model you just built <code class="language-plaintext highlighter-rouge">batchnorm_model</code> is loaded for you to use. An exact copy of it without batch normalization: <code class="language-plaintext highlighter-rouge">standard_model</code> , is available as well. You can check their <code class="language-plaintext highlighter-rouge">summary()</code> in the console. <code class="language-plaintext highlighter-rouge">X_train</code> , <code class="language-plaintext highlighter-rouge">y_train</code> , <code class="language-plaintext highlighter-rouge">X_test</code> , and <code class="language-plaintext highlighter-rouge">y_test</code> are also loaded so that you can train both models.</p>
+
+<p>You will compare the accuracy learning curves for both models plotting them with <code class="language-plaintext highlighter-rouge">compare_histories_acc()</code> .</p>
+
+<p>You can check the function pasting <code class="language-plaintext highlighter-rouge">print(inspect.getsource(compare_histories_acc))</code> in the console.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Train your standard model, storing its history callback
+</span><span class="n">h1_callback</span> <span class="o">=</span> <span class="n">standard_model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span><span class="n">y_test</span><span class="p">),</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Train the batch normalized model you recently built, store its history callback
+</span><span class="n">h2_callback</span> <span class="o">=</span> <span class="n">batchnorm_model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span><span class="n">y_test</span><span class="p">),</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Call compare_histories_acc passing in both model histories
+</span><span class="n">compare_histories_acc</span><span class="p">(</span><span class="n">h1_callback</span><span class="p">,</span> <span class="n">h2_callback</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/10-23.png?w=1024" alt="Desktop View" /></p>
+
+<p>Outstanding! You can see that for this deep model batch normalization proved to be useful, helping the model obtain high accuracy values just over the first 10 training epochs.</p>
+
+<h2 id="34-hyperparameter-tuning"><strong>3.4 Hyperparameter tuning</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/11-23.png?w=997" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/12-22.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/13-21.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/14-20.png?w=902" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/15-20.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/16-19.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/17-16.png?w=987" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/18-13.png?w=955" alt="Desktop View" /></p>
+
+<h3 id="341-preparing-a-model-for-tuning"><strong>3.4.1 Preparing a model for tuning</strong></h3>
+
+<p>Let’s tune the hyperparameters of a <strong>binary classification</strong> model that does well classifying the <strong>breast cancer dataset</strong> .</p>
+
+<p>You’ve seen that the first step to turn a model into a sklearn estimator is to build a function that creates it. This function is important since you can play with the parameters it receives to achieve the different models you’d like to try out.</p>
+
+<p>Build a simple <code class="language-plaintext highlighter-rouge">create_model()</code> function that receives a learning rate and an activation function as parameters. The <code class="language-plaintext highlighter-rouge">Adam</code> optimizer has been imported as an object from <code class="language-plaintext highlighter-rouge">keras.optimizers</code> so that you can change its learning rate parameter.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Creates a model given an activation and learning rate
+</span><span class="k">def</span> <span class="nf">create_model</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">,</span> <span class="n">activation</span><span class="p">):</span>
+
+  	<span class="c1"># Create an Adam optimizer with the given learning rate
+</span>  	<span class="n">opt</span> <span class="o">=</span> <span class="n">Adam</span><span class="p">(</span><span class="n">lr</span> <span class="o">=</span> <span class="n">learning_rate</span><span class="p">)</span>
+
+  	<span class="c1"># Create your binary classification model
+</span>  	<span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+  	<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">30</span><span class="p">,),</span> <span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span><span class="p">))</span>
+  	<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">256</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span><span class="p">))</span>
+  	<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'sigmoid'</span><span class="p">))</span>
+
+  	<span class="c1"># Compile your model with your optimizer, loss, and metrics
+</span>  	<span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">opt</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="s">'binary_crossentropy'</span><span class="p">,</span> <span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+  	<span class="k">return</span> <span class="n">model</span>
+</code></pre></div></div>
+
+<p>Well done! With this function ready you can now create a sklearn estimator and perform hyperparameter tuning!</p>
+
+<h3 id="342-tuning-the-model-parameters"><strong>3.4.2 Tuning the model parameters</strong></h3>
+
+<p>It’s time to try out different parameters on your model and see how well it performs!</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">create_model()</code> function you built in the previous exercise is loaded for you to use.</p>
+
+<p>Since fitting the <code class="language-plaintext highlighter-rouge">RandomizedSearchCV</code> would take too long, the results you’d get are printed in the <code class="language-plaintext highlighter-rouge">show_results()</code> function. You could try <code class="language-plaintext highlighter-rouge">random_search.fit(X,y)</code> in the console yourself to check it does work after you have built everything else, but you will probably timeout your exercise (so copy your code first if you try it!).</p>
+
+<p>You don’t need to use the optional <code class="language-plaintext highlighter-rouge">epochs</code> and <code class="language-plaintext highlighter-rouge">batch_size</code> parameters when building your <code class="language-plaintext highlighter-rouge">KerasClassifier</code> since you are passing them as <code class="language-plaintext highlighter-rouge">params</code> to the random search and this works as well.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import KerasClassifier from keras scikit learn wrappers
+</span><span class="kn">from</span> <span class="nn">keras.wrappers.scikit_learn</span> <span class="kn">import</span> <span class="n">KerasClassifier</span>
+
+<span class="c1"># Create a KerasClassifier
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">KerasClassifier</span><span class="p">(</span><span class="n">build_fn</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">)</span>
+
+<span class="c1"># Define the parameters to try out
+</span><span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="s">'activation'</span><span class="p">:</span> <span class="p">[</span><span class="s">'relu'</span><span class="p">,</span> <span class="s">'tanh'</span><span class="p">],</span> <span class="s">'batch_size'</span><span class="p">:</span> <span class="p">[</span><span class="mi">32</span><span class="p">,</span> <span class="mi">128</span><span class="p">,</span> <span class="mi">256</span><span class="p">],</span>
+          <span class="s">'epochs'</span><span class="p">:</span> <span class="p">[</span><span class="mi">50</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">200</span><span class="p">],</span> <span class="s">'learning_rate'</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">]}</span>
+
+<span class="c1"># Create a randomize search cv object passing in the parameters to try
+</span><span class="n">random_search</span> <span class="o">=</span> <span class="n">RandomizedSearchCV</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">param_distributions</span> <span class="o">=</span> <span class="n">params</span><span class="p">,</span> <span class="n">cv</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="c1"># Running random_search.fit(X,y) would start the search,but it takes too long!
+</span><span class="n">show_results</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Best</span><span class="p">:</span> <span class="mf">0.975395</span> <span class="n">using</span> <span class="p">{</span><span class="n">learning_rate</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">relu</span><span class="p">}</span>
+ <span class="mf">0.956063</span> <span class="p">(</span><span class="mf">0.013236</span><span class="p">)</span> <span class="k">with</span><span class="p">:</span> <span class="p">{</span><span class="n">learning_rate</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">tanh</span><span class="p">}</span>
+ <span class="mf">0.970123</span> <span class="p">(</span><span class="mf">0.019838</span><span class="p">)</span> <span class="k">with</span><span class="p">:</span> <span class="p">{</span><span class="n">learning_rate</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">tanh</span><span class="p">}</span>
+ <span class="mf">0.971880</span> <span class="p">(</span><span class="mf">0.006524</span><span class="p">)</span> <span class="k">with</span><span class="p">:</span> <span class="p">{</span><span class="n">learning_rate</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">tanh</span><span class="p">}</span>
+ <span class="mf">0.724077</span> <span class="p">(</span><span class="mf">0.072993</span><span class="p">)</span> <span class="k">with</span><span class="p">:</span> <span class="p">{</span><span class="n">learning_rate</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">relu</span><span class="p">}</span>
+ <span class="mf">0.588752</span> <span class="p">(</span><span class="mf">0.281793</span><span class="p">)</span> <span class="k">with</span><span class="p">:</span> <span class="p">{</span><span class="n">learning_rate</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">relu</span><span class="p">}</span>
+ <span class="mf">0.966608</span> <span class="p">(</span><span class="mf">0.004892</span><span class="p">)</span> <span class="k">with</span><span class="p">:</span> <span class="p">{</span><span class="n">learning_rate</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">tanh</span><span class="p">}</span>
+ <span class="mf">0.952548</span> <span class="p">(</span><span class="mf">0.019734</span><span class="p">)</span> <span class="k">with</span><span class="p">:</span> <span class="p">{</span><span class="n">learning_rate</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="mi">256</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">relu</span><span class="p">}</span>
+ <span class="mf">0.971880</span> <span class="p">(</span><span class="mf">0.006524</span><span class="p">)</span> <span class="k">with</span><span class="p">:</span> <span class="p">{</span><span class="n">learning_rate</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="mi">200</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">relu</span><span class="p">}</span>
+ <span class="mf">0.968366</span> <span class="p">(</span><span class="mf">0.004239</span><span class="p">)</span> <span class="k">with</span><span class="p">:</span> <span class="p">{</span><span class="n">learning_rate</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">relu</span><span class="p">}</span>
+ <span class="mf">0.910369</span> <span class="p">(</span><span class="mf">0.055824</span><span class="p">)</span> <span class="k">with</span><span class="p">:</span> <span class="p">{</span><span class="n">learning_rate</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="n">epochs</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="mi">128</span><span class="p">,</span> <span class="n">activation</span><span class="p">:</span> <span class="n">relu</span><span class="p">}</span>
+</code></pre></div></div>
+
+<p>That was great! I’m glad that the server is still working. Now that we have a better idea of which parameters are performing best, let’s use them!</p>
+
+<h3 id="343-training-with-cross-validation"><strong>3.4.3 Training with cross-validation</strong></h3>
+
+<p>Time to train your model with the best parameters found: <strong>0.001</strong> for the <strong>learning rate</strong> , <strong>50 epochs</strong> , <strong>a 128 batch_size</strong> and <strong>relu activations</strong> .</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">create_model()</code> function has been redefined so that it now creates a model with those parameters. <code class="language-plaintext highlighter-rouge">X</code> and <code class="language-plaintext highlighter-rouge">y</code> are loaded for you to use as features and labels.</p>
+
+<p>In this exercise you do pass the best epochs and batch <em>size values found for your model to the <code class="language-plaintext highlighter-rouge">KerasClassifier</code> object so that they are used when performing cross</em> validation.</p>
+
+<p>End this chapter by training an awesome tuned model on the <strong>breast cancer dataset</strong> !</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Import KerasClassifier from keras wrappers
+</span><span class="kn">from</span> <span class="nn">keras.wrappers.scikit_learn</span> <span class="kn">import</span> <span class="n">KerasClassifier</span>
+
+<span class="c1"># Create a KerasClassifier
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">KerasClassifier</span><span class="p">(</span><span class="n">build_fn</span> <span class="o">=</span> <span class="n">create_model</span><span class="p">(</span><span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.001</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'relu'</span><span class="p">),</span> <span class="n">epochs</span> <span class="o">=</span> <span class="mi">50</span><span class="p">,</span>
+             <span class="n">batch_size</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span> <span class="n">verbose</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Calculate the accuracy score for each fold
+</span><span class="n">kfolds</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span>
+
+<span class="c1"># Print the mean accuracy
+</span><span class="k">print</span><span class="p">(</span><span class="s">'The mean accuracy was:'</span><span class="p">,</span> <span class="n">kfolds</span><span class="p">.</span><span class="n">mean</span><span class="p">())</span>
+
+<span class="c1"># Print the accuracy standard deviation
+</span><span class="k">print</span><span class="p">(</span><span class="s">'With a standard deviation of:'</span><span class="p">,</span> <span class="n">kfolds</span><span class="p">.</span><span class="n">std</span><span class="p">())</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">The</span> <span class="n">mean</span> <span class="n">accuracy</span> <span class="n">was</span><span class="p">:</span> <span class="mf">0.9718834066666666</span>
+<span class="n">With</span> <span class="n">a</span> <span class="n">standard</span> <span class="n">deviation</span> <span class="n">of</span><span class="p">:</span> <span class="mf">0.002448915612216046</span>
+</code></pre></div></div>
+
+<p>Amazing! Now you can more reliably test out different parameters on your networks and find better models!</p>
+
+<h1 id="4-advanced-model-architectures">4. Advanced Model Architectures</h1>
+
+<h2 id="41-tensors-layers-and-autoencoders"><strong>4.1 Tensors, layers, and autoencoders</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/1-27.png?w=920" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/2-27.png?w=589" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/3-26.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/4-26.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/5-26.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/6-26.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/7-26.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/8-26.png?w=1014" alt="Desktop View" /></p>
+
+<h3 id="411-its-a-flow-of-tensors"><strong>4.1.1 It’s a flow of tensors</strong></h3>
+
+<p>If you have already built a model, you can use the
+ <code class="language-plaintext highlighter-rouge">model.layers</code>
+ and the
+ <code class="language-plaintext highlighter-rouge">keras.backend</code>
+ to build functions that, provided with a valid input tensor, return the corresponding output tensor.</p>
+
+<p>This is a useful tool when trying to understand what is going on inside the layers of a neural network.</p>
+
+<p>For instance, if you get the input and output from the first layer of a network, you can build an
+ <code class="language-plaintext highlighter-rouge">inp_to_out</code>
+ function that returns the result of carrying out forward propagation through only the first layer for a given input tensor.</p>
+
+<p>So that’s what you’re going to do right now!</p>
+
+<p><code class="language-plaintext highlighter-rouge">X_test</code>
+ from the
+ <strong>Banknote Authentication</strong>
+ dataset and its
+ <code class="language-plaintext highlighter-rouge">model</code>
+ are preloaded. Type
+ <code class="language-plaintext highlighter-rouge">model.summary()</code>
+ in the console to check it.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import keras backend
+</span><span class="kn">import</span> <span class="nn">keras.backend</span> <span class="k">as</span> <span class="n">K</span>
+
+<span class="c1"># Input tensor from the 1st layer of the model
+</span><span class="n">inp</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nb">input</span>
+
+<span class="c1"># Output tensor from the 1st layer of the model
+</span><span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">output</span>
+
+<span class="c1"># Define a function from inputs to outputs
+</span><span class="n">inp_to_out</span> <span class="o">=</span> <span class="n">K</span><span class="p">.</span><span class="n">function</span><span class="p">([</span><span class="n">inp</span><span class="p">],[</span><span class="n">out</span><span class="p">])</span>
+
+<span class="c1"># Print the results of passing X_test through the 1st layer
+</span><span class="k">print</span><span class="p">(</span><span class="n">inp_to_out</span><span class="p">([</span><span class="n">X_test</span><span class="p">]))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[array([[7.77682841e-01, 0.00000000e+00],
+       [0.00000000e+00, 0.00000000e+00],
+       [0.00000000e+00, 1.50813460e+00],
+       [0.00000000e+00, 1.34600031e+00],
+...
+
+</code></pre></div></div>
+
+<p>Nice job! Let’s use this function for something more interesting.</p>
+
+<h3 id="412-neural-separation"><strong>4.1.2 Neural separation</strong></h3>
+
+<p>Neurons learn by updating their weights to output values that help them distinguish between the input classes. So put on your gloves because you’re going to perform brain surgery!</p>
+
+<p>You will make use of the
+ <code class="language-plaintext highlighter-rouge">inp_to_out()</code>
+ function you just built to visualize the output of two neurons in the first layer of the
+ <strong>Banknote Authentication</strong>
+<code class="language-plaintext highlighter-rouge">model</code>
+ as epochs go by. Plotting the outputs of both of these neurons against each other will show you the difference in output depending on whether each bill was real or fake.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">model</code>
+ you built in chapter 2 is ready for you to use, just like
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ . Copy
+ <code class="language-plaintext highlighter-rouge">print(inspect.getsource(plot))</code>
+ in the console if you want to check
+ <code class="language-plaintext highlighter-rouge">plot()</code>
+ .</p>
+
+<p>You’re performing heavy duty, once it’s done, take a look at the graphs to watch the separation live!</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+print(inspect.getsource(plot))
+def plot():
+  fig, ax = plt.subplots()
+  plt.scatter(layer_output[:, 0], layer_output[:, 1],c=y_test,edgecolors='none')
+  plt.title('Epoch: {}, Test Acc: {:3.1f} %'.format(i+1, test_accuracy * 100.0))
+  plt.show()
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+for i in range(0, 21):
+  	# Train model for 1 epoch
+    h = model.fit(X_train, y_train, batch_size=16, epochs=1,verbose=0)
+    if i%4==0:
+      # Get the output of the first layer
+      layer_output = inp_to_out([X_test])[0]
+
+      # Evaluate model accuracy for this epoch
+      test_accuracy = model.evaluate(X_test, y_test)[1]
+
+      # Plot 1st vs 2nd neuron output
+      plot()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/9-24.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/10-24.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/11-24.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/12-23.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/13-22.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/14-21.png?w=1024" alt="Desktop View" /></p>
+
+<p>That took a while! If you take a look at the graphs you can see how the neurons are learning to spread out the classes during training. Click in between graphs fast, it’s like a movie!</p>
+
+<h3 id="413-building-an-autoencoder"><strong>4.1.3 Building an autoencoder</strong></h3>
+
+<p>Autoencoders have several interesting applications like anomaly detection or image denoising. They aim at producing an output identical to its inputs. The input will be compressed into a lower dimensional space,
+ <strong>encoded</strong>
+ . The model then learns to
+ <strong>decode</strong>
+ it back to its original form.</p>
+
+<p>You will encode and decode the
+ <strong>MNIST</strong>
+ dataset of handwritten digits, the hidden layer will encode a 32-dimensional representation of the image, which originally consists of 784 pixels.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">Sequential</code>
+ model and
+ <code class="language-plaintext highlighter-rouge">Dense</code>
+ layers are ready for you to use.</p>
+
+<p>Let’s build an autoencoder!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Start with a sequential model
+</span><span class="n">autoencoder</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add a dense layer with input the original image pixels and neurons the encoded representation
+</span><span class="n">autoencoder</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">784</span><span class="p">,</span> <span class="p">),</span> <span class="n">activation</span><span class="o">=</span><span class="s">"relu"</span><span class="p">))</span>
+
+<span class="c1"># Add an output layer with as many neurons as the orginal image pixels
+</span><span class="n">autoencoder</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">784</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">"sigmoid"</span><span class="p">))</span>
+
+<span class="c1"># Compile your model with adadelta
+</span><span class="n">autoencoder</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adadelta'</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">)</span>
+
+<span class="c1"># Summarize your model structure
+</span><span class="n">autoencoder</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Model: "sequential_1"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+dense_1 (Dense)              (None, 32)                25120
+_________________________________________________________________
+dense_2 (Dense)              (None, 784)               25872
+=================================================================
+Total params: 50,992
+Trainable params: 50,992
+Non-trainable params: 0
+_________________________________________________________________
+
+</code></pre></div></div>
+
+<p>Great start! Your model is now ready. Let’s see what you can do with it!</p>
+
+<h3 id="414-de-noising-like-an-autoencoder"><strong>4.1.4 De-noising like an autoencoder</strong></h3>
+
+<p>Okay, you have just built an
+ <code class="language-plaintext highlighter-rouge">autoencoder</code>
+ model. Let’s see how it handles a more challenging task.</p>
+
+<p>First, you will build a model that encodes images, and you will check how different digits are represented with
+ <code class="language-plaintext highlighter-rouge">show_encodings()</code>
+ . You can change the
+ <code class="language-plaintext highlighter-rouge">number</code>
+ parameter of this function to check other digits in the console.</p>
+
+<p>Then, you will apply your
+ <code class="language-plaintext highlighter-rouge">autoencoder</code>
+ to noisy images from
+ <code class="language-plaintext highlighter-rouge">MNIST</code>
+ , it should be able to clean the noisy artifacts.</p>
+
+<p><code class="language-plaintext highlighter-rouge">X_test_noise</code>
+ is loaded in your workspace. The digits in this data look like this:</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/4335/datasets/55f20c8d36688a6a83b2609ef574c0965915e012/noisy_mnist_sample.png" alt="" /></p>
+
+<p>Apply the power of the autoencoder!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build your encoder by using the first layer of your autoencoder
+</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+<span class="n">encoder</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">autoencoder</span><span class="p">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># Encode the noisy images and show the encodings for your favorite number [0-9]
+</span><span class="n">encodings</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_noise</span><span class="p">)</span>
+<span class="n">show_encodings</span><span class="p">(</span><span class="n">encodings</span><span class="p">,</span> <span class="n">number</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/15-21.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Predict on the noisy images with your autoencoder
+</span><span class="n">decoded_imgs</span> <span class="o">=</span> <span class="n">autoencoder</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_noise</span><span class="p">)</span>
+
+<span class="c1"># Plot noisy vs decoded images
+</span><span class="n">compare_plot</span><span class="p">(</span><span class="n">X_test_noise</span><span class="p">,</span> <span class="n">decoded_imgs</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Amazing! The noise is gone now! You could get a better reconstruction by using a convolutional autoencoder.</p>
+
+<hr />
+
+<h2 id="42-intro-to-cnns"><strong>4.2 Intro to CNNs</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/16-20.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/17-17.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/18-14.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/19-11.png?w=790" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/20-9.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/21-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/22-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/23-8.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="421-building-a-cnn-model"><strong>4.2.1 Building a CNN model</strong></h3>
+
+<p>Building a CNN model in Keras isn’t much more difficult than building any of the models you’ve already built throughout the course! You just need to make use of convolutional layers.</p>
+
+<p>You’re going to build a shallow convolutional
+ <code class="language-plaintext highlighter-rouge">model</code>
+ that classifies the
+ <strong>MNIST</strong>
+ dataset of digits. The same one you de-noised with your autoencoder!. The images are 28×28 pixels and just have one channel.</p>
+
+<p>Go ahead and build this small convolutional model!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the Conv2D and Flatten layers and instantiate model
+</span><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Conv2D</span><span class="p">,</span><span class="n">Flatten</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add a convolutional layer of 32 filters of size 3x3
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+
+<span class="c1"># Add a convolutional layer of 16 filters of size 3x3
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Conv2D</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">kernel_size</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+
+<span class="c1"># Flatten the previous layer output
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Flatten</span><span class="p">())</span>
+
+<span class="c1"># Add as many outputs as classes with softmax activation
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span> <span class="o">=</span> <span class="s">'softmax'</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<p>Well done! You can see that the key concepts are the same, you just have to use new layers!</p>
+
+<h3 id="422-looking-at-convolutions"><strong>4.2.2 Looking at convolutions</strong></h3>
+
+<p>Inspecting the activations of a convolutional layer is a cool thing. You have to do it at least once in your lifetime!</p>
+
+<p>To do so, you will build a new model with the Keras
+ <code class="language-plaintext highlighter-rouge">Model</code>
+ object, which takes in a list of inputs and a list of outputs. The output you will provide to this new model is the first convolutional layer outputs when given an
+ <strong>MNIST</strong>
+ digit as input image.</p>
+
+<p>The convolutional
+ <code class="language-plaintext highlighter-rouge">model</code>
+ you built in the previous exercise has already been trained for you. You can check it with
+ <code class="language-plaintext highlighter-rouge">model.summary()</code>
+ in the console.</p>
+
+<p>Let’s look at a couple convolutional masks that were learned in the first convolutional layer of this model!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Obtain a reference to the outputs of the first layer
+</span><span class="n">first_layer_output</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">output</span>
+
+<span class="c1"># Build a model using the model's input and the first layer output
+</span><span class="n">first_layer_model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">inputs</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="nb">input</span><span class="p">,</span> <span class="n">outputs</span> <span class="o">=</span> <span class="n">first_layer_output</span><span class="p">)</span>
+
+<span class="c1"># Use this model to predict on X_test
+</span><span class="n">activations</span> <span class="o">=</span> <span class="n">first_layer_model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Plot the activations of first digit of X_test for the 15th filter
+</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">matshow</span><span class="p">(</span><span class="n">activations</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:,</span><span class="mi">14</span><span class="p">],</span> <span class="n">cmap</span> <span class="o">=</span> <span class="s">'viridis'</span><span class="p">)</span>
+
+<span class="c1"># Do the same but for the 18th filter now
+</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">matshow</span><span class="p">(</span><span class="n">activations</span><span class="p">[</span><span class="mi">0</span><span class="p">,:,:,</span><span class="mi">17</span><span class="p">],</span> <span class="n">cmap</span> <span class="o">=</span> <span class="s">'viridis'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/24-9.png?w=1024" alt="Desktop View" /></p>
+
+<p>Hurrah! Each neuron filter of the first layer learned a different convolution. The 15th filter (a.k.a convolutional mask) learned to detect horizontal traces in your digits. On the other hand, filter 18th seems to be checking for vertical traces.</p>
+
+<h3 id="423-preparing-your-input-image"><strong>4.2.3 Preparing your input image</strong></h3>
+
+<p>When using an already trained model like
+ <strong>ResNet50</strong>
+ , we need to make sure that we fit the network the way it was originally trained. So if we want to use a trained model on our custom images, these images need to have the same dimensions as the one used in the original model.</p>
+
+<p>The original
+ <strong>ResNet50 model</strong>
+ was trained with images of size
+ <strong>224×224 pixels</strong>
+ and a number of preprocessing operations; like the subtraction of the mean pixel value in the training set for all training images.</p>
+
+<p>You will go over these preprocessing steps as you prepare this dog’s (named Ivy) image into one that can be classified by
+ <strong>ResNet50</strong>
+ .
+ <img src="https://assets.datacamp.com/production/repositories/4335/datasets/56f1027f1b0d84caa98b0b3cd5b37cf68c13468c/dog.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import image and preprocess_input
+</span><span class="kn">from</span> <span class="nn">keras.preprocessing</span> <span class="kn">import</span> <span class="n">image</span>
+<span class="kn">from</span> <span class="nn">keras.applications.resnet50</span> <span class="kn">import</span> <span class="n">preprocess_input</span>
+
+<span class="c1"># Load the image with the right target size for your model
+</span><span class="n">img</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">load_img</span><span class="p">(</span><span class="n">img_path</span><span class="p">,</span> <span class="n">target_size</span><span class="o">=</span><span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
+
+<span class="c1"># Turn it into an array
+</span><span class="n">img_array</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">img_to_array</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+<span class="c1"># Expand the dimensions of the image, this is so that it fits the expected model input format
+</span><span class="n">img_expanded</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">img_array</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Pre-process the img in the same way original images were
+</span><span class="n">img_ready</span> <span class="o">=</span> <span class="n">preprocess_input</span><span class="p">(</span><span class="n">img_expanded</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Alright! Ivy is now ready for ResNet50. Do you know this dog’s breed? Let’s see what this model thinks it is!</p>
+
+<h3 id="424-using-a-real-world-model"><strong>4.2.4 Using a real world model</strong></h3>
+
+<p>Okay, so Ivy’s picture is ready to be used by
+ <strong>ResNet50</strong>
+ . It is stored in
+ <code class="language-plaintext highlighter-rouge">img_ready</code>
+ and now looks like this:
+ <img src="https://assets.datacamp.com/production/repositories/4335/datasets/f5092a58464fd6887e436db3eba85534fdf34bde/dog_processed.png" alt="" /></p>
+
+<p><strong>ResNet50</strong>
+ is a model trained on the
+ <strong>Imagenet dataset</strong>
+ that is able to distinguish between 1000 different objects.
+ <strong>ResNet50</strong>
+ is a deep model with 50 layers, you can check it in 3D
+ <a href="https://tensorspace.org/html/playground/resnet50.html">here</a>
+ .</p>
+
+<p><code class="language-plaintext highlighter-rouge">ResNet50</code>
+ and
+ <code class="language-plaintext highlighter-rouge">decode_predictions</code>
+ have both been imported from
+ <code class="language-plaintext highlighter-rouge">keras.applications.resnet50</code>
+ for you.</p>
+
+<p>It’s time to use this trained model to find out Ivy’s breed!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Instantiate a ResNet50 model with 'imagenet' weights
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">ResNet50</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s">'imagenet'</span><span class="p">)</span>
+
+<span class="c1"># Predict with ResNet50 on your already processed img
+</span><span class="n">preds</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">img_ready</span><span class="p">)</span>
+
+<span class="c1"># Decode the first 3 predictions
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Predicted:'</span><span class="p">,</span> <span class="n">decode_predictions</span><span class="p">(</span><span class="n">preds</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">3</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+
+</code></pre></div></div>
+
+<p>Predicted: [(‘n02088364’, ‘beagle’, 0.8280003), (‘n02089867’, ‘Walker_hound’, 0.12915272), (‘n02089973’, ‘English_foxhound’, 0.03711732)]</p>
+
+<p>Amazing! Now you know Ivy is a Beagle and that deep learning models that have already been trained for you are easy to use!</p>
+
+<hr />
+
+<h2 id="43-intro-to-lstms"><strong>4.3 Intro to LSTMs</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/25-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/26-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/27-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/28-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/29-1.png?w=841" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/30-1.png?w=1009" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/31-1.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="431-text-prediction-with-lstms"><strong>4.3.1 Text prediction with LSTMs</strong></h3>
+
+<p>During the following exercises you will build an LSTM model that is able to predict the next word using a small text dataset. This dataset consist of cleaned quotes from the
+ <strong>The Lord of the Ring</strong>
+ movies. You can find them in the
+ <code class="language-plaintext highlighter-rouge">text</code>
+ variable.</p>
+
+<p>You will turn this
+ <code class="language-plaintext highlighter-rouge">text</code>
+ into
+ <code class="language-plaintext highlighter-rouge">sequences</code>
+ of
+ <strong>length 4</strong>
+ and make use of the Keras
+ <code class="language-plaintext highlighter-rouge">Tokenizer</code>
+ to prepare the features and labels for your model!</p>
+
+<p>The Keras
+ <code class="language-plaintext highlighter-rouge">Tokenizer</code>
+ is already imported for you to use. It assigns a unique number to each unique word, and stores the mappings in a dictionary. This is important since the model deals with numbers but we later will want to decode the output numbers back into words.</p>
+
+<p>You’re working with this small chunk of The Lord of The Ring quotes:</p>
+
+<ul>
+  <li>It is not the strength of the body but the strength of the spirit.</li>
+  <li>It is useless to meet revenge with revenge it will heal nothing.</li>
+  <li>Even the smallest person can change the course of history.</li>
+  <li>All we have to decide is what to do with the time that is given us.</li>
+  <li>The burned hand teaches best. After that, advice about fire goes to the heart.</li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+text
+'it is not the strength of the body but the strength of the spirit it is useless to meet revenge with revenge it will heal nothing even the smallest person can change the course of history all we have to decide is what to do with the time that is given us the burned hand teaches best after that advice about fire goes to the heart'
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Split text into an array of words
+</span><span class="n">words</span> <span class="o">=</span> <span class="n">text</span><span class="p">.</span><span class="n">split</span><span class="p">()</span>
+
+<span class="c1"># Make sentences of 4 words each, moving one word at a time
+</span><span class="n">sentences</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)):</span>
+  <span class="n">sentences</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="s">' '</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">words</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">4</span><span class="p">:</span><span class="n">i</span><span class="p">]))</span>
+
+<span class="c1"># Instantiate a Tokenizer, then fit it on the sentences
+</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">Tokenizer</span><span class="p">()</span>
+<span class="n">tokenizer</span><span class="p">.</span><span class="n">fit_on_texts</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
+
+<span class="c1"># Turn sentences into a sequence of numbers
+</span><span class="n">sequences</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">.</span><span class="n">texts_to_sequences</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Sentences: </span><span class="se">\n</span><span class="s"> {} </span><span class="se">\n</span><span class="s"> Sequences: </span><span class="se">\n</span><span class="s"> {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">sentences</span><span class="p">[:</span><span class="mi">5</span><span class="p">],</span><span class="n">sequences</span><span class="p">[:</span><span class="mi">5</span><span class="p">]))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Lines:
+ ['it is not the', 'is not the strength', 'not the strength of', 'the strength of the', 'strength of the body']
+ Sequences:
+ [[5, 2, 42, 1], [2, 42, 1, 6], [42, 1, 6, 4], [1, 6, 4, 1], [6, 4, 1, 10]]
+
+</code></pre></div></div>
+
+<p>Great! Your lines are now sequences of numbers, check that identical words are assigned the same number.</p>
+
+<h3 id="432-build-your-lstm-model"><strong>4.3.2 Build your LSTM model</strong></h3>
+
+<p>You’ve already prepared your sequences of text, with each of the sequences consisting of four words. It’s time to build your LSTM model!</p>
+
+<p>Your model will be trained on the first three words of each sequence, predicting the 4th one. You are going to use an
+ <code class="language-plaintext highlighter-rouge">Embedding</code>
+ layer that will essentially learn to turn words into vectors. These vectors will then be passed to a simple
+ <code class="language-plaintext highlighter-rouge">LSTM</code>
+ layer. Our output is a
+ <code class="language-plaintext highlighter-rouge">Dense</code>
+ layer with as many neurons as words in the vocabulary and
+ <code class="language-plaintext highlighter-rouge">softmax</code>
+ activation. This is because we want to obtain the highest probable next word out of all possible words.</p>
+
+<p>The size of the vocabulary of words (the unique number of words) is stored in
+ <code class="language-plaintext highlighter-rouge">vocab_size</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the Embedding, LSTM and Dense layer
+</span><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Embedding</span><span class="p">,</span> <span class="n">LSTM</span><span class="p">,</span> <span class="n">Dense</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">Sequential</span><span class="p">()</span>
+
+<span class="c1"># Add an Embedding layer with the right parameters
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Embedding</span><span class="p">(</span><span class="n">input_dim</span><span class="o">=</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">output_dim</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">input_length</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+
+<span class="c1"># Add a 32 unit LSTM layer
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">LSTM</span><span class="p">(</span><span class="mi">32</span><span class="p">))</span>
+
+<span class="c1"># Add a hidden Dense layer of 32 units and an output layer of vocab_size with softmax
+</span><span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">Dense</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">))</span>
+<span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Model: "sequential_1"
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #
+=================================================================
+embedding_1 (Embedding)      (None, 3, 8)              352
+_________________________________________________________________
+lstm_1 (LSTM)                (None, 32)                5248
+_________________________________________________________________
+dense_1 (Dense)              (None, 32)                1056
+_________________________________________________________________
+dense_2 (Dense)              (None, 44)                1452
+=================================================================
+Total params: 8,108
+Trainable params: 8,108
+Non-trainable params: 0
+_________________________________________________________________
+
+</code></pre></div></div>
+
+<p>That’s a nice looking model you’ve built! You’ll see that this model is powerful enough to learn text relationships. Specially because we aren’t using a lot of text in this tiny example.</p>
+
+<h3 id="433-decode-your-predictions"><strong>4.3.3 Decode your predictions</strong></h3>
+
+<p>Your LSTM
+ <code class="language-plaintext highlighter-rouge">model</code>
+ has already been trained for you so that you don’t have to wait. It’s time to
+ <strong>define a function</strong>
+ that decodes its predictions.</p>
+
+<p>Since you are predicting on a model that uses the softmax function,
+ <code class="language-plaintext highlighter-rouge">argmax()</code>
+ is used to obtain the position of the output layer with the highest probability, that is the index representing the most probable next word.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">tokenizer</code>
+ you previously created and fitted, is loaded for you. You will be making use of its internal
+ <code class="language-plaintext highlighter-rouge">index_word</code>
+ dictionary to turn the model’s next word prediction (which is an integer) into the actual written word it represents.</p>
+
+<p>You’re very close to experimenting with your model!</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def predict_text(test_text):
+  if len(test_text.split())!=3:
+    print('Text input should be 3 words!')
+    return False
+
+  # Turn the test_text into a sequence of numbers
+  test_seq = tokenizer.texts_to_sequences([test_text])
+  test_seq = np.array(test_seq)
+
+  # Get the model's next word prediction by passing in test_seq
+  pred = model.predict(test_seq).argmax(axis = 1)[0]
+
+  # Return the word associated to the predicted index
+  return tokenizer.index_word[pred]
+
+</code></pre></div></div>
+
+<p>Great job! It’s finally time to try out your model to see how well it does!</p>
+
+<h3 id="434-test-your-model"><strong>4.3.4 Test your model!</strong></h3>
+
+<p>The function you just built,
+ <code class="language-plaintext highlighter-rouge">predict_text()</code>
+ , is ready to use.</p>
+
+<p>Try out these strings on your LSTM model:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">'meet revenge with'</code></li>
+  <li><code class="language-plaintext highlighter-rouge">'the course of'</code></li>
+  <li><code class="language-plaintext highlighter-rouge">'strength of the'</code></li>
+</ul>
+
+<p>Which sentence could be made with the word output from the sentences above?</p>
+
+<h5 id="possible-answers">Possible Answers</h5>
+
+<ul>
+  <li>
+    <p>A <strong>worthless</strong> <strong>gnome</strong> is <strong>king</strong></p>
+  </li>
+  <li>
+    <p><strong>*Revenge</strong> is your <strong>history</strong> and <strong>spirit</strong> *</p>
+  </li>
+  <li>
+    <p>Take a <strong>sword</strong> and <strong>ride</strong> to <strong>Florida</strong></p>
+  </li>
+</ul>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+predict_text('meet revenge with')
+'revenge'
+
+predict_text('the course of')
+'history'
+
+predict_text('strength of the')
+'spirit'
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="44-youre-done"><strong>4.4 You’re done!</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/32-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/33-1.png?w=846" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-deep-learning-with-keras/34-1.png?w=1010" alt="Desktop View" /></p>
+
+<hr />
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

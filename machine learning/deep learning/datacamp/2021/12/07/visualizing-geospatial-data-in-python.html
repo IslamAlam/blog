@@ -1,0 +1,1476 @@
+<h1 id="visualizing-geospatial-data-in-python">Visualizing Geospatial Data in Python</h1>
+
+<p>This is the memo of the 5th course (5 courses in all) of ‘Data Visualization with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/visualizing-geospatial-data-in-python">HERE</a></strong>
+ .</p>
+
+<p>###
+<strong>Course Description</strong></p>
+
+<p>One of the most important tasks of a data scientist is to understand the relationships between their data’s physical location and their geographical context. In this course you’ll be learning to make attractive visualizations of geospatial data with the GeoPandas package. You will learn to spatially join datasets, linking data to context. Finally you will learn to overlay geospatial data to maps to add even more spatial cues to your work. You will use several datasets from the City of Nashville’s open data portal to find out where the chickens are in Nashville, which neighborhood has the most public art, and more!</p>
+
+<p>###
+<strong>Table of contents</strong></p>
+
+<ol>
+  <li>Building 2-layer maps : combining polygons and scatterplots</li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/11/08/visualizing-geospatial-data-in-python-from-datacamp/2/">Creating and joining GeoDataFrames</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/11/08/visualizing-geospatial-data-in-python-from-datacamp/3/">GeoSeries and folium</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/11/08/visualizing-geospatial-data-in-python-from-datacamp/4/">Creating a choropleth building permit density in Nashville</a></li>
+</ol>
+
+<h1 id="1-building-2-layer-maps--combining-polygons-and-scatterplots"><strong>1. Building 2-layer maps : combining polygons and scatterplots</strong></h1>
+<hr />
+
+<h2 id="11-introduction"><strong>1.1 Introduction</strong></h2>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/6.png?w=838" alt="Desktop View" /></p>
+
+<h3 id="111-plotting-a-scatterplot-from-longitude-and-latitude"><strong>1.1.1 Plotting a scatterplot from longitude and latitude</strong></h3>
+
+<p>When using latitude and longitude to create a scatterplot, which value is plotted along the horizontal axis (as x)?</p>
+
+<p>Longitude is plotted as x on the horizontal axis.</p>
+
+<h3 id="112-styling-a-scatterplot"><strong>1.1.2 Styling a scatterplot</strong></h3>
+
+<p>In this exercise, you’ll be using
+ <code class="language-plaintext highlighter-rouge">plt.scatter()</code>
+ to plot the father and son height data from the video. The
+ <code class="language-plaintext highlighter-rouge">father_son</code>
+ DataFrame is available in your workspace. In each scatterplot, plot
+ <code class="language-plaintext highlighter-rouge">father_son.fheight</code>
+ as x-axis and
+ <code class="language-plaintext highlighter-rouge">father_son.sheight</code>
+ as y-axis.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import matplotlib.pyplot
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Scatterplot 3
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">father_son</span><span class="p">.</span><span class="n">fheight</span><span class="p">,</span> <span class="n">father_son</span><span class="p">.</span><span class="n">sheight</span><span class="p">,</span>  <span class="n">c</span> <span class="o">=</span> <span class="s">'yellow'</span><span class="p">,</span> <span class="n">edgecolor</span> <span class="o">=</span> <span class="s">'darkblue'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'father height (inches)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'son height (inches)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Son Height as a Function of Father Height'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">grid</span><span class="p">()</span>
+
+<span class="c1"># Show your plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/7.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="112-extracting-longitude-and-latitude"><strong>1.1.2 Extracting longitude and latitude</strong></h3>
+
+<p>A DataFrame named
+ <code class="language-plaintext highlighter-rouge">df</code>
+ has been loaded to your workspace. Complete the code to extract longitude and latitude to new,
+ <em>separate</em>
+ columns.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+df.head()
+   StopID                             StopName                 Location
+0    4431      MUSIC CITY CENTRAL 5TH - BAY 11   (36.16659, -86.781996)
+1     588         CHARLOTTE AVE &amp; 7TH AVE N WB      (36.165, -86.78406)
+2     590         CHARLOTTE AVE &amp; 8TH AVE N WB  (36.164393, -86.785451)
+3     541  11TH AVE / N GULCH STATION OUTBOUND  (36.162249, -86.790464)
+
+type(df.Location[0])
+tuple
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># extract latitude to a new column: lat
+</span><span class="n">df</span><span class="p">[</span><span class="s">'lat'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="n">df</span><span class="p">.</span><span class="n">Location</span><span class="p">]</span>
+
+<span class="c1"># extract longitude to a new column: lng
+</span><span class="n">df</span><span class="p">[</span><span class="s">'lng'</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">loc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">loc</span> <span class="ow">in</span> <span class="n">df</span><span class="p">.</span><span class="n">Location</span><span class="p">]</span>
+
+<span class="c1"># print the first few rows of df again
+</span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+   StopID                             StopName                 Location        lat        lng
+0    4431      MUSIC CITY CENTRAL 5TH - BAY 11   (36.16659, -86.781996)  36.166590 -86.781996
+1     588         CHARLOTTE AVE &amp; 7TH AVE N WB      (36.165, -86.78406)  36.165000 -86.784060
+2     590         CHARLOTTE AVE &amp; 8TH AVE N WB  (36.164393, -86.785451)  36.164393 -86.785451
+3     541  11TH AVE / N GULCH STATION OUTBOUND  (36.162249, -86.790464)  36.162249 -86.790464
+
+</code></pre></div></div>
+
+<p>####
+<strong>Plotting chicken locations</strong></p>
+
+<p>Now you will create a scatterplot that shows where the Nashville chickens are!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import pandas and matplotlib.pyplot using their customary aliases
+</span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Load the dataset
+</span><span class="n">chickens</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">chickens_path</span><span class="p">)</span>
+
+<span class="c1"># Look at the first few rows of the chickens DataFrame
+</span><span class="k">print</span><span class="p">(</span><span class="n">chickens</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Plot the locations of all Nashville chicken permits
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="n">chickens</span><span class="p">.</span><span class="n">lng</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">chickens</span><span class="p">.</span><span class="n">lat</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/8.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="12-geometries-and-shapefiles"><strong>1.2 Geometries and shapefiles</strong></h2>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/9.png?w=919" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/10.png?w=886" alt="Desktop View" /></p>
+
+<h3 id="121-creating-a-geodataframe--examining-the-geometry"><strong>1.2.1 Creating a GeoDataFrame &amp; examining the geometry</strong></h3>
+
+<p>Let’s see where service districts are in Nashville. The path to the service district shapefile has been stored in the variable
+ <code class="language-plaintext highlighter-rouge">shapefile_path</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import geopandas
+</span><span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="n">gpd</span>
+
+<span class="c1"># Read in the services district shapefile and look at the first few rows.
+</span><span class="n">service_district</span> <span class="o">=</span> <span class="n">gpd</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">shapefile_path</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">service_district</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Print the contents of the service districts geometry in the first row
+</span><span class="k">print</span><span class="p">(</span><span class="n">service_district</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="s">'geometry'</span><span class="p">])</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+       area_sq_mi  objectid                       name                                           geometry
+    0       198.0       0.0    Urban Services District  POLYGON ((-86.68680500011935 36.28670500013504...
+    1       327.0       4.0  General Services District  (POLYGON ((-86.56776164301485 36.0342383159728...
+    POLYGON ((-86.68680500011935 36.28670500013504, -86.68706099969657 36.28550299967364, -86.68709498823965 36.28511683351293, -86.68712691935902 36.28475404474551, -86.6871549990252 36.28443499969863, -86.68715025108719 36.28438104319917, -86.68708600011215 36.2836510002216, ...
+
+</code></pre></div></div>
+
+<h3 id="122-plotting-shapefile-polygons"><strong>1.2.2 Plotting shapefile polygons</strong></h3>
+
+<p>The next step is to show the map of polygons. We have imported
+ <code class="language-plaintext highlighter-rouge">matplotlib.pyplot</code>
+ as
+ <code class="language-plaintext highlighter-rouge">plt</code>
+ and
+ <code class="language-plaintext highlighter-rouge">geopandas</code>
+ as
+ <code class="language-plaintext highlighter-rouge">gpd</code>
+ , A GeoDataFrame of the service districts called
+ <code class="language-plaintext highlighter-rouge">service_district</code>
+ is in your workspace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import packages
+</span><span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="n">gpd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Plot the Service Districts without any additional arguments
+</span><span class="n">service_district</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+<span class="n">service_district</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="c1"># Plot the Service Districts, color them according to name, and show a legend
+</span><span class="n">service_district</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span> <span class="o">=</span> <span class="s">'name'</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/12.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="13-scatterplots-over-polygons"><strong>1.3 Scatterplots over polygons</strong></h2>
+
+<h3 id="131-geometry"><strong>1.3.1 Geometry</strong></h3>
+
+<p>Geometry is a special type of data structure. What types of geometries might be stored in a geometry field?</p>
+
+<p><strong>lines, points, and polygons</strong></p>
+
+<h3 id="132-plotting-points-over-polygons--part-1"><strong>1.3.2 Plotting points over polygons – part 1</strong></h3>
+
+<p>Make a basic plot of the service districts with the chicken locations. The packages needed have already been imported for you. The
+ <code class="language-plaintext highlighter-rouge">chickens</code>
+ DataFrame and
+ <code class="language-plaintext highlighter-rouge">service_district</code>
+ GeoDataFrame are in your workspace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the service district shapefile
+</span><span class="n">service_district</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'name'</span><span class="p">)</span>
+
+<span class="c1"># Add the chicken locations
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">chickens</span><span class="p">.</span><span class="n">lng</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">chickens</span><span class="p">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">c</span> <span class="o">=</span> <span class="s">'black'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/13.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+ 1.3.3 Plotting points over polygons – part 2</p>
+
+<p>We have loaded the usual libraries as
+ <code class="language-plaintext highlighter-rouge">pd</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">plt</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">gpd</code>
+ , the chickens dataset as
+ <code class="language-plaintext highlighter-rouge">chickens</code>
+ , and the service districts as
+ <code class="language-plaintext highlighter-rouge">service_district</code>
+ . Plot the service districts and chicken permits together to see what story your visualization tells.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the service district shapefile
+</span><span class="n">service_district</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span><span class="o">=</span><span class="s">'name'</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Add the chicken locations
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">chickens</span><span class="p">.</span><span class="n">lng</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">chickens</span><span class="p">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'black'</span><span class="p">,</span> <span class="n">edgecolor</span> <span class="o">=</span> <span class="s">'white'</span><span class="p">)</span>
+
+
+<span class="c1"># Add labels and title
+</span><span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Nashville Chicken Permits'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'longitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'latitude'</span><span class="p">)</span>
+
+<span class="c1"># Add grid lines and show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">grid</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/14.png?w=1024" alt="Desktop View" /></p>
+
+<h1 id="2-creating-and-joining-geodataframes"><strong>2. Creating and joining GeoDataFrames</strong></h1>
+<hr />
+
+<h2 id="21-geojson-and-plotting-with-geopandas"><strong>2.1 GeoJSON and plotting with geopandas</strong></h2>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/15.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/16.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/17.png?w=859" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/18.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="211-working-with-geojson"><strong>2.1.1 Working with GeoJSON</strong></h3>
+
+<p>The advantage of GeoJSON over shapefiles is:</p>
+
+<ul>
+  <li>The file is human readable, so you can open it in a text editor and understand the contents.</li>
+  <li>The file stands alone and doesn’t rely on other files.</li>
+  <li>GeoJSON supports multi-part geometries.</li>
+</ul>
+
+<h3 id="212-colormaps"><strong>2.1.2 Colormaps</strong></h3>
+
+<p>When you want to differentiate regions, but not imply any type of relationship between the regions, a qualitative colormap is the best choice. In this exercise you’ll compare a qualitative colormap to a sequential (quantitative) colormap using the school districts GeoDataFrame. It is available in your workspace as
+ <code class="language-plaintext highlighter-rouge">school_districts</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+school_districts.head()
+   first_name       city    zip                           email state  ...    position term_expir district         phone                                           geometry
+0  Dr. Sharon  Nashville  37218  gentryfordistrict1@comcast.net    TN  ...      Member       2016        1  615-268-5269  (POLYGON ((-86.77136400034288 36.3835669997190...
+1        Jill    Madison  37115          jill.speering@mnps.org    TN  ...  Vice-Chair       2016        3  615-562-5234  (POLYGON ((-86.75364713283636 36.4042760799855...
+2  Dr. Jo Ann  Nashville  37220          joann.brannon@mnps.org    TN  ...      Member       2018        2  615-833-5976  (POLYGON ((-86.76696199971282 36.0833250002130...
+3        Anna  Hermitage  37076          anna.shepherd@mnps.org    TN  ...       Chair       2018        4  615-210-3768  (POLYGON ((-86.5809831462547 36.20934685360503...
+4         Amy  Nashville  37221             amy.frogge@mnps.org    TN  ...      Member       2016        9  615-521-5650  (POLYGON ((-86.97287099971373 36.2082789997189...
+
+[5 rows x 12 columns]
+
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Set legend style
+</span><span class="n">lgnd_kwds</span> <span class="o">=</span> <span class="p">{</span><span class="s">'title'</span><span class="p">:</span> <span class="s">'School Districts'</span><span class="p">,</span>
+               <span class="s">'loc'</span><span class="p">:</span> <span class="s">'upper left'</span><span class="p">,</span> <span class="s">'bbox_to_anchor'</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">),</span> <span class="s">'ncol'</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+<span class="c1"># Plot the school districts using the tab20 colormap (qualitative)
+</span><span class="n">school_districts</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span> <span class="o">=</span> <span class="s">'district'</span><span class="p">,</span> <span class="n">cmap</span> <span class="o">=</span> <span class="s">'tab20'</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">legend_kwds</span>  <span class="o">=</span> <span class="n">lgnd_kwds</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Latitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Longitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Nashville School Districts'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">();</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/19.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Set legend style
+</span><span class="n">lgnd_kwds</span> <span class="o">=</span> <span class="p">{</span><span class="s">'title'</span><span class="p">:</span> <span class="s">'School Districts'</span><span class="p">,</span>
+               <span class="s">'loc'</span><span class="p">:</span> <span class="s">'upper left'</span><span class="p">,</span> <span class="s">'bbox_to_anchor'</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">),</span> <span class="s">'ncol'</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+<span class="c1"># Plot the school districts using the summer colormap (sequential)
+</span><span class="n">school_districts</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span> <span class="o">=</span> <span class="s">'district'</span><span class="p">,</span> <span class="n">cmap</span> <span class="o">=</span> <span class="s">'summer'</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">legend_kwds</span> <span class="o">=</span> <span class="n">lgnd_kwds</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Latitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Longitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Nashville School Districts'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">();</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/20.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Set legend style
+</span><span class="n">lgnd_kwds</span> <span class="o">=</span> <span class="p">{</span><span class="s">'title'</span><span class="p">:</span> <span class="s">'School Districts'</span><span class="p">,</span>
+               <span class="s">'loc'</span><span class="p">:</span> <span class="s">'upper left'</span><span class="p">,</span> <span class="s">'bbox_to_anchor'</span><span class="p">:</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">),</span> <span class="s">'ncol'</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+
+<span class="c1"># Plot the school districts using Set3 colormap without the column argument
+</span><span class="n">school_districts</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span> <span class="o">=</span> <span class="s">'Set3'</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="bp">True</span><span class="p">,</span> <span class="n">legend_kwds</span> <span class="o">=</span> <span class="n">lgnd_kwds</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Latitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Longitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Nashville School Districts'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">();</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/21.png?w=1024" alt="Desktop View" /></p>
+
+<p>There is no legend when the column argument is not supplied even if you set legend to
+ <code class="language-plaintext highlighter-rouge">True</code>
+ !</p>
+
+<h3 id="213-map-nashville-neighborhoods"><strong>2.1.3 Map Nashville neighborhoods</strong></h3>
+
+<p>This time you’ll read a GeoJSON file in to a GeoDataFrame to take a quick peek at where Nashville neighborhoods are.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                   name                                           geometry
+0  Historic Buena Vista  (POLYGON ((-86.79511056795417 36.1757596496334...
+1        Charlotte Park  (POLYGON ((-86.87459668651866 36.1575770268129...
+2              Hillwood  (POLYGON ((-86.87613708067906 36.1355409894979...
+3            West Meade  (POLYGON ((-86.9038380396094 36.1255414807897,...
+4          White Bridge  (POLYGON ((-86.86321427797685 36.1288622289404...
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import geopandas as gpd
+import matplotlib.pyplot as plt
+
+# Read in the neighborhoods geojson file
+neighborhoods = gpd.read_file(neighborhoods_path)
+
+# Print the first few rows of neighborhoods
+print(neighborhoods.head())
+
+# Plot the neighborhoods, color according to name and use the Dark2 colormap
+neighborhoods.plot(column = 'name', cmap = 'Dark2')
+
+# Show the plot.
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/22.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<p>###
+ 2.2 Projections and coordinate reference systems</p>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/27.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/23.png?w=902" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/24.png?w=909" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/25.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/26.png?w=962" alt="Desktop View" /></p>
+
+<h3 id="221-changing-coordinate-reference-systems"><strong>2.2.1 Changing coordinate reference systems</strong></h3>
+
+<p>In this exercise you will learn how to find a GeoDataFrame’s coordinate reference system and how to change it. The school districts GeoDataFrame is available in your workspace as
+ <code class="language-plaintext highlighter-rouge">school_districts</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the first row of school districts GeoDataFrame and the crs
+</span><span class="k">print</span><span class="p">(</span><span class="n">school_districts</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">school_districts</span><span class="p">.</span><span class="n">crs</span><span class="p">)</span>
+
+<span class="c1"># Convert the crs to epsg:3857
+</span><span class="n">school_districts</span><span class="p">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">school_districts</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span> <span class="o">=</span> <span class="mi">3857</span><span class="p">)</span>
+
+<span class="c1"># Print the first row of school districts GeoDataFrame and the crs again
+</span><span class="k">print</span><span class="p">(</span><span class="n">school_districts</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">school_districts</span><span class="p">.</span><span class="n">crs</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+       first_name       city    zip                           email state  ... position term_expir district         phone                                           geometry
+    0  Dr. Sharon  Nashville  37218  gentryfordistrict1@comcast.net    TN  ...   Member       2016        1  615-268-5269  (POLYGON ((-86.77136400034288 36.3835669997190...
+
+    [1 rows x 12 columns]
+    {'init': 'epsg:4326'}
+
+       first_name       city    zip                           email state  ... position term_expir district         phone                                           geometry
+    0  Dr. Sharon  Nashville  37218  gentryfordistrict1@comcast.net    TN  ...   Member       2016        1  615-268-5269  (POLYGON ((-9659344.055955959 4353528.76657080...
+
+    [1 rows x 12 columns]
+    {'init': 'epsg:3857', 'no_defs': True}
+
+</code></pre></div></div>
+
+<p>You can change the coordinate reference system of a GeoDataFrame by changing the crs property of the GeoDataFrame. Notice that the units for geometry change when you change the CRS. You always need to ensure two GeoDataFrames share the same crs before you spatially join them.</p>
+
+<h3 id="222-construct-a-geodataframe-from-a-dataframe"><strong>2.2.2 Construct a GeoDataFrame from a DataFrame</strong></h3>
+
+<p>In this exercise, you will construct a
+ <code class="language-plaintext highlighter-rouge">geopandas</code>
+ GeoDataFrame from the Nashville Public Art DataFrame. You will need to import the
+ <code class="language-plaintext highlighter-rouge">Point</code>
+ constructor from the
+ <code class="language-plaintext highlighter-rouge">shapely.geometry</code>
+ module to create a geometry column in
+ <code class="language-plaintext highlighter-rouge">art</code>
+ before you can create a GeoDataFrame from
+ <code class="language-plaintext highlighter-rouge">art</code>
+ . This will get you ready to spatially join the art data and the neighborhoods data in order to discover which neighborhood has the most art.</p>
+
+<p>The Nashville Public Art data has been loaded for you as
+ <code class="language-plaintext highlighter-rouge">art</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import pandas as pd
+import geopandas as gpd
+from shapely.geometry import Point
+import matplotlib.pyplot as plt
+
+# Print the first few rows of the art DataFrame
+print(art.head())
+
+# Create a geometry column from lng &amp; lat
+art['geometry'] = art.apply(lambda x: Point(float(x.lng), float(x.lat)), axis=1)
+
+# Create a GeoDataFrame from art and verify the type
+art_geo = gpd.GeoDataFrame(art, crs = neighborhoods.crs, geometry = art.geometry)
+print(type(art_geo))
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                                 title                                 last_name                 first_name                            address                                             medium  \
+    0          [Cross Country Runners]                                     Frost                      Miley     4001 Harding Rd., Nashville TN                                             Bronze
+    1  [Fourth and Commerce Sculpture]                                    Walker                        Lin  333 Commerce Street, Nashville TN                                                NaN
+    2              12th &amp; Porter Mural                                   Kennedy                        Kim                  114 12th Avenue N                   Porter all-weather outdoor paint
+    3                A Splash of Color  Stevenson and Stanley and ROFF (Harroff)  Doug and Ronnica and Lynn                   616 17th Ave. N.  Steel, brick, wood, and fabric on frostproof c...
+    4             A Story of Nashville                                    Ridley                       Greg    615 Church Street, Nashville TN                           Hammered copper repousse
+
+            type                                               desc       lat       lng                    loc
+    0  Sculpture                                                NaN  36.12856 -86.83660   (36.12856, -86.8366)
+    1  Sculpture                                                NaN  36.16234 -86.77774  (36.16234, -86.77774)
+    2      Mural  Kim Kennedy is a musician and visual artist wh...  36.15790 -86.78817   (36.1579, -86.78817)
+    3      Mural  Painted wooden hoop dancer on a twenty foot po...  36.16202 -86.79975  (36.16202, -86.79975)
+    4     Frieze  Inside the Grand Reading Room, this is a serie...  36.16215 -86.78205  (36.16215, -86.78205)
+    &lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
+
+</code></pre></div></div>
+
+<p>Now that the public art data is in a GeoDataFrame we can join it to the neighborhoods with a special kind of join called a spatial join.</p>
+
+<hr />
+
+<h2 id="23-spatial-joins"><strong>2.3 Spatial joins</strong></h2>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/1-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/2-1.png?w=783" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/3-1.png?w=859" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/4-1.png?w=928" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/5.png?w=942" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/6-1.png?w=922" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/7-1.png?w=948" alt="Desktop View" /></p>
+
+<h3 id="231-spatial-join-practice"><strong>2.3.1 Spatial join practice</strong></h3>
+
+<p>Is there a difference between art (point data) that
+ <strong><em>intersects</em></strong>
+ with neighborhoods (polygon data) and art (point data)
+ <strong><em>within</em></strong>
+ neighborhoods (polygon data)? Explore different spatial joins with the
+ <code class="language-plaintext highlighter-rouge">art_geo</code>
+ and
+ <code class="language-plaintext highlighter-rouge">neighborhoods</code>
+ GeoDataFrames, which are available in your workspace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Spatially join art_geo and neighborhoods
+</span><span class="n">art_intersect_neighborhoods</span> <span class="o">=</span> <span class="n">gpd</span><span class="p">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">art_geo</span><span class="p">,</span> <span class="n">neighborhoods</span><span class="p">,</span> <span class="n">op</span> <span class="o">=</span> <span class="s">'intersects'</span><span class="p">)</span>
+
+<span class="c1"># Print the shape property of art_intersect_neighborhoods
+</span><span class="k">print</span><span class="p">(</span><span class="n">art_intersect_neighborhoods</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (40, 13)
+</span>
+
+<span class="n">art_geo</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                     <span class="n">title</span> <span class="n">last_name</span> <span class="n">first_name</span>                         <span class="n">address</span>  <span class="n">medium</span>  <span class="p">...</span> <span class="n">desc</span>       <span class="n">lat</span>      <span class="n">lng</span>                   <span class="n">loc</span>                   <span class="n">geometry</span>
+<span class="mi">0</span>  <span class="p">[</span><span class="n">Cross</span> <span class="n">Country</span> <span class="n">Runners</span><span class="p">]</span>     <span class="n">Frost</span>      <span class="n">Miley</span>  <span class="mi">4001</span> <span class="n">Harding</span> <span class="n">Rd</span><span class="p">.,</span> <span class="n">Nashville</span> <span class="n">TN</span>  <span class="n">Bronze</span>  <span class="p">...</span>  <span class="n">NaN</span>  <span class="mf">36.12856</span> <span class="o">-</span><span class="mf">86.8366</span>  <span class="p">(</span><span class="mf">36.12856</span><span class="p">,</span> <span class="o">-</span><span class="mf">86.8366</span><span class="p">)</span>  <span class="n">POINT</span> <span class="p">(</span><span class="o">-</span><span class="mf">86.8366</span> <span class="mf">36.12856</span><span class="p">)</span>
+
+<span class="p">[</span><span class="mi">1</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">11</span> <span class="n">columns</span><span class="p">]</span>
+
+
+<span class="n">neighborhoods</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                   <span class="n">name</span>                                           <span class="n">geometry</span>
+<span class="mi">0</span>  <span class="n">Historic</span> <span class="n">Buena</span> <span class="n">Vista</span>  <span class="p">(</span><span class="n">POLYGON</span> <span class="p">((</span><span class="o">-</span><span class="mf">86.79511056795417</span> <span class="mf">36.1757596496334</span><span class="p">...</span>
+
+
+<span class="n">art_intersect_neighborhoods</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                             <span class="n">title</span> <span class="n">last_name</span> <span class="n">first_name</span>                            <span class="n">address</span> <span class="n">medium</span>  <span class="p">...</span>       <span class="n">lng</span>                    <span class="n">loc</span>                             <span class="n">geometry</span>  <span class="n">index_right</span>  \
+<span class="mi">1</span>  <span class="p">[</span><span class="n">Fourth</span> <span class="ow">and</span> <span class="n">Commerce</span> <span class="n">Sculpture</span><span class="p">]</span>    <span class="n">Walker</span>        <span class="n">Lin</span>  <span class="mi">333</span> <span class="n">Commerce</span> <span class="n">Street</span><span class="p">,</span> <span class="n">Nashville</span> <span class="n">TN</span>    <span class="n">NaN</span>  <span class="p">...</span> <span class="o">-</span><span class="mf">86.77774</span>  <span class="p">(</span><span class="mf">36.16234</span><span class="p">,</span> <span class="o">-</span><span class="mf">86.77774</span><span class="p">)</span>  <span class="n">POINT</span> <span class="p">(</span><span class="o">-</span><span class="mf">86.77774000000001</span> <span class="mf">36.16234</span><span class="p">)</span>           <span class="mi">41</span>
+
+              <span class="n">name</span>
+<span class="mi">1</span>  <span class="n">Urban</span> <span class="n">Residents</span>
+
+<span class="p">[</span><span class="mi">1</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">13</span> <span class="n">columns</span><span class="p">]</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create art_within_neighborhoods by spatially joining art_geo and neighborhoods
+</span><span class="n">art_within_neighborhoods</span> <span class="o">=</span> <span class="n">gpd</span><span class="p">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">art_geo</span><span class="p">,</span> <span class="n">neighborhoods</span><span class="p">,</span> <span class="n">op</span> <span class="o">=</span> <span class="s">'within'</span><span class="p">)</span>
+
+<span class="c1"># Print the shape property of art_within_neighborhoods
+</span><span class="k">print</span><span class="p">(</span><span class="n">art_within_neighborhoods</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (40, 13)
+</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Spatially join art_geo and neighborhoods and using the contains op
+</span><span class="n">art_containing_neighborhoods</span> <span class="o">=</span> <span class="n">gpd</span><span class="p">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">art_geo</span><span class="p">,</span> <span class="n">neighborhoods</span><span class="p">,</span> <span class="n">op</span> <span class="o">=</span> <span class="s">'contains'</span><span class="p">)</span>
+
+<span class="c1"># Print the shape property of art_containing_neighborhoods
+</span><span class="k">print</span><span class="p">(</span><span class="n">art_containing_neighborhoods</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (0, 13)
+</span>
+</code></pre></div></div>
+
+<h3 id="232-finding-the-neighborhood-with-the-most-public-art"><strong>2.3.2 Finding the neighborhood with the most public art</strong></h3>
+
+<p>Now that you have created
+ <code class="language-plaintext highlighter-rouge">art_geo</code>
+ , a GeoDataFrame, from the
+ <code class="language-plaintext highlighter-rouge">art</code>
+ DataFrame, you can join it
+ <em>spatially</em>
+ to the
+ <code class="language-plaintext highlighter-rouge">neighborhoods</code>
+ data to see what art is in each neighborhood.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># import packages
+</span><span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="n">gpd</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># Spatially join neighborhoods with art_geo
+</span><span class="n">neighborhood_art</span> <span class="o">=</span> <span class="n">gpd</span><span class="p">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">art_geo</span><span class="p">,</span> <span class="n">neighborhoods</span><span class="p">,</span> <span class="n">op</span> <span class="o">=</span> <span class="s">"within"</span><span class="p">)</span>
+
+<span class="c1"># Print the first few rows
+</span><span class="k">print</span><span class="p">(</span><span class="n">neighborhood_art</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+
+<span class="n">neighborhood_art</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                             <span class="n">title</span> <span class="n">last_name</span> <span class="n">first_name</span>                            <span class="n">address</span> <span class="n">medium</span>  <span class="p">...</span>       <span class="n">lng</span>                    <span class="n">loc</span>                             <span class="n">geometry</span>  <span class="n">index_right</span>  \
+<span class="mi">1</span>  <span class="p">[</span><span class="n">Fourth</span> <span class="ow">and</span> <span class="n">Commerce</span> <span class="n">Sculpture</span><span class="p">]</span>    <span class="n">Walker</span>        <span class="n">Lin</span>  <span class="mi">333</span> <span class="n">Commerce</span> <span class="n">Street</span><span class="p">,</span> <span class="n">Nashville</span> <span class="n">TN</span>    <span class="n">NaN</span>  <span class="p">...</span> <span class="o">-</span><span class="mf">86.77774</span>  <span class="p">(</span><span class="mf">36.16234</span><span class="p">,</span> <span class="o">-</span><span class="mf">86.77774</span><span class="p">)</span>  <span class="n">POINT</span> <span class="p">(</span><span class="o">-</span><span class="mf">86.77774000000001</span> <span class="mf">36.16234</span><span class="p">)</span>           <span class="mi">41</span>
+
+              <span class="n">name</span>
+<span class="mi">1</span>  <span class="n">Urban</span> <span class="n">Residents</span>
+
+<span class="p">[</span><span class="mi">1</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">13</span> <span class="n">columns</span><span class="p">]</span>
+
+</code></pre></div></div>
+
+<h3 id="233-aggregating-points-within-polygons"><strong>2.3.3 Aggregating points within polygons</strong></h3>
+
+<p>Now that you have spatially joined
+ <code class="language-plaintext highlighter-rouge">art</code>
+ and
+ <code class="language-plaintext highlighter-rouge">neighborhoods</code>
+ , you can group, aggregate, and sort the data to find which neighborhood has the most public art. You can count artwork titles to see how many artworks are in each neighborhood.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Get name and title from neighborhood_art and group by name
+</span><span class="n">neighborhood_art_grouped</span> <span class="o">=</span> <span class="n">neighborhood_art</span><span class="p">[[</span><span class="s">'name'</span><span class="p">,</span> <span class="s">'title'</span><span class="p">]].</span><span class="n">groupby</span><span class="p">(</span><span class="s">'name'</span><span class="p">)</span>
+
+<span class="c1"># Aggregate the grouped data and count the artworks within each polygon
+</span><span class="k">print</span><span class="p">(</span><span class="n">neighborhood_art_grouped</span><span class="p">.</span><span class="n">agg</span><span class="p">(</span><span class="s">'count'</span><span class="p">).</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span> <span class="o">=</span> <span class="s">'title'</span><span class="p">,</span> <span class="n">ascending</span> <span class="o">=</span> <span class="bp">False</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                          title
+name
+Urban Residents              22
+Lockeland Springs             3
+Edgehill (ONE)                2
+Germantown                    2
+Hillsboro-West End            2
+Inglewood                     2
+Sunnyside                     2
+Chestnut Hill (TAG)           1
+Historic Edgefield            1
+McFerrin Park                 1
+Renraw                        1
+Wedgewood Houston (SNAP)      1
+
+</code></pre></div></div>
+
+<h3 id="234-plotting-the-urban-residents-neighborhood-and-art"><strong>2.3.4 Plotting the Urban Residents neighborhood and art</strong></h3>
+
+<p>Now you know that most art is in the
+ <strong>Urban Residents</strong>
+ neighborhood. In this exercise, you’ll create a plot of art in that neighborhood. First you will subset just the
+ <code class="language-plaintext highlighter-rouge">urban_art</code>
+ from
+ <code class="language-plaintext highlighter-rouge">neighborhood_art</code>
+ and you’ll subset the
+ <code class="language-plaintext highlighter-rouge">urban_polygon</code>
+ from
+ <code class="language-plaintext highlighter-rouge">neighborhoods</code>
+ . Then you will create a plot of the polygon as
+ <code class="language-plaintext highlighter-rouge">ax</code>
+ before adding a plot of the art.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create urban_art from neighborhood_art where the neighborhood name is Urban Residents
+</span><span class="n">urban_art</span> <span class="o">=</span> <span class="n">neighborhood_art</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">neighborhood_art</span><span class="p">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">'Urban Residents'</span><span class="p">]</span>
+
+<span class="c1"># Get just the Urban Residents neighborhood polygon and save it as urban_polygon
+</span><span class="n">urban_polygon</span> <span class="o">=</span> <span class="n">neighborhoods</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="n">neighborhoods</span><span class="p">.</span><span class="n">name</span> <span class="o">==</span> <span class="s">"Urban Residents"</span><span class="p">]</span>
+
+<span class="c1"># Plot the urban_polygon as ax
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">urban_polygon</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">'lightgreen'</span><span class="p">)</span>
+
+<span class="c1"># Add a plot of the urban_art and show it
+</span><span class="n">urban_art</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">,</span> <span class="n">column</span> <span class="o">=</span> <span class="s">'type'</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="bp">True</span><span class="p">);</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/11-1.png?w=1024" alt="Desktop View" /></p>
+
+<h1 id="3-geoseries-and-folium">3. <strong>GeoSeries and folium</strong></h1>
+
+<h2 id="31-geoseries-attributes-and-methods-i">3.1 GeoSeries attributes and methods I</h2>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/1-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/2-2.png?w=860" alt="Desktop View" /></p>
+
+<h3 id="311-find-the-area-of-the-urban-residents-neighborhood"><strong>3.1.1 Find the area of the Urban Residents neighborhood</strong></h3>
+
+<p>How big is the Urban Residents neighborhood?</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the head of the urban polygon
+</span><span class="k">print</span><span class="p">(</span><span class="n">urban_polygon</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Create a copy of the urban_polygon using EPSG:3857 and print the head
+</span><span class="n">urban_poly_3857</span> <span class="o">=</span> <span class="n">urban_polygon</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span> <span class="o">=</span> <span class="mi">3857</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">urban_poly_3857</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Print the area of urban_poly_3857 in kilometers squared
+</span><span class="n">area</span> <span class="o">=</span> <span class="n">urban_poly_3857</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="n">area</span> <span class="o">/</span> <span class="mi">10</span><span class="o">**</span><span class="mi">6</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'The area of the Urban Residents neighborhood is '</span><span class="p">,</span> <span class="n">area</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s">' km squared'</span><span class="p">)</span>
+
+<span class="s">'''
+   index             name                                           geometry
+0     41  Urban Residents  (POLYGON ((-86.78122053774267 36.1645653773768...
+   index             name                                           geometry
+0     41  Urban Residents  (POLYGON ((-9660441.280680289 4323289.00479539...
+The area of the Urban Residents neighborhood is  1.1289896057984288  km squared
+'''</span>
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="32-geoseries-attributes-and-methods-ii"><strong>3.2 GeoSeries attributes and methods II</strong></h2>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/3-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/4-2.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="321-the-center-of-the-urban-residents-neighborhood"><strong>3.2.1 The center of the Urban Residents neighborhood</strong></h3>
+
+<p>Now you’ll find the center point of the
+ <code class="language-plaintext highlighter-rouge">urban_poly_3857</code>
+ and plot it over the polygon.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create downtown_center from urban_poly_3857
+</span><span class="n">downtown_center</span> <span class="o">=</span> <span class="n">urban_poly_3857</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="n">centroid</span>
+
+<span class="c1"># Print the type of downtown_center
+</span><span class="k">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">downtown_center</span><span class="p">))</span>
+
+<span class="c1"># Plot the urban_poly_3857 as ax and add the center point
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">urban_poly_3857</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span> <span class="o">=</span> <span class="s">'lightgreen'</span><span class="p">)</span>
+<span class="n">downtown_center</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span> <span class="o">=</span> <span class="n">ax</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s">'black'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span> <span class="o">=</span> <span class="mi">45</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/5-1.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="322-prepare-to-calculate-distances"><strong>3.2.2 Prepare to calculate distances</strong></h3>
+
+<p>In this exercise you will prepare a GeoDataFrame called
+ <code class="language-plaintext highlighter-rouge">art_dist_meters</code>
+ with the locations of downtown art converted to meters using EPSG:3857. You will use
+ <code class="language-plaintext highlighter-rouge">art_dist_meters</code>
+ in the next exercise to calculate the distance of each artwork from the center of the Urban Residents neighborhood in meters.</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">art</code>
+ data is in your workspace, along with
+ <code class="language-plaintext highlighter-rouge">urban_poly_3857</code>
+ and
+ <code class="language-plaintext highlighter-rouge">center_point</code>
+ , the center point of the Urban Residents neighborhood. A geometry column called
+ <code class="language-plaintext highlighter-rouge">geometry</code>
+ that uses degrees has already been created in the
+ <code class="language-plaintext highlighter-rouge">art</code>
+ DataFrame.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+art.columns
+Index(['title', 'last_name', 'first_name', 'address', 'medium', 'type', 'desc', 'lat', 'lng', 'loc', 'geometry', 'center'], dtype='object')
+
+type(art)
+pandas.core.frame.DataFrame
+
+art.head(1)
+                     title last_name first_name                         address  medium  ...       lat      lng                   loc                                     geometry  \
+0  [Cross Country Runners]     Frost      Miley  4001 Harding Rd., Nashville TN  Bronze  ...  36.12856 -86.8366  (36.12856, -86.8366)  POINT (-9666606.09421918 4318325.479300267)
+
+                                         center
+0  POINT (-9660034.312198792 4322835.782813124)
+
+[1 rows x 12 columns]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import packages
+</span><span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="n">gpd</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+
+<span class="c1"># Create art_dist_meters using art and the geometry from art
+</span><span class="n">art_dist_meters</span> <span class="o">=</span> <span class="n">gpd</span><span class="p">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">art</span><span class="p">,</span> <span class="n">geometry</span> <span class="o">=</span> <span class="n">art</span><span class="p">.</span><span class="n">geometry</span><span class="p">,</span> <span class="n">crs</span> <span class="o">=</span> <span class="p">{</span><span class="s">'init'</span><span class="p">:</span> <span class="s">'epsg:4326'</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">art_dist_meters</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Set the crs of art_dist_meters to use EPSG:3857
+</span><span class="n">art_dist_meters</span><span class="p">.</span><span class="n">geometry</span> <span class="o">=</span> <span class="n">art_dist_meters</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span> <span class="o">=</span> <span class="mi">3857</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">art_dist_meters</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Add a column to art_meters, center
+</span><span class="n">art_dist_meters</span><span class="p">[</span><span class="s">'center'</span><span class="p">]</span> <span class="o">=</span> <span class="n">center_point</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                             title last_name first_name                            address  medium  ... desc       lat       lng                    loc                             geometry
+0          [Cross Country Runners]     Frost      Miley     4001 Harding Rd., Nashville TN  Bronze  ...  NaN  36.12856 -86.83660   (36.12856, -86.8366)            POINT (-86.8366 36.12856)
+1  [Fourth and Commerce Sculpture]    Walker        Lin  333 Commerce Street, Nashville TN     NaN  ...  NaN  36.16234 -86.77774  (36.16234, -86.77774)  POINT (-86.77774000000001 36.16234)
+
+[2 rows x 11 columns]
+
+
+                             title last_name first_name                            address  medium  ... desc       lat       lng                    loc                                      geometry
+0          [Cross Country Runners]     Frost      Miley     4001 Harding Rd., Nashville TN  Bronze  ...  NaN  36.12856 -86.83660   (36.12856, -86.8366)   POINT (-9666606.09421918 4318325.479300267)
+1  [Fourth and Commerce Sculpture]    Walker        Lin  333 Commerce Street, Nashville TN     NaN  ...  NaN  36.16234 -86.77774  (36.16234, -86.77774)  POINT (-9660053.828991087 4322982.159062029)
+
+[2 rows x 11 columns]
+
+</code></pre></div></div>
+
+<h3 id="323-art-distances-from-neighborhood-center"><strong>3.2.3 Art distances from neighborhood center</strong></h3>
+
+<p>Now that you have the center point and the art locations in the units we need to calculate distances in meters, it’s time to perform that step.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import package for pretty printing
+</span><span class="kn">import</span> <span class="nn">pprint</span>
+
+<span class="c1"># Build a dictionary of titles and distances for Urban Residents art
+</span><span class="n">art_distances</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">art_dist_meters</span><span class="p">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">vals</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">key</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="s">'title'</span><span class="p">]</span>
+    <span class="n">ctr</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="s">'center'</span><span class="p">]</span>
+    <span class="n">art_distances</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">vals</span><span class="p">[</span><span class="s">'geometry'</span><span class="p">].</span><span class="n">distance</span><span class="p">(</span><span class="n">other</span><span class="o">=</span><span class="n">ctr</span><span class="p">)</span>
+
+<span class="c1"># Pretty print the art_distances
+</span><span class="n">pprint</span><span class="p">.</span><span class="n">pprint</span><span class="p">(</span><span class="n">art_distances</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+{'12th &amp; Porter Mural': 1269.1502879119878,
+ 'A Splash of Color': 2471.774738455904,
+ 'A Story of Nashville': 513.5632030470281,
+ 'Aerial Innovations Mural': 4516.755210408422,
+ 'Airport Sun Project': 12797.594229783645,
+ 'Andrew Jackson': 948.9812821640502,
+ 'Angel': 10202.565989739454,
+ 'Anticipation': 688.8349105273556,
+......
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="33-street-maps-with-folium"><strong>3.3 Street maps with folium</strong></h2>
+
+<h3 id="331-create-a-folium-location-from-the-urban-centroid"><strong>3.3.1 Create a folium location from the urban centroid</strong></h3>
+
+<p>In order to construct a folium map of the Urban Residents neighborhood, you need to build a coordinate pair location that is formatted for folium.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the head of the urban_polygon
+</span><span class="k">print</span><span class="p">(</span><span class="n">urban_polygon</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Create urban_center from the urban_polygon center
+</span><span class="n">urban_center</span> <span class="o">=</span> <span class="n">urban_polygon</span><span class="p">.</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Print urban_center
+</span><span class="k">print</span><span class="p">(</span><span class="n">urban_center</span><span class="p">)</span>
+
+<span class="c1"># Create array for folium called urban_location
+</span><span class="n">urban_location</span> <span class="o">=</span> <span class="p">[</span><span class="n">urban_center</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">urban_center</span><span class="p">.</span><span class="n">x</span><span class="p">]</span>
+
+<span class="c1"># Print urban_location
+</span><span class="k">print</span><span class="p">(</span><span class="n">urban_location</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+       index             name                                           geometry                                        center
+    0     41  Urban Residents  (POLYGON ((-86.78122053774267 36.1645653773768...  POINT (-86.77756457127047 36.16127820928791)
+    POINT (-86.77756457127047 36.16127820928791)
+    [36.161278209287914, -86.77756457127047]
+
+</code></pre></div></div>
+
+<h3 id="332-create-a-folium-map-of-downtown-nashville"><strong>3.3.2 Create a folium map of downtown Nashville</strong></h3>
+
+<p>In this exercise you will create a street map of downtown Nashville using folium.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Construct a folium map with urban_location
+</span><span class="n">downtown_map</span> <span class="o">=</span> <span class="n">folium</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="n">urban_location</span><span class="p">,</span> <span class="n">zoom_start</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span>
+
+<span class="c1"># Display the map
+</span><span class="n">display</span><span class="p">(</span><span class="n">downtown_map</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/1-3.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="333-folium-street-map-of-the-downtown-neighborhood"><strong>3.3.3 Folium street map of the downtown neighborhood</strong></h3>
+
+<p>This time you will create the folium map of downtown and add the Urban Residents neighborhood area from
+ <code class="language-plaintext highlighter-rouge">urban_polygon</code>
+ . The
+ <code class="language-plaintext highlighter-rouge">urban_polygon</code>
+ has been printed to your console.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create array for called folium_loc from the urban_polygon center point
+</span><span class="n">point</span> <span class="o">=</span> <span class="n">urban_polygon</span><span class="p">.</span><span class="n">centroid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">folium_loc</span> <span class="o">=</span> <span class="p">[</span><span class="n">point</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">point</span><span class="p">.</span><span class="n">x</span><span class="p">]</span>
+
+<span class="c1"># Construct a map from folium_loc: downtown_map
+</span><span class="n">downtown_map</span> <span class="o">=</span> <span class="n">folium</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="n">folium_loc</span><span class="p">,</span> <span class="n">zoom_start</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span>
+
+<span class="c1"># Draw our neighborhood: Urban Residents
+</span><span class="n">folium</span><span class="p">.</span><span class="n">GeoJson</span><span class="p">(</span><span class="n">urban_polygon</span><span class="p">.</span><span class="n">geometry</span><span class="p">).</span><span class="n">add_to</span><span class="p">(</span><span class="n">downtown_map</span><span class="p">)</span>
+
+<span class="c1"># Display the map
+</span><span class="n">display</span><span class="p">(</span><span class="n">downtown_map</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/2-3.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="34-creating-markers-and-popups-in-folium"><strong>3.4 Creating markers and popups in folium</strong></h2>
+
+<h3 id="341-adding-markers-for-the-public-art"><strong>3.4.1 Adding markers for the public art</strong></h3>
+
+<p>Now that you have added the polygon for the Urban Residents neighborhood to your folium street map, it’s time to add the locations of the art within the neighborhood. You can do that by creating folium markers. Each marker needs a location assigned. Use
+ <code class="language-plaintext highlighter-rouge">iterrows()</code>
+ to loop through the data to grab the values you need.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Iterate through the urban_art and print each part of tuple returned
+</span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">urban_art</span><span class="p">.</span><span class="n">iterrows</span><span class="p">():</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">'first part: '</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+  <span class="k">print</span><span class="p">(</span><span class="s">'second part: '</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Create a location and marker with each iteration for the downtown_map
+</span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">urban_art</span><span class="p">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">row_values</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="p">[</span><span class="n">row_values</span><span class="p">[</span><span class="s">'lat'</span><span class="p">],</span> <span class="n">row_values</span><span class="p">[</span><span class="s">'lng'</span><span class="p">]]</span>
+    <span class="n">marker</span> <span class="o">=</span> <span class="n">folium</span><span class="p">.</span><span class="n">Marker</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span><span class="p">)</span>
+    <span class="n">marker</span><span class="p">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">downtown_map</span><span class="p">)</span>
+
+<span class="c1"># Display the map
+</span><span class="n">display</span><span class="p">(</span><span class="n">downtown_map</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+first part:  1
+second part:  title              [Fourth and Commerce Sculpture]
+last_name                                   Walker
+first_name                                     Lin
+address          333 Commerce Street, Nashville TN
+medium                                         NaN
+type                                     Sculpture
+desc                                           NaN
+lat                                        36.1623
+lng                                       -86.7777
+loc                          (36.16234, -86.77774)
+geometry       POINT (-86.77774000000001 36.16234)
+index_right                                     41
+name                               Urban Residents
+Name: 1, dtype: object
+
+...
+...
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/3-3.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="342-troubleshooting-data-issues"><strong>3.4.2 Troubleshooting data issues</strong></h3>
+
+<p>You will be building popups for the downtown art using the
+ <code class="language-plaintext highlighter-rouge">title</code>
+ and
+ <code class="language-plaintext highlighter-rouge">desc</code>
+ columns from the
+ <code class="language-plaintext highlighter-rouge">urban_art</code>
+ DataFrame. Here, you will inspect those columns to identify and clean up any problematic values.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the urban_art titles
+</span><span class="k">print</span><span class="p">(</span><span class="n">urban_art</span><span class="p">.</span><span class="n">title</span><span class="p">)</span>
+
+<span class="c1">#Print the urban_art descriptions
+</span><span class="k">print</span><span class="p">(</span><span class="n">urban_art</span><span class="p">.</span><span class="n">desc</span><span class="p">)</span>
+
+<span class="c1"># Replace Nan and ' values in description
+</span><span class="n">urban_art</span><span class="p">.</span><span class="n">desc</span><span class="p">.</span><span class="n">fillna</span><span class="p">(</span><span class="s">''</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">urban_art</span><span class="p">.</span><span class="n">desc</span> <span class="o">=</span> <span class="n">urban_art</span><span class="p">.</span><span class="n">desc</span><span class="p">.</span><span class="nb">str</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">"'"</span><span class="p">,</span> <span class="s">"`"</span><span class="p">)</span>
+
+<span class="c1">#Print the urban_art descriptions again
+</span><span class="k">print</span><span class="p">(</span><span class="n">urban_art</span><span class="p">.</span><span class="n">desc</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+    1                        [Fourth and Commerce Sculpture]
+    4                                   A Story of Nashville
+    21                                           Chet Atkins
+...
+    Name: title, dtype: object
+
+    1                                                    NaN
+    4      Inside the Grand Reading Room, this is a serie...
+    21     A sculpture of a young Chet Atkins seated on a...
+...
+    Name: desc, dtype: object
+
+    1
+    4      Inside the Grand Reading Room, this is a serie...
+    21     A sculpture of a young Chet Atkins seated on a...
+...
+    Name: desc, dtype: object
+
+</code></pre></div></div>
+
+<h3 id="343-a-map-of-downtown-art"><strong>3.4.3 A map of downtown art</strong></h3>
+
+<p>Now you will assign a
+ <code class="language-plaintext highlighter-rouge">popup</code>
+ to each marker to give information about the artwork at each location. In particular you will assign the art title and description to the
+ <code class="language-plaintext highlighter-rouge">popup</code>
+ for each marker. You will do so by creating the map object
+ <code class="language-plaintext highlighter-rouge">downtown_map</code>
+ , then add the popups, and finally use the
+ <code class="language-plaintext highlighter-rouge">display</code>
+ function to show your map.</p>
+
+<p>One warning before you start: you’ll need to ensure that all instances of single quotes (
+ <code class="language-plaintext highlighter-rouge">'</code>
+ ) are removed from the pop-up message, otherwise your plot will not render!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Construct downtown map
+</span><span class="n">downtown_map</span> <span class="o">=</span> <span class="n">folium</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="n">nashville</span><span class="p">,</span> <span class="n">zoom_start</span> <span class="o">=</span> <span class="mi">15</span><span class="p">)</span>
+<span class="n">folium</span><span class="p">.</span><span class="n">GeoJson</span><span class="p">(</span><span class="n">urban_polygon</span><span class="p">).</span><span class="n">add_to</span><span class="p">(</span><span class="n">downtown_map</span><span class="p">)</span>
+
+<span class="c1"># Create popups inside the loop you built to create the markers
+</span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">urban_art</span><span class="p">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">row_values</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="p">[</span><span class="n">row_values</span><span class="p">[</span><span class="s">'lat'</span><span class="p">],</span> <span class="n">row_values</span><span class="p">[</span><span class="s">'lng'</span><span class="p">]]</span>
+    <span class="n">popup</span> <span class="o">=</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">row_values</span><span class="p">[</span><span class="s">'title'</span><span class="p">])</span> <span class="o">+</span> <span class="s">': '</span> <span class="o">+</span>
+             <span class="nb">str</span><span class="p">(</span><span class="n">row_values</span><span class="p">[</span><span class="s">'desc'</span><span class="p">])).</span><span class="n">replace</span><span class="p">(</span><span class="s">"'"</span><span class="p">,</span> <span class="s">"`"</span><span class="p">)</span>
+    <span class="n">marker</span> <span class="o">=</span> <span class="n">folium</span><span class="p">.</span><span class="n">Marker</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span><span class="p">,</span> <span class="n">popup</span> <span class="o">=</span> <span class="n">popup</span><span class="p">)</span>
+    <span class="n">marker</span><span class="p">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">downtown_map</span><span class="p">)</span>
+
+<span class="c1"># Display the map.
+</span><span class="n">display</span><span class="p">(</span><span class="n">downtown_map</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/4-3.png?w=1024" alt="Desktop View" /></p>
+
+<h1 id="4-creating-a-choropleth-building-permit-density-in-nashville"><strong>4. Creating a choropleth building permit density in Nashville</strong></h1>
+<hr />
+
+<h2 id="41-what-is-a-choropleth"><strong>4.1 What is a choropleth?</strong></h2>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/5-2.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="411-finding-counts-from-a-spatial-join"><strong>4.1.1 Finding counts from a spatial join</strong></h3>
+
+<p>You will be using a dataset of the building permits issued in Nashville during 2017. This DataFrame called
+ <code class="language-plaintext highlighter-rouge">permits</code>
+ is in your workspace along with the
+ <code class="language-plaintext highlighter-rouge">council_districts</code>
+ GeoDataFrame.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+permits.head(3)
+    permit_id      issued      cost        lat        lng
+0  2017032777  2017-05-24  226201.0  36.198241 -86.742235
+1  2017061156  2017-10-23   15000.0  36.151554 -86.830222
+2  2017074521  2017-11-20   13389.0  36.034239 -86.708892
+
+
+council_districts.head(3)
+  district                                           geometry
+0        1  (POLYGON ((-86.90738248774342 36.3905151283193...
+1        2  (POLYGON ((-86.75902399986667 36.2309080000732...
+2        8  (POLYGON ((-86.72850199989709 36.2832840002146...
+
+
+council_districts.crs
+{'init': 'epsg:4326'}
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from shapely.geometry import Point
+
+# Create a shapely Point from lat and lng
+permits['geometry'] = permits.apply(lambda x: Point((x.lng , x.lat)), axis = 1)
+
+# Build a GeoDataFrame: permits_geo
+permits_geo = gpd.GeoDataFrame(permits, crs = council_districts.crs, geometry = permits.geometry)
+
+# Spatial join of permits_geo and council_districts
+permits_by_district = gpd.sjoin(permits_geo, council_districts, op = 'within')
+print(permits_by_district.head(2))
+
+# Create permit_counts
+permit_counts = permits_by_district.groupby(['district']).size()
+print(permit_counts)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+     permit_id      issued      cost        lat        lng                              geometry  index_right district
+0   2017032777  2017-05-24  226201.0  36.198241 -86.742235  POINT (-86.74223499999999 36.198241)            5        5
+68  2017053890  2017-09-05       0.0  36.185442 -86.768239  POINT (-86.76823900000001 36.185442)            5        5
+
+
+district
+1     146
+10    119
+11    239
+...
+dtype: int64
+
+</code></pre></div></div>
+
+<p>Now you have a count of building permits issued for each council district. Next you’ll get the area of each council_district.</p>
+
+<h3 id="412-council-district-areas-and-permit-counts"><strong>4.1.2 Council district areas and permit counts</strong></h3>
+
+<p>In order to create a normalized value for the building permits issued in each council district, you will need to find the area of each council district. Remember that you can leverage the
+ <code class="language-plaintext highlighter-rouge">area</code>
+ attribute of a GeoSeries to do this. You will need to convert
+ <code class="language-plaintext highlighter-rouge">permit_counts</code>
+ to a DataFrame so you can merge it with the
+ <code class="language-plaintext highlighter-rouge">council_districts</code>
+ data. Both
+ <code class="language-plaintext highlighter-rouge">permit_counts</code>
+ and
+ <code class="language-plaintext highlighter-rouge">council_districts</code>
+ are in your workspace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create an area column in council_districts
+</span><span class="n">council_districts</span><span class="p">[</span><span class="s">'area'</span><span class="p">]</span> <span class="o">=</span> <span class="n">council_districts</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="n">area</span>
+<span class="k">print</span><span class="p">(</span><span class="n">council_districts</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="s">'''
+  district                                           geometry      area
+0        1  (POLYGON ((-86.90738248774342 36.3905151283193...  0.022786
+1        2  (POLYGON ((-86.75902399986667 36.2309080000732...  0.002927
+'''</span>
+
+<span class="c1"># Convert permit_counts to a DataFrame
+</span><span class="n">permits_df</span> <span class="o">=</span> <span class="n">permit_counts</span><span class="p">.</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">permits_df</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="s">'''
+            0
+district
+1         146
+10        119
+'''</span>
+
+<span class="c1"># Reset index and column names
+</span><span class="n">permits_df</span><span class="p">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">permits_df</span><span class="p">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'district'</span><span class="p">,</span> <span class="s">'bldg_permits'</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">permits_df</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="s">'''
+  district  bldg_permits
+0        1           146
+1       10           119
+'''</span>
+
+<span class="c1"># Merge council_districts and permits_df:
+</span><span class="n">districts_and_permits</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">merge</span><span class="p">(</span><span class="n">council_districts</span><span class="p">,</span> <span class="n">permits_df</span><span class="p">,</span> <span class="n">on</span> <span class="o">=</span> <span class="s">'district'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">districts_and_permits</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="s">'''
+  district                                           geometry    bldg_permits
+0        1  (POLYGON ((-86.90738248774342 36.3905151283193...  146
+1        2  (POLYGON ((-86.75902399986667 36.2309080000732...  399
+'''</span>
+
+</code></pre></div></div>
+
+<p>You have created a column with the
+ <code class="language-plaintext highlighter-rouge">area</code>
+ in the
+ <code class="language-plaintext highlighter-rouge">council_districts</code>
+ Geo DataFrame and built a DataFrame from the
+ <code class="language-plaintext highlighter-rouge">permit_counts</code>
+ . You have merged all the information into a single GeoDataFrame. Next you will calculate the permits by area for each council district.</p>
+
+<h3 id="413-calculating-a-normalized-metric"><strong>4.1.3 Calculating a normalized metric</strong></h3>
+
+<p>Now you are ready to divide the number of building permits issued for projects in each council district by the area of that district to get a normalized value for the permits issued. First you will verify that the
+ <code class="language-plaintext highlighter-rouge">districts_and_permits</code>
+ is still a GeoDataFrame.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the type of districts_and_permits
+</span><span class="k">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">districts_and_permits</span><span class="p">))</span>
+
+<span class="c1"># Create permit_density column in districts_and_permits
+</span><span class="n">districts_and_permits</span><span class="p">[</span><span class="s">'permit_density'</span><span class="p">]</span> <span class="o">=</span> <span class="n">districts_and_permits</span><span class="p">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">row</span><span class="p">.</span><span class="n">bldg_permits</span> <span class="o">/</span> <span class="n">row</span><span class="p">.</span><span class="n">area</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Print the head of districts_and_permits
+</span><span class="k">print</span><span class="p">(</span><span class="n">districts_and_permits</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+&lt;class 'geopandas.geodataframe.GeoDataFrame'&gt;
+
+  district                                           geometry        area  bldg_permits  permit_density                                        center
+0        1  (POLYGON ((-86.9073824877434 36.39051512831934...  350.194851           146        0.416911  POINT (-86.89459869514988 36.26266635824652)
+1        2  (POLYGON ((-86.75902399986667 36.2309080000731...   44.956987           399        8.875150  POINT (-86.80270842421444 36.20859420830921)
+2        8  (POLYGON ((-86.72850199989709 36.2832840002146...   38.667932           209        5.404995   POINT (-86.7377559683446 36.24515598511006)
+3        9  (POLYGON ((-86.68680500011934 36.2867050001350...   44.295293           186        4.199092  POINT (-86.67436394441576 36.23852818463936)
+4        4  (POLYGON ((-86.74488864807593 36.0531632050230...   31.441618           139        4.420892  POINT (-86.73914087216721 36.02939641896401)
+
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="42-choropleths-with-geopandas"><strong>4.2 Choropleths with geopandas</strong></h2>
+
+<h3 id="421-geopandas-choropleths"><strong>4.2.1 Geopandas choropleths</strong></h3>
+
+<p>First you will plot a choropleth of the building permit density for each council district using the default colormap. Then you will polish it by changing the colormap and adding labels and a title.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import packages
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="n">gpd</span>
+
+<span class="c1"># Simple plot of building permit_density
+</span><span class="n">districts_and_permits</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span> <span class="o">=</span> <span class="s">'permit_density'</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="bp">True</span><span class="p">);</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">();</span>
+
+
+<span class="c1"># Polished choropleth of building permit_density
+</span><span class="n">districts_and_permits</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span> <span class="o">=</span> <span class="s">'permit_density'</span><span class="p">,</span> <span class="n">cmap</span> <span class="o">=</span> <span class="s">'BuGn'</span><span class="p">,</span> <span class="n">edgecolor</span> <span class="o">=</span> <span class="s">'black'</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'longitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'latitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span> <span class="o">=</span> <span class="s">'vertical'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'2017 Building Project Density by Council District'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">();</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/8-1.png?w=982" alt="Desktop View" />
+<img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/9-1.png?w=995" alt="Desktop View" /></p>
+
+<h3 id="422-area-in-km-squared-geometry-in-decimal-degrees"><strong>4.2.2 Area in km squared, geometry in decimal degrees</strong></h3>
+
+<p>In this exercise, you’ll start again with the
+ <code class="language-plaintext highlighter-rouge">council_districts</code>
+ GeoDataFrame and the
+ <code class="language-plaintext highlighter-rouge">permits</code>
+ DataFrame. You will change the
+ <code class="language-plaintext highlighter-rouge">council_districts</code>
+ to use the EPSG 3857 coordinate reference system before creating a column for
+ <code class="language-plaintext highlighter-rouge">area</code>
+ . Once the
+ <code class="language-plaintext highlighter-rouge">area</code>
+ column has been created, you will change the CRS back to EPSG 4326 so that the geometry is in decimal degrees.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Change council_districts crs to epsg 3857
+</span><span class="n">council_districts</span> <span class="o">=</span> <span class="n">council_districts</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span> <span class="o">=</span> <span class="mi">3857</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">council_districts</span><span class="p">.</span><span class="n">crs</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">council_districts</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Create area in square km
+</span><span class="n">sqm_to_sqkm</span> <span class="o">=</span> <span class="mi">10</span><span class="o">**</span><span class="mi">6</span>
+<span class="n">council_districts</span><span class="p">[</span><span class="s">'area'</span><span class="p">]</span> <span class="o">=</span> <span class="n">council_districts</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="n">area</span> <span class="o">/</span> <span class="n">sqm_to_sqkm</span>
+
+<span class="c1"># Change council_districts crs back to epsg 4326
+</span><span class="n">council_districts</span> <span class="o">=</span> <span class="n">council_districts</span><span class="p">.</span><span class="n">to_crs</span><span class="p">(</span><span class="n">epsg</span> <span class="o">=</span> <span class="mi">4326</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">council_districts</span><span class="p">.</span><span class="n">crs</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">council_districts</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+    {'init': 'epsg:3857', 'no_defs': True}
+      district                                           geometry
+    0        1  (POLYGON ((-9674485.564711858 4354489.55569189...
+    1        2  (POLYGON ((-9657970.37338656 4332440.649821124...
+    2        8  (POLYGON ((-9654572.679891953 4339671.15221535...
+    3        9  (POLYGON ((-9649930.991109086 4340143.58970314...
+    4        4  (POLYGON ((-9656396.83322303 4307939.01495162,...
+
+    {'init': 'epsg:4326', 'no_defs': True}
+      district                                           geometry        area
+    0        1  (POLYGON ((-86.9073824877434 36.39051512831934...  350.194851
+    1        2  (POLYGON ((-86.75902399986667 36.2309080000731...   44.956987
+    2        8  (POLYGON ((-86.72850199989709 36.2832840002146...   38.667932
+    3        9  (POLYGON ((-86.68680500011934 36.2867050001350...   44.295293
+    4        4  (POLYGON ((-86.74488864807593 36.0531632050230...   31.441618
+
+</code></pre></div></div>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">council_districts</code>
+ have
+ <code class="language-plaintext highlighter-rouge">area</code>
+ in kilometers squared and
+ <code class="language-plaintext highlighter-rouge">geometry</code>
+ measures in decimal degrees.</p>
+
+<h3 id="423-spatially-joining-and-getting-counts"><strong>4.2.3 Spatially joining and getting counts</strong></h3>
+
+<p>You will continue preparing your dataset for plotting a
+ <code class="language-plaintext highlighter-rouge">geopandas</code>
+ choropleth by creating a GeoDataFrame of the building permits spatially joined to the council districts. After that, you will be able to get counts of the building permits issued in each council district.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create permits_geo
+</span><span class="n">permits_geo</span> <span class="o">=</span> <span class="n">gpd</span><span class="p">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">permits</span><span class="p">,</span> <span class="n">crs</span> <span class="o">=</span> <span class="n">council_districts</span><span class="p">.</span><span class="n">crs</span><span class="p">,</span> <span class="n">geometry</span> <span class="o">=</span> <span class="n">permits</span><span class="p">.</span><span class="n">geometry</span><span class="p">)</span>
+
+<span class="c1"># Spatially join permits_geo and council_districts
+</span><span class="n">permits_by_district</span> <span class="o">=</span> <span class="n">gpd</span><span class="p">.</span><span class="n">sjoin</span><span class="p">(</span><span class="n">permits_geo</span><span class="p">,</span> <span class="n">council_districts</span><span class="p">,</span> <span class="n">op</span> <span class="o">=</span> <span class="s">'within'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">permits_by_district</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Count permits in each district
+</span><span class="n">permit_counts</span> <span class="o">=</span> <span class="n">permits_by_district</span><span class="p">.</span><span class="n">groupby</span><span class="p">(</span><span class="s">'district'</span><span class="p">).</span><span class="n">size</span><span class="p">()</span>
+
+<span class="c1"># Convert permit_counts to a df with 2 columns: district and bldg_permits
+</span><span class="n">counts_df</span> <span class="o">=</span> <span class="n">permit_counts</span><span class="p">.</span><span class="n">to_frame</span><span class="p">()</span>
+<span class="n">counts_df</span><span class="p">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">counts_df</span><span class="p">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s">'district'</span><span class="p">,</span> <span class="s">'bldg_permits'</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">counts_df</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+     permit_id      issued      cost        lat        lng                              geometry  index_right district       area
+0   2017032777  2017-05-24  226201.0  36.198241 -86.742235  POINT (-86.74223499999999 36.198241)            5        5  19.030612
+68  2017053890  2017-09-05       0.0  36.185442 -86.768239  POINT (-86.76823900000001 36.185442)            5        5  19.030612
+
+
+  district  bldg_permits
+0        1           146
+1       10           119
+
+</code></pre></div></div>
+
+<h3 id="424-building-a-polished-geopandas-choropleth"><strong>4.2.4 Building a polished Geopandas choropleth</strong></h3>
+
+<p>After merging the
+ <code class="language-plaintext highlighter-rouge">counts_df</code>
+ with
+ <code class="language-plaintext highlighter-rouge">permits_by_district</code>
+ , you will create a column with normalized
+ <code class="language-plaintext highlighter-rouge">permit_density</code>
+ by dividing the count of permits in each council district by the area of that council district. Then you will plot your final
+ <code class="language-plaintext highlighter-rouge">geopandas</code>
+ choropleth of the building projects in each council district.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Merge permits_by_district and counts_df
+</span><span class="n">districts_and_permits</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">merge</span><span class="p">(</span><span class="n">permits_by_district</span><span class="p">,</span> <span class="n">counts_df</span><span class="p">,</span> <span class="n">on</span> <span class="o">=</span> <span class="s">'district'</span><span class="p">)</span>
+
+<span class="c1"># Create permit_density column
+</span><span class="n">districts_and_permits</span><span class="p">[</span><span class="s">'permit_density'</span><span class="p">]</span> <span class="o">=</span> <span class="n">districts_and_permits</span><span class="p">.</span><span class="nb">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">row</span><span class="p">.</span><span class="n">bldg_permits</span> <span class="o">/</span> <span class="n">row</span><span class="p">.</span><span class="n">area</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">districts_and_permits</span><span class="p">.</span><span class="n">head</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Create choropleth plot
+</span><span class="n">districts_and_permits</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">column</span> <span class="o">=</span> <span class="s">'permit_density'</span><span class="p">,</span> <span class="n">cmap</span> <span class="o">=</span> <span class="s">'OrRd'</span><span class="p">,</span> <span class="n">edgecolor</span> <span class="o">=</span> <span class="s">'black'</span><span class="p">,</span> <span class="n">legend</span> <span class="o">=</span> <span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Add axis labels and title
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'longitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'latitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'2017 Building Project Density by Council District'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/10-1.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="43-choropleths-with-folium"><strong>4.3 Choropleths with folium</strong></h2>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/11-2.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="431-folium-choropleth"><strong>4.3.1 Folium choropleth</strong></h3>
+
+<p>In this exercise, you will construct a folium choropleth to show the density of permitted construction projects in different Nashville council districts. You will be using a single data source, the
+ <code class="language-plaintext highlighter-rouge">districts_and_permits</code>
+ GeoDataFrame, which is in your workspace.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+districts_and_permits.head(1)
+  district                                           geometry        area  bldg_permits  permit_density
+0        1  (POLYGON ((-86.9073824877434 36.39051512831934...  350.194851           146        0.416911
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Center point for Nashville
+</span><span class="n">nashville</span> <span class="o">=</span> <span class="p">[</span><span class="mf">36.1636</span><span class="p">,</span><span class="o">-</span><span class="mf">86.7823</span><span class="p">]</span>
+
+<span class="c1"># Create map
+</span><span class="n">m</span> <span class="o">=</span> <span class="n">folium</span><span class="p">.</span><span class="n">Map</span><span class="p">(</span><span class="n">location</span><span class="o">=</span><span class="n">nashville</span><span class="p">,</span> <span class="n">zoom_start</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Build choropleth
+</span><span class="n">m</span><span class="p">.</span><span class="n">choropleth</span><span class="p">(</span>
+    <span class="n">geo_data</span><span class="o">=</span><span class="n">districts_and_permits</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s">'geometry'</span><span class="p">,</span>
+    <span class="n">data</span><span class="o">=</span><span class="n">districts_and_permits</span><span class="p">,</span>
+    <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'district'</span><span class="p">,</span> <span class="s">'permit_density'</span><span class="p">],</span>
+    <span class="n">key_on</span><span class="o">=</span><span class="s">'feature.properties.district'</span><span class="p">,</span>
+    <span class="n">fill_color</span><span class="o">=</span><span class="s">'Reds'</span><span class="p">,</span>
+    <span class="n">fill_opacity</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">line_opacity</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">legend_name</span><span class="o">=</span><span class="s">'2017 Permitted Building Projects per km squared'</span>
+<span class="p">)</span>
+
+<span class="c1"># Create LayerControl and add it to the map
+</span><span class="n">folium</span><span class="p">.</span><span class="n">LayerControl</span><span class="p">().</span><span class="n">add_to</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+<span class="c1"># Display the map
+</span><span class="n">display</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/12-1.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="432-folium-choropleth-with-markers-and-popups"><strong>4.3.2 Folium choropleth with markers and popups</strong></h3>
+
+<p>Now you will add a marker to the center of each council district that shows the district number along with the count of building permits issued in 2017 for that district. The map you created in the last exercise is in your workspace as
+ <code class="language-plaintext highlighter-rouge">m</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create center column for the centroid of each district
+</span><span class="n">districts_and_permits</span><span class="p">[</span><span class="s">'center'</span><span class="p">]</span> <span class="o">=</span> <span class="n">districts_and_permits</span><span class="p">.</span><span class="n">geometry</span><span class="p">.</span><span class="n">centroid</span>
+
+<span class="c1"># Build markers and popups
+</span><span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">districts_and_permits</span><span class="p">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">row_values</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">center_point</span> <span class="o">=</span> <span class="n">row_values</span><span class="p">[</span><span class="s">'center'</span><span class="p">]</span>
+    <span class="n">location</span> <span class="o">=</span> <span class="p">[</span><span class="n">center_point</span><span class="p">.</span><span class="n">y</span><span class="p">,</span> <span class="n">center_point</span><span class="p">.</span><span class="n">x</span><span class="p">]</span>
+    <span class="n">popup</span> <span class="o">=</span> <span class="p">(</span><span class="s">'Council District: '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row_values</span><span class="p">[</span><span class="s">'district'</span><span class="p">])</span> <span class="o">+</span>
+             <span class="s">';  '</span> <span class="o">+</span> <span class="s">'permits issued: '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">row_values</span><span class="p">[</span><span class="s">'bldg_permits'</span><span class="p">]))</span>
+    <span class="n">marker</span> <span class="o">=</span> <span class="n">folium</span><span class="p">.</span><span class="n">Marker</span><span class="p">(</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span><span class="p">,</span> <span class="n">popup</span> <span class="o">=</span> <span class="n">popup</span><span class="p">)</span>
+    <span class="n">marker</span><span class="p">.</span><span class="n">add_to</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+<span class="c1"># Display the map
+</span><span class="n">display</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/visualizing-geospatial-data-in-python/13-1.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

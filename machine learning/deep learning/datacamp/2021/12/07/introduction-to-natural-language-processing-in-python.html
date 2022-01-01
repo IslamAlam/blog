@@ -1,0 +1,1651 @@
+<h1 id="introduction-to-natural-language-processing-in-python">Introduction to Natural Language Processing in Python</h1>
+
+<p>This is the memo of the 12th course (23 courses in all) of ‘Machine Learning Scientist with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/natural-language-processing-fundamentals-in-python">HERE</a></strong>
+ .</p>
+
+<p>reference:
+ <strong><a href="https://www.nltk.org/">Natural Language Toolkit</a></strong></p>
+
+<p>###
+<strong>Course Description</strong></p>
+
+<p>In this course, you’ll learn natural language processing (NLP) basics, such as how to identify and separate words, how to extract topics in a text, and how to build your own fake news classifier. You’ll also learn how to use basic libraries such as NLTK, alongside libraries which utilize deep learning to solve common NLP problems. This course will give you the foundation to process and parse text as you move forward in your Python learning.</p>
+
+<p>###
+<strong>Table of contents</strong></p>
+
+<ul>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/14/introduction-to-natural-language-processing-in-python-from-datacamp/">Regular expressions &amp; word tokenization</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/14/introduction-to-natural-language-processing-in-python-from-datacamp/2/">Simple topic identification</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/14/introduction-to-natural-language-processing-in-python-from-datacamp/3/">Named-entity recognition</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2020/01/14/introduction-to-natural-language-processing-in-python-from-datacamp/4/">Building a “fake news” classifier</a></li>
+</ul>
+
+<h1 id="1-regular-expressions--word-tokenization"><strong>1. Regular expressions &amp; word tokenization</strong></h1>
+<hr />
+
+<h2 id="11-introduction-to-regular-expressions"><strong>1.1 Introduction to regular expressions</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/1-6.png?w=954" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/2-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/3-6.png?w=780" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/4-6.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="111-which-pattern"><strong>1.1.1 Which pattern?</strong></h3>
+
+<p>Which of the following Regex patterns results in the following text?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+&gt;&gt;&gt; my_string = "Let's write RegEx!"
+&gt;&gt;&gt; re.findall(PATTERN, my_string)
+['Let', 's', 'write', 'RegEx']
+
+
+</code></pre></div></div>
+
+<p>In the IPython Shell, try replacing
+ <code class="language-plaintext highlighter-rouge">PATTERN</code>
+ with one of the below options and observe the resulting output. The
+ <code class="language-plaintext highlighter-rouge">re</code>
+ module has been pre-imported for you and
+ <code class="language-plaintext highlighter-rouge">my_string</code>
+ is available in your namespace.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+PATTERN = r"\w+"
+
+In [2]: re.findall(PATTERN, my_string)
+Out[2]: ['Let', 's', 'write', 'RegEx']
+
+</code></pre></div></div>
+
+<h3 id="112-practicing-regular-expressions-resplit-and-refindall"><strong>1.1.2 Practicing regular expressions: re.split() and re.findall()</strong></h3>
+
+<p>Now you’ll get a chance to write some regular expressions to match digits, strings and non-alphanumeric characters. Take a look at
+ <code class="language-plaintext highlighter-rouge">my_string</code>
+ first by printing it in the IPython Shell, to determine how you might best match the different steps.</p>
+
+<p>Note: It’s important to prefix your regex patterns with
+ <code class="language-plaintext highlighter-rouge">r</code>
+ to ensure that your patterns are interpreted in the way you want them to. Else, you may encounter problems to do with escape sequences in strings. For example,
+ <code class="language-plaintext highlighter-rouge">"\n"</code>
+ in Python is used to indicate a new line, but if you use the
+ <code class="language-plaintext highlighter-rouge">r</code>
+ prefix, it will be interpreted as the raw string
+ <code class="language-plaintext highlighter-rouge">"\n"</code>
+ – that is, the character
+ <code class="language-plaintext highlighter-rouge">"\"</code>
+ followed by the character
+ <code class="language-plaintext highlighter-rouge">"n"</code>
+ – and not as a new line.</p>
+
+<p>The regular expression module
+ <code class="language-plaintext highlighter-rouge">re</code>
+ has already been imported for you.</p>
+
+<p><em>Remember from the video that the syntax for the regex library is to always to pass the
+ <strong>pattern first</strong>
+ , and then the
+ <strong>string second</strong>
+ .</em></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+my_string
+"Let's write RegEx!  Won't that be fun?  I sure think so.  Can you find 4 sentences?  Or perhaps, all 19 words?"
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Write a pattern to match sentence endings: sentence_endings
+</span><span class="n">sentence_endings</span> <span class="o">=</span> <span class="sa">r</span><span class="s">"[.?!]"</span>
+
+<span class="c1"># Split my_string on sentence endings and print the result
+</span><span class="k">print</span><span class="p">(</span><span class="n">re</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">sentence_endings</span><span class="p">,</span> <span class="n">my_string</span><span class="p">))</span>
+<span class="c1"># ["Let's write RegEx", "  Won't that be fun", '  I sure think so', '  Can you find 4 sentences', '  Or perhaps, all 19 words', '']
+</span>
+
+<span class="c1"># Find all capitalized words in my_string and print the result
+</span><span class="n">capitalized_words</span> <span class="o">=</span> <span class="sa">r</span><span class="s">"[A-Z]\w+"</span>
+<span class="k">print</span><span class="p">(</span><span class="n">re</span><span class="p">.</span><span class="n">findall</span><span class="p">(</span><span class="n">capitalized_words</span><span class="p">,</span> <span class="n">my_string</span><span class="p">))</span>
+<span class="c1"># ['Let', 'RegEx', 'Won', 'Can', 'Or']
+</span>
+
+<span class="c1"># Split my_string on spaces and print the result
+</span><span class="n">spaces</span> <span class="o">=</span> <span class="sa">r</span><span class="s">"\s+"</span>
+<span class="k">print</span><span class="p">(</span><span class="n">re</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">spaces</span><span class="p">,</span> <span class="n">my_string</span><span class="p">))</span>
+<span class="c1"># ["Let's", 'write', 'RegEx!', "Won't", 'that', 'be', 'fun?', 'I', 'sure', 'think', 'so.', 'Can', 'you', 'find', '4', 'sentences?', 'Or', 'perhaps,', 'all', '19', 'words?']
+</span>
+
+<span class="c1"># Find all digits in my_string and print the result
+</span><span class="n">digits</span> <span class="o">=</span> <span class="sa">r</span><span class="s">"\d+"</span>
+<span class="k">print</span><span class="p">(</span><span class="n">re</span><span class="p">.</span><span class="n">findall</span><span class="p">(</span><span class="n">digits</span><span class="p">,</span> <span class="n">my_string</span><span class="p">))</span>
+<span class="c1"># ['4', '19']
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="12-introduction-to-tokenization"><strong>1.2 Introduction to tokenization</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/5-6.png?w=985" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/6-6.png?w=593" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/7-6.png?w=755" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/8-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/9-6.png?w=790" alt="Desktop View" /></p>
+
+<h3 id="121-word-tokenization-with-nltk"><strong>1.2.1 Word tokenization with NLTK</strong></h3>
+
+<p>Here, you’ll be using the first scene of Monty Python’s Holy Grail, which has been pre-loaded as
+ <code class="language-plaintext highlighter-rouge">scene_one</code>
+ . Feel free to check it out in the IPython Shell!</p>
+
+<p>Your job in this exercise is to utilize
+ <code class="language-plaintext highlighter-rouge">word_tokenize</code>
+ and
+ <code class="language-plaintext highlighter-rouge">sent_tokenize</code>
+ from
+ <code class="language-plaintext highlighter-rouge">nltk.tokenize</code>
+ to tokenize both words and sentences from Python strings – in this case, the first scene of Monty Python’s Holy Grail.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+scene_one
+"SCENE 1: [wind] [clop clop clop] \nKING ARTHUR: Whoa there!  [clop clop clop] \nSOLDIER #1: Halt!  Who goes there?\nARTHUR: It is I, Arthur, son of
+...
+creeper!\nSOLDIER #1: What, held under the dorsal guiding feathers?\nSOLDIER #2: Well, why not?\n"
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import necessary modules
+</span><span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">sent_tokenize</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">word_tokenize</span>
+
+<span class="c1"># Split scene_one into sentences: sentences
+</span><span class="n">sentences</span> <span class="o">=</span> <span class="n">sent_tokenize</span><span class="p">(</span><span class="n">scene_one</span><span class="p">)</span>
+
+<span class="c1"># Use word_tokenize to tokenize the fourth sentence: tokenized_sent
+</span><span class="n">tokenized_sent</span> <span class="o">=</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">sentences</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="c1"># Make a set of unique tokens in the entire scene: unique_tokens
+</span><span class="n">unique_tokens</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">word_tokenize</span><span class="p">(</span><span class="n">scene_one</span><span class="p">))</span>
+
+<span class="c1"># Print the unique tokens result
+</span><span class="k">print</span><span class="p">(</span><span class="n">unique_tokens</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+{'ridden', 'bird', 'King', 'winter', 'right', 'under', 'needs', 'them', 'with', 'use', 'Mercea', 'simple', 'No', '!', 'Ridden', 'Pendragon',
+...
+'minute', 'Whoa', '...', "'m", '[', '#', 'will', "'ve", 'an', 'In', 'interested', 'England', "'re"}
+
+</code></pre></div></div>
+
+<p>Excellent! Tokenization is fundamental to NLP, and you’ll end up using it a lot in text mining and information retrieval projects.</p>
+
+<h3 id="122-more-regex-with-research"><strong>1.2.2 More regex with re.search()</strong></h3>
+
+<p>In this exercise, you’ll utilize
+ <code class="language-plaintext highlighter-rouge">re.search()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">re.match()</code>
+ to find specific tokens. Both
+ <code class="language-plaintext highlighter-rouge">search</code>
+ and
+ <code class="language-plaintext highlighter-rouge">match</code>
+ expect regex patterns, similar to those you defined in an earlier exercise. You’ll apply these regex library methods to the same Monty Python text from the
+ <code class="language-plaintext highlighter-rouge">nltk</code>
+ corpora.</p>
+
+<p>You have both
+ <code class="language-plaintext highlighter-rouge">scene_one</code>
+ and
+ <code class="language-plaintext highlighter-rouge">sentences</code>
+ available from the last exercise; now you can use them with
+ <code class="language-plaintext highlighter-rouge">re.search()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">re.match()</code>
+ to extract and match more text.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Search for the first occurrence of "coconuts" in scene_one: match
+</span><span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="s">"coconuts"</span><span class="p">,</span> <span class="n">scene_one</span><span class="p">)</span>
+
+<span class="c1"># Print the start and end indexes of match
+</span><span class="k">print</span><span class="p">(</span><span class="n">match</span><span class="p">.</span><span class="n">start</span><span class="p">(),</span> <span class="n">match</span><span class="p">.</span><span class="n">end</span><span class="p">())</span>
+<span class="c1"># 580 588
+</span>
+
+<span class="c1"># Write a regular expression to search for anything in square brackets: pattern1
+</span><span class="n">pattern1</span> <span class="o">=</span> <span class="sa">r</span><span class="s">"\[.*]"</span>
+
+<span class="c1"># Use re.search to find the first text in square brackets
+</span><span class="k">print</span><span class="p">(</span><span class="n">re</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern1</span><span class="p">,</span> <span class="n">scene_one</span><span class="p">))</span>
+<span class="c1"># &lt;_sre.SRE_Match object; span=(9, 32), match='[wind] [clop clop clop]'&gt;
+</span>
+
+<span class="c1"># Find the script notation at the beginning of the fourth sentence and print it
+</span><span class="n">pattern2</span> <span class="o">=</span> <span class="sa">r</span><span class="s">"[\w\s]+:"</span>
+<span class="k">print</span><span class="p">(</span><span class="n">re</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="n">pattern2</span><span class="p">,</span> <span class="n">sentences</span><span class="p">[</span><span class="mi">3</span><span class="p">]))</span>
+<span class="c1"># &lt;_sre.SRE_Match object; span=(0, 7), match='ARTHUR:'&gt;
+</span>
+</code></pre></div></div>
+
+<p>Fantastic work! Now that you’re familiar with the basics of tokenization and regular expressions, it’s time to learn about more advanced tokenization.</p>
+
+<hr />
+
+<h2 id="13-advanced-tokenization-with-nltk-and-regex"><strong>1.3 Advanced tokenization with NLTK and regex</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/1-7.png?w=814" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/2-7.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/3-7.png?w=857" alt="Desktop View" /></p>
+
+<h3 id="131-choosing-a-tokenizer"><strong>1.3.1 Choosing a tokenizer</strong></h3>
+
+<p>Given the following string, which of the below patterns is the best tokenizer? If possible, you want to retain sentence punctuation as separate tokens, but have
+ <code class="language-plaintext highlighter-rouge">'#1'</code>
+ remain a single token.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+my_string = "SOLDIER #1: Found them? In Mercea? The coconut's tropical!"
+
+</code></pre></div></div>
+
+<p>The string is available in your workspace as
+ <code class="language-plaintext highlighter-rouge">my_string</code>
+ , and the patterns have been pre-loaded as
+ <code class="language-plaintext highlighter-rouge">pattern1</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">pattern2</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">pattern3</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">pattern4</code>
+ , respectively.</p>
+
+<p>Additionally,
+ <code class="language-plaintext highlighter-rouge">regexp_tokenize</code>
+ has been imported from
+ <code class="language-plaintext highlighter-rouge">nltk.tokenize</code>
+ . You can use
+ <code class="language-plaintext highlighter-rouge">regexp_tokenize(string, pattern)</code>
+ with
+ <code class="language-plaintext highlighter-rouge">my_string</code>
+ and one of the patterns as arguments to experiment for yourself and see which is the best tokenizer.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+my_string
+# "SOLDIER #1: Found them? In Mercea? The coconut's tropical!"
+
+pattern2
+# '(\\w+|#\\d|\\?|!)'
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+regexp_tokenize(my_string, pattern2)
+['SOLDIER',
+ '#1',
+ 'Found',
+ 'them',
+ '?',
+ 'In',
+ 'Mercea',
+ '?',
+ 'The',
+ 'coconut',
+ 's',
+ 'tropical',
+ '!']
+
+</code></pre></div></div>
+
+<h3 id="132-regex-with-nltk-tokenization"><strong>1.3.2 Regex with NLTK tokenization</strong></h3>
+
+<p>Twitter is a frequently used source for NLP text and tasks. In this exercise, you’ll build a more complex tokenizer for tweets with hashtags and mentions using
+ <code class="language-plaintext highlighter-rouge">nltk</code>
+ and regex. The
+ <code class="language-plaintext highlighter-rouge">nltk.tokenize.TweetTokenizer</code>
+ class gives you some extra methods and attributes for parsing tweets.</p>
+
+<p>Here, you’re given some example tweets to parse using both
+ <code class="language-plaintext highlighter-rouge">TweetTokenizer</code>
+ and
+ <code class="language-plaintext highlighter-rouge">regexp_tokenize</code>
+ from the
+ <code class="language-plaintext highlighter-rouge">nltk.tokenize</code>
+ module. These example tweets have been pre-loaded into the variable
+ <code class="language-plaintext highlighter-rouge">tweets</code>
+ . Feel free to explore it in the IPython Shell!</p>
+
+<p><em>Unlike the syntax for the regex library, with
+ <code class="language-plaintext highlighter-rouge">nltk_tokenize()</code>
+ you pass the pattern as the
+ <strong>second</strong>
+ argument.</em></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+tweets[0]
+'This is the best #nlp exercise ive found online! #python'
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the necessary modules
+</span><span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">regexp_tokenize</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">TweetTokenizer</span>
+
+<span class="c1"># Define a regex pattern to find hashtags: pattern1
+</span><span class="n">pattern1</span> <span class="o">=</span> <span class="sa">r</span><span class="s">"#\w+"</span>
+<span class="c1"># Use the pattern on the first tweet in the tweets list
+</span><span class="n">hashtags</span> <span class="o">=</span> <span class="n">regexp_tokenize</span><span class="p">(</span><span class="n">tweets</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">pattern1</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">hashtags</span><span class="p">)</span>
+<span class="p">[</span><span class="s">'#nlp'</span><span class="p">,</span> <span class="s">'#python'</span><span class="p">]</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+tweets[-1]
+'Thanks @datacamp 🙂 #nlp #python'
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the necessary modules
+</span><span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">regexp_tokenize</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">TweetTokenizer</span>
+<span class="c1"># Write a pattern that matches both mentions (@) and hashtags
+</span><span class="n">pattern2</span> <span class="o">=</span> <span class="sa">r</span><span class="s">"([@#]\w+)"</span>
+<span class="c1"># Use the pattern on the last tweet in the tweets list
+</span><span class="n">mentions_hashtags</span> <span class="o">=</span> <span class="n">regexp_tokenize</span><span class="p">(</span><span class="n">tweets</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">pattern2</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">mentions_hashtags</span><span class="p">)</span>
+<span class="c1"># ['@datacamp', '#nlp', '#python']
+</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+tweets
+['This is the best #nlp exercise ive found online! #python',
+ '#NLP is super fun! ❤ #learning',
+ 'Thanks @datacamp 🙂 #nlp #python']
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the necessary modules
+</span><span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">regexp_tokenize</span>
+<span class="kn">from</span> <span class="nn">nltk.tokenize</span> <span class="kn">import</span> <span class="n">TweetTokenizer</span>
+<span class="c1"># Use the TweetTokenizer to tokenize all tweets into one list
+</span><span class="n">tknzr</span> <span class="o">=</span> <span class="n">TweetTokenizer</span><span class="p">()</span>
+<span class="n">all_tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">tknzr</span><span class="p">.</span><span class="n">tokenize</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tweets</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">all_tokens</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[['This', 'is', 'the', 'best', '#nlp', 'exercise', 'ive', 'found', 'online', '!', '#python'], ['#NLP', 'is', 'super', 'fun', '!', '&lt;3', '#learning'], ['Thanks', '@datacamp', ':)', '#nlp', '#python']]
+
+</code></pre></div></div>
+
+<h3 id="133-non-ascii-tokenization"><strong>1.3.3 Non-ascii tokenization</strong></h3>
+
+<p>In this exercise, you’ll practice advanced tokenization by tokenizing some non-ascii based text. You’ll be using German with emoji!</p>
+
+<p>Here, you have access to a string called
+ <code class="language-plaintext highlighter-rouge">german_text</code>
+ , which has been printed for you in the Shell. Notice the emoji and the German characters!</p>
+
+<p>The following modules have been pre-imported from
+ <code class="language-plaintext highlighter-rouge">nltk.tokenize</code>
+ :
+ <code class="language-plaintext highlighter-rouge">regexp_tokenize</code>
+ and
+ <code class="language-plaintext highlighter-rouge">word_tokenize</code>
+ .</p>
+
+<p>Unicode ranges for emoji are:</p>
+
+<p><code class="language-plaintext highlighter-rouge">('\U0001F300'-'\U0001F5FF')</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">('\U0001F600-\U0001F64F')</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">('\U0001F680-\U0001F6FF')</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">('\u2600'-\u26FF-\u2700-\u27BF')</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+german_text
+'Wann gehen wir Pizza essen? 🍕 Und fährst du mit Über? 🚕'
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Tokenize and print all words in german_text
+</span><span class="n">all_words</span> <span class="o">=</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">german_text</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">all_words</span><span class="p">)</span>
+<span class="p">[</span><span class="s">'Wann'</span><span class="p">,</span> <span class="s">'gehen'</span><span class="p">,</span> <span class="s">'wir'</span><span class="p">,</span> <span class="s">'Pizza'</span><span class="p">,</span> <span class="s">'essen'</span><span class="p">,</span> <span class="s">'?'</span><span class="p">,</span> <span class="s">'🍕'</span><span class="p">,</span> <span class="s">'Und'</span><span class="p">,</span> <span class="s">'fährst'</span><span class="p">,</span> <span class="s">'du'</span><span class="p">,</span> <span class="s">'mit'</span><span class="p">,</span> <span class="s">'Über'</span><span class="p">,</span> <span class="s">'?'</span><span class="p">,</span> <span class="s">'🚕'</span><span class="p">]</span>
+
+<span class="c1"># Tokenize and print only capital words
+</span><span class="n">capital_words</span> <span class="o">=</span> <span class="sa">r</span><span class="s">"[A-ZÜ]\w+"</span>
+<span class="k">print</span><span class="p">(</span><span class="n">regexp_tokenize</span><span class="p">(</span><span class="n">german_text</span><span class="p">,</span> <span class="n">capital_words</span><span class="p">))</span>
+<span class="p">[</span><span class="s">'Wann'</span><span class="p">,</span> <span class="s">'Pizza'</span><span class="p">,</span> <span class="s">'Und'</span><span class="p">,</span> <span class="s">'Über'</span><span class="p">]</span>
+
+
+<span class="c1"># Tokenize and print only emoji
+</span><span class="n">emoji</span> <span class="o">=</span> <span class="s">"['</span><span class="se">\U0001F300</span><span class="s">-</span><span class="se">\U0001F5FF</span><span class="s">'|'</span><span class="se">\U0001F600</span><span class="s">-</span><span class="se">\U0001F64F</span><span class="s">'|'</span><span class="se">\U0001F680</span><span class="s">-</span><span class="se">\U0001F6FF</span><span class="s">'|'</span><span class="se">\u2600</span><span class="s">-</span><span class="se">\u26FF\u2700</span><span class="s">-</span><span class="se">\u27BF</span><span class="s">']"</span>
+<span class="k">print</span><span class="p">(</span><span class="n">regexp_tokenize</span><span class="p">(</span><span class="n">german_text</span><span class="p">,</span> <span class="n">emoji</span><span class="p">))</span>
+<span class="p">[</span><span class="s">'🍕'</span><span class="p">,</span> <span class="s">'🚕'</span><span class="p">]</span>
+
+
+</code></pre></div></div>
+
+<h2 id="14-charting-word-length-with-nltk"><strong>1.4 Charting word length with NLTK</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/4-7.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/5-7.png?w=896" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/6-7.png?w=539" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/7-7.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/8-7.png?w=861" alt="Desktop View" /></p>
+
+<h1 id="charting-practice">Charting practice</h1>
+
+<p>Try using your new skills to find and chart the number of words per line in the script using
+ <code class="language-plaintext highlighter-rouge">matplotlib</code>
+ . The Holy Grail script is loaded for you, and you need to use regex to find the words per line.</p>
+
+<p>Using list comprehensions here will speed up your computations. For example:
+ <code class="language-plaintext highlighter-rouge">my_lines = [tokenize(l) for l in lines]</code>
+ will call a function
+ <code class="language-plaintext highlighter-rouge">tokenize</code>
+ on each line in the list
+ <code class="language-plaintext highlighter-rouge">lines</code>
+ . The new transformed list will be saved in the
+ <code class="language-plaintext highlighter-rouge">my_lines</code>
+ variable.</p>
+
+<p>You have access to the entire script in the variable
+ <code class="language-plaintext highlighter-rouge">holy_grail</code>
+ . Go for it!</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+holy_grail
+"SCENE 1: [wind] [clop clop clop] \nKING ARTHUR: Whoa there!  [clop clop clop] \nSOLDIER #1: Halt!  Who goes there?\nARTHUR: It is I, Arthur,
+...
+ along.\nINSPECTOR: Everything? [squeak] \nOFFICER #1: All right, sonny.  That's enough.  Just pack that in. [crash] \nCAMERAMAN: Christ!\n"
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Split the script into lines: lines
+</span><span class="n">lines</span> <span class="o">=</span> <span class="n">holy_grail</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+
+<span class="c1"># Replace all script lines for speaker
+</span><span class="n">pattern</span> <span class="o">=</span> <span class="s">"[A-Z]{2,}(\s)?(#\d)?([A-Z]{2,})?:"</span>
+<span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">re</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="s">''</span><span class="p">,</span> <span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+
+<span class="c1"># Tokenize each line: tokenized_lines
+</span><span class="n">tokenized_lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">regexp_tokenize</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="s">'\w+'</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">]</span>
+
+<span class="c1"># Make a frequency list of lengths: line_num_words
+</span><span class="n">line_num_words</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">t_line</span><span class="p">)</span> <span class="k">for</span> <span class="n">t_line</span> <span class="ow">in</span> <span class="n">tokenized_lines</span><span class="p">]</span>
+
+<span class="c1"># Plot a histogram of the line lengths
+</span><span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">line_num_words</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/9-7.png?w=1024" alt="Desktop View" /></p>
+
+<h1 id="2-simple-topic-identification"><strong>2. Simple topic identification</strong></h1>
+<hr />
+
+<h2 id="21-word-counts-with-bag-of-words"><strong>2.1 Word counts with bag-of-words</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/10-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/11-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/12-6.png?w=802" alt="Desktop View" /></p>
+
+<h3 id="211-bag-of-words-picker"><strong>2.1.1 Bag-of-words picker</strong></h3>
+
+<p>It’s time for a quick check on your understanding of bag-of-words. Which of the below options, with basic
+ <code class="language-plaintext highlighter-rouge">nltk</code>
+ tokenization, map the bag-of-words for the following text?</p>
+
+<p>“The cat is in the box. The cat box.”</p>
+
+<p><strong>(‘The’, 2), (‘box’, 2), (‘.’, 2), (‘cat’, 2), (‘is’, 1), (‘in’, 1), (‘the’, 1)</strong></p>
+
+<h3 id="212-building-a-counter-with-bag-of-words"><strong>2.1.2 Building a Counter with bag-of-words</strong></h3>
+
+<p>In this exercise, you’ll build your first (in this course) bag-of-words counter using a Wikipedia article, which has been pre-loaded as
+ <code class="language-plaintext highlighter-rouge">article</code>
+ . Try doing the bag-of-words without looking at the full article text, and guessing what the topic is! If you’d like to peek at the title at the end, we’ve included it as
+ <code class="language-plaintext highlighter-rouge">article_title</code>
+ . Note that this article text has had very little preprocessing from the raw Wikipedia database entry.</p>
+
+<p><code class="language-plaintext highlighter-rouge">word_tokenize</code>
+ has been imported for you.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import Counter
+</span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+
+<span class="c1"># Tokenize the article: tokens
+</span><span class="n">tokens</span> <span class="o">=</span> <span class="n">word_tokenize</span><span class="p">(</span><span class="n">article</span><span class="p">)</span>
+
+<span class="c1"># Convert the tokens into lowercase: lower_tokens
+</span><span class="n">lower_tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="p">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">]</span>
+
+<span class="c1"># Create a Counter with the lowercase tokens: bow_simple
+</span><span class="n">bow_simple</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">lower_tokens</span><span class="p">)</span>
+
+<span class="c1"># Print the 10 most common tokens
+</span><span class="k">print</span><span class="p">(</span><span class="n">bow_simple</span><span class="p">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="c1"># [(',', 151), ('the', 150), ('.', 89), ('of', 81), ("''", 68), ('to', 63), ('a', 60), ('in', 44), ('and', 41), ('debugging', 40)]
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="22-simple-text-preprocessing"><strong>2.2 Simple text preprocessing</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/13-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/14-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/15-6.png?w=789" alt="Desktop View" /></p>
+
+<h3 id="221-text-preprocessing-steps"><strong>2.2.1 Text preprocessing steps</strong></h3>
+
+<p>Which of the following are useful text preprocessing steps?</p>
+
+<p><strong>Lemmatization, lowercasing, removing unwanted tokens.</strong></p>
+
+<h3 id="222-text-preprocessing-practice"><strong>2.2.2 Text preprocessing practice</strong></h3>
+
+<p>Now, it’s your turn to apply the techniques you’ve learned to help clean up text for better NLP results. You’ll need to remove stop words and non-alphabetic characters, lemmatize, and perform a new bag-of-words on your cleaned text.</p>
+
+<p>You start with the same tokens you created in the last exercise:
+ <code class="language-plaintext highlighter-rouge">lower_tokens</code>
+ . You also have the
+ <code class="language-plaintext highlighter-rouge">Counter</code>
+ class imported.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import WordNetLemmatizer
+</span><span class="kn">from</span> <span class="nn">nltk.stem</span> <span class="kn">import</span> <span class="n">WordNetLemmatizer</span>
+
+<span class="c1"># Retain alphabetic words: alpha_only
+</span><span class="n">alpha_only</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">lower_tokens</span> <span class="k">if</span> <span class="n">t</span><span class="p">.</span><span class="n">isalpha</span><span class="p">()]</span>
+
+<span class="c1"># Remove all stop words: no_stops
+</span><span class="n">no_stops</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">alpha_only</span> <span class="k">if</span> <span class="n">t</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">english_stops</span><span class="p">]</span>
+
+<span class="c1"># Instantiate the WordNetLemmatizer
+</span><span class="n">wordnet_lemmatizer</span> <span class="o">=</span> <span class="n">WordNetLemmatizer</span><span class="p">()</span>
+
+<span class="c1"># Lemmatize all tokens into a new list: lemmatized
+</span><span class="n">lemmatized</span> <span class="o">=</span> <span class="p">[</span><span class="n">wordnet_lemmatizer</span><span class="p">.</span><span class="n">lemmatize</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">no_stops</span><span class="p">]</span>
+
+<span class="c1"># Create the bag-of-words: bow
+</span><span class="n">bow</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="n">lemmatized</span><span class="p">)</span>
+
+<span class="c1"># Print the 10 most common tokens
+</span><span class="k">print</span><span class="p">(</span><span class="n">bow</span><span class="p">.</span><span class="n">most_common</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[('debugging', 40), ('system', 25), ('software', 16), ('bug', 16), ('problem', 15), ('tool', 15), ('computer', 14), ('process', 13), ('term', 13), ('used', 12)]
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="23-introduction-to-gensim"><strong>2.3 Introduction to gensim</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/1-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/2-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/3-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/4-8.png?w=898" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/5-8.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="231-what-are-word-vectors"><strong>2.3.1 What are word vectors?</strong></h3>
+
+<p>What are word vectors and how do they help with NLP?</p>
+
+<p><strong>Word vectors are multi-dimensional mathematical representations of words created using deep learning methods. They give us insight into relationships between words in a corpus.</strong></p>
+
+<h3 id="232-creating-and-querying-a-corpus-with-gensim"><strong>2.3.2 Creating and querying a corpus with gensim</strong></h3>
+
+<p>It’s time to apply the methods you learned in the previous video to create your first
+ <code class="language-plaintext highlighter-rouge">gensim</code>
+ dictionary and corpus!</p>
+
+<p>You’ll use these data structures to investigate word trends and potential interesting topics in your document set. To get started, we have imported a few additional messy articles from Wikipedia, which were preprocessed by lowercasing all words, tokenizing them, and removing stop words and punctuation. These were then stored in a list of document tokens called
+ <code class="language-plaintext highlighter-rouge">articles</code>
+ . You’ll need to do some light preprocessing and then generate the
+ <code class="language-plaintext highlighter-rouge">gensim</code>
+ dictionary and corpus.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import Dictionary
+</span><span class="kn">from</span> <span class="nn">gensim.corpora.dictionary</span> <span class="kn">import</span> <span class="n">Dictionary</span>
+
+<span class="c1"># Create a Dictionary from the articles: dictionary
+</span><span class="n">dictionary</span> <span class="o">=</span> <span class="n">Dictionary</span><span class="p">(</span><span class="n">articles</span><span class="p">)</span>
+
+<span class="c1"># Select the id for "computer": computer_id
+</span><span class="n">computer_id</span> <span class="o">=</span> <span class="n">dictionary</span><span class="p">.</span><span class="n">token2id</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="s">"computer"</span><span class="p">)</span>
+
+<span class="c1"># Use computer_id with the dictionary to print the word
+</span><span class="k">print</span><span class="p">(</span><span class="n">dictionary</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">computer_id</span><span class="p">))</span>
+<span class="c1"># computer
+</span>
+
+<span class="c1"># Create a MmCorpus: corpus
+</span><span class="n">corpus</span> <span class="o">=</span> <span class="p">[</span><span class="n">dictionary</span><span class="p">.</span><span class="n">doc2bow</span><span class="p">(</span><span class="n">article</span><span class="p">)</span> <span class="k">for</span> <span class="n">article</span> <span class="ow">in</span> <span class="n">articles</span><span class="p">]</span>
+
+<span class="c1"># Print the first 10 word ids with their frequency counts from the fifth document
+</span><span class="k">print</span><span class="p">(</span><span class="n">corpus</span><span class="p">[</span><span class="mi">4</span><span class="p">][:</span><span class="mi">10</span><span class="p">])</span>
+<span class="c1"># [(0, 88), (23, 11), (24, 2), (39, 1), (41, 2), (55, 22), (56, 1), (57, 1), (58, 1), (59, 3)]
+</span>
+</code></pre></div></div>
+
+<h3 id="233-gensim-bag-of-words"><strong>2.3.3 Gensim bag-of-words</strong></h3>
+
+<p>Now, you’ll use your new
+ <code class="language-plaintext highlighter-rouge">gensim</code>
+ corpus and dictionary to see the most common terms per document and across all documents. You can use your dictionary to look up the terms. Take a guess at what the topics are and feel free to explore more documents in the IPython Shell!</p>
+
+<p>You have access to the
+ <code class="language-plaintext highlighter-rouge">dictionary</code>
+ and
+ <code class="language-plaintext highlighter-rouge">corpus</code>
+ objects you created in the previous exercise, as well as the Python
+ <code class="language-plaintext highlighter-rouge">defaultdict</code>
+ and
+ <code class="language-plaintext highlighter-rouge">itertools</code>
+ to help with the creation of intermediate data structures for analysis.</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">defaultdict</code>
+ allows us to initialize a dictionary that will assign a default value to non-existent keys. By supplying the argument
+ <code class="language-plaintext highlighter-rouge">int</code>
+ , we are able to ensure that any non-existent keys are automatically assigned a default value of
+ <code class="language-plaintext highlighter-rouge">0</code>
+ . This makes it ideal for storing the counts of words in this exercise.</li>
+  <li><code class="language-plaintext highlighter-rouge">itertools.chain.from_iterable()</code>
+ allows us to iterate through a set of sequences as if they were one continuous sequence. Using this function, we can easily iterate through our
+ <code class="language-plaintext highlighter-rouge">corpus</code>
+ object (which is a list of lists).</li>
+</ul>
+
+<p>The fifth document from
+ <code class="language-plaintext highlighter-rouge">corpus</code>
+ is stored in the variable
+ <code class="language-plaintext highlighter-rouge">doc</code>
+ , which has been sorted in descending order.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Save the fifth document: doc
+</span><span class="n">doc</span> <span class="o">=</span> <span class="n">corpus</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+
+<span class="c1"># Sort the doc for frequency: bow_doc
+</span><span class="n">bow_doc</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Print the top 5 words of the document alongside the count
+</span><span class="k">for</span> <span class="n">word_id</span><span class="p">,</span> <span class="n">word_count</span> <span class="ow">in</span> <span class="n">bow_doc</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">dictionary</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">word_id</span><span class="p">),</span> <span class="n">word_count</span><span class="p">)</span>
+
+<span class="c1"># Create the defaultdict: total_word_count
+</span><span class="n">total_word_count</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">word_id</span><span class="p">,</span> <span class="n">word_count</span> <span class="ow">in</span> <span class="n">itertools</span><span class="p">.</span><span class="n">chain</span><span class="p">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">corpus</span><span class="p">):</span>
+    <span class="n">total_word_count</span><span class="p">[</span><span class="n">word_id</span><span class="p">]</span> <span class="o">+=</span> <span class="n">word_count</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+engineering 91
+'' 88
+reverse 71
+software 51
+cite 26
+
+total_word_count
+defaultdict(int,
+            {0: 1042,
+             1: 1,
+             2: 1,
+...
+             997: 1,
+             998: 1,
+             999: 22,
+             ...})
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a sorted list from the defaultdict: sorted_word_count
+</span><span class="n">sorted_word_count</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">total_word_count</span><span class="p">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Print the top 5 words across all documents alongside the count
+</span><span class="k">for</span> <span class="n">word_id</span><span class="p">,</span> <span class="n">word_count</span> <span class="ow">in</span> <span class="n">sorted_word_count</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">dictionary</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">word_id</span><span class="p">),</span> <span class="n">word_count</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+'' 1042
+computer 594
+software 450
+`` 345
+cite 322
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="24-tf-idf-with-gensim"><strong>2.4 Tf-idf with gensim</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/6-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/7-8.png?w=971" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/8-8.png?w=705" alt="Desktop View" /></p>
+
+<h3 id="241-what-is-tf-idf"><strong>2.4.1 What is tf-idf?</strong></h3>
+
+<p>You want to calculate the tf-idf weight for the word
+ <code class="language-plaintext highlighter-rouge">"computer"</code>
+ , which appears five times in a document containing 100 words. Given a corpus containing 200 documents, with 20 documents mentioning the word
+ <code class="language-plaintext highlighter-rouge">"computer"</code>
+ , tf-idf can be calculated by multiplying term frequency with inverse document frequency.</p>
+
+<p>Term frequency = percentage share of the word compared to all tokens in the document Inverse document frequency = logarithm of the total number of documents in a corpora divided by the number of documents containing the term</p>
+
+<p>Which of the below options is correct?</p>
+
+<p><strong>(5 / 100) * log(200 / 20)</strong></p>
+
+<h3 id="242-tf-idf-with-wikipedia"><strong>2.4.2 Tf-idf with Wikipedia</strong></h3>
+
+<p>Now it’s your turn to determine new significant terms for your corpus by applying
+ <code class="language-plaintext highlighter-rouge">gensim</code>
+ ‘s tf-idf. You will again have access to the same corpus and dictionary objects you created in the previous exercises –
+ <code class="language-plaintext highlighter-rouge">dictionary</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">corpus</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">doc</code>
+ . Will tf-idf make for more interesting results on the document level?</p>
+
+<p><code class="language-plaintext highlighter-rouge">TfidfModel</code>
+ has been imported for you from
+ <code class="language-plaintext highlighter-rouge">gensim.models.tfidfmodel</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a new TfidfModel using the corpus: tfidf
+</span><span class="n">tfidf</span> <span class="o">=</span> <span class="n">TfidfModel</span><span class="p">(</span><span class="n">corpus</span><span class="p">)</span>
+
+<span class="c1"># Calculate the tfidf weights of doc: tfidf_weights
+</span><span class="n">tfidf_weights</span> <span class="o">=</span> <span class="n">tfidf</span><span class="p">[</span><span class="n">doc</span><span class="p">]</span>
+
+<span class="c1"># Print the first five weights
+</span><span class="k">print</span><span class="p">(</span><span class="n">tfidf_weights</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+<span class="c1"># [(24, 0.0022836332291091273), (39, 0.0043409401554717324), (41, 0.008681880310943465), (55, 0.011988285029371418), (56, 0.005482756770026296)]
+</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+corpus
+[[(0, 50),
+  (1, 1),
+  (2, 1),
+...
+  (10325, 1),
+  (10326, 1),
+  (10327, 1)]]
+
+tfidf
+&lt;gensim.models.tfidfmodel.TfidfModel at 0x7f10f5755978&gt;
+
+doc
+[(0, 88),
+ (23, 11),
+ (24, 2),
+...
+ (3627, 1),
+ (3628, 2),
+ ...]
+
+
+tfidf_weights
+[(24, 0.0022836332291091273),
+ (39, 0.0043409401554717324),
+ (41, 0.008681880310943465),
+ (55, 0.011988285029371418),
+...
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Sort the weights from highest to lowest: sorted_tfidf_weights
+</span><span class="n">sorted_tfidf_weights</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">tfidf_weights</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="n">w</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Print the top 5 weighted words
+</span><span class="k">for</span> <span class="n">term_id</span><span class="p">,</span> <span class="n">weight</span> <span class="ow">in</span> <span class="n">sorted_tfidf_weights</span><span class="p">[:</span><span class="mi">5</span><span class="p">]:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">dictionary</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">term_id</span><span class="p">),</span> <span class="n">weight</span><span class="p">)</span>
+
+<span class="n">reverse</span> <span class="mf">0.4884961428651127</span>
+<span class="n">infringement</span> <span class="mf">0.18674529210288995</span>
+<span class="n">engineering</span> <span class="mf">0.16395041814479536</span>
+<span class="n">interoperability</span> <span class="mf">0.12449686140192663</span>
+<span class="n">reverse</span><span class="o">-</span><span class="n">engineered</span> <span class="mf">0.12449686140192663</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+sorted_tfidf_weights
+[(1535, 0.4884961428651127),
+ (3796, 0.18674529210288995),
+ (350, 0.16395041814479536),
+ (3804, 0.12449686140192663),
+...
+
+</code></pre></div></div>
+
+<h1 id="3-named-entity-recognition"><strong>3. Named-entity recognition</strong></h1>
+<hr />
+
+<h2 id="31-named-entity-recognition"><strong>3.1 Named Entity Recognition</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/9-8.png?w=949" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/10-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/11-8.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/12-8.png?w=995" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/13-7.png?w=532" alt="Desktop View" /></p>
+
+<h3 id="311-ner-with-nltk"><strong>3.1.1 NER with NLTK</strong></h3>
+
+<p>You’re now going to have some fun with named-entity recognition! A scraped news article has been pre-loaded into your workspace. Your task is to use
+ <code class="language-plaintext highlighter-rouge">nltk</code>
+ to find the named entities in this article.</p>
+
+<p>What might the article be about, given the names you found?</p>
+
+<p>Along with
+ <code class="language-plaintext highlighter-rouge">nltk</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">sent_tokenize</code>
+ and
+ <code class="language-plaintext highlighter-rouge">word_tokenize</code>
+ from
+ <code class="language-plaintext highlighter-rouge">nltk.tokenize</code>
+ have been pre-imported.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Tokenize the article into sentences: sentences
+</span><span class="n">sentences</span> <span class="o">=</span> <span class="n">sent_tokenize</span><span class="p">(</span><span class="n">article</span><span class="p">)</span>
+
+<span class="c1"># Tokenize each sentence into words: token_sentences
+</span><span class="n">token_sentences</span> <span class="o">=</span> <span class="p">[</span><span class="n">word_tokenize</span><span class="p">(</span><span class="n">sent</span><span class="p">)</span> <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
+
+<span class="c1"># Tag each tokenized sentence into parts of speech: pos_sentences
+</span><span class="n">pos_sentences</span> <span class="o">=</span> <span class="p">[</span><span class="n">nltk</span><span class="p">.</span><span class="n">pos_tag</span><span class="p">(</span><span class="n">sent</span><span class="p">)</span> <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">token_sentences</span><span class="p">]</span>
+
+<span class="c1"># Create the named entity chunks: chunked_sentences
+</span><span class="n">chunked_sentences</span> <span class="o">=</span> <span class="n">nltk</span><span class="p">.</span><span class="n">ne_chunk_sents</span><span class="p">(</span><span class="n">pos_sentences</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Test for stems of the tree with 'NE' tags
+</span><span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">chunked_sentences</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">sent</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="s">"label"</span><span class="p">)</span> <span class="ow">and</span> <span class="n">chunk</span><span class="p">.</span><span class="n">label</span><span class="p">()</span> <span class="o">==</span> <span class="s">"NE"</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">chunk</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+(NE Uber/NNP)
+(NE Beyond/NN)
+(NE Apple/NNP)
+(NE Uber/NNP)
+(NE Uber/NNP)
+(NE Travis/NNP Kalanick/NNP)
+(NE Tim/NNP Cook/NNP)
+(NE Apple/NNP)
+(NE Silicon/NNP Valley/NNP)
+(NE CEO/NNP)
+(NE Yahoo/NNP)
+(NE Marissa/NNP Mayer/NNP)
+
+</code></pre></div></div>
+
+<h2 id="312-charting-practice"><strong>3.1.2 Charting practice</strong></h2>
+
+<p>In this exercise, you’ll use some extracted named entities and their groupings from a series of newspaper articles to chart the diversity of named entity types in the articles.</p>
+
+<p>You’ll use a
+ <code class="language-plaintext highlighter-rouge">defaultdict</code>
+ called
+ <code class="language-plaintext highlighter-rouge">ner_categories</code>
+ , with keys representing every named entity group type, and values to count the number of each different named entity type. You have a chunked sentence list called
+ <code class="language-plaintext highlighter-rouge">chunked_sentences</code>
+ similar to the last exercise, but this time with non-binary category names.</p>
+
+<p>You can use
+ <code class="language-plaintext highlighter-rouge">hasattr()</code>
+ to determine if each chunk has a
+ <code class="language-plaintext highlighter-rouge">'label'</code>
+ and then simply use the chunk’s
+ <code class="language-plaintext highlighter-rouge">.label()</code>
+ method as the dictionary key.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+type(chunked_sentences)
+list
+
+chunked_sentences
+[Tree('S', [('\ufeffImage', 'NN'), ('copyright', 'NN'), Tree('ORGANIZATION', [('EPA', 'NNP'), ('Image', 'NNP')]), ('caption', 'NN'), ('Uber', 'NNP'), ('has', 'VBZ'), ('been', 'VBN'), ('criticised', 'VBN'), ('many', 'JJ'), ('times', 'NNS'), ('over', 'IN'), ('the', 'DT'), ('way', 'NN'), ('it', 'PRP'), ('runs', 'VBZ'), ('its', 'PRP$'), ('business', 'NN'), ('Ride-sharing', 'JJ'), ('firm', 'NN'), ('Uber', 'NNP'), ('is', 'VBZ'), ('facing', 'VBG'), ('a', 'DT'), ('criminal', 'JJ'), ('investigation', 'NN'), ('by', 'IN'), ('the', 'DT'), Tree('GPE', [('US', 'JJ')]), ('government', 'NN'), ('.', '.')]),
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create the defaultdict: ner_categories
+</span><span class="n">ner_categories</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="c1"># Create the nested for loop
+</span><span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">chunked_sentences</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">chunk</span> <span class="ow">in</span> <span class="n">sent</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">chunk</span><span class="p">,</span> <span class="s">'label'</span><span class="p">):</span>
+            <span class="n">ner_categories</span><span class="p">[</span><span class="n">chunk</span><span class="p">.</span><span class="n">label</span><span class="p">()]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="c1"># Create a list from the dictionary keys for the chart labels: labels
+</span><span class="n">labels</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ner_categories</span><span class="p">.</span><span class="n">keys</span><span class="p">())</span>
+
+<span class="n">labels</span>
+<span class="c1"># ['ORGANIZATION', 'GPE', 'PERSON', 'LOCATION', 'FACILITY']
+</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a list of the values: values
+</span><span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">ner_categories</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">]</span>
+
+<span class="c1"># Create the pie chart
+</span><span class="n">plt</span><span class="p">.</span><span class="n">pie</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">autopct</span><span class="o">=</span><span class="s">'%1.1f%%'</span><span class="p">,</span> <span class="n">startangle</span><span class="o">=</span><span class="mi">140</span><span class="p">)</span>
+
+<span class="c1"># Display the chart
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/14-7.png?w=1024" alt="Desktop View" /></p>
+
+<h2 id="313-stanford-library-with-nltk"><strong>3.1.3 Stanford library with NLTK</strong></h2>
+
+<p>When using the Stanford library with NLTK, what is needed to get started?</p>
+
+<p><strong>NLTK, the Stanford Java Libraries and some environment variables to help with integration.</strong></p>
+
+<hr />
+
+<h2 id="32-introduction-to-spacy"><strong>3.2 Introduction to SpaCy</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/15-7.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/16-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/17-5.png?w=844" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/18-4.png?w=888" alt="Desktop View" /></p>
+
+<h3 id="321-comparing-nltk-with-spacy-ner"><strong>3.2.1 Comparing NLTK with spaCy NER</strong></h3>
+
+<p>Using the same text you used in the first exercise of this chapter, you’ll now see the results using spaCy’s NER annotator. How will they compare?</p>
+
+<p>The article has been pre-loaded as
+ <code class="language-plaintext highlighter-rouge">article</code>
+ . To minimize execution times, you’ll be asked to specify the keyword arguments
+ <code class="language-plaintext highlighter-rouge">tagger=False, parser=False, matcher=False</code>
+ when loading the spaCy model, because you only care about the
+ <code class="language-plaintext highlighter-rouge">entity</code>
+ in this exercise.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import spacy
+</span><span class="kn">import</span> <span class="nn">spacy</span>
+
+<span class="c1"># Instantiate the English model: nlp
+</span><span class="n">nlp</span> <span class="o">=</span> <span class="n">spacy</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">'en'</span><span class="p">,</span><span class="n">tagger</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">parser</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">matcher</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># Create a new document: doc
+</span><span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">article</span><span class="p">)</span>
+
+<span class="c1"># Print all of the found entities and their labels
+</span><span class="k">for</span> <span class="n">ent</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">.</span><span class="n">ents</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">ent</span><span class="p">.</span><span class="n">label_</span><span class="p">,</span> <span class="n">ent</span><span class="p">.</span><span class="n">text</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+ORG Uber
+ORG Uber
+ORG Apple
+ORG Uber
+ORG Uber
+PERSON Travis Kalanick
+ORG Uber
+PERSON Tim Cook
+ORG Apple
+CARDINAL Millions
+ORG Uber
+GPE drivers’
+LOC Silicon Valley’s
+ORG Yahoo
+PERSON Marissa Mayer
+MONEY $186m
+
+</code></pre></div></div>
+
+<h3 id="322-spacy-ner-categories"><strong>3.2.2 spaCy NER Categories</strong></h3>
+
+<p>Which are the
+ <em>extra</em>
+ categories that
+ <code class="language-plaintext highlighter-rouge">spacy</code>
+ uses compared to
+ <code class="language-plaintext highlighter-rouge">nltk</code>
+ in its named-entity recognition?</p>
+
+<p><strong>NORP, CARDINAL, MONEY, WORK
+ <em>OF</em>
+ ART, LANGUAGE, EVENT</strong></p>
+
+<hr />
+
+<h2 id="33-multilingual-ner-with-polyglot"><strong>3.3 Multilingual NER with polyglot</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/19-3.png?w=1004" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/20-3.png?w=873" alt="Desktop View" /></p>
+
+<p>####
+ 3.3.1 French NER with polyglot I</p>
+
+<p>In this exercise and the next, you’ll use the
+ <code class="language-plaintext highlighter-rouge">polyglot</code>
+ library to identify French entities. The library functions slightly differently than
+ <code class="language-plaintext highlighter-rouge">spacy</code>
+ , so you’ll use a few of the new things you learned in the last video to display the named entity text and category.</p>
+
+<p>You have access to the full article string in
+ <code class="language-plaintext highlighter-rouge">article</code>
+ . Additionally, the
+ <code class="language-plaintext highlighter-rouge">Text</code>
+ class of
+ <code class="language-plaintext highlighter-rouge">polyglot</code>
+ has been imported from
+ <code class="language-plaintext highlighter-rouge">polyglot.text</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a new text object using Polyglot's Text class: txt
+</span><span class="n">txt</span> <span class="o">=</span> <span class="n">Text</span><span class="p">(</span><span class="n">article</span><span class="p">)</span>
+
+<span class="c1"># Print each of the entities found
+</span><span class="k">for</span> <span class="n">ent</span> <span class="ow">in</span> <span class="n">txt</span><span class="p">.</span><span class="n">entities</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">ent</span><span class="p">)</span>
+
+<span class="c1"># Print the type of ent
+</span><span class="k">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ent</span><span class="p">))</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+['Charles', 'Cuvelliez']
+['Charles', 'Cuvelliez']
+['Bruxelles']
+['l’IA']
+['Julien', 'Maldonato']
+['Deloitte']
+['Ethiquement']
+['l’IA']
+['.']
+
+&lt;class 'polyglot.text.Chunk'&gt;
+
+</code></pre></div></div>
+
+<h3 id="332-french-ner-with-polyglot-ii"><strong>3.3.2 French NER with polyglot II</strong></h3>
+
+<p>Here, you’ll complete the work you began in the previous exercise.</p>
+
+<p>Your task is to use a list comprehension to create a list of tuples, in which the first element is the entity tag, and the second element is the full string of the entity text.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create the list of tuples: entities
+</span><span class="n">entities</span> <span class="o">=</span> <span class="p">[(</span><span class="n">ent</span><span class="p">.</span><span class="n">tag</span><span class="p">,</span> <span class="s">' '</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">ent</span><span class="p">))</span> <span class="k">for</span> <span class="n">ent</span> <span class="ow">in</span> <span class="n">txt</span><span class="p">.</span><span class="n">entities</span><span class="p">]</span>
+
+<span class="c1"># Print entities
+</span><span class="k">print</span><span class="p">(</span><span class="n">entities</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+[('I-PER', 'Charles Cuvelliez'), ('I-PER', 'Charles Cuvelliez'), ('I-ORG', 'Bruxelles'), ('I-PER', 'l’IA'), ('I-PER', 'Julien Maldonato'), ('I-ORG', 'Deloitte'), ('I-PER', 'Ethiquement'), ('I-LOC', 'l’IA'), ('I-PER', '.')]
+
+</code></pre></div></div>
+
+<h3 id="333-spanish-ner-with-polyglot"><strong>3.3.3 Spanish NER with polyglot</strong></h3>
+
+<p>You’ll continue your exploration of
+ <code class="language-plaintext highlighter-rouge">polyglot</code>
+ now with some Spanish annotation. This article is not written by a newspaper, so it is your first example of a more blog-like text. How do you think that might compare when finding entities?</p>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">Text</code>
+ object has been created as
+ <code class="language-plaintext highlighter-rouge">txt</code>
+ , and each entity has been printed, as you can see in the IPython Shell.</p>
+
+<p>Your specific task is to determine how many of the entities contain the words
+ <code class="language-plaintext highlighter-rouge">"Márquez"</code>
+ or
+ <code class="language-plaintext highlighter-rouge">"Gabo"</code>
+ – these refer to the same person in different ways!</p>
+
+<p><code class="language-plaintext highlighter-rouge">txt.entities</code>
+ is available.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate the proportion of txt.entities that
+# contains 'Márquez' or 'Gabo': prop_ggm
+</span><span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">ent</span> <span class="ow">in</span> <span class="n">txt</span><span class="p">.</span><span class="n">entities</span><span class="p">:</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s">"Márquez"</span> <span class="ow">in</span> <span class="n">ent</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s">"Gabo"</span> <span class="ow">in</span> <span class="n">ent</span><span class="p">):</span>
+        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="n">prop_ggm</span> <span class="o">=</span> <span class="n">count</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">txt</span><span class="p">.</span><span class="n">entities</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">prop_ggm</span><span class="p">)</span>
+<span class="c1"># 0.29591836734693877
+</span>
+</code></pre></div></div>
+
+<h1 id="4-building-a-fake-news-classifier"><strong>4. Building a “fake news” classifier</strong></h1>
+<hr />
+
+<h2 id="41-classifying-fake-news-using-supervised-learning-with-nlp"><strong>4.1 Classifying fake news using supervised learning with NLP</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/21-2.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/22-2.png?w=881" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/23-2.png?w=983" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/24-2.png?w=911" alt="Desktop View" /></p>
+
+<h3 id="411-which-possible-features"><strong>4.1.1 Which possible features?</strong></h3>
+
+<p>Which of the following are possible features for a text classification problem?</p>
+
+<ul>
+  <li><strong>Number of words in a document.</strong></li>
+  <li><strong>Specific named entities.</strong></li>
+  <li><strong>Language.</strong></li>
+</ul>
+
+<hr />
+
+<h2 id="42-building-word-count-vectors-with-scikit-learn"><strong>4.2 Building word count vectors with scikit-learn</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/1-9.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/2-9.png?w=849" alt="Desktop View" /></p>
+
+<h3 id="421-countvectorizer-for-text-classification"><strong>4.2.1 CountVectorizer for text classification</strong></h3>
+
+<p>It’s time to begin building your text classifier! The
+ <a href="https://s3.amazonaws.com/assets.datacamp.com/production/course_3629/fake_or_real_news.csv">data</a>
+ has been loaded into a DataFrame called
+ <code class="language-plaintext highlighter-rouge">df</code>
+ . Explore it in the IPython Shell to investigate what columns you can use. The
+ <code class="language-plaintext highlighter-rouge">.head()</code>
+ method is particularly informative.</p>
+
+<p>In this exercise, you’ll use
+ <code class="language-plaintext highlighter-rouge">pandas</code>
+ alongside scikit-learn to create a sparse text vectorizer you can use to train and test a simple supervised model. To begin, you’ll set up a
+ <code class="language-plaintext highlighter-rouge">CountVectorizer</code>
+ and investigate some of its features.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+print(df.head())
+   Unnamed: 0                                              title  \
+0        8476                       You Can Smell Hillary’s Fear
+1       10294  Watch The Exact Moment Paul Ryan Committed Pol...
+2        3608        Kerry to go to Paris in gesture of sympathy
+3       10142  Bernie supporters on Twitter erupt in anger ag...
+4         875   The Battle of New York: Why This Primary Matters
+
+                                                text label
+0  Daniel Greenfield, a Shillman Journalism Fello...  FAKE
+1  Google Pinterest Digg Linkedin Reddit Stumbleu...  FAKE
+2  U.S. Secretary of State John F. Kerry said Mon...  REAL
+3  — Kaydee King (@KaydeeKing) November 9, 2016 T...  FAKE
+4  It's primary day in New York and front-runners...  REAL
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the necessary modules
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">CountVectorizer</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="c1"># Print the head of df
+</span><span class="k">print</span><span class="p">(</span><span class="n">df</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Create a series to store the labels: y
+</span><span class="n">y</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">label</span>
+
+<span class="c1"># Create training and test sets
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s">'text'</span><span class="p">],</span><span class="n">y</span><span class="p">,</span><span class="n">test_size</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span><span class="n">random_state</span><span class="o">=</span><span class="mi">53</span><span class="p">)</span>
+
+<span class="c1"># Initialize a CountVectorizer object: count_vectorizer
+</span><span class="n">count_vectorizer</span> <span class="o">=</span> <span class="n">CountVectorizer</span><span class="p">(</span><span class="n">stop_words</span><span class="o">=</span><span class="s">'english'</span><span class="p">)</span>
+
+<span class="c1"># Transform the training data using only the 'text' column values: count_train
+</span><span class="n">count_train</span> <span class="o">=</span> <span class="n">count_vectorizer</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+<span class="c1"># Transform the test data using only the 'text' column values: count_test
+</span><span class="n">count_test</span> <span class="o">=</span> <span class="n">count_vectorizer</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Print the first 10 features of the count_vectorizer
+</span><span class="k">print</span><span class="p">(</span><span class="n">count_vectorizer</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">()[:</span><span class="mi">10</span><span class="p">])</span>
+<span class="c1"># ['00', '000', '0000', '00000031', '000035', '00006', '0001', '0001pt', '000ft', '000km']
+</span>
+</code></pre></div></div>
+
+<h3 id="422-tfidfvectorizer-for-text-classification"><strong>4.2.2 TfidfVectorizer for text classification</strong></h3>
+
+<p>Similar to the sparse
+ <code class="language-plaintext highlighter-rouge">CountVectorizer</code>
+ created in the previous exercise, you’ll work on creating tf-idf vectors for your documents. You’ll set up a
+ <code class="language-plaintext highlighter-rouge">TfidfVectorizer</code>
+ and investigate some of its features.</p>
+
+<p>In this exercise, you’ll use
+ <code class="language-plaintext highlighter-rouge">pandas</code>
+ and
+ <code class="language-plaintext highlighter-rouge">sklearn</code>
+ along with the same
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ and
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ DataFrames and Series you created in the last exercise.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import TfidfVectorizer
+</span><span class="kn">from</span> <span class="nn">sklearn.feature_extraction.text</span> <span class="kn">import</span> <span class="n">TfidfVectorizer</span>
+
+<span class="c1"># Initialize a TfidfVectorizer object: tfidf_vectorizer
+</span><span class="n">tfidf_vectorizer</span> <span class="o">=</span> <span class="n">TfidfVectorizer</span><span class="p">(</span><span class="n">stop_words</span><span class="o">=</span><span class="s">'english'</span><span class="p">,</span> <span class="n">max_df</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+
+<span class="c1"># Transform the training data: tfidf_train
+</span><span class="n">tfidf_train</span> <span class="o">=</span> <span class="n">tfidf_vectorizer</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+<span class="c1"># Transform the test data: tfidf_test
+</span><span class="n">tfidf_test</span> <span class="o">=</span> <span class="n">tfidf_vectorizer</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Print the first 10 features
+</span><span class="k">print</span><span class="p">(</span><span class="n">tfidf_vectorizer</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">()[:</span><span class="mi">10</span><span class="p">])</span>
+
+<span class="c1"># Print the first 5 vectors of the tfidf training data
+</span><span class="k">print</span><span class="p">(</span><span class="n">tfidf_train</span><span class="p">.</span><span class="n">A</span><span class="p">[:</span><span class="mi">5</span><span class="p">])</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+['00', '000', '001', '008s', '00am', '00pm', '01', '01am', '02', '024']
+[[0.         0.01928563 0.         ... 0.         0.         0.        ]
+ [0.         0.         0.         ... 0.         0.         0.        ]
+ [0.         0.02895055 0.         ... 0.         0.         0.        ]
+ [0.         0.03056734 0.         ... 0.         0.         0.        ]
+ [0.         0.         0.         ... 0.         0.         0.        ]]
+
+</code></pre></div></div>
+
+<h3 id="423-inspecting-the-vectors"><strong>4.2.3 Inspecting the vectors</strong></h3>
+
+<p>To get a better idea of how the vectors work, you’ll investigate them by converting them into
+ <code class="language-plaintext highlighter-rouge">pandas</code>
+ DataFrames.</p>
+
+<p>Here, you’ll use the same data structures you created in the previous two exercises (
+ <code class="language-plaintext highlighter-rouge">count_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">count_vectorizer</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">tfidf_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">tfidf_vectorizer</code>
+ ) as well as
+ <code class="language-plaintext highlighter-rouge">pandas</code>
+ , which is imported as
+ <code class="language-plaintext highlighter-rouge">pd</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create the CountVectorizer DataFrame: count_df
+</span><span class="n">count_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">count_train</span><span class="p">.</span><span class="n">A</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">count_vectorizer</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">())</span>
+
+<span class="c1"># Create the TfidfVectorizer DataFrame: tfidf_df
+</span><span class="n">tfidf_df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">tfidf_train</span><span class="p">.</span><span class="n">A</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">tfidf_vectorizer</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">())</span>
+
+<span class="c1"># Print the head of count_df
+</span><span class="k">print</span><span class="p">(</span><span class="n">count_df</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Print the head of tfidf_df
+</span><span class="k">print</span><span class="p">(</span><span class="n">tfidf_df</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+
+<span class="c1"># Calculate the difference in columns: difference
+</span><span class="n">difference</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">count_df</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">tfidf_df</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">difference</span><span class="p">)</span>
+<span class="c1"># set()
+</span>
+<span class="c1"># Check whether the DataFrames are equal
+</span><span class="k">print</span><span class="p">(</span><span class="n">count_df</span><span class="p">.</span><span class="n">equals</span><span class="p">(</span><span class="n">tfidf_df</span><span class="p">))</span>
+<span class="c1"># False
+</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+print(count_df.head())
+   000  00am  0600  10  100  107  11  110  1100  12    ...      younger  \
+0    0     0     0   0    0    0   0    0     0   0    ...            0
+1    0     0     0   3    0    0   0    0     0   0    ...            0
+2    0     0     0   0    0    0   0    0     0   0    ...            0
+3    0     0     0   0    0    0   0    0     0   0    ...            1
+4    0     0     0   0    0    0   0    0     0   0    ...            0
+
+   youth  youths  youtube  ypg  yuan  zawahiri  zeitung  zero  zerohedge
+0      0       0        0    0     0         0        0     1          0
+1      0       0        0    0     0         0        0     0          0
+2      0       0        0    0     0         0        0     0          0
+3      0       0        0    0     0         0        0     0          0
+4      0       0        0    0     0         0        0     0          0
+
+[5 rows x 5111 columns]
+
+
+print(tfidf_df.head())
+   000  00am  0600        10  100  107   11  110  1100   12    ...      \
+0  0.0   0.0   0.0  0.000000  0.0  0.0  0.0  0.0   0.0  0.0    ...
+1  0.0   0.0   0.0  0.105636  0.0  0.0  0.0  0.0   0.0  0.0    ...
+2  0.0   0.0   0.0  0.000000  0.0  0.0  0.0  0.0   0.0  0.0    ...
+3  0.0   0.0   0.0  0.000000  0.0  0.0  0.0  0.0   0.0  0.0    ...
+4  0.0   0.0   0.0  0.000000  0.0  0.0  0.0  0.0   0.0  0.0    ...
+
+    younger  youth  youths  youtube  ypg  yuan  zawahiri  zeitung      zero  \
+0  0.000000    0.0     0.0      0.0  0.0   0.0       0.0      0.0  0.033579
+1  0.000000    0.0     0.0      0.0  0.0   0.0       0.0      0.0  0.000000
+2  0.000000    0.0     0.0      0.0  0.0   0.0       0.0      0.0  0.000000
+3  0.015175    0.0     0.0      0.0  0.0   0.0       0.0      0.0  0.000000
+4  0.000000    0.0     0.0      0.0  0.0   0.0       0.0      0.0  0.000000
+
+   zerohedge
+0        0.0
+1        0.0
+2        0.0
+3        0.0
+4        0.0
+
+[5 rows x 5111 columns]
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="43-training-and-testing-a-classification-model-with-scikit-learn"><strong>4.3 Training and testing a classification model with scikit-learn</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/1-10.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/2-10.png?w=721" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/3-9.png?w=780" alt="Desktop View" /></p>
+
+<h3 id="431-text-classification-models"><strong>4.3.1 Text classification models</strong></h3>
+
+<p>Which of the below is the most reasonable model to use when training a new supervised model using text vector data?</p>
+
+<p><strong>Naive Bayes</strong></p>
+
+<h3 id="432-training-and-testing-the-fake-news-model-with-countvectorizer"><strong>4.3.2 Training and testing the “fake news” model with CountVectorizer</strong></h3>
+
+<p>Now it’s your turn to train the “fake news” model using the features you identified and extracted. In this first exercise you’ll train and test a Naive Bayes model using the
+ <code class="language-plaintext highlighter-rouge">CountVectorizer</code>
+ data.</p>
+
+<p>The training and test sets have been created, and
+ <code class="language-plaintext highlighter-rouge">count_vectorizer</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">count_train</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">count_test</code>
+ have been computed.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the necessary modules
+</span><span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">MultinomialNB</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">metrics</span>
+
+<span class="c1"># Instantiate a Multinomial Naive Bayes classifier: nb_classifier
+</span><span class="n">nb_classifier</span> <span class="o">=</span> <span class="n">MultinomialNB</span><span class="p">()</span>
+
+<span class="c1"># Fit the classifier to the training data
+</span><span class="n">nb_classifier</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">count_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Create the predicted tags: pred
+</span><span class="n">pred</span> <span class="o">=</span> <span class="n">nb_classifier</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">count_test</span><span class="p">)</span>
+
+<span class="c1"># Calculate the accuracy score: score
+</span><span class="n">score</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">.</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span><span class="n">pred</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+<span class="c1"># 0.893352462936394
+</span>
+<span class="c1"># Calculate the confusion matrix: cm
+</span><span class="n">cm</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">.</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span><span class="n">pred</span><span class="p">,</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s">'FAKE'</span><span class="p">,</span> <span class="s">'REAL'</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">cm</span><span class="p">)</span>
+<span class="c1">#[[ 865  143]
+</span> <span class="p">[</span>  <span class="mi">80</span> <span class="mi">1003</span><span class="p">]]</span>
+
+</code></pre></div></div>
+
+<h3 id="433-training-and-testing-the-fake-news-model-with-tfidfvectorizer"><strong>4.3.3 Training and testing the “fake news” model with TfidfVectorizer</strong></h3>
+
+<p>Now that you have evaluated the model using the
+ <code class="language-plaintext highlighter-rouge">CountVectorizer</code>
+ , you’ll do the same using the
+ <code class="language-plaintext highlighter-rouge">TfidfVectorizer</code>
+ with a Naive Bayes model.</p>
+
+<p>The training and test sets have been created, and
+ <code class="language-plaintext highlighter-rouge">tfidf_vectorizer</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">tfidf_train</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">tfidf_test</code>
+ have been computed. Additionally,
+ <code class="language-plaintext highlighter-rouge">MultinomialNB</code>
+ and
+ <code class="language-plaintext highlighter-rouge">metrics</code>
+ have been imported from, respectively,
+ <code class="language-plaintext highlighter-rouge">sklearn.naive_bayes</code>
+ and
+ <code class="language-plaintext highlighter-rouge">sklearn</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate the accuracy score and confusion matrix of
+# Multinomial Naive Bayes classifier predictions trained on
+# tfidf_train, y_train and tested against tfidf_test and
+# y_test
+</span>
+<span class="c1"># Instantiate a Multinomial Naive Bayes classifier: nb_classifier
+</span><span class="n">nb_classifier</span> <span class="o">=</span> <span class="n">MultinomialNB</span><span class="p">()</span>
+
+<span class="c1"># Fit the classifier to the training data
+</span><span class="n">nb_classifier</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">tfidf_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Create the predicted tags: pred
+</span><span class="n">pred</span> <span class="o">=</span> <span class="n">nb_classifier</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">tfidf_test</span><span class="p">)</span>
+
+<span class="c1"># Calculate the accuracy score: score
+</span><span class="n">score</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">.</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span><span class="n">pred</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+<span class="c1"># 0.8565279770444764
+</span>
+<span class="c1"># Calculate the confusion matrix: cm
+</span><span class="n">cm</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">.</span><span class="n">confusion_matrix</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span><span class="n">pred</span><span class="p">,</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s">'FAKE'</span><span class="p">,</span> <span class="s">'REAL'</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="n">cm</span><span class="p">)</span>
+<span class="c1">#[[ 739  269]
+</span> <span class="p">[</span>  <span class="mi">31</span> <span class="mi">1052</span><span class="p">]]</span>
+
+</code></pre></div></div>
+
+<p>Fantastic fake detection! The model correctly identifies fake news about 86% of the time. That’s a great start, but for a real world situation, you’d need to improve the score.</p>
+
+<hr />
+
+<h2 id="44-simple-nlp-complex-problems"><strong>4.4 Simple NLP, complex problems</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/4-9.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/5-9.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-natural-language-processing-in-python/6-9.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="441-improving-the-model"><strong>4.4.1 Improving the model</strong></h3>
+
+<p>What are possible next steps you could take to improve the model?</p>
+
+<ul>
+  <li>Tweaking alpha levels.</li>
+  <li><strong>Trying a new classification model.</strong></li>
+  <li><strong>Training on a larger dataset.</strong></li>
+  <li><strong>Improving text preprocessing.</strong></li>
+</ul>
+
+<h3 id="442-improving-your-model"><strong>4.4.2 Improving your model</strong></h3>
+
+<p>Your job in this exercise is to test a few different alpha levels using the
+ <code class="language-plaintext highlighter-rouge">Tfidf</code>
+ vectors to determine if there is a better performing combination.</p>
+
+<p>The training and test sets have been created, and
+ <code class="language-plaintext highlighter-rouge">tfidf_vectorizer</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">tfidf_train</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">tfidf_test</code>
+ have been computed.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create the list of alphas: alphas
+</span><span class="n">alphas</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mf">0.1</span><span class="p">)</span>
+
+<span class="c1"># Define train_and_predict()
+</span><span class="k">def</span> <span class="nf">train_and_predict</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
+    <span class="c1"># Instantiate the classifier: nb_classifier
+</span>    <span class="n">nb_classifier</span> <span class="o">=</span> <span class="n">MultinomialNB</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="n">alpha</span><span class="p">)</span>
+    <span class="c1"># Fit to the training data
+</span>    <span class="n">nb_classifier</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">tfidf_train</span><span class="p">,</span><span class="n">y_train</span><span class="p">)</span>
+    <span class="c1"># Predict the labels: pred
+</span>    <span class="n">pred</span> <span class="o">=</span> <span class="n">nb_classifier</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">tfidf_test</span><span class="p">)</span>
+    <span class="c1"># Compute accuracy: score
+</span>    <span class="n">score</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">.</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span><span class="n">pred</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">score</span>
+
+<span class="c1"># Iterate over the alphas and print the corresponding score
+</span><span class="k">for</span> <span class="n">alpha</span> <span class="ow">in</span> <span class="n">alphas</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Alpha: '</span><span class="p">,</span> <span class="n">alpha</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Score: '</span><span class="p">,</span> <span class="n">train_and_predict</span><span class="p">(</span><span class="n">alpha</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Alpha:  0.0
+Score:  0.8813964610234337
+
+Alpha:  0.1
+Score:  0.8976566236250598
+
+Alpha:  0.2
+Score:  0.8938307030129125
+
+Alpha:  0.30000000000000004
+Score:  0.8900047824007652
+
+Alpha:  0.4
+Score:  0.8857006217120995
+
+Alpha:  0.5
+Score:  0.8842659014825442
+
+Alpha:  0.6000000000000001
+Score:  0.874701099952176
+
+Alpha:  0.7000000000000001
+Score:  0.8703969392635102
+
+Alpha:  0.8
+Score:  0.8660927785748446
+
+Alpha:  0.9
+Score:  0.8589191774270684
+
+</code></pre></div></div>
+
+<h3 id="443-inspecting-your-model"><strong>4.4.3 Inspecting your model</strong></h3>
+
+<p>Now that you have built a “fake news” classifier, you’ll investigate what it has learned. You can map the important vector weights back to actual words using some simple inspection techniques.</p>
+
+<p>You have your well performing tfidf Naive Bayes classifier available as
+ <code class="language-plaintext highlighter-rouge">nb_classifier</code>
+ , and the vectors as
+ <code class="language-plaintext highlighter-rouge">tfidf_vectorizer</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Get the class labels: class_labels
+</span><span class="n">class_labels</span> <span class="o">=</span> <span class="n">nb_classifier</span><span class="p">.</span><span class="n">classes_</span>
+
+<span class="c1"># Extract the features: feature_names
+</span><span class="n">feature_names</span> <span class="o">=</span> <span class="n">tfidf_vectorizer</span><span class="p">.</span><span class="n">get_feature_names</span><span class="p">()</span>
+
+<span class="c1"># Zip the feature names together with the coefficient array and sort by weights: feat_with_weights
+</span><span class="n">feat_with_weights</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">nb_classifier</span><span class="p">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">feature_names</span><span class="p">))</span>
+
+<span class="c1"># Print the first class label and the top 20 feat_with_weights entries
+</span><span class="k">print</span><span class="p">(</span><span class="n">class_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">feat_with_weights</span><span class="p">[:</span><span class="mi">20</span><span class="p">])</span>
+
+<span class="c1"># Print the second class label and the bottom 20 feat_with_weights entries
+</span><span class="k">print</span><span class="p">(</span><span class="n">class_labels</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">feat_with_weights</span><span class="p">[</span><span class="o">-</span><span class="mi">20</span><span class="p">:])</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+FAKE [(-12.641778440826338, '0000'), (-12.641778440826338, '000035'), (-12.641778440826338, '0001'), (-12.641778440826338, '0001pt'), (-12.641778440826338, '000km'), (-12.641778440826338, '0011'), (-12.641778440826338, '006s'), (-12.641778440826338, '007'), (-12.641778440826338, '007s'), (-12.641778440826338, '008s'), (-12.641778440826338, '0099'), (-12.641778440826338, '00am'), (-12.641778440826338, '00p'), (-12.641778440826338, '00pm'), (-12.641778440826338, '014'), (-12.641778440826338, '015'), (-12.641778440826338, '018'), (-12.641778440826338, '01am'), (-12.641778440826338, '020'), (-12.641778440826338, '023')]
+
+REAL [(-6.790929954967984, 'states'), (-6.765360557845786, 'rubio'), (-6.751044290367751, 'voters'), (-6.701050756752027, 'house'), (-6.695547793099875, 'republicans'), (-6.6701912490429685, 'bush'), (-6.661945235816139, 'percent'), (-6.589623788689862, 'people'), (-6.559670340096453, 'new'), (-6.489892292073901, 'party'), (-6.452319082422527, 'cruz'), (-6.452076515575875, 'state'), (-6.397696648238072, 'republican'), (-6.376343060363355, 'campaign'), (-6.324397735392007, 'president'), (-6.2546017970213645, 'sanders'), (-6.144621899738043, 'obama'), (-5.756817248152807, 'clinton'), (-5.596085785733112, 'said'), (-5.357523914504495, 'trump')]
+
+</code></pre></div></div>
+
+<hr />
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

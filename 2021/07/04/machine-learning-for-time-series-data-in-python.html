@@ -1,0 +1,1956 @@
+<h1 id="machine-learning-for-time-series-data-in-python">Machine Learning for Time Series Data in Python</h1>
+
+<p>chapter1.md
+Details
+Activity
+Earlier this year
+Jul 5</p>
+
+<p>You uploaded an item
+Text
+chapter1.md
+No recorded activity before July 5, 2021</p>
+
+<p>This is the memo of the 9th course (23 courses in all) of ‘Machine Learning Scientist with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/machine-learning-for-time-series-data-in-python">HERE</a></strong>
+ .</p>
+
+<p>###
+<strong>Course Description</strong></p>
+
+<p>Time series data is ubiquitous. Whether it be stock market fluctuations, sensor data recording climate change, or activity in the brain, any signal that changes over time can be described as a time series. Machine learning has emerged as a powerful method for leveraging complexity in data in order to generate predictions and insights into the problem one is trying to solve. This course is an intersection between these two worlds of machine learning and time series data, and covers feature engineering, spectograms, and other advanced techniques in order to classify heartbeat sounds and predict stock prices.</p>
+
+<p>###
+<strong>Table of contents</strong></p>
+
+<p>1.
+ Time Series and Machine Learning Primer</p>
+<ol>
+  <li><a href="https://datascience103579984.wordpress.com/2019/12/29/machine-learning-for-time-series-data-in-python-from-datacamp/2/">Time Series as Inputs to a Model</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/12/29/machine-learning-for-time-series-data-in-python-from-datacamp/3/">Predicting Time Series Data</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/12/29/machine-learning-for-time-series-data-in-python-from-datacamp/4/">Validating and Inspecting Time Series Models</a></li>
+</ol>
+
+<h1 id="1-time-series-and-machine-learning-primer"><strong>1. Time Series and Machine Learning Primer</strong></h1>
+<hr />
+
+<h2 id="11-timeseries-kinds-and-applications"><strong>1.1 Timeseries kinds and applications</strong></h2>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/1-13.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/2-14.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/3-14.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/4-14.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/5-14.png?w=827" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/6-14.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/7-14.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/8-13.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/9-13.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/10-13.png?w=812" alt="" /></p>
+
+<h3 id="111-plotting-a-time-series-i"><strong>1.1.1 Plotting a time series (I)</strong></h3>
+
+<p>In this exercise, you’ll practice plotting the values of two time series without the time component.</p>
+
+<p>Two DataFrames,
+ <code class="language-plaintext highlighter-rouge">data</code>
+ and
+ <code class="language-plaintext highlighter-rouge">data2</code>
+ are available in your workspace.</p>
+
+<p>Unless otherwise noted, assume that all required packages are loaded with their common aliases throughout this course.</p>
+
+<dl>
+  <dt><strong>Note</strong></dt>
+  <dd>This course assumes some familiarity with time series data, as well as how to use them in data analytics pipelines. For an introduction to time series, we recommend the
+ <a href="https://www.datacamp.com/courses/introduction-to-time-series-analysis-in-python">Introduction to Time Series Analysis in Python</a>
+ and
+ <a href="https://www.datacamp.com/courses/visualizing-time-series-data-in-python">Visualizing Time Series Data with Python</a>
+ courses.</dd>
+</dl>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the time series in each dataset
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">data</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">1000</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s">'data_values'</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">data2</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">1000</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="s">'data_values'</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/11-12.png?w=1024" alt="" /></p>
+
+<h3 id="112-plotting-a-time-series-ii"><strong>1.1.2 Plotting a time series (II)</strong></h3>
+
+<p>You’ll now plot both the datasets again, but with the included time stamps for each (stored in the column called
+ <code class="language-plaintext highlighter-rouge">"time"</code>
+ ). Let’s see if this gives you some more context for understanding each time series data.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the time series in each dataset
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+<span class="n">data</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">1000</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'time'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'data_values'</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">data2</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">1000</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'time'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'data_values'</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/12-13.png?w=1024" alt="" /></p>
+
+<p>As you can now see, each time series has a very different sampling frequency (the amount of time between samples). The first is daily stock market data, and the second is an audio waveform.</p>
+
+<hr />
+
+<h2 id="12-machine-learning-basics"><strong>1.2 Machine learning basics</strong></h2>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/13-11.png?w=793" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/14-9.png?w=996" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/15-9.png?w=1007" alt="" /></p>
+
+<h2 id="121-fitting-a-simple-model-classification"><strong>1.2.1 Fitting a simple model: classification</strong></h2>
+
+<p>In this exercise, you’ll use the iris dataset (representing petal characteristics of a number of flowers) to practice using the scikit-learn API to fit a classification model. You can see a sample plot of the data to the right.</p>
+
+<dl>
+  <dt><strong>Note</strong></dt>
+  <dd>This course assumes some familiarity with Machine Learning and
+ <code class="language-plaintext highlighter-rouge">scikit-learn</code>
+ . For an introduction to scikit-learn, we recommend the
+ <a href="https://www.datacamp.com/courses/supervised-learning-with-scikit-learn">Supervised Learning with Scikit-Learn</a>
+ and
+ <a href="https://www.datacamp.com/courses/preprocessing-for-machine-learning-in-python">Preprocessing for Machine Learning in Python</a>
+ courses.</dd>
+</dl>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/16-7.png?w=1024" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">LinearSVC</span>
+
+<span class="c1"># Construct data for the model
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s">'petal length (cm)'</span><span class="p">,</span><span class="s">'petal width (cm)'</span><span class="p">]]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">data</span><span class="p">[[</span><span class="s">'target'</span><span class="p">]]</span>
+
+<span class="c1"># Fit the model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">LinearSVC</span><span class="p">()</span>
+<span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<h3 id="122-predicting-using-a-classification-model"><strong>1.2.2 Predicting using a classification model</strong></h3>
+
+<p>Now that you have fit your classifier, let’s use it to predict the type of flower (or class) for some newly-collected flowers.</p>
+
+<p>Information about petal width and length for several new flowers is stored in the variable
+ <code class="language-plaintext highlighter-rouge">targets</code>
+ . Using the classifier you fit, you’ll predict the type of each flower.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create input array
+</span><span class="n">X_predict</span> <span class="o">=</span> <span class="n">targets</span><span class="p">[[</span><span class="s">'petal length (cm)'</span><span class="p">,</span> <span class="s">'petal width (cm)'</span><span class="p">]]</span>
+
+<span class="c1"># Predict with the model
+</span><span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_predict</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+<span class="c1"># [2 2 2 1 1 2 2 2 2 1 2 1 1 2 1 1 2 1 2 2]
+</span>
+<span class="c1"># Visualize predictions and actual values
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">X_predict</span><span class="p">[</span><span class="s">'petal length (cm)'</span><span class="p">],</span> <span class="n">X_predict</span><span class="p">[</span><span class="s">'petal width (cm)'</span><span class="p">],</span>
+            <span class="n">c</span><span class="o">=</span><span class="n">predictions</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="p">.</span><span class="n">cm</span><span class="p">.</span><span class="n">coolwarm</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">"Predicted class values"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/17-5.png?w=1024" alt="" /></p>
+
+<h3 id="123-fitting-a-simple-model-regression"><strong>1.2.3 Fitting a simple model: regression</strong></h3>
+
+<p>In this exercise, you’ll practice fitting a regression model using data from the Boston housing market. A DataFrame called
+ <code class="language-plaintext highlighter-rouge">boston</code>
+ is available in your workspace. It contains many variables of data (stored as columns). Can you find a relationship between the following two variables?</p>
+
+<ul>
+  <li>
+    <dl>
+      <dt><code class="language-plaintext highlighter-rouge">"AGE"</code></dt>
+      <dd>proportion of owner-occupied units built prior to 1940</dd>
+    </dl>
+  </li>
+  <li>
+    <dl>
+      <dt><code class="language-plaintext highlighter-rouge">"RM"</code></dt>
+      <dd>average number of rooms per dwelling</dd>
+    </dl>
+  </li>
+</ul>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/18-6.png?w=1024" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
+
+<span class="c1"># Prepare input and output DataFrames
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">boston</span><span class="p">[[</span><span class="s">'AGE'</span><span class="p">]]</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">boston</span><span class="p">[[</span><span class="s">'RM'</span><span class="p">]]</span>
+
+<span class="c1"># Fit the model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">linear_model</span><span class="p">.</span><span class="n">LinearRegression</span><span class="p">()</span>
+<span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<h3 id="124-predicting-using-a-regression-model"><strong>1.2.4 Predicting using a regression model</strong></h3>
+
+<p>Now that you’ve fit a model with the Boston housing data, lets see what predictions it generates on some new data. You can investigate the underlying relationship that the model has found between inputs and outputs by feeding in a range of numbers as inputs and seeing what the model predicts for each input.</p>
+
+<p>A 1-D array
+ <code class="language-plaintext highlighter-rouge">new_inputs</code>
+ consisting of 100 “new” values for
+ <code class="language-plaintext highlighter-rouge">"AGE"</code>
+ (proportion of owner-occupied units built prior to 1940) is available in your workspace along with the
+ <code class="language-plaintext highlighter-rouge">model</code>
+ you fit in the previous exercise.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Generate predictions with the model using those inputs
+</span><span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">new_inputs</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+<span class="c1"># Visualize the inputs and predicted values
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">new_inputs</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'inputs'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'predictions'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/19-6.png?w=1024" alt="" /></p>
+
+<p>Here the red line shows the relationship that your model found. As the proportion of pre-1940s houses gets larger, the average number of rooms gets slightly lower.</p>
+
+<hr />
+
+<h2 id="13-machine-learning-and-time-series-data"><strong>1.3 Machine learning and time series data</strong></h2>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/20-6.png?w=962" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/21-6.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/22-6.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/23-6.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/24-6.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/25-5.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/26-5.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/27-5.png?w=802" alt="" /></p>
+
+<h3 id="131-inspecting-the-classification-data"><strong>1.3.1 Inspecting the classification data</strong></h3>
+
+<p>In these final exercises of this chapter, you’ll explore the two datasets you’ll use in this course.</p>
+
+<p>The first is a collection of heartbeat sounds. Hearts normally have a predictable sound pattern as they beat, but some disorders can cause the heart to beat
+ <em>abnormally</em>
+ . This dataset contains a
+ <em>training</em>
+ set with labels for each type of heartbeat, and a
+ <em>testing</em>
+ set with no labels. You’ll use the
+ <em>testing</em>
+ set to validate your models.</p>
+
+<p>As you have labeled data, this dataset is ideal for
+ <em>classification</em>
+ . In fact, it was originally offered as a part of a
+ <a href="https://www.kaggle.com/kinguistics/heartbeat-sounds">public Kaggle competition</a>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="kn">import</span> <span class="nn">librosa</span> <span class="k">as</span> <span class="n">lr</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+
+<span class="c1"># List all the wav files in the folder
+</span><span class="n">audio_files</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="n">data_dir</span> <span class="o">+</span> <span class="s">'/*.wav'</span><span class="p">)</span>
+
+<span class="c1"># Read in the first audio file, create the time array
+</span><span class="n">audio</span><span class="p">,</span> <span class="n">sfreq</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="n">audio_files</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">time</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">audio</span><span class="p">))</span> <span class="o">/</span> <span class="n">sfreq</span>
+
+<span class="c1"># Plot audio over time
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">audio</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="n">xlabel</span><span class="o">=</span><span class="s">'Time (s)'</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s">'Sound Amplitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="n">audio_files</span>
+<span class="p">[</span><span class="s">'./files/murmur__201108222248.wav'</span><span class="p">,</span>
+ <span class="s">'./files/murmur__201108222242.wav'</span><span class="p">,</span>
+ <span class="s">'./files/murmur__201108222253.wav'</span><span class="p">,</span>
+<span class="p">...]</span>
+
+<span class="n">audio</span>
+<span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="mf">0.00039537</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00043787</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.00047949</span><span class="p">,</span> <span class="p">...,</span>  <span class="mf">0.00376802</span><span class="p">,</span>
+        <span class="mf">0.00299449</span><span class="p">,</span>  <span class="mf">0.00206312</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">float32</span><span class="p">)</span>
+
+<span class="n">sfreq</span>
+<span class="mi">22050</span>
+
+<span class="n">time</span>
+<span class="n">array</span><span class="p">([</span>  <span class="mf">0.00000000e+00</span><span class="p">,</span>   <span class="mf">4.53514739e-05</span><span class="p">,</span>   <span class="mf">9.07029478e-05</span><span class="p">,</span> <span class="p">...,</span>
+         <span class="mf">7.93546485e+00</span><span class="p">,</span>   <span class="mf">7.93551020e+00</span><span class="p">,</span>   <span class="mf">7.93555556e+00</span><span class="p">])</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/28-5.png?w=1024" alt="" /></p>
+
+<p>There are several seconds of heartbeat sounds in here, though note that most of this time is silence. A common procedure in machine learning is to separate the datapoints with lots of stuff happening from the ones that don’t.</p>
+
+<h3 id="132-inspecting-the-regression-data"><strong>1.3.2 Inspecting the regression data</strong></h3>
+
+<p>The next dataset contains information about company market value over several years of time. This is one of the most popular kind of time series data used for regression. If you can model the value of a company as it changes over time, you can make predictions about where that company will be in the future. This dataset was also originally provided as part of a
+ <a href="https://www.kaggle.com/dgawlik/nyse">public Kaggle competition</a>
+ .</p>
+
+<p>In this exercise, you’ll plot the time series for a number of companies to get an understanding of how they are (or aren’t) related to one another.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Read in the data
+</span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'prices.csv'</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Convert the index of the DataFrame to datetime
+</span><span class="n">data</span><span class="p">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">index</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+<span class="c1"># Loop through each column, plot its values over time
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">data</span><span class="p">.</span><span class="n">columns</span><span class="p">:</span>
+    <span class="n">data</span><span class="p">[</span><span class="n">column</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">column</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/29-4.png?w=1024" alt="" /></p>
+
+<p>Note that each company’s value is sometimes correlated with others, and sometimes not. Also note there are a lot of ‘jumps’ in there – what effect do you think these jumps would have on a predictive model?</p>
+
+<p>chapter1.txt
+Details
+Activity
+Earlier this year
+Jul 5</p>
+
+<p>You edited an item
+Text
+chapter1.txt
+Jul 5</p>
+
+<p>You uploaded an item
+Text
+chapter1.txt
+No recorded activity before July 5, 2021</p>
+
+<h1 id="2-time-series-as-inputs-to-a-model"><strong>2. Time Series as Inputs to a Model</strong></h1>
+<hr />
+
+<h2 id="21-classifying-a-time-series"><strong>2.1 Classifying a time series</strong></h2>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/1-14.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/2-15.png?w=826" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/3-15.png?w=712" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/4-15.png?w=859" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/5-15.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/6-15.png?w=1024" alt="" /></p>
+
+<h3 id="211-many-repetitions-of-sounds"><strong>2.1.1 Many repetitions of sounds</strong></h3>
+
+<p>In this exercise, you’ll start with perhaps the simplest classification technique: averaging across dimensions of a dataset and visually inspecting the result.</p>
+
+<p>You’ll use the heartbeat data described in the last chapter. Some recordings are
+ <em>normal</em>
+ heartbeat activity, while others are
+ <em>abnormal</em>
+ activity. Let’s see if you can spot the difference.</p>
+
+<p>Two DataFrames,
+ <code class="language-plaintext highlighter-rouge">normal</code>
+ and
+ <code class="language-plaintext highlighter-rouge">abnormal</code>
+ , each with the shape of
+ <code class="language-plaintext highlighter-rouge">(n_times_points, n_audio_files)</code>
+ containing the audio for several heartbeats are available in your workspace. Also, the sampling frequency is loaded into a variable called
+ <code class="language-plaintext highlighter-rouge">sfreq</code>
+ . A convenience plotting function
+ <code class="language-plaintext highlighter-rouge">show_plot_and_make_titles()</code>
+ is also available in your workspace.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+normal.shape
+# (8820, 3)
+
+normal.head()
+                 3         4         6
+time
+0.000000 -0.000995  0.000281  0.002953
+0.000454 -0.003381  0.000381  0.003034
+0.000907 -0.000948  0.000063  0.000292
+0.001361 -0.000766  0.000026 -0.005916
+0.001814  0.000469 -0.000432 -0.005307
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+fig, axs = plt.subplots(3, 2, figsize=(15, 7), sharex=True, sharey=True)
+
+# Calculate the time array
+time = np.arange(normal.shape[0]) / sfreq
+
+# Stack the normal/abnormal audio so you can loop and plot
+stacked_audio = np.hstack([normal, abnormal]).T
+
+# Loop through each audio file / ax object and plot
+# .T.ravel() transposes the array, then unravels it into a 1-D vector for looping
+for iaudio, ax in zip(stacked_audio, axs.T.ravel()):
+    ax.plot(time, iaudio)
+show_plot_and_make_titles()
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/7-15.png?w=919" alt="" /></p>
+
+<p>As you can see there is a lot of variability in the raw data, let’s see if you can average out some of that noise to notice a difference.</p>
+
+<h3 id="212-invariance-in-time"><strong>2.1.2 Invariance in time</strong></h3>
+
+<p>While you should always start by visualizing your raw data, this is often uninformative when it comes to discriminating between two classes of data points. Data is usually noisy or exhibits complex patterns that aren’t discoverable by the naked eye.</p>
+
+<p>Another common technique to find simple differences between two sets of data is to
+ <em>average</em>
+ across multiple instances of the same class. This
+ <em>may</em>
+ remove noise and reveal underlying patterns (or, it may not).</p>
+
+<p>In this exercise, you’ll average across many instances of each class of heartbeat sound.</p>
+
+<p>The two DataFrames (
+ <code class="language-plaintext highlighter-rouge">normal</code>
+ and
+ <code class="language-plaintext highlighter-rouge">abnormal</code>
+ ) and the time array (
+ <code class="language-plaintext highlighter-rouge">time</code>
+ ) from the previous exercise are available in your workspace.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+normal.shape
+# (8820, 10)
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Average across the audio files of each DataFrame
+</span><span class="n">mean_normal</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">normal</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">mean_abnormal</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">abnormal</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Plot each average over time
+</span><span class="n">fig</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">sharey</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">ax1</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">mean_normal</span><span class="p">)</span>
+<span class="n">ax1</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">"Normal Data"</span><span class="p">)</span>
+<span class="n">ax2</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">mean_abnormal</span><span class="p">)</span>
+<span class="n">ax2</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">"Abnormal Data"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/8-14.png?w=1024" alt="" /></p>
+
+<p>Do you see a noticeable difference between the two? Maybe, but it’s quite noisy. Let’s see how you can dig into the data a bit further.</p>
+
+<h3 id="213-build-a-classification-model"><strong>2.1.3 Build a classification model</strong></h3>
+
+<p>While eye-balling differences is a useful way to gain an intuition for the data, let’s see if you can operationalize things with a model. In this exercise, you will use each repetition as a datapoint, and each moment in time as a feature to fit a classifier that attempts to predict abnormal vs. normal heartbeats using
+ <em>only the raw data</em>
+ .</p>
+
+<p>We’ve split the two DataFrames (
+ <code class="language-plaintext highlighter-rouge">normal</code>
+ and
+ <code class="language-plaintext highlighter-rouge">abnormal</code>
+ ) into
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.svm import LinearSVC
+
+# Initialize and fit the model
+model = LinearSVC()
+model.fit(X_train,y_train)
+
+# Generate predictions and score them manually
+predictions = model.predict(X_test)
+print(sum(predictions == y_test.squeeze()) / len(y_test))
+# 0.555555555556
+
+</code></pre></div></div>
+
+<p>Note that your predictions didn’t do so well. That’s because the features you’re using as inputs to the model (raw data) aren’t very good at differentiating classes. Next, you’ll explore how to calculate some more complex features that may improve the results.</p>
+
+<hr />
+
+<h2 id="22-improving-features-for-classification"><strong>2.2 Improving features for classification</strong></h2>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/9-14.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/10-14.png?w=970" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/11-13.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/12-14.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/13-12.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/14-10.png?w=978" alt="" /></p>
+
+<p>row</p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/15-10.png?w=982" alt="" /></p>
+
+<p>abs</p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/16-8.png?w=981" alt="" /></p>
+
+<p>roll</p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/17-6.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/18-7.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/19-7.png?w=913" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/20-7.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/21-7.png?w=1024" alt="" /></p>
+
+<p>####
+ 2.2.1 Calculating the envelope of sound</p>
+
+<p>One of the ways you can improve the features available to your model is to remove some of the noise present in the data. In audio data, a common way to do this is to
+ <em>smooth</em>
+ the data and then
+ <em>rectify</em>
+ it so that the total amount of sound energy over time is more distinguishable. You’ll do this in the current exercise.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+audio.head()
+time
+0.000000   -0.024684
+0.000454   -0.060429
+0.000907   -0.070080
+0.001361   -0.084212
+0.001814   -0.085111
+Name: 0, dtype: float32
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the raw data first
+</span><span class="n">audio</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/1-15.png?w=1024" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Rectify the audio signal
+</span><span class="n">audio_rectified</span> <span class="o">=</span> <span class="n">audio</span><span class="p">.</span><span class="nb">apply</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">)</span>
+
+<span class="c1"># Plot the result
+</span><span class="n">audio_rectified</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/2-16.png?w=1024" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Smooth by applying a rolling mean
+</span><span class="n">audio_rectified_smooth</span> <span class="o">=</span> <span class="n">audio_rectified</span><span class="p">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">50</span><span class="p">).</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># Plot the result
+</span><span class="n">audio_rectified_smooth</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/3-16.png?w=1024" alt="" /></p>
+
+<p>By calculating the envelope of each sound and smoothing it, you’ve eliminated much of the noise and have a cleaner signal to tell you when a heartbeat is happening.</p>
+
+<h3 id="222-calculating-features-from-the-envelope"><strong>2.2.2 Calculating features from the envelope</strong></h3>
+
+<p>Now that you’ve removed some of the noisier fluctuations in the audio, let’s see if this improves your ability to classify.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="n">model</span>
+<span class="n">LinearSVC</span><span class="p">(</span><span class="n">C</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">class_weight</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">dual</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">fit_intercept</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+          <span class="n">intercept_scaling</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s">'squared_hinge'</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span>
+          <span class="n">multi_class</span><span class="o">=</span><span class="s">'ovr'</span><span class="p">,</span> <span class="n">penalty</span><span class="o">=</span><span class="s">'l2'</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">tol</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">,</span>
+          <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate stats
+</span><span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">audio_rectified_smooth</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">stds</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">audio_rectified_smooth</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">maxs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">audio_rectified_smooth</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Create the X and y arrays
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">means</span><span class="p">,</span> <span class="n">stds</span><span class="p">,</span> <span class="n">maxs</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">labels</span><span class="p">.</span><span class="n">reshape</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Fit the model and score on testing data
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>
+<span class="n">percent_score</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">percent_score</span><span class="p">))</span>
+<span class="c1"># 0.716666666667
+</span>
+</code></pre></div></div>
+
+<p>This model is both simpler (only 3 features) and more understandable (features are simple summary statistics of the data).</p>
+
+<h3 id="223-derivative-features-the-tempogram"><strong>2.2.3 Derivative features: The tempogram</strong></h3>
+
+<p>One benefit of cleaning up your data is that it lets you compute more sophisticated features. For example, the envelope calculation you performed is a common technique in computing
+ <strong>tempo</strong>
+ and
+ <strong>rhythm</strong>
+ features. In this exercise, you’ll use
+ <code class="language-plaintext highlighter-rouge">librosa</code>
+ to compute some tempo and rhythm features for heartbeat data, and fit a model once more.</p>
+
+<p>Note that
+ <code class="language-plaintext highlighter-rouge">librosa</code>
+ functions tend to only operate on
+ <strong>numpy arrays</strong>
+ instead of DataFrames, so we’ll access our Pandas data as a Numpy array with the
+ <code class="language-plaintext highlighter-rouge">.values</code>
+ attribute.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate the tempo of the sounds
+</span><span class="n">tempos</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">col</span><span class="p">,</span> <span class="n">i_audio</span> <span class="ow">in</span> <span class="n">audio</span><span class="p">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">tempos</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">beat</span><span class="p">.</span><span class="n">tempo</span><span class="p">(</span><span class="n">i_audio</span><span class="p">.</span><span class="n">values</span><span class="p">,</span> <span class="n">sr</span><span class="o">=</span><span class="n">sfreq</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">6</span><span class="p">,</span> <span class="n">aggregate</span><span class="o">=</span><span class="bp">None</span><span class="p">))</span>
+
+<span class="c1"># Convert the list to an array so you can manipulate it more easily
+</span><span class="n">tempos</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">tempos</span><span class="p">)</span>
+
+<span class="c1"># Calculate statistics of each tempo
+</span><span class="n">tempos_mean</span> <span class="o">=</span> <span class="n">tempos</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">tempos_std</span> <span class="o">=</span> <span class="n">tempos</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">tempos_max</span> <span class="o">=</span> <span class="n">tempos</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Create the X and y arrays
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">means</span><span class="p">,</span> <span class="n">stds</span><span class="p">,</span> <span class="n">maxs</span><span class="p">,</span> <span class="n">tempos_mean</span><span class="p">,</span> <span class="n">tempos_std</span><span class="p">,</span> <span class="n">tempos_max</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">labels</span><span class="p">.</span><span class="n">reshape</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Fit the model and score on testing data
+</span><span class="n">percent_score</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">percent_score</span><span class="p">))</span>
+<span class="c1">#  0.516666666667
+</span>
+</code></pre></div></div>
+
+<p>Note that your predictive power may not have gone up (because this dataset is quite small), but you now have a more rich feature representation of audio that your model can use!</p>
+
+<hr />
+
+<h2 id="23-the-spectrogram"><strong>2.3 The spectrogram</strong></h2>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/4-16.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/5-16.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/6-16.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/7-16.png?w=721" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/8-15.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/9-15.png?w=930" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/10-15.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/11-14.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/12-15.png?w=1024" alt="" /></p>
+
+<h3 id="231-spectrograms-of-heartbeat-audio"><strong>2.3.1 Spectrograms of heartbeat audio</strong></h3>
+
+<p>Spectral engineering is one of the most common techniques in machine learning for time series data. The first step in this process is to calculate a
+ <strong>spectrogram</strong>
+ of sound. This describes what spectral content (e.g., low and high pitches) are present in the sound over time. In this exercise, you’ll calculate a spectrogram of a heartbeat audio file.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the stft function
+</span><span class="kn">from</span> <span class="nn">librosa.core</span> <span class="kn">import</span> <span class="n">stft</span>
+
+<span class="c1"># Prepare the STFT
+</span><span class="n">HOP_LENGTH</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">4</span>
+<span class="n">spec</span> <span class="o">=</span> <span class="n">stft</span><span class="p">(</span><span class="n">audio</span><span class="p">,</span> <span class="n">hop_length</span><span class="o">=</span><span class="n">HOP_LENGTH</span><span class="p">,</span> <span class="n">n_fft</span><span class="o">=</span><span class="mi">2</span><span class="o">**</span><span class="mi">7</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from librosa.core import amplitude_to_db
+from librosa.display import specshow
+
+# Convert into decibels
+spec_db = amplitude_to_db(spec)
+
+# Compare the raw audio to the spectrogram of the audio
+fig, axs = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
+axs[0].plot(time, audio)
+specshow(spec_db, sr=sfreq, x_axis='time', y_axis='hz', hop_length=HOP_LENGTH)
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/13-13.png?w=1024" alt="" /></p>
+
+<p>Do you notice that the heartbeats come in pairs, as seen by the vertical lines in the spectrogram?</p>
+
+<h3 id="232-engineering-spectral-features"><strong>2.3.2 Engineering spectral features</strong></h3>
+
+<p>As you can probably tell, there is a lot more information in a spectrogram compared to a raw audio file. By computing the spectral features, you have a much better idea of what’s going on. As such, there are all kinds of spectral features that you can compute using the spectrogram as a base. In this exercise, you’ll look at a few of these features.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import librosa as lr
+
+# Calculate the spectral centroid and bandwidth for the spectrogram
+bandwidths = lr.feature.spectral_bandwidth(S=spec)[0]
+centroids = lr.feature.spectral_centroid(S=spec)[0]
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from librosa.core import amplitude_to_db
+from librosa.display import specshow
+
+# Convert spectrogram to decibels for visualization
+spec_db = amplitude_to_db(spec)
+
+# Display these features on top of the spectrogram
+fig, ax = plt.subplots(figsize=(10, 5))
+ax = specshow(spec_db, x_axis='time', y_axis='hz', hop_length=HOP_LENGTH)
+ax.plot(times_spec, centroids)
+ax.fill_between(times_spec, centroids - bandwidths / 2, centroids + bandwidths / 2, alpha=.5)
+ax.set(ylim=[None, 6000])
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/14-11.png?w=1024" alt="" /></p>
+
+<p>As you can see, the spectral centroid and bandwidth characterize the spectral content in each sound over time. They give us a summary of the spectral content that we can use in a classifier.</p>
+
+<h3 id="233-combining-many-features-in-a-classifier"><strong>2.3.3 Combining many features in a classifier</strong></h3>
+
+<p>You’ve spent this lesson engineering many features from the audio data – some contain information about how the audio changes in time, others contain information about the spectral content that is present.</p>
+
+<p>The beauty of machine learning is that it can handle all of these features at the same time. If there is different information present in each feature, it should improve the classifier’s ability to distinguish the types of audio. Note that this often requires more advanced techniques such as regularization, which we’ll cover in the next chapter.</p>
+
+<p>For the final exercise in the chapter, we’ve loaded many of the features that you calculated before. Combine all of them into an array that can be fed into the classifier, and see how it does.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Loop through each spectrogram
+</span><span class="n">bandwidths</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">centroids</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">spectrograms</span><span class="p">:</span>
+    <span class="c1"># Calculate the mean spectral bandwidth
+</span>    <span class="n">this_mean_bandwidth</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">feature</span><span class="p">.</span><span class="n">spectral_bandwidth</span><span class="p">(</span><span class="n">S</span><span class="o">=</span><span class="n">spec</span><span class="p">))</span>
+    <span class="c1"># Calculate the mean spectral centroid
+</span>    <span class="n">this_mean_centroid</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">feature</span><span class="p">.</span><span class="n">spectral_centroid</span><span class="p">(</span><span class="n">S</span><span class="o">=</span><span class="n">spec</span><span class="p">))</span>
+    <span class="c1"># Collect the values
+</span>    <span class="n">bandwidths</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_mean_bandwidth</span><span class="p">)</span>
+    <span class="n">centroids</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_mean_centroid</span><span class="p">)</span>
+
+
+<span class="c1"># Create X and y arrays
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">means</span><span class="p">,</span> <span class="n">stds</span><span class="p">,</span> <span class="n">maxs</span><span class="p">,</span> <span class="n">tempo_mean</span><span class="p">,</span> <span class="n">tempo_max</span><span class="p">,</span> <span class="n">tempo_std</span><span class="p">,</span> <span class="n">bandwidths</span><span class="p">,</span> <span class="n">centroids</span><span class="p">])</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">labels</span><span class="p">.</span><span class="n">reshape</span><span class="p">([</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Fit the model and score on testing data
+</span><span class="n">percent_score</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">percent_score</span><span class="p">))</span>
+<span class="c1"># 0.533333333333
+</span>
+</code></pre></div></div>
+
+<p>You calculated many different features of the audio, and combined each of them under the assumption that they provide independent information that can be used in classification. You may have noticed that the accuracy of your models varied a lot when using different set of features. This chapter was focused on creating new “features” from raw data and not obtaining the best accuracy. To improve the accuracy, you want to find the right features that provide relevant information and also build models on
+ <em>much</em>
+ larger data.</p>
+
+<p>chapter1.txt
+Details
+Activity
+Earlier this year
+Jul 5</p>
+
+<p>You edited an item
+Text
+chapter1.txt
+Jul 5</p>
+
+<p>You uploaded an item
+Text
+chapter1.txt
+No recorded activity before July 5, 2021</p>
+
+<h1 id="3-predicting-time-series-data"><strong>3. Predicting Time Series Data</strong></h1>
+<hr />
+
+<h2 id="31-predicting-data-over-time"><strong>3.1 Predicting data over time</strong></h2>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/15-11.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/16-9.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/17-7.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/18-8.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/19-8.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/20-8.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/21-8.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/22-7.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/23-7.png?w=779" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/24-7.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/25-6.png?w=662" alt="" /></p>
+
+<h3 id="311-introducing-the-dataset"><strong>3.1.1 Introducing the dataset</strong></h3>
+
+<p>As mentioned in the video, you’ll deal with stock market prices that fluctuate over time. In this exercise you’ve got historical prices from two tech companies (
+ <strong>Ebay</strong>
+ and
+ <strong>Yahoo</strong>
+ ) in the DataFrame
+ <code class="language-plaintext highlighter-rouge">prices</code>
+ . You’ll visualize the raw data for the two companies, then generate a scatter plot showing how the values for each company compare with one another. Finally, you’ll add in a “time” dimension to your scatter plot so you can see how this relationship changes over time.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the raw values over time
+</span><span class="n">prices</span><span class="p">.</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/26-6.png?w=1024" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Scatterplot with one company per axis
+</span><span class="n">prices</span><span class="p">.</span><span class="n">plot</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="s">'EBAY'</span><span class="p">,</span> <span class="s">'YHOO'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/27-6.png?w=1024" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Scatterplot with color relating to time
+</span><span class="n">prices</span><span class="p">.</span><span class="n">plot</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="s">'EBAY'</span><span class="p">,</span> <span class="s">'YHOO'</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="s">'date'</span><span class="p">,</span>
+                    <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="p">.</span><span class="n">cm</span><span class="p">.</span><span class="n">viridis</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/28-6.png?w=1024" alt="" /></p>
+
+<p>As you can see, these two time series seem
+ <em>somewhat</em>
+ related to each other, though its a complex relationship that changes over time.</p>
+
+<h3 id="312-fitting-a-simple-regression-model"><strong>3.1.2 Fitting a simple regression model</strong></h3>
+
+<p>Now we’ll look at a larger number of companies. Recall that we have historical price values for many companies. Let’s use data from several companies to predict the value of a test company. You’ll attempt to predict the value of the
+ <strong>Apple</strong>
+ stock price using the values of NVidia, Ebay, and Yahoo.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+all_prices.head()
+symbol            AAPL        ABT        AIG   AMAT       ARNC        BAC  \
+date
+2010-01-04  214.009998  54.459951  29.889999  14.30  16.650013  15.690000
+2010-01-05  214.379993  54.019953  29.330000  14.19  16.130013  16.200001
+2010-01-06  210.969995  54.319953  29.139999  14.16  16.970013  16.389999
+2010-01-07  210.580000  54.769952  28.580000  14.01  16.610014  16.930000
+2010-01-08  211.980005  55.049952  29.340000  14.55  17.020014  16.780001
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.linear_model import Ridge
+from sklearn.model_selection import cross_val_score
+
+# Use stock symbols to extract training data
+X = all_prices[["EBAY","NVDA","YHOO"]]
+y = all_prices[["AAPL"]]
+
+# Fit and score the model with cross-validation
+scores = cross_val_score(Ridge(), X, y, cv=3)
+print(scores)
+# [-6.09050633 -0.3179172  -3.72957284]
+
+</code></pre></div></div>
+
+<p>As you can see, fitting a model with raw data doesn’t give great results.</p>
+
+<h3 id="313-visualizing-predicted-values"><strong>3.1.3 Visualizing predicted values</strong></h3>
+
+<p>When dealing with time series data, it’s useful to visualize model predictions on top of the “actual” values that are used to test the model.</p>
+
+<p>In this exercise, after splitting the data (stored in the variables
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ ) into training and test sets, you’ll build a model and then visualize the model’s predictions on top of the testing data in order to estimate the model’s performance.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import r2_score
+
+# Split our data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X, y,
+                                                    train_size=.8, shuffle=False, random_state=1)
+
+# Fit our model and generate predictions
+model = Ridge()
+model.fit(X_train, y_train)
+predictions = model.predict(X_test)
+score = r2_score(y_test, predictions)
+print(score)
+# -5.70939901949
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Visualize our predictions along with the "true" values, and print the score
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/29-5.png?w=1024" alt="" /></p>
+
+<p>Now you have an explanation for your poor score. The predictions clearly deviate from the true time series values.</p>
+
+<hr />
+
+<h2 id="32-advanced-time-series-prediction"><strong>3.2 Advanced time series prediction</strong></h2>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/1-16.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/2-17.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/3-17.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/4-17.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/5-17.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/6-17.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/7-17.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/8-16.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/9-16.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/10-16.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/11-15.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/12-16.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/13-14.png?w=1024" alt="" /></p>
+
+<h3 id="321-visualizing-messy-data"><strong>3.2.1 Visualizing messy data</strong></h3>
+
+<p>Let’s take a look at a new dataset – this one is a bit less-clean than what you’ve seen before.</p>
+
+<p>As always, you’ll first start by visualizing the raw data. Take a close look and try to find datapoints that could be problematic for fitting models.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Visualize the dataset
+</span><span class="n">prices</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">legend</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Count the missing values of each time series
+</span><span class="n">missing_values</span> <span class="o">=</span> <span class="n">prices</span><span class="p">.</span><span class="n">isna</span><span class="p">().</span><span class="nb">sum</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">missing_values</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/14-12.png?w=1024" alt="" /></p>
+
+<p>In the plot, you can see there are clearly missing chunks of time in your data. There also seem to be a few ‘jumps’ in the data. How can you deal with this?</p>
+
+<h3 id="322-imputing-missing-values"><strong>3.2.2 Imputing missing values</strong></h3>
+
+<p>When you have missing data points, how can you fill them in?</p>
+
+<p>In this exercise, you’ll practice using different interpolation methods to fill in some missing values, visualizing the result each time. But first, you will create the function (
+ <code class="language-plaintext highlighter-rouge">interpolate_and_plot()</code>
+ ) you’ll use to interpolate missing data points and plot them.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a function we'll use to interpolate and plot
+</span><span class="k">def</span> <span class="nf">interpolate_and_plot</span><span class="p">(</span><span class="n">prices</span><span class="p">,</span> <span class="n">interpolation</span><span class="p">):</span>
+
+    <span class="c1"># Create a boolean mask for missing values
+</span>    <span class="n">missing_values</span> <span class="o">=</span> <span class="n">prices</span><span class="p">.</span><span class="n">isna</span><span class="p">()</span>
+
+    <span class="c1"># Interpolate the missing values
+</span>    <span class="n">prices_interp</span> <span class="o">=</span> <span class="n">prices</span><span class="p">.</span><span class="n">interpolate</span><span class="p">(</span><span class="n">interpolation</span><span class="p">)</span>
+
+    <span class="c1"># Plot the results, highlighting the interpolated values in black
+</span>    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+    <span class="n">prices_interp</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="p">.</span><span class="mi">6</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="c1"># Now plot the interpolated values on top in red
+</span>    <span class="n">prices_interp</span><span class="p">[</span><span class="n">missing_values</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">legend</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Interpolate using the latest non-missing value
+</span><span class="n">interpolation_type</span> <span class="o">=</span> <span class="s">'zero'</span>
+<span class="n">interpolate_and_plot</span><span class="p">(</span><span class="n">prices</span><span class="p">,</span> <span class="n">interpolation_type</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/15-12.png?w=1024" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Interpolate linearly
+</span><span class="n">interpolation_type</span> <span class="o">=</span> <span class="s">'linear'</span>
+<span class="n">interpolate_and_plot</span><span class="p">(</span><span class="n">prices</span><span class="p">,</span> <span class="n">interpolation_type</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/16-10.png?w=1024" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Interpolate with a quadratic function
+</span><span class="n">interpolation_type</span> <span class="o">=</span> <span class="s">'quadratic'</span>
+<span class="n">interpolate_and_plot</span><span class="p">(</span><span class="n">prices</span><span class="p">,</span> <span class="n">interpolation_type</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/17-8.png?w=1024" alt="" /></p>
+
+<p>When you interpolate, the pre-existing data is used to infer the values of missing data. As you can see, the method you use for this has a big effect on the outcome.</p>
+
+<h3 id="323-transforming-raw-data"><strong>3.2.3 Transforming raw data</strong></h3>
+
+<p>In the last chapter, you calculated the rolling mean. In this exercise, you will define a function that calculates the percent change of the latest data point from the mean of a window of previous data points. This function will help you calculate the percent change over a rolling window.</p>
+
+<p>This is a more stable kind of time series that is often useful in machine learning.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Your custom function
+</span><span class="k">def</span> <span class="nf">percent_change</span><span class="p">(</span><span class="n">series</span><span class="p">):</span>
+    <span class="c1"># Collect all *but* the last value of this window, then the final value
+</span>    <span class="n">previous_values</span> <span class="o">=</span> <span class="n">series</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">last_value</span> <span class="o">=</span> <span class="n">series</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># Calculate the % difference between the last value and the mean of earlier values
+</span>    <span class="n">percent_change</span> <span class="o">=</span> <span class="p">(</span><span class="n">last_value</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">previous_values</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">previous_values</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">percent_change</span>
+
+<span class="c1"># Apply your custom function and plot
+</span><span class="n">prices_perc</span> <span class="o">=</span> <span class="n">prices</span><span class="p">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">20</span><span class="p">).</span><span class="n">aggregate</span><span class="p">(</span><span class="n">percent_change</span><span class="p">)</span>
+<span class="n">prices_perc</span><span class="p">.</span><span class="n">loc</span><span class="p">[</span><span class="s">"2014"</span><span class="p">:</span><span class="s">"2015"</span><span class="p">].</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/18-9.png?w=1024" alt="" /></p>
+
+<p>You’ve converted the data so it’s easier to compare one time point to another. This is a cleaner representation of the data.</p>
+
+<h3 id="324-handling-outliers"><strong>3.2.4 Handling outliers</strong></h3>
+
+<p>In this exercise, you’ll handle outliers – data points that are so different from the rest of your data, that you treat them
+ <em>differently</em>
+ from other “normal-looking” data points. You’ll use the output from the previous exercise (percent change over time) to detect the outliers. First you will write a function that replaces outlier data points with the median value from the entire time series.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def replace_outliers(series):
+    # Calculate the absolute difference of each timepoint from the series mean
+    absolute_differences_from_mean = np.abs(series - np.mean(series))
+
+    # Calculate a mask for the differences that are &gt; 3 standard deviations from zero
+    this_mask = absolute_differences_from_mean &gt; (np.std(series) * 3)
+
+    # Replace these values with the median accross the data
+    series[this_mask] = np.nanmedian(series)
+    return series
+
+# Apply your preprocessing function to the timeseries and plot the results
+prices_perc = prices_perc.apply(replace_outliers)
+prices_perc.loc["2014":"2015"].plot()
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/19-9.png?w=1024" alt="" /></p>
+
+<p>Since you’ve converted the data to % change over time, it was easier to spot and correct the outliers.</p>
+
+<hr />
+
+<h2 id="33-creating-features-over-time"><strong>3.3 Creating features over time</strong></h2>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/20-9.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/21-9.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/22-8.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/23-8.png?w=749" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/24-8.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/25-7.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/26-7.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/27-7.png?w=1024" alt="" /></p>
+
+<h3 id="331-engineering-multiple-rolling-features-at-once"><strong>3.3.1 Engineering multiple rolling features at once</strong></h3>
+
+<p>Now that you’ve practiced some simple feature engineering, let’s move on to something more complex. You’ll calculate a collection of features for your time series data and visualize what they look like over time. This process resembles how many other time series models operate.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define a rolling window with Pandas, excluding the right-most datapoint of the window
+</span><span class="n">prices_perc_rolling</span> <span class="o">=</span> <span class="n">prices_perc</span><span class="p">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s">'right'</span><span class="p">)</span>
+
+<span class="c1"># Define the features you'll calculate for each window
+</span><span class="n">features_to_calculate</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="nb">min</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">]</span>
+
+<span class="c1"># Calculate these features for your rolling window object
+</span><span class="n">features</span> <span class="o">=</span> <span class="n">prices_perc_rolling</span><span class="p">.</span><span class="n">agg</span><span class="p">(</span><span class="n">features_to_calculate</span><span class="p">)</span>
+
+<span class="c1"># Plot the results
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">features</span><span class="p">.</span><span class="n">loc</span><span class="p">[:</span><span class="s">"2011-01"</span><span class="p">].</span><span class="n">plot</span><span class="p">()</span>
+<span class="n">prices_perc</span><span class="p">.</span><span class="n">loc</span><span class="p">[:</span><span class="s">"2011-01"</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'k'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="p">.</span><span class="mi">2</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="p">(</span><span class="mf">1.01</span><span class="p">,</span> <span class="p">.</span><span class="mi">6</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/28-7.png?w=1024" alt="" /></p>
+
+<h3 id="332-percentiles-and-partial-functions"><strong>3.3.2 Percentiles and partial functions</strong></h3>
+
+<p>In this exercise, you’ll practice how to pre-choose arguments of a function so that you can pre-configure how it runs. You’ll use this to calculate several percentiles of your data using the same
+ <code class="language-plaintext highlighter-rouge">percentile()</code>
+ function in
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import partial from functools
+</span><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="n">percentiles</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">90</span><span class="p">,</span> <span class="mi">99</span><span class="p">]</span>
+
+<span class="c1"># Use a list comprehension to create a partial function for each quantile
+</span><span class="n">percentile_functions</span> <span class="o">=</span> <span class="p">[</span><span class="n">partial</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">,</span> <span class="n">q</span><span class="o">=</span><span class="n">percentile</span><span class="p">)</span> <span class="k">for</span> <span class="n">percentile</span> <span class="ow">in</span> <span class="n">percentiles</span><span class="p">]</span>
+
+<span class="c1"># Calculate each of these quantiles on the data using a rolling window
+</span><span class="n">prices_perc_rolling</span> <span class="o">=</span> <span class="n">prices_perc</span><span class="p">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="n">min_periods</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">closed</span><span class="o">=</span><span class="s">'right'</span><span class="p">)</span>
+<span class="n">features_percentiles</span> <span class="o">=</span> <span class="n">prices_perc_rolling</span><span class="p">.</span><span class="n">agg</span><span class="p">(</span><span class="n">percentile_functions</span><span class="p">)</span>
+
+<span class="c1"># Plot a subset of the result
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">features_percentiles</span><span class="p">.</span><span class="n">loc</span><span class="p">[:</span><span class="s">"2011-01"</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="p">.</span><span class="n">cm</span><span class="p">.</span><span class="n">viridis</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">percentiles</span><span class="p">,</span> <span class="n">loc</span><span class="o">=</span><span class="p">(</span><span class="mf">1.01</span><span class="p">,</span> <span class="p">.</span><span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/29-6.png?w=1024" alt="" /></p>
+
+<h3 id="333-using-date-information"><strong>3.3.3 Using “date” information</strong></h3>
+
+<p>It’s easy to think of timestamps as pure numbers, but don’t forget they generally correspond to things that happen in the real world. That means there’s often extra information encoded in the data such as “is it a weekday?” or “is it a holiday?”. This information is often useful in predicting timeseries data.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+prices_perc.head()
+                EBAY
+date
+2014-01-02  0.017938
+2014-01-03  0.002268
+2014-01-06 -0.027365
+2014-01-07 -0.006665
+2014-01-08 -0.017206
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Extract date features from the data, add them as columns
+</span><span class="n">prices_perc</span><span class="p">[</span><span class="s">'day_of_week'</span><span class="p">]</span> <span class="o">=</span> <span class="n">prices_perc</span><span class="p">.</span><span class="n">index</span><span class="p">.</span><span class="n">dayofweek</span>
+<span class="n">prices_perc</span><span class="p">[</span><span class="s">'week_of_year'</span><span class="p">]</span> <span class="o">=</span> <span class="n">prices_perc</span><span class="p">.</span><span class="n">index</span><span class="p">.</span><span class="n">weekofyear</span>
+<span class="n">prices_perc</span><span class="p">[</span><span class="s">'month_of_year'</span><span class="p">]</span> <span class="o">=</span> <span class="n">prices_perc</span><span class="p">.</span><span class="n">index</span><span class="p">.</span><span class="n">month</span>
+
+<span class="c1"># Print prices_perc
+</span><span class="k">print</span><span class="p">(</span><span class="n">prices_perc</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                EBAY  day_of_week  week_of_year  month_of_year
+date
+2014-01-02  0.017938            3             1              1
+2014-01-03  0.002268            4             1              1
+2014-01-06 -0.027365            0             2              1
+2014-01-07 -0.006665            1             2              1
+...
+
+</code></pre></div></div>
+
+<p>This concludes the third chapter. In the next chapter, you will learn advanced techniques to validate and inspect your time series models.</p>
+
+<p>chapter1.txt
+Details
+Activity
+Earlier this year
+Jul 5</p>
+
+<p>You edited an item
+Text
+chapter1.txt
+Jul 5</p>
+
+<p>You uploaded an item
+Text
+chapter1.txt
+No recorded activity before July 5, 2021</p>
+
+<h1 id="4-validating-and-inspecting-time-series-models"><strong>4. Validating and Inspecting Time Series Models</strong></h1>
+<hr />
+
+<h2 id="41-creating-features-from-the-past"><strong>4.1 Creating features from the past</strong></h2>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/30-4.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/31-3.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/32-2.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/33-2.png?w=917" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/34-1.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/35.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/36.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/37.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/38.png?w=1024" alt="" /></p>
+
+<h3 id="411-creating-time-shifted-features"><strong>4.1.1 Creating time-shifted features</strong></h3>
+
+<p>In machine learning for time series, it’s common to use information about previous time points to predict a subsequent time point.</p>
+
+<p>In this exercise, you’ll “shift” your raw data and visualize the results. You’ll use the
+ <em>percent change</em>
+ time series that you calculated in the previous chapter, this time with a
+ <em>very short</em>
+ window. A short window is important because, in a real-world scenario, you want to predict the day-to-day fluctuations of a time series, not its change over a longer window of time.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># These are the "time lags"
+</span><span class="n">shifts</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">).</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="c1"># Use a dictionary comprehension to create name: value pairs, one pair per shift
+</span><span class="n">shifted_data</span> <span class="o">=</span> <span class="p">{</span><span class="s">"lag_{}_day"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">day_shift</span><span class="p">):</span> <span class="n">prices_perc</span><span class="p">.</span><span class="n">shift</span><span class="p">(</span><span class="n">day_shift</span><span class="p">)</span> <span class="k">for</span> <span class="n">day_shift</span> <span class="ow">in</span> <span class="n">shifts</span><span class="p">}</span>
+
+<span class="c1"># Convert into a DataFrame for subsequent use
+</span><span class="n">prices_perc_shifted</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">shifted_data</span><span class="p">)</span>
+
+<span class="c1"># Plot the first 100 samples of each
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">prices_perc_shifted</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">100</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="p">.</span><span class="n">cm</span><span class="p">.</span><span class="n">viridis</span><span class="p">)</span>
+<span class="n">prices_perc</span><span class="p">.</span><span class="n">iloc</span><span class="p">[:</span><span class="mi">100</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">color</span><span class="o">=</span><span class="s">'r'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">'best'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/1-17.png?w=1024" alt="" /></p>
+
+<h3 id="412-special-case-auto-regressive-models"><strong>4.1.2 Special case: Auto-regressive models</strong></h3>
+
+<p>Now that you’ve created time-shifted versions of a single time series, you can fit an
+ <em>auto-regressive</em>
+ model. This is a regression model where the input features are time-shifted versions of the output time series data. You are using previous values of a timeseries to predict current values of the same timeseries (thus, it is auto-regressive).</p>
+
+<p>By investigating the coefficients of this model, you can explore any repetitive patterns that exist in a timeseries, and get an idea for how far in the past a data point is predictive of the future.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Replace missing values with the median for each column
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">prices_perc_shifted</span><span class="p">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">prices_perc_shifted</span><span class="p">))</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">prices_perc</span><span class="p">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">nanmedian</span><span class="p">(</span><span class="n">prices_perc</span><span class="p">))</span>
+
+<span class="c1"># Fit the model
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">()</span>
+<span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+X.head(1)
+            lag_1_day  lag_2_day  lag_3_day  lag_4_day  lag_5_day  lag_6_day  \
+date
+2010-01-04   0.000756   0.000756   0.000756   0.000756   0.000756   0.000756
+
+            lag_7_day  lag_8_day  lag_9_day  lag_10_day
+date
+2010-01-04   0.000756   0.000756   0.000756    0.000756
+
+y.head(1)
+date
+2010-01-04    0.000756
+Name: AAPL, dtype: float64
+
+</code></pre></div></div>
+
+<p>You’ve filled in the missing values with the median so that it behaves well with scikit-learn. Now let’s take a look at what your model found.</p>
+
+<h3 id="413-visualize-regression-coefficients"><strong>4.1.3 Visualize regression coefficients</strong></h3>
+
+<p>Now that you’ve fit the model, let’s visualize its coefficients. This is an important part of machine learning because it gives you an idea for how the different features of a model affect the outcome.</p>
+
+<p>The shifted time series DataFrame (
+ <code class="language-plaintext highlighter-rouge">prices_perc_shifted</code>
+ ) and the regression model (
+ <code class="language-plaintext highlighter-rouge">model</code>
+ ) are available in your workspace.</p>
+
+<p>In this exercise, you will create a function that, given a set of coefficients and feature names, visualizes the coefficient values.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def visualize_coefficients(coefs, names, ax):
+    # Make a bar plot for the coefficients, including their names on the x-axis
+    ax.bar(names, coefs)
+    ax.set(xlabel='Coefficient name', ylabel='Coefficient value')
+
+    # Set formatting so it looks nice
+    plt.setp(ax.get_xticklabels(), rotation=45, horizontalalignment='right')
+    return ax
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Visualize the output data up to "2011-01"
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">y</span><span class="p">.</span><span class="n">loc</span><span class="p">[:</span><span class="s">'2011-01'</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># Run the function to visualize model's coefficients
+</span><span class="n">visualize_coefficients</span><span class="p">(</span><span class="n">model</span><span class="p">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">prices_perc_shifted</span><span class="p">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/2-18.png?w=1024" alt="" /></p>
+
+<p>When you use time-lagged features on the raw data, you see that the highest coefficient by far is the first one. This means that the N-1th time point is useful in predicting the Nth timepoint, but no other points are useful.</p>
+
+<h3 id="414-auto-regression-with-a-smoother-time-series"><strong>4.1.4 Auto-regression with a smoother time series</strong></h3>
+
+<p>Now, let’s re-run the same procedure using a smoother signal. You’ll use the same
+ <em>percent change</em>
+ algorithm as before, but this time use a much larger window (40 instead of 20). As the window grows, the difference between neighboring timepoints gets smaller, resulting in a
+ <em>smoother</em>
+ signal. What do you think this will do to the auto-regressive model?</p>
+
+<p><code class="language-plaintext highlighter-rouge">prices_perc_shifted</code>
+ and
+ <code class="language-plaintext highlighter-rouge">model</code>
+ (updated to use a window of 40) are available in your workspace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Visualize the output data up to "2011-01"
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">y</span><span class="p">.</span><span class="n">loc</span><span class="p">[:</span><span class="s">'2011-01'</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="c1"># Run the function to visualize model's coefficients
+</span><span class="n">visualize_coefficients</span><span class="p">(</span><span class="n">model</span><span class="p">.</span><span class="n">coef_</span><span class="p">,</span> <span class="n">prices_perc_shifted</span><span class="p">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/3-18.png?w=1024" alt="" /></p>
+
+<p>As you can see here, by transforming your data with a larger window, you’ve also changed the relationship between each timepoint and the ones that come just before it. This model’s coefficients gradually go down to zero, which means that the signal itself is smoother over time. Be careful when you see something like this, as it means your data is not
+ <a href="https://en.wikipedia.org/wiki/Independent_and_identically_distributed_random_variables">i.i.d</a>
+ .</p>
+
+<hr />
+
+<h2 id="42-cross-validating-time-series-data"><strong>4.2 Cross-validating time series data</strong></h2>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/4-18.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/5-18.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/6-18.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/7-18.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/8-17.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/9-17.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/10-17.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/11-16.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/12-17.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/13-15.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/14-13.png?w=1024" alt="" /></p>
+
+<h3 id="421-cross-validation-with-shuffling"><strong>4.2.1 Cross-validation with shuffling</strong></h3>
+
+<p>As you’ll recall, cross-validation is the process of splitting your data into training and test sets multiple times. Each time you do this, you choose a
+ <em>different</em>
+ training and test set. In this exercise, you’ll perform a traditional
+ <code class="language-plaintext highlighter-rouge">ShuffleSplit</code>
+ cross-validation on the company value data from earlier. Later we’ll cover what changes need to be made for time series data. The data we’ll use is the same historical price data for several large companies.</p>
+
+<p>An instance of the Linear regression object (
+ <code class="language-plaintext highlighter-rouge">model</code>
+ ) is available in your workspace along with the function
+ <code class="language-plaintext highlighter-rouge">r2_score()</code>
+ for scoring. Also, the data is stored in arrays
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ . We’ve also provided a helper function (
+ <code class="language-plaintext highlighter-rouge">visualize_predictions()</code>
+ ) to help visualize the results.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import ShuffleSplit and create the cross-validation object
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">ShuffleSplit</span>
+<span class="n">cv</span> <span class="o">=</span> <span class="n">ShuffleSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Iterate through CV splits
+</span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">tr</span><span class="p">,</span> <span class="n">tt</span> <span class="ow">in</span> <span class="n">cv</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="c1"># Fit the model on training data
+</span>    <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">tr</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">tr</span><span class="p">])</span>
+
+    <span class="c1"># Generate predictions on the test data, score the predictions, and collect
+</span>    <span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">tt</span><span class="p">])</span>
+    <span class="n">score</span> <span class="o">=</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">tt</span><span class="p">],</span> <span class="n">prediction</span><span class="p">)</span>
+    <span class="n">results</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="n">prediction</span><span class="p">,</span> <span class="n">score</span><span class="p">,</span> <span class="n">tt</span><span class="p">))</span>
+
+<span class="c1"># Custom function to quickly visualize predictions
+</span><span class="n">visualize_predictions</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/15-13.png?w=1024" alt="" /></p>
+
+<p>You’ve correctly constructed and fit the model. If you look at the plot to the right, see that the order of datapoints in the test set is scrambled. Let’s see how it looks when we shuffle the data in blocks.</p>
+
+<h3 id="422-cross-validation-without-shuffling"><strong>4.2.2 Cross-validation without shuffling</strong></h3>
+
+<p>Now, re-run your model fit using block cross-validation (without shuffling all datapoints). In this case, neighboring time-points will be kept close to one another. How do you think the model predictions will look in each cross-validation loop?</p>
+
+<p>An instance of the Linear regression
+ <code class="language-plaintext highlighter-rouge">model</code>
+ object is available in your workspace. Also, the arrays
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ (training data) are available too.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create KFold cross-validation object
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">KFold</span>
+<span class="n">cv</span> <span class="o">=</span> <span class="n">KFold</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Iterate through CV splits
+</span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">tr</span><span class="p">,</span> <span class="n">tt</span> <span class="ow">in</span> <span class="n">cv</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="c1"># Fit the model on training data
+</span>    <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">tr</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">tr</span><span class="p">])</span>
+
+    <span class="c1"># Generate predictions on the test data and collect
+</span>    <span class="n">prediction</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">tt</span><span class="p">])</span>
+    <span class="n">results</span><span class="p">.</span><span class="n">append</span><span class="p">((</span><span class="n">prediction</span><span class="p">,</span> <span class="n">tt</span><span class="p">))</span>
+
+<span class="c1"># Custom function to quickly visualize predictions
+</span><span class="n">visualize_predictions</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/16-11.png?w=1024" alt="" /></p>
+
+<p>This time, the predictions generated within each CV loop look ‘smoother’ than they were before – they look more like a real time series because you didn’t shuffle the data. This is a good sanity check to make sure your CV splits are correct.</p>
+
+<h3 id="423-time-based-cross-validation"><strong>4.2.3 Time-based cross-validation</strong></h3>
+
+<p>Finally, let’s visualize the behavior of the
+ <em>time series cross-validation iterator</em>
+ in scikit-learn. Use this object to iterate through your data one last time, visualizing the training data used to fit the model on each iteration.</p>
+
+<p>An instance of the Linear regression
+ <code class="language-plaintext highlighter-rouge">model</code>
+ object is available in your workpsace. Also, the arrays
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ (training data) are available too.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import TimeSeriesSplit
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">TimeSeriesSplit</span>
+
+<span class="c1"># Create time-series cross-validation object
+</span><span class="n">cv</span> <span class="o">=</span> <span class="n">TimeSeriesSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+
+<span class="c1"># Iterate through CV splits
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">tt</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cv</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)):</span>
+    <span class="c1"># Plot the training data on each iteration, to see the behavior of the CV
+</span>    <span class="n">ax</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">ii</span> <span class="o">+</span> <span class="n">y</span><span class="p">[</span><span class="n">tr</span><span class="p">])</span>
+
+<span class="n">ax</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">'Training data on each CV iteration'</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s">'CV iteration'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/17-9.png?w=1024" alt="" /></p>
+
+<p>Note that the size of the training set grew each time when you used the time series cross-validation object. This way, the time points you predict are always
+ <em>after</em>
+ the timepoints we train on.</p>
+
+<hr />
+
+<h2 id="43-stationarity-and-stability"><strong>4.3 Stationarity and stability</strong></h2>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/18-10.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/19-10.png?w=727" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/20-10.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/21-10.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/22-9.png?w=981" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/23-9.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/24-9.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/25-8.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/26-8.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/27-8.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/28-8.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/29-7.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/30-5.png?w=1024" alt="" /></p>
+
+<h3 id="431-stationarity"><strong>4.3.1 Stationarity</strong></h3>
+
+<p>First, let’s confirm what we know about stationarity. Take a look at these time series.</p>
+
+<p>Which of the following time series do you think are not stationary?</p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/1-18.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/2-19.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/3-19.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/4-19.png?w=1024" alt="" /></p>
+
+<p>B and C</p>
+
+<p>C begins to trend upward partway through, while B shows a large increase in variance mid-way through, making both of them non-stationary.</p>
+
+<h3 id="432-bootstrapping-a-confidence-interval"><strong>4.3.2 Bootstrapping a confidence interval</strong></h3>
+
+<p>A useful tool for assessing the variability of some data is the bootstrap. In this exercise, you’ll write your own bootstrapping function that can be used to return a bootstrapped confidence interval.</p>
+
+<p>This function takes three parameters: a 2-D array of numbers (
+ <code class="language-plaintext highlighter-rouge">data</code>
+ ), a list of percentiles to calculate (
+ <code class="language-plaintext highlighter-rouge">percentiles</code>
+ ), and the number of boostrap iterations to use (
+ <code class="language-plaintext highlighter-rouge">n_boots</code>
+ ). It uses the
+ <code class="language-plaintext highlighter-rouge">resample</code>
+ function to generate a bootstrap sample, and then repeats this many times to calculate the confidence interval.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.utils import resample
+
+def bootstrap_interval(data, percentiles=(2.5, 97.5), n_boots=100):
+    """Bootstrap a confidence interval for the mean of columns of a 2-D dataset."""
+    # Create our empty array to fill the results
+    bootstrap_means = np.zeros([n_boots, data.shape[-1]])
+    for ii in range(n_boots):
+        # Generate random indices for our data *with* replacement, then take the sample mean
+        random_sample = resample(data)
+        bootstrap_means[ii] = random_sample.mean(axis=0)
+
+    # Compute the percentiles of choice for the bootstrapped means
+    percentiles = np.percentile(bootstrap_means, percentiles, axis=0)
+    return percentiles
+
+</code></pre></div></div>
+
+<p>You can use this function to assess the variability of your model coefficients.</p>
+
+<h3 id="433-calculating-variability-in-model-coefficients"><strong>4.3.3 Calculating variability in model coefficients</strong></h3>
+
+<p>In this lesson, you’ll re-run the cross-validation routine used before, but this time paying attention to the model’s stability over time. You’ll investigate the coefficients of the model, as well as the uncertainty in its predictions.</p>
+
+<p>Begin by assessing the
+ <em>stability</em>
+ (or uncertainty) of a model’s coefficients across multiple CV splits. Remember, the coefficients are a reflection of the pattern that your model has found in the data.</p>
+
+<p>An instance of the Linear regression object (
+ <code class="language-plaintext highlighter-rouge">model</code>
+ ) is available in your workpsace. Also, the arrays
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ (the data) are available too.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Iterate through CV splits
+</span><span class="n">n_splits</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">cv</span> <span class="o">=</span> <span class="n">TimeSeriesSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="n">n_splits</span><span class="p">)</span>
+
+<span class="c1"># Create empty array to collect coefficients
+</span><span class="n">coefficients</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n_splits</span><span class="p">,</span> <span class="n">X</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+
+<span class="k">for</span> <span class="n">ii</span><span class="p">,</span> <span class="p">(</span><span class="n">tr</span><span class="p">,</span> <span class="n">tt</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">cv</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">)):</span>
+    <span class="c1"># Fit the model on training data and collect the coefficients
+</span>    <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="p">[</span><span class="n">tr</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">tr</span><span class="p">])</span>
+    <span class="n">coefficients</span><span class="p">[</span><span class="n">ii</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">coef_</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate a confidence interval around each coefficient
+</span><span class="n">bootstrapped_interval</span> <span class="o">=</span> <span class="n">bootstrap_interval</span><span class="p">(</span><span class="n">coefficients</span><span class="p">,</span> <span class="p">(</span><span class="mf">2.5</span><span class="p">,</span><span class="mf">97.5</span><span class="p">))</span>
+
+<span class="c1"># Plot it
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">feature_names</span><span class="p">,</span> <span class="n">bootstrapped_interval</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s">'_'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">feature_names</span><span class="p">,</span> <span class="n">bootstrapped_interval</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">marker</span><span class="o">=</span><span class="s">'_'</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">'95% confidence interval for model coefficients'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">setp</span><span class="p">(</span><span class="n">ax</span><span class="p">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span> <span class="n">horizontalalignment</span><span class="o">=</span><span class="s">'right'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/5-19.png?w=1024" alt="" /></p>
+
+<p>You’ve calculated the variability around each coefficient, which helps assess which coefficients are more stable over time!</p>
+
+<h3 id="434-visualizing-model-score-variability-over-time"><strong>4.3.4 Visualizing model score variability over time</strong></h3>
+
+<p>Now that you’ve assessed the variability of each coefficient, let’s do the same for the performance (scores) of the model. Recall that the
+ <code class="language-plaintext highlighter-rouge">TimeSeriesSplit</code>
+ object will use successively-later indices for each test set. This means that you can treat the
+ <em>scores</em>
+ of your validation as a time series. You can visualize this over time in order to see how the model’s performance changes over time.</p>
+
+<p>An instance of the Linear regression model object is stored in
+ <code class="language-plaintext highlighter-rouge">model</code>
+ , a cross-validation object in
+ <code class="language-plaintext highlighter-rouge">cv</code>
+ , and data in
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>
+
+<span class="c1"># Generate scores for each split to see how the model performs over time
+</span><span class="n">scores</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">my_pearsonr</span><span class="p">)</span>
+
+<span class="c1"># Convert to a Pandas Series object
+</span><span class="n">scores_series</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">Series</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">times_scores</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s">'score'</span><span class="p">)</span>
+
+<span class="c1"># Bootstrap a rolling confidence interval for the mean score
+</span><span class="n">scores_lo</span> <span class="o">=</span> <span class="n">scores_series</span><span class="p">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">20</span><span class="p">).</span><span class="n">aggregate</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">bootstrap_interval</span><span class="p">,</span> <span class="n">percentiles</span><span class="o">=</span><span class="mf">2.5</span><span class="p">))</span>
+<span class="n">scores_hi</span> <span class="o">=</span> <span class="n">scores_series</span><span class="p">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">20</span><span class="p">).</span><span class="n">aggregate</span><span class="p">(</span><span class="n">partial</span><span class="p">(</span><span class="n">bootstrap_interval</span><span class="p">,</span> <span class="n">percentiles</span><span class="o">=</span><span class="mf">97.5</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the results
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">scores_lo</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"Lower confidence interval"</span><span class="p">)</span>
+<span class="n">scores_hi</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"Upper confidence interval"</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/6-19.png?w=1024" alt="" /></p>
+
+<p>You plotted a rolling confidence interval for scores over time. This is useful in seeing when your model predictions are correct.</p>
+
+<h3 id="435-accounting-for-non-stationarity"><strong>4.3.5 Accounting for non-stationarity</strong></h3>
+
+<p>In this exercise, you will again visualize the variations in model scores, but now for data that changes its statistics over time.</p>
+
+<p>An instance of the Linear regression model object is stored in
+ <code class="language-plaintext highlighter-rouge">model</code>
+ , a cross-validation object in
+ <code class="language-plaintext highlighter-rouge">cv</code>
+ , and the data in
+ <code class="language-plaintext highlighter-rouge">X</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Pre-initialize window sizes
+</span><span class="n">window_sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+
+<span class="c1"># Create an empty DataFrame to collect the stores
+</span><span class="n">all_scores</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">times_scores</span><span class="p">)</span>
+
+<span class="c1"># Generate scores for each split to see how the model performs over time
+</span><span class="k">for</span> <span class="n">window</span> <span class="ow">in</span> <span class="n">window_sizes</span><span class="p">:</span>
+    <span class="c1"># Create cross-validation object using a limited lookback window
+</span>    <span class="n">cv</span> <span class="o">=</span> <span class="n">TimeSeriesSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_train_size</span><span class="o">=</span><span class="n">window</span><span class="p">)</span>
+
+    <span class="c1"># Calculate scores across all CV splits and collect them in a DataFrame
+</span>    <span class="n">this_scores</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="n">my_pearsonr</span><span class="p">)</span>
+    <span class="n">all_scores</span><span class="p">[</span><span class="s">'Length {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">window</span><span class="p">)]</span> <span class="o">=</span> <span class="n">this_scores</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Visualize the scores
+</span><span class="n">ax</span> <span class="o">=</span> <span class="n">all_scores</span><span class="p">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">10</span><span class="p">).</span><span class="n">mean</span><span class="p">().</span><span class="n">plot</span><span class="p">(</span><span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="p">.</span><span class="n">cm</span><span class="p">.</span><span class="n">coolwarm</span><span class="p">)</span>
+<span class="n">ax</span><span class="p">.</span><span class="nb">set</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s">'Scores for multiple windows'</span><span class="p">,</span> <span class="n">ylabel</span><span class="o">=</span><span class="s">'Correlation (r)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/7-19.png?w=1024" alt="" /></p>
+
+<p>Wonderful – notice how in some stretches of time, longer windows perform worse than shorter ones. This is because the statistics in the data have changed, and the longer window is now using outdated information.</p>
+
+<hr />
+
+<p>###
+ 4.4 Wrap-up</p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/8-18.png?w=957" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/9-18.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/10-18.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/11-17.png?w=1024" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/12-18.png?w=982" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/13-16.png?w=1007" alt="" /></p>
+
+<p>*
+<img src="https://datascience103579984.files.wordpress.com/2019/12/14-14.png?w=1024" alt="" /></p>
+
+<hr />
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

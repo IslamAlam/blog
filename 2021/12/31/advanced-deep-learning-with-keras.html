@@ -1,0 +1,1232 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.7.1 -->
+<title>Advanced Deep Learning with Keras | fastpages</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Advanced Deep Learning with Keras" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="An easy to use blogging platform with support for Jupyter Notebooks." />
+<meta property="og:description" content="An easy to use blogging platform with support for Jupyter Notebooks." />
+<link rel="canonical" href="https://islamalam.github.io/blog/2021/12/31/advanced-deep-learning-with-keras.html" />
+<meta property="og:url" content="https://islamalam.github.io/blog/2021/12/31/advanced-deep-learning-with-keras.html" />
+<meta property="og:site_name" content="fastpages" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-12-31T00:00:00-06:00" />
+<meta name="twitter:card" content="summary" />
+<meta property="twitter:title" content="Advanced Deep Learning with Keras" />
+<script type="application/ld+json">
+{"url":"https://islamalam.github.io/blog/2021/12/31/advanced-deep-learning-with-keras.html","@type":"BlogPosting","headline":"Advanced Deep Learning with Keras","dateModified":"2021-12-31T00:00:00-06:00","datePublished":"2021-12-31T00:00:00-06:00","mainEntityOfPage":{"@type":"WebPage","@id":"https://islamalam.github.io/blog/2021/12/31/advanced-deep-learning-with-keras.html"},"description":"An easy to use blogging platform with support for Jupyter Notebooks.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/blog/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://islamalam.github.io/blog/feed.xml" title="fastpages" /><link rel="shortcut icon" type="image/x-icon" href="/blog/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/blog/">fastpages</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/blog/about/">About Me</a><a class="page-link" href="/blog/search/">Search</a><a class="page-link" href="/blog/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Advanced Deep Learning with Keras</h1><p class="post-meta post-meta-title"><time class="dt-published" datetime="2021-12-31T00:00:00-06:00" itemprop="datePublished">
+        Dec 31, 2021
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      20 min read
+    
+</span></p>
+
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-justify-center">
+          <div class="px-2">
+
+    <a href="https://github.com/IslamAlam/blog/tree/master/_notebooks/advanced-deep-learning-with-keras.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/blog/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/IslamAlam/blog/master?filepath=_notebooks%2Fadvanced-deep-learning-with-keras.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/blog/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/IslamAlam/blog/blob/master/_notebooks/advanced-deep-learning-with-keras.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/blog/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+          <div class="px-2">
+  <a href="https://deepnote.com/launch?url=https%3A%2F%2Fgithub.com%2FIslamAlam%2Fblog%2Fblob%2Fmaster%2F_notebooks%2Fadvanced-deep-learning-with-keras.ipynb" target="_blank">
+      <img class="notebook-badge-image" src="/blog/assets/badges/deepnote.svg" alt="Launch in Deepnote"/>
+  </a>
+</div>
+
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/advanced-deep-learning-with-keras.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a href="https://colab.research.google.com/github/IslamAlam/datacamp-blog/blob/main/_notebooks/advanced-deep-learning-with-keras.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab" /></a></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="2.2-Define-team-lookup">2.2 Define team lookup<a class="anchor-link" href="#2.2-Define-team-lookup"> </a></h2><p>Shared layers allow a model to use the same weight matrix for multiple steps. In this exercise, you will build a "team strength" layer that represents each team by a single number. You will use this number for both teams in the model. The model will learn a number for each team that works well both when the team is <code>team_1</code> and when the team is <code>team_2</code> in the input data.</p>
+<p>The <code>games_season</code> DataFrame is available in your workspace.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Count the number of unique teams.</li>
+<li>Create an embedding layer that maps each team ID to a single number representing that team's strength.</li>
+<li>The output shape should be 1 dimension (as we want to represent the teams by a single number).</li>
+<li>The input length should be 1 dimension (as each team is represented by exactly one id).</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Embedding</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">unique</span>
+
+<span class="c1"># Count the unique number of teams</span>
+<span class="n">n_teams</span> <span class="o">=</span> <span class="n">unique</span><span class="p">(</span><span class="n">games_season</span><span class="p">[</span><span class="s1">&#39;team_1&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Create an embedding layer</span>
+<span class="n">team_lookup</span> <span class="o">=</span> <span class="n">Embedding</span><span class="p">(</span><span class="n">input_dim</span><span class="o">=</span><span class="n">n_teams</span><span class="p">,</span>
+                        <span class="n">output_dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">input_length</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Team-Strength&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="2.3-Define-team-model">2.3 Define team model<a class="anchor-link" href="#2.3-Define-team-model"> </a></h2><p>The team strength lookup has three components: an input, an embedding layer, and a flatten layer that creates the output.</p>
+<p>If you wrap these three layers in a model with an input and output, you can re-use that stack of three layers at multiple places.</p>
+<p>Note again that the weights for <em>all three</em> layers will be shared everywhere we use them.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Create a 1D input layer for the team ID (which will be an integer). Be sure to set the correct input shape!</li>
+<li>Pass this input to the team strength lookup layer you created previously.</li>
+<li>Flatten the output of the team strength lookup.</li>
+<li>Create a model that uses the 1D input as input and flattened team strength as output.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Input</span><span class="p">,</span> <span class="n">Embedding</span><span class="p">,</span> <span class="n">Flatten</span>
+<span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Model</span>
+
+<span class="c1"># Create an input layer for the team ID</span>
+<span class="n">teamid_in</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,))</span>
+
+<span class="c1"># Lookup the input in the team strength embedding layer</span>
+<span class="n">strength_lookup</span> <span class="o">=</span> <span class="n">team_lookup</span><span class="p">(</span><span class="n">teamid_in</span><span class="p">)</span>
+
+<span class="c1"># Flatten the output</span>
+<span class="n">strength_lookup_flat</span> <span class="o">=</span> <span class="n">Flatten</span><span class="p">()(</span><span class="n">strength_lookup</span><span class="p">)</span>
+
+<span class="c1"># Combine the operations into a single, re-usable model</span>
+<span class="n">team_strength_model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">teamid_in</span><span class="p">,</span> <span class="n">strength_lookup_flat</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Team-Strength-Model&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="2.4-Defining-two-inputs">2.4 Defining two inputs<a class="anchor-link" href="#2.4-Defining-two-inputs"> </a></h2><p>In this exercise, you will define two input layers for the two teams in your model. This allows you to specify later in the model how the data from each team will be used differently.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Create an input layer to use for team 1. Recall that our input dimension is 1.</li>
+<li>Name the input "Team-1-In" so you can later distinguish it from team 2.</li>
+<li>Create an input layer to use for team 2, named "Team-2-In".</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Input</span>
+
+<span class="c1"># Input layer for team 1</span>
+<span class="n">team_in_1</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Team-1-In&quot;</span> <span class="p">)</span>
+
+<span class="c1"># Separate input layer for team 2</span>
+<span class="n">team_in_2</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Team-2-In&quot;</span> <span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="2.5-Lookup-both-inputs-in-the-same-model">2.5 Lookup both inputs in the same model<a class="anchor-link" href="#2.5-Lookup-both-inputs-in-the-same-model"> </a></h2><p>Now that you have a team strength model and an input layer for each team, you can lookup the team inputs in the shared team strength model. The two inputs will share the same weights.</p>
+<p>In this dataset, you have 10,888 unique teams. You want to learn a strength rating for each team, such that if any pair of teams plays each other, you can predict the score, even if those two teams have never played before. Furthermore, you want the strength rating to be the same, regardless of whether the team is the home team or the away team.</p>
+<p>To achieve this, you use a shared layer, defined by the re-usable model (<code>team_strength_model()</code>) you built in exercise 3 and the two input layers (<code>team_in_1</code> and <code>team_in_2</code>) from the previous exercise, all of which are available in your workspace.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Lookup the first team ID in the team strength model.</li>
+<li>Lookup the second team ID in the team strength model.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">team_1_strength</span> <span class="o">=</span> <span class="n">team_strength_model</span><span class="p">(</span><span class="n">team_in_1</span><span class="p">)</span>
+
+<span class="c1"># Lookup team 2 in the team strength model</span>
+<span class="n">team_2_strength</span> <span class="o">=</span> <span class="n">team_strength_model</span><span class="p">(</span><span class="n">team_in_2</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="2.8-Output-layer-using-shared-layer">2.8 Output layer using shared layer<a class="anchor-link" href="#2.8-Output-layer-using-shared-layer"> </a></h2><p>Now that you've looked up how "strong" each team is, subtract the team strengths to determine which team is expected to win the game.</p>
+<p>This is a bit like the seeds that the tournament committee uses, which are also a measure of team strength. But rather than using seed differences to predict score differences, you'll use the difference of your own team strength model to predict score differences.</p>
+<p>The subtract layer will combine the weights from the two layers by subtracting them.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Import the <code>Subtract</code> layer from <code>keras.layers</code>.</li>
+<li>Combine the two-team strength lookups you did earlier.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Subtract</span>
+
+<span class="c1"># Create a subtract layer using the inputs from the previous exercise</span>
+<span class="n">score_diff</span> <span class="o">=</span> <span class="n">Subtract</span><span class="p">()([</span><span class="n">team_1_strength</span><span class="p">,</span> <span class="n">team_2_strength</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Model-using-two-inputs-and-one-output">Model using two inputs and one output<a class="anchor-link" href="#Model-using-two-inputs-and-one-output"> </a></h2><p>Now that you have your two inputs (team id 1 and team id 2) and output (score difference), you can wrap them up in a model so you can use it later for fitting to data and evaluating on new data.</p>
+<p>Your model will look like the following diagram:</p>
+<p><img src="https://s3.amazonaws.com/assets.datacamp.com/production/course_6554/datasets/basketball_model_2.png" alt="" /></p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Define a model with the two teams as inputs and use the score difference as the output.</li>
+<li>Compile the model with the <code>'adam'</code> optimizer and <code>'mean_absolute_error'</code> loss.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">keras.layers</span> <span class="kn">import</span> <span class="n">Subtract</span>
+<span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Model</span>
+
+<span class="c1"># Subtraction layer from previous exercise</span>
+<span class="n">score_diff</span> <span class="o">=</span> <span class="n">Subtract</span><span class="p">()([</span><span class="n">team_1_strength</span><span class="p">,</span> <span class="n">team_2_strength</span><span class="p">])</span>
+
+<span class="c1"># Create the model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">([</span><span class="n">team_in_1</span><span class="p">,</span> <span class="n">team_in_2</span><span class="p">],</span> <span class="n">score_diff</span><span class="p">)</span>
+
+<span class="c1"># Compile the model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s1">&#39;adam&#39;</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;mean_absolute_error&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Fit-the-model-to-the-regular-season-training-data">Fit the model to the regular season training data<a class="anchor-link" href="#Fit-the-model-to-the-regular-season-training-data"> </a></h2><p>Now that you've defined a complete team strength model, you can fit it to the basketball data! Since your model has two inputs now, you need to pass the input data as a list.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Assign the <code>'team_1'</code> and <code>'team_2'</code> columns from <code>games_season</code> to <code>input_1</code> and <code>input_2</code>, respectively.</li>
+<li>Use <code>'score_diff'</code> column from <code>games_season</code> as the target.</li>
+<li>Fit the model using 1 epoch, a batch size of 2048, and a 10% validation split.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">input_1</span> <span class="o">=</span> <span class="n">games_season</span><span class="p">[</span><span class="s1">&#39;team_1&#39;</span><span class="p">]</span>
+
+<span class="c1"># Get the team_2 column from the regular season data</span>
+<span class="n">input_2</span> <span class="o">=</span> <span class="n">games_season</span><span class="p">[</span><span class="s1">&#39;team_2&#39;</span><span class="p">]</span>
+
+<span class="c1"># Fit the model to input 1 and 2, using score diff as a target</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="n">input_1</span><span class="p">,</span> <span class="n">input_2</span><span class="p">],</span>
+          <span class="n">games_season</span><span class="p">[</span><span class="s1">&#39;score_diff&#39;</span><span class="p">],</span>
+          <span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+          <span class="n">batch_size</span><span class="o">=</span><span class="mi">2048</span><span class="p">,</span>
+          <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+          <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Evaluate-the-model-on-the-tournament-test-data">Evaluate the model on the tournament test data<a class="anchor-link" href="#Evaluate-the-model-on-the-tournament-test-data"> </a></h2><p>The model you fit to the regular season data (<code>model</code>) in the previous exercise and the tournament dataset (<code>games_tourney</code>) are available in your workspace.</p>
+<p>In this exercise, you will evaluate the model on this new dataset. This evaluation will tell you how well you can predict the tournament games, based on a model trained with the regular season data. This is interesting because many teams play each other in the tournament that did not play in the regular season, so this is a very good check that your model is not overfitting.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Assign the <code>'team_1'</code> and <code>'team_2'</code> columns from <code>games_tourney</code> to <code>input_1</code> and <code>input_2</code>, respectively.</li>
+<li>Evaluate the model.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">input_1</span> <span class="o">=</span> <span class="n">games_tourney</span><span class="p">[</span><span class="s1">&#39;team_1&#39;</span><span class="p">]</span>
+
+<span class="c1"># Get team_2 from the tournament data</span>
+<span class="n">input_2</span> <span class="o">=</span> <span class="n">games_tourney</span><span class="p">[</span><span class="s1">&#39;team_2&#39;</span><span class="p">]</span>
+
+<span class="c1"># Evaluate the model using these inputs</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">([</span><span class="n">input_1</span><span class="p">,</span> <span class="n">input_2</span><span class="p">],</span> <span class="n">games_tourney</span><span class="p">[</span><span class="s1">&#39;score_diff&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="3.-Multiple-Inputs:-3-Inputs-(and-Beyond!)">3. Multiple Inputs: 3 Inputs (and Beyond!)<a class="anchor-link" href="#3.-Multiple-Inputs:-3-Inputs-(and-Beyond!)"> </a></h1><p>In this chapter, you will extend your 2-input model to 3 inputs, and learn how to use Keras' summary and plot functions to understand the parameters and topology of your neural networks. By the end of the chapter, you will understand how to extend a 2-input model to 3 inputs and beyond.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Make-an-input-layer-for-home-vs.-away">Make an input layer for home vs. away<a class="anchor-link" href="#Make-an-input-layer-for-home-vs.-away"> </a></h2><p>Now you will make an improvement to the model you used in the previous chapter for regular season games. You know there is a well-documented home-team advantage in basketball, so you will add a new input to your model to capture this effect.</p>
+<p>This model will have three inputs: <code>team_id_1</code>, <code>team_id_2</code>, and <code>home</code>. The team IDs will be integers that you look up in your team strength model from the previous chapter, and home will be a binary variable, 1 if <code>team_1</code> is playing at home, 0 if they are not.</p>
+<p>The <code>team_strength_model</code> you used in the previous chapter has been loaded into your workspace. After applying it to each input, use a Concatenate layer to join the two team strengths and with the home vs away variable, and pass the result to a Dense layer.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Create three inputs layers of shape 1, one each for team 1, team 2, and home vs away.</li>
+<li>Lookup the team inputs in <code>team_strength_model()</code>.</li>
+<li>Concatenate the team strengths with the home input and pass to a Dense layer.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">team_in_1</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Team-1-In&#39;</span><span class="p">)</span>
+<span class="n">team_in_2</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Team-2-In&#39;</span><span class="p">)</span>
+
+<span class="c1"># Create an input for home vs away</span>
+<span class="n">home_in</span> <span class="o">=</span> <span class="n">Input</span><span class="p">(</span><span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;Home-In&#39;</span><span class="p">)</span>
+
+<span class="c1"># Lookup the team inputs in the team strength model</span>
+<span class="n">team_1_strength</span> <span class="o">=</span> <span class="n">team_strength_model</span><span class="p">(</span><span class="n">team_in_1</span><span class="p">)</span>
+<span class="n">team_2_strength</span> <span class="o">=</span> <span class="n">team_strength_model</span><span class="p">(</span><span class="n">team_in_2</span><span class="p">)</span>
+
+<span class="c1"># Combine the team strengths with the home input using a Concatenate layer, then add a Dense layer</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">Concatenate</span><span class="p">()([</span><span class="n">team_1_strength</span><span class="p">,</span> <span class="n">team_2_strength</span><span class="p">,</span> <span class="n">home_in</span><span class="p">])</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="n">out</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Make-a-model-and-compile-it">Make a model and compile it<a class="anchor-link" href="#Make-a-model-and-compile-it"> </a></h2><p>Now that you've input and output layers for the 3-input model, wrap them up in a Keras model class, and then compile the model, so you can fit it to data and use it to make predictions on new data.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Create a model using <code>team_in_1</code>, <code>team_in_2</code>, and <code>home_in</code> as inputs and <code>out</code> as the output.</li>
+<li>Compile the model using the <code>'adam'</code> optimizer and <code>'mean_absolute_error'</code> as the loss function.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">keras.models</span> <span class="kn">import</span> <span class="n">Model</span>
+
+<span class="c1"># Make a Model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">([</span><span class="n">team_in_1</span><span class="p">,</span> <span class="n">team_in_2</span><span class="p">,</span> <span class="n">home_in</span><span class="p">],</span> <span class="n">out</span><span class="p">)</span>
+
+<span class="c1"># Compile the model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s1">&#39;adam&#39;</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;mean_absolute_error&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Fit-the-model-and-evaluate">Fit the model and evaluate<a class="anchor-link" href="#Fit-the-model-and-evaluate"> </a></h2><p>Now that you've defined a new model, fit it to the regular season basketball data.</p>
+<p>Use the <code>model</code> you fit in the previous exercise (which was trained on the regular season data) and evaluate the model on data for tournament games (<code>games_tourney</code>).</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Fit the model to the <code>games_season</code> dataset, using <code>'team_1'</code>, <code>'team_2'</code> and <code>'home'</code> columns as inputs, and the <code>'score_diff'</code> column as the target.</li>
+<li>Fit the model using 1 epoch, 10% validation split and a batch size of 2048.</li>
+<li>Evaluate the model on <code>games_tourney</code>, using the same inputs and outputs.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">([</span><span class="n">games_season</span><span class="p">[</span><span class="s1">&#39;team_1&#39;</span><span class="p">],</span> <span class="n">games_season</span><span class="p">[</span><span class="s1">&#39;team_2&#39;</span><span class="p">],</span> <span class="n">games_season</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]],</span>
+          <span class="n">games_season</span><span class="p">[</span><span class="s1">&#39;score_diff&#39;</span><span class="p">],</span>
+          <span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+          <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+          <span class="n">validation_split</span><span class="o">=.</span><span class="mi">1</span><span class="p">,</span>
+          <span class="n">batch_size</span><span class="o">=</span><span class="mi">2048</span><span class="p">)</span>
+
+
+<span class="c1"># Evaluate the model on the games_tourney dataset</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">([</span><span class="n">games_tourney</span><span class="p">[</span><span class="s1">&#39;team_1&#39;</span><span class="p">],</span> <span class="n">games_tourney</span><span class="p">[</span><span class="s1">&#39;team_2&#39;</span><span class="p">],</span> <span class="n">games_tourney</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]],</span> <span class="n">games_tourney</span><span class="p">[</span><span class="s1">&#39;score_diff&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Model-summaries">Model summaries<a class="anchor-link" href="#Model-summaries"> </a></h2><p>In this exercise, you will take a closer look at the summary of one of your 3-input models available in your workspace as <code>model</code>. Note how many layers the model has, how many parameters it has, and how many of those parameters are trainable/non-trainable.</p>
+<h5 id="Instructions-1/3">Instructions 1/3<a class="anchor-link" href="#Instructions-1/3"> </a></h5><p><strong>35 XP</strong></p>
+<h4 id="Question">Question<a class="anchor-link" href="#Question"> </a></h4><p>How many <em>total</em> parameters does this model have?</p>
+<h5 id="Possible-Answers">Possible Answers<a class="anchor-link" href="#Possible-Answers"> </a></h5><ul>
+<li><p>0</p>
+</li>
+<li><p>4</p>
+</li>
+<li><p>10,888</p>
+</li>
+<li><p><strong>10,892</strong></p>
+</li>
+</ul>
+<h5 id="Instructions-2/3">Instructions 2/3<a class="anchor-link" href="#Instructions-2/3"> </a></h5><h4 id="Question">Question<a class="anchor-link" href="#Question"> </a></h4><p>How many <em>trainable</em> parameters does this model have?</p>
+<h5 id="Possible-Answers">Possible Answers<a class="anchor-link" href="#Possible-Answers"> </a></h5><ul>
+<li><p>0</p>
+</li>
+<li><p>4</p>
+</li>
+<li><p>10,888</p>
+</li>
+<li><p>10,892</p>
+</li>
+</ul>
+<h5 id="Instructions-3/3">Instructions 3/3<a class="anchor-link" href="#Instructions-3/3"> </a></h5><h4 id="Question">Question<a class="anchor-link" href="#Question"> </a></h4><p>Which layer of your model has the most trainable parameters?</p>
+<h5 id="Possible-Answers">Possible Answers<a class="anchor-link" href="#Possible-Answers"> </a></h5><ul>
+<li><p>Team-1-In (InputLayer)</p>
+</li>
+<li><p>Team-2-In (InputLayer)</p>
+</li>
+<li><p>Team-Strength (Model)</p>
+</li>
+<li><p>Home-In (InputLayer)</p>
+</li>
+<li><p>concatenate_1 (Concatenate)</p>
+</li>
+<li><p>dense_1 (Dense)</p>
+</li>
+</ul>
+<div class="highlight"><pre><span></span><span class="n">In</span> <span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+<span class="n">model</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="n">__________________________________________________________________________________________________</span>
+<span class="n">Layer</span> <span class="p">(</span><span class="nb">type</span><span class="p">)</span>                    <span class="n">Output</span> <span class="n">Shape</span>         <span class="n">Param</span> <span class="c1">#     Connected to                     </span>
+<span class="o">==================================================================================================</span>
+<span class="n">Team</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">In</span> <span class="p">(</span><span class="n">InputLayer</span><span class="p">)</span>          <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>            <span class="mi">0</span>                                            
+<span class="n">__________________________________________________________________________________________________</span>
+<span class="n">Team</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="n">In</span> <span class="p">(</span><span class="n">InputLayer</span><span class="p">)</span>          <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>            <span class="mi">0</span>                                            
+<span class="n">__________________________________________________________________________________________________</span>
+<span class="n">Team</span><span class="o">-</span><span class="n">Strength</span> <span class="p">(</span><span class="n">Model</span><span class="p">)</span>           <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>            <span class="mi">10888</span>       <span class="n">Team</span><span class="o">-</span><span class="mi">1</span><span class="o">-</span><span class="n">In</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>                  
+                                                                 <span class="n">Team</span><span class="o">-</span><span class="mi">2</span><span class="o">-</span><span class="n">In</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>                  
+<span class="n">__________________________________________________________________________________________________</span>
+<span class="n">Home</span><span class="o">-</span><span class="n">In</span> <span class="p">(</span><span class="n">InputLayer</span><span class="p">)</span>            <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>            <span class="mi">0</span>                                            
+<span class="n">__________________________________________________________________________________________________</span>
+<span class="n">concatenate_1</span> <span class="p">(</span><span class="n">Concatenate</span><span class="p">)</span>     <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>            <span class="mi">0</span>           <span class="n">Team</span><span class="o">-</span><span class="n">Strength</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>              
+                                                                 <span class="n">Team</span><span class="o">-</span><span class="n">Strength</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>              
+                                                                 <span class="n">Home</span><span class="o">-</span><span class="n">In</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>                    
+<span class="n">__________________________________________________________________________________________________</span>
+<span class="n">dense_1</span> <span class="p">(</span><span class="n">Dense</span><span class="p">)</span>                 <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>            <span class="mi">4</span>           <span class="n">concatenate_1</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>              
+<span class="o">==================================================================================================</span>
+<span class="n">Total</span> <span class="n">params</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span><span class="mi">892</span>
+<span class="n">Trainable</span> <span class="n">params</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span><span class="mi">892</span>
+<span class="n">Non</span><span class="o">-</span><span class="n">trainable</span> <span class="n">params</span><span class="p">:</span> <span class="mi">0</span>
+<span class="n">__________________________________________________________________________________________________</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Plotting-models">Plotting models<a class="anchor-link" href="#Plotting-models"> </a></h2><p>In addition to summarizing your model, you can also plot your model to get a more intuitive sense of it. Your <code>model</code> is available in the workspace.</p>
+<h5 id="Instructions-1/4">Instructions 1/4<a class="anchor-link" href="#Instructions-1/4"> </a></h5><p><strong>35 XP</strong></p>
+<ul>
+<li><a href="">1</a>)</li>
+<li><a href="">2</a>)</li>
+<li><a href="">3</a>)</li>
+<li><p><a href="">4</a>)</p>
+</li>
+<li><p>Save the model plot to the file <code>'model.png'</code>.</p>
+</li>
+<li>Import and display <code>'model.png'</code> into Python using <code>matplotlib</code>.</li>
+</ul>
+<h5 id="Instructions-2/4">Instructions 2/4<a class="anchor-link" href="#Instructions-2/4"> </a></h5><h4 id="Question">Question<a class="anchor-link" href="#Question"> </a></h4><p>How many <em>inputs</em> does this model have?</p>
+<h5 id="Possible-Answers">Possible Answers<a class="anchor-link" href="#Possible-Answers"> </a></h5><ul>
+<li><p>1</p>
+</li>
+<li><p>2</p>
+</li>
+<li><p>3</p>
+</li>
+<li><p>4</p>
+</li>
+</ul>
+<h5 id="Instructions-2/4">Instructions 2/4<a class="anchor-link" href="#Instructions-2/4"> </a></h5><h4 id="Question">Question<a class="anchor-link" href="#Question"> </a></h4><p>How many <em>inputs</em> does this model have?</p>
+<h5 id="Possible-Answers">Possible Answers<a class="anchor-link" href="#Possible-Answers"> </a></h5><ul>
+<li><p>1</p>
+</li>
+<li><p>2</p>
+</li>
+<li><p>3</p>
+</li>
+<li><p>4</p>
+</li>
+</ul>
+<h5 id="Instructions-3/4">Instructions 3/4<a class="anchor-link" href="#Instructions-3/4"> </a></h5><h4 id="Question">Question<a class="anchor-link" href="#Question"> </a></h4><p>How many <em>outputs</em> does this model have?</p>
+<h5 id="Possible-Answers">Possible Answers<a class="anchor-link" href="#Possible-Answers"> </a></h5><ul>
+<li><p>1</p>
+</li>
+<li><p>2</p>
+</li>
+<li><p>3</p>
+</li>
+<li><p>4</p>
+</li>
+</ul>
+<h5 id="Instructions-4/4">Instructions 4/4<a class="anchor-link" href="#Instructions-4/4"> </a></h5><h4 id="Question">Question<a class="anchor-link" href="#Question"> </a></h4><p>Which layer is <em>shared</em> between 2 inputs?</p>
+<h5 id="Possible-Answers">Possible Answers<a class="anchor-link" href="#Possible-Answers"> </a></h5><ul>
+<li><p>Team-1-In</p>
+</li>
+<li><p>Team-2-In</p>
+</li>
+<li><p>Team-Strength</p>
+</li>
+<li><p>dense_1</p>
+</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">keras.utils</span> <span class="kn">import</span> <span class="n">plot_model</span>
+
+<span class="c1"># Plot the model</span>
+<span class="n">plot_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">to_file</span><span class="o">=</span><span class="s1">&#39;model.png&#39;</span><span class="p">)</span>
+
+<span class="c1"># Display the image</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;model.png&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Add-the-model-predictions-to-the-tournament-data">Add the model predictions to the tournament data<a class="anchor-link" href="#Add-the-model-predictions-to-the-tournament-data"> </a></h2><p>In lesson 1 of this chapter, you used the regular season model to make predictions on the tournament dataset, and got pretty good results! Try to improve your predictions for the tournament by modeling it specifically.</p>
+<p>You'll use the prediction from the regular season model as an input to the tournament model. This is a form of "model stacking."</p>
+<p>To start, take the regular season model from the previous lesson, and predict on the tournament data. Add this prediction to the tournament data as a new column.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<p>Use the <code>model</code> to predict on the <code>games_tourney</code> dataset. The model has three inputs: <code>'team_1'</code>, <code>'team_2'</code>, and <code>'home'</code> columns. Assign the predictions to a new column, <code>'pred'</code>.</p>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">games_tourney</span><span class="p">[</span><span class="s1">&#39;pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">([</span><span class="n">games_tourney</span><span class="p">[</span><span class="s1">&#39;team_1&#39;</span><span class="p">],</span> <span class="n">games_tourney</span><span class="p">[</span><span class="s1">&#39;team_2&#39;</span><span class="p">],</span> <span class="n">games_tourney</span><span class="p">[</span><span class="s1">&#39;home&#39;</span><span class="p">]])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Create-an-input-layer-with-multiple-columns">Create an input layer with multiple columns<a class="anchor-link" href="#Create-an-input-layer-with-multiple-columns"> </a></h2><p>In this exercise, you will look at a different way to create models with multiple inputs. This method only works for purely numeric data, but its a much simpler approach to making multi-variate neural networks.</p>
+<p>Now you have three numeric columns in the tournament dataset: <code>'seed_diff'</code>, <code>'home'</code>, and <code>'pred'</code>. In this exercise, you will create a neural network that uses a single input layer to process all three of these numeric inputs.</p>
+<p>This model should have a single output to predict the tournament game score difference.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Create a single input layer with 3 columns.</li>
+<li>Connect this input to a Dense layer with 1 unit.</li>
+<li>Create a model with <code>input_tensor</code> as the input and <code>output_tensor</code> as the output.</li>
+<li>Compile the model with <code>'adam'</code> as the optimizer and <code>'mean_absolute_error'</code> as the loss function.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">input_tensor</span> <span class="o">=</span> <span class="n">Input</span><span class="p">((</span><span class="mi">3</span><span class="p">,))</span>
+
+<span class="c1"># Pass it to a Dense layer with 1 unit</span>
+<span class="n">output_tensor</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">)(</span><span class="n">input_tensor</span><span class="p">)</span>
+
+<span class="c1"># Create a model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="n">output_tensor</span><span class="p">)</span>
+
+<span class="c1"># Compile the model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s1">&#39;adam&#39;</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;mean_absolute_error&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Fit-the-model">Fit the model<a class="anchor-link" href="#Fit-the-model"> </a></h2><p>Now that you've enriched the tournament dataset and built a model to make use of the new data, fit that model to the tournament data.</p>
+<p>Note that this <code>model</code> has only one input layer that is capable of handling all 3 inputs, so it's inputs and outputs do not need to be a list.</p>
+<p>Tournament games are split into a training set and a test set. The tournament games before 2010 are in the training set, and the ones after 2010 are in the test set.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Fit the model to the <code>games_tourney_train</code> dataset using 1 epoch.</li>
+<li>The input columns are <code>'home'</code>, <code>'seed_diff'</code>, and <code>'pred'</code>.</li>
+<li>The target column is <code>'score_diff'</code>.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">games_tourney_train</span><span class="p">[[</span><span class="s1">&#39;home&#39;</span><span class="p">,</span> <span class="s1">&#39;seed_diff&#39;</span><span class="p">,</span> <span class="s1">&#39;pred&#39;</span><span class="p">]],</span>
+          <span class="n">games_tourney_train</span><span class="p">[</span><span class="s1">&#39;score_diff&#39;</span><span class="p">],</span>
+          <span class="n">epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+          <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Evaluate-the-model">Evaluate the model<a class="anchor-link" href="#Evaluate-the-model"> </a></h2><p>Now that you've fit your model to the tournament training data, evaluate it on the tournament test data. Recall that the tournament test data contains games from after 2010.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Evaluate the model on the <code>games_tourney_test</code> data.</li>
+<li>Recall that the model's inputs are <code>'home'</code>, <code>'seed_diff'</code>, and <code>'prediction'</code> columns and the target column is <code>'score_diff'</code>.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">games_tourney_test</span><span class="p">[[</span><span class="s1">&#39;home&#39;</span><span class="p">,</span> <span class="s1">&#39;seed_diff&#39;</span><span class="p">,</span> <span class="s1">&#39;prediction&#39;</span><span class="p">]],</span>
+               <span class="n">games_tourney_test</span><span class="p">[</span><span class="s1">&#39;score_diff&#39;</span><span class="p">],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="4.-Multiple-Outputs">4. Multiple Outputs<a class="anchor-link" href="#4.-Multiple-Outputs"> </a></h1><p>In this chapter, you will build neural networks with multiple outputs, which can be used to solve regression problems with multiple targets. You will also build a model that solves a regression problem and a classification problem simultaneously.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.2-Simple-two-output-model">4.2 Simple two-output model<a class="anchor-link" href="#4.2-Simple-two-output-model"> </a></h2><p>In this exercise, you will use the tournament data to build one model that makes two predictions: the scores of both teams in a given game. Your inputs will be the seed difference of the two teams, as well as the predicted score difference from the model you built in chapter 3.</p>
+<p>The output from your model will be the predicted score for team 1 as well as team 2. This is called "multiple target regression": one model making more than one prediction.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Create a single input layer with 2 columns.</li>
+<li>Connect this input to a Dense layer with 2 units.</li>
+<li>Create a model with <code>input_tensor</code> as the input and <code>output_tensor</code> as the output.</li>
+<li>Compile the model with <code>'adam'</code> as the optimizer and <code>'mean_absolute_error'</code> as the loss function.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">input_tensor</span> <span class="o">=</span> <span class="n">Input</span><span class="p">((</span><span class="mi">2</span><span class="p">,))</span>
+
+<span class="c1"># Define the output</span>
+<span class="n">output_tensor</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">2</span><span class="p">)(</span><span class="n">input_tensor</span><span class="p">)</span>
+
+<span class="c1"># Create a model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="n">output_tensor</span><span class="p">)</span>
+
+<span class="c1"># Compile the model</span>
+<span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s1">&#39;adam&#39;</span><span class="p">,</span> <span class="n">loss</span><span class="o">=</span><span class="s1">&#39;mean_absolute_error&#39;</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.3-Fit-a-model-with-two-outputs">4.3 Fit a model with two outputs<a class="anchor-link" href="#4.3-Fit-a-model-with-two-outputs"> </a></h2><p>Now that you've defined your 2-output model, fit it to the tournament data. I've split the data into <code>games_tourney_train</code> <code>and games_tourney_test</code>, so use the training set to fit for now.</p>
+<p>This model will use the pre-tournament seeds, as well as your pre-tournament predictions from the regular season model you built previously in this course.</p>
+<p>As a reminder, this model will predict the scores of both teams.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Fit the model to the <code>games_tourney_train</code> dataset using 100 epochs and a batch size of 16384.</li>
+<li>The input columns are <code>'seed_diff'</code>, and <code>'pred'</code>.</li>
+<li>The target columns are <code>'score_1'</code> and <code>'score_2'</code>.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">games_tourney_train</span><span class="p">[[</span><span class="s1">&#39;seed_diff&#39;</span><span class="p">,</span> <span class="s1">&#39;pred&#39;</span><span class="p">]],</span>
+  		  <span class="n">games_tourney_train</span><span class="p">[[</span><span class="s1">&#39;score_1&#39;</span><span class="p">,</span> <span class="s1">&#39;score_2&#39;</span><span class="p">]],</span>
+  		  <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+  		  <span class="n">epochs</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+  		  <span class="n">batch_size</span><span class="o">=</span><span class="mi">16384</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.4-Inspect-the-model-(I)">4.4 Inspect the model (I)<a class="anchor-link" href="#4.4-Inspect-the-model-(I)"> </a></h2><p>Now that you've fit your model, let's take a look at it. You can use the <code>.get_weights()</code> method to inspect your model's weights.</p>
+<p>The input layer will have 4 weights: 2 for each input times 2 for each output.</p>
+<p>The output layer will have 2 weights, one for each output.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Print the <code>model</code>'s weights.</li>
+<li>Print the column means of the training data (<code>games_tourney_train</code>).</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_weights</span><span class="p">())</span>
+
+<span class="c1"># Print the column means of the training data</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">games_tourney_train</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.5-Evaluate-the-model">4.5 Evaluate the model<a class="anchor-link" href="#4.5-Evaluate-the-model"> </a></h2><p>Now that you've fit your model and inspected it's weights to make sure it makes sense, evaluate it on the tournament test set to see how well it performs on new data.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Evaluate the model on <code>games_tourney_test</code>.</li>
+<li>Use the same inputs and outputs as the training set.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">games_tourney_test</span><span class="p">[[</span><span class="s1">&#39;seed_diff&#39;</span><span class="p">,</span> <span class="s1">&#39;pred&#39;</span><span class="p">]],</span> <span class="n">games_tourney_test</span><span class="p">[[</span><span class="s1">&#39;score_1&#39;</span><span class="p">,</span> <span class="s1">&#39;score_2&#39;</span><span class="p">]],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.6-Single-model-for-classification-and-regression">4.6 <a href="https://campus.datacamp.com/courses/advanced-deep-learning-with-keras/multiple-outputs?ex=6">Single model for classification and regression</a><a class="anchor-link" href="#4.6-Single-model-for-classification-and-regression"> </a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Classification-and-regression-in-one-model">Classification and regression in one model<a class="anchor-link" href="#Classification-and-regression-in-one-model"> </a></h2><p>Now you will create a different kind of 2-output model. This time, you will predict the score difference, instead of both team's scores and then you will predict the probability that team 1 won the game. This is a pretty cool model: it is going to do both classification and regression!</p>
+<p>In this model, turn off the bias, or intercept for each layer. Your inputs (seed difference and predicted score difference) have a mean of very close to zero, and your outputs both have means that are close to zero, so your model shouldn't need the bias term to fit the data well.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Create a single input layer with 2 columns.</li>
+<li>The first output layer should have 1 unit with <code>'linear'</code> activation and no bias term.</li>
+<li>The second output layer should have 1 unit with <code>'sigmoid'</code> activation and no bias term. Also, use the first output layer as an input to this layer.</li>
+<li>Create a model with these input and outputs.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="n">input_tensor</span> <span class="o">=</span> <span class="n">Input</span><span class="p">((</span><span class="mi">2</span><span class="p">,))</span>
+
+<span class="c1"># Create the first output</span>
+<span class="n">output_tensor_1</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="n">input_tensor</span><span class="p">)</span>
+
+<span class="c1"># Create the second output (use the first output as input here)</span>
+<span class="n">output_tensor_2</span> <span class="o">=</span> <span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s1">&#39;sigmoid&#39;</span><span class="p">,</span> <span class="n">use_bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)(</span><span class="n">output_tensor_1</span><span class="p">)</span>
+
+<span class="c1"># Create a model with 2 outputs</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">Model</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="p">[</span><span class="n">output_tensor_1</span><span class="p">,</span> <span class="n">output_tensor_2</span><span class="p">])</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.8-Compile-and-fit-the-model">4.8 Compile and fit the model<a class="anchor-link" href="#4.8-Compile-and-fit-the-model"> </a></h2><p>Now that you have a model with 2 outputs, compile it with 2 loss functions: mean absolute error (MAE) for <code>'score_diff'</code> and binary cross-entropy (also known as logloss) for <code>'won'</code>. Then fit the model with <code>'seed_diff'</code> and <code>'pred'</code> as inputs. For outputs, predict <code>'score_diff'</code> and <code>'won'</code>.</p>
+<p>This model can use the scores of the games to make sure that close games (small score diff) have lower win probabilities than blowouts (large score diff).</p>
+<p>The regression problem is easier than the classification problem because MAE punishes the model less for a loss due to random chance. For example, if <code>score_diff</code> is -1 and <code>won</code> is 0, that means <code>team_1</code> had some bad luck and lost by a single free throw. The data for the easy problem helps the model find a solution to the hard problem.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Import <code>Adam</code> from <code>keras.optimizers</code>.</li>
+<li>Compile the model with 2 losses: <code>'mean_absolute_error'</code> and <code>'binary_crossentropy'</code>, and use the Adam optimizer with a learning rate of 0.01.</li>
+<li>Fit the model with <code>'seed_diff'</code> and <code>'pred'</code> columns as the inputs and <code>'score_diff'</code> and <code>'won'</code> columns as the targets.</li>
+<li>Use 10 epochs and a batch size of 16384.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">keras.optimizers</span> <span class="kn">import</span> <span class="n">Adam</span>
+
+<span class="c1"># Compile the model with 2 losses and the Adam optimzer with a higher learning rate</span>
+<span class="n">model</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;mean_absolute_error&#39;</span><span class="p">,</span> <span class="s1">&#39;binary_crossentropy&#39;</span><span class="p">],</span> <span class="n">optimizer</span><span class="o">=</span><span class="n">Adam</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="mf">0.01</span><span class="p">))</span>
+
+<span class="c1"># Fit the model to the tournament training data, with 2 inputs and 2 outputs</span>
+<span class="n">model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">games_tourney_train</span><span class="p">[[</span><span class="s1">&#39;seed_diff&#39;</span><span class="p">,</span> <span class="s1">&#39;pred&#39;</span><span class="p">]],</span>
+          <span class="p">[</span><span class="n">games_tourney_train</span><span class="p">[[</span><span class="s1">&#39;score_diff&#39;</span><span class="p">]],</span> <span class="n">games_tourney_train</span><span class="p">[[</span><span class="s1">&#39;won&#39;</span><span class="p">]]],</span>
+          <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+          <span class="n">verbose</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+          <span class="n">batch_size</span><span class="o">=</span><span class="mi">16384</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.9-Inspect-the-model-(II)">4.9 Inspect the model (II)<a class="anchor-link" href="#4.9-Inspect-the-model-(II)"> </a></h2><p>Now you should take a look at the weights for this model. In particular, note the last weight of the model. This weight converts the predicted score difference to a predicted win probability. If you multiply the predicted score difference by the last weight of the model and then apply the sigmoid function, you get the win probability of the game.</p>
+<h5 id="Instructions-1/2">Instructions 1/2<a class="anchor-link" href="#Instructions-1/2"> </a></h5><p><strong>50 XP</strong></p>
+<ul>
+<li>Print the <code>model</code>'s weights.</li>
+<li>Print the column means of the training data (<code>games_tourney_train</code>).</li>
+</ul>
+<h5 id="Instructions-2/2">Instructions 2/2<a class="anchor-link" href="#Instructions-2/2"> </a></h5><p><strong>50 XP</strong></p>
+<ul>
+<li>Print the approximate win probability predicted for a close game (1 point difference).</li>
+<li>Print the approximate win probability predicted blowout game (10 point difference).</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">get_weights</span><span class="p">())</span>
+
+<span class="c1"># Print the training data means</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">games_tourney_train</span><span class="o">.</span><span class="n">mean</span><span class="p">())</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">expit</span> <span class="k">as</span> <span class="n">sigmoid</span>
+
+<span class="c1"># Weight from the model</span>
+<span class="n">weight</span> <span class="o">=</span> <span class="mf">0.14</span>
+
+<span class="c1"># Print the approximate win probability predicted close game</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sigmoid</span><span class="p">(</span><span class="mi">1</span> <span class="o">*</span> <span class="n">weight</span><span class="p">))</span>
+
+<span class="c1"># Print the approximate win probability predicted blowout game</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sigmoid</span><span class="p">(</span><span class="mi">10</span> <span class="o">*</span> <span class="n">weight</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered"><div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="4.10-Evaluate-on-new-data-with-two-metrics">4.10 Evaluate on new data with two metrics<a class="anchor-link" href="#4.10-Evaluate-on-new-data-with-two-metrics"> </a></h2><p>Now that you've fit your model and inspected its weights to make sure they make sense, evaluate your model on the tournament test set to see how well it does on new data.</p>
+<p>Note that in this case, Keras will return 3 numbers: the first number will be the sum of both the loss functions, and then the next 2 numbers will be the loss functions you used when defining the model.</p>
+<p>Ready to take your deep learning to the next level? Check out <a href="https://www.datacamp.com/courses/convolutional-neural-networks-for-image-processing">"Convolutional Neural Networks for Image Processing"</a>.</p>
+<h5 id="Instructions">Instructions<a class="anchor-link" href="#Instructions"> </a></h5><p><strong>100 XP</strong></p>
+<ul>
+<li>Evaluate the model on <code>games_tourney_test</code>.</li>
+<li>Use the same inputs and outputs as the training set.</li>
+</ul>
+
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-python"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">games_tourney_test</span><span class="p">[[</span><span class="s1">&#39;seed_diff&#39;</span><span class="p">,</span> <span class="s1">&#39;pred&#39;</span><span class="p">]],</span>
+               <span class="p">[</span><span class="n">games_tourney_test</span><span class="p">[[</span><span class="s1">&#39;score_diff&#39;</span><span class="p">]],</span> <span class="n">games_tourney_test</span><span class="p">[[</span><span class="s1">&#39;won&#39;</span><span class="p">]]],</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+</div>
+
+
+
+  </div><a class="u-url" href="/blog/2021/12/31/advanced-deep-learning-with-keras.html" hidden></a>
+</article>
+
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/blog/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/blog/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/blog/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>An easy to use blogging platform with support for Jupyter Notebooks.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/fastai" target="_blank" title="fastai"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#github"></use></svg></a></li><li><a rel="me" href="https://twitter.com/fastdotai" target="_blank" title="fastdotai"><svg class="svg-icon grey"><use xlink:href="/blog/assets/minima-social-icons.svg#twitter"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>

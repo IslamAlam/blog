@@ -1,0 +1,1860 @@
+<h1 id="introduction-to-linear-modeling-in-python">Introduction to Linear Modeling in Python</h1>
+
+<p>This is the memo of the 3rd course (5 courses in all) of ‘Statistics Fundamentals with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/introduction-to-linear-modeling-in-python">HERE</a></strong>
+ .</p>
+
+<hr />
+
+<p>###
+<strong>Table of contents</strong></p>
+
+<ol>
+  <li>Exploring Linear Trends</li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/09/24/introduction-to-linear-modeling-in-python-from-datacamp/2/">Building Linear Models</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/09/24/introduction-to-linear-modeling-in-python-from-datacamp/3/">Making Model Predictions</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/09/24/introduction-to-linear-modeling-in-python-from-datacamp/4/">Estimating Model Parameters</a></li>
+</ol>
+
+<h1 id="1-exploring-linear-trends"><strong>1. Exploring Linear Trends</strong></h1>
+<hr />
+
+<h2 id="11-introduction-to-modeling-data"><strong>1.1 Introduction to Modeling Data</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture1-23.png?w=790" alt="Desktop View" /></p>
+
+<p>####
+<strong>Reasons for Modeling: Interpolation</strong></p>
+
+<p>One common use of modeling is
+ <strong>interpolation</strong>
+ to determine a value “inside” or “in between” the measured data points. In this exercise, you will make a prediction for the value of the dependent variable
+ <code class="language-plaintext highlighter-rouge">distances</code>
+ for a given independent variable
+ <code class="language-plaintext highlighter-rouge">times</code>
+ that falls “in between” two measurements from a road trip, where the distances are those traveled for the given elapse times.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/54e50fcc0edd78c85780200e6225902e8dd39b2c/ch01_ex02_fig02.png" alt="context figure" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+times, distances
+[hours], [miles]
+ 0.0,     0.00
+ 1.0,    44.05
+ 2.0,   107.16
+ 3.0,   148.44
+ 4.0,   196.40
+ 5.0,   254.44
+ 6.0,   300.00
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the total change in distance and change in time
+</span><span class="n">total_distance</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">distances</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">total_time</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c1"># Estimate the slope of the data from the ratio of the changes
+</span><span class="n">average_speed</span> <span class="o">=</span> <span class="n">total_distance</span> <span class="o">/</span> <span class="n">total_time</span>
+
+<span class="c1"># Predict the distance traveled for a time not measured
+</span><span class="n">elapse_time</span> <span class="o">=</span> <span class="mf">2.5</span>
+<span class="n">distance_traveled</span> <span class="o">=</span> <span class="n">average_speed</span> <span class="o">*</span> <span class="n">elapse_time</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The distance traveled is {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">distance_traveled</span><span class="p">))</span>
+
+<span class="c1"># The distance traveled is 125.0
+</span>
+</code></pre></div></div>
+
+<p>Notice that the answer distance is ‘inside’ that range of data values, so, less than the max(distances) but greater than the min(distances) .</p>
+
+<p>####
+<strong>Reasons for Modeling: Extrapolation</strong></p>
+
+<p>Another common use of modeling is
+ <strong>extrapolation</strong>
+ to estimate data values
+ <em>“outside”</em>
+ or
+ <em>“beyond”</em>
+ the range (min and max values of
+ <code class="language-plaintext highlighter-rouge">time</code>
+ ) of the measured data. In this exercise, we have measured distances for times 0 through 5 hours, but we are interested in estimating how far we’d go in 8 hours. Using the same data set from the previous exercise, we have prepared a linear model
+ <code class="language-plaintext highlighter-rouge">distance = model(time)</code>
+ . Use that
+ <code class="language-plaintext highlighter-rouge">model()</code>
+ to make a prediction about the distance traveled for a time much larger than the other times in the measurements.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/ba7464321089e724e40b06c36532c176e237145f/ch01_ex03_fig02.png" alt="context figure" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Select a time not measured.
+</span><span class="n">time</span> <span class="o">=</span> <span class="mi">8</span>
+
+<span class="c1"># Use the model to compute a predicted distance for that time.
+</span><span class="n">distance</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+<span class="c1"># Inspect the value of the predicted distance traveled.
+</span><span class="k">print</span><span class="p">(</span><span class="n">distance</span><span class="p">)</span>
+
+<span class="c1"># Determine if you will make it without refueling.
+</span><span class="n">answer</span> <span class="o">=</span> <span class="p">(</span><span class="n">distance</span> <span class="o">&lt;=</span> <span class="mi">400</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">answer</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Notice that the car can travel just to the range limit of 400 miles, so you’d run out of gas just as you completed the trip</p>
+
+<p>####
+<strong>Reasons for Modeling: Estimating Relationships</strong></p>
+
+<p>Another common application of modeling is to
+ <em>compare two data sets</em>
+ by building models for each, and then
+ <em>comparing the models</em>
+ . In this exercise, you are given data for a road trip two cars took together. The cars stopped for gas every 50 miles, but each car did not need to fill up the same amount, because the cars do not have the same fuel efficiency (MPG). Complete the function
+ <code class="language-plaintext highlighter-rouge">efficiency_model(miles, gallons)</code>
+ to estimate efficiency as average miles traveled per gallons of fuel consumed. Use the provided dictionaries
+ <code class="language-plaintext highlighter-rouge">car1</code>
+ and
+ <code class="language-plaintext highlighter-rouge">car2</code>
+ , which both have keys
+ <code class="language-plaintext highlighter-rouge">car['miles']</code>
+ and
+ <code class="language-plaintext highlighter-rouge">car['gallons']</code>
+ .</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/79778532773c5cee6fa1c29caff5d66bd4f798c3/ch01_ex04_fig03.png" alt="context figure" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+car1
+{'gallons': array([  0.03333333,   1.69666667,   3.36      ,   5.02333333,
+          6.68666667,   8.35      ,  10.01333333,  11.67666667,
+         13.34      ,  15.00333333,  16.66666667]),
+ 'miles': array([   1. ,   50.9,  100.8,  150.7,  200.6,  250.5,  300.4,  350.3,
+         400.2,  450.1,  500. ])}
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Complete the function to model the efficiency.
+</span><span class="k">def</span> <span class="nf">efficiency_model</span><span class="p">(</span><span class="n">miles</span><span class="p">,</span> <span class="n">gallons</span><span class="p">):</span>
+   <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span> <span class="n">miles</span> <span class="o">/</span> <span class="n">gallons</span> <span class="p">)</span>
+
+<span class="c1"># Use the function to estimate the efficiency for each car.
+</span><span class="n">car1</span><span class="p">[</span><span class="s">'mpg'</span><span class="p">]</span> <span class="o">=</span> <span class="n">efficiency_model</span><span class="p">(</span><span class="n">car1</span><span class="p">[</span><span class="s">'miles'</span><span class="p">]</span> <span class="p">,</span> <span class="n">car1</span><span class="p">[</span><span class="s">'gallons'</span><span class="p">]</span> <span class="p">)</span>
+<span class="n">car2</span><span class="p">[</span><span class="s">'mpg'</span><span class="p">]</span> <span class="o">=</span> <span class="n">efficiency_model</span><span class="p">(</span><span class="n">car2</span><span class="p">[</span><span class="s">'miles'</span><span class="p">]</span> <span class="p">,</span> <span class="n">car2</span><span class="p">[</span><span class="s">'gallons'</span><span class="p">]</span> <span class="p">)</span>
+
+<span class="c1"># Finish the logic statement to compare the car efficiencies.
+</span><span class="k">if</span> <span class="n">car1</span><span class="p">[</span><span class="s">'mpg'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">car2</span><span class="p">[</span><span class="s">'mpg'</span><span class="p">]</span> <span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'car1 is the best'</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">car1</span><span class="p">[</span><span class="s">'mpg'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">car2</span><span class="p">[</span><span class="s">'mpg'</span><span class="p">]</span> <span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'car2 is the best'</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'the cars have the same efficiency'</span><span class="p">)</span>
+
+<span class="c1"># car2 is the best
+</span>
+</code></pre></div></div>
+
+<p>Notice the original plot that visualized the raw data was plot
+ <em>gpm(), and the slope is 1/MPG and so car1 is steeper than car2, but if you call plot</em>
+ mpg(gallons, miles) the slope is MPG, and so car2 has a steeper slope than car1</p>
+
+<hr />
+
+<h2 id="12-visualizing-linear-relationships"><strong>1.2 Visualizing Linear Relationships</strong></h2>
+
+<p>####
+<strong>Plotting the Data</strong></p>
+
+<p>Everything in python is an object, even modules. Your goal in this exercise is to review the use of the object oriented interfaces to the python library
+ <code class="language-plaintext highlighter-rouge">matplotlib</code>
+ in order to visualize measured data in a more flexible and extendable work flow. The general plotting work flow looks like this:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import matplotlib.pyplot as plt
+fig, axis = plt.subplots()
+axis.plot(x, y, color="green", linestyle="--", marker="s")
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/e2d6e23eecfc94bada0015a19d18f993c35fcfba/ch01_ex06_fig01.png" alt="context figure" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create figure and axis objects using subplots()
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">()</span>
+
+<span class="c1"># Plot line using the axis.plot() method
+</span><span class="n">line</span> <span class="o">=</span> <span class="n">axis</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span> <span class="p">,</span> <span class="n">distances</span> <span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">" "</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">"o"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">"red"</span><span class="p">)</span>
+
+<span class="c1"># Use the plt.show() method to display the figure
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture2-26.png?w=652" alt="Desktop View" /></p>
+
+<p>Notice how linestyle=’ ‘ means no line at all, just markers.</p>
+
+<p>####
+<strong>Plotting the Model on the Data</strong></p>
+
+<p>Continuing with the same measured data from the previous exercise, your goal is to use a predefined
+ <code class="language-plaintext highlighter-rouge">model()</code>
+ and measured data
+ <code class="language-plaintext highlighter-rouge">times</code>
+ and
+ <code class="language-plaintext highlighter-rouge">measured_distances</code>
+ to compute modeled distances, and then plot both measured and modeled data on the same axis.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/5bd0ccfd857b7c4b5870c2cf8401bdddd6f2633f/ch01_ex07_fig01.png" alt="context figure" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Pass times and measured distances into model
+</span><span class="n">model_distances</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">measured_distances</span><span class="p">)</span>
+
+<span class="c1"># Create figure and axis objects and call axis.plot() twice to plot data and model distances versus times
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">axis</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">measured_distances</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">" "</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">"o"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">"black"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"Measured"</span><span class="p">)</span>
+<span class="n">axis</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">times</span><span class="p">,</span> <span class="n">model_distances</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">"-"</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">"red"</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">"Modeled"</span><span class="p">)</span>
+
+<span class="c1"># Add grid lines and a legend to your plot, and then show to display
+</span><span class="n">axis</span><span class="p">.</span><span class="n">grid</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">axis</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">"best"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture3-24.png?w=1024" alt="Desktop View" /></p>
+
+<p>Notice a subtlety of python.
+ <code class="language-plaintext highlighter-rouge">None</code>
+ is a special object that is often used as a place-holder to be replaced by default values, so
+ <code class="language-plaintext highlighter-rouge">linestyle=None</code>
+ does not mean no line, it means the default which is a solid line style, whereas
+ <code class="language-plaintext highlighter-rouge">marker=None</code>
+ triggers the default marker, which happens to be no marker at all. If you use
+ <code class="language-plaintext highlighter-rouge">color=None</code>
+ , the resulting color will be blue, the default line color for
+ <code class="language-plaintext highlighter-rouge">matplotlib</code>
+ .</p>
+
+<p>####
+<strong>Visually Estimating the Slope &amp; Intercept</strong></p>
+
+<p>Building linear models is an automated way of doing something we can roughly do “manually” with data visualization and a lot of trial-and-error. The visual method is not the most efficient or precise method, but it
+ <em>does</em>
+ illustrate the concepts very well, so let’s try it!</p>
+
+<p>Given some measured data, your goal is to guess values for slope and intercept, pass them into the model, and adjust your guess until the resulting model fits the data. Use the provided data
+ <code class="language-plaintext highlighter-rouge">xd, yd</code>
+ , and the provided function
+ <code class="language-plaintext highlighter-rouge">model()</code>
+ to create model predictions. Compare the predictions and data using the provided
+ <code class="language-plaintext highlighter-rouge">plot_data_and_model()</code>
+ .</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/b10af870f99d87f8adad221ed091483ff57c4aae/ch01_ex08_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Look at the plot data and guess initial trial values
+</span><span class="n">trial_slope</span> <span class="o">=</span> <span class="mf">1.2</span>
+<span class="n">trial_intercept</span> <span class="o">=</span> <span class="mf">1.8</span>
+
+<span class="c1"># input thoses guesses into the model function to compute the model values.
+</span><span class="n">xm</span><span class="p">,</span> <span class="n">ym</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">trial_intercept</span><span class="p">,</span> <span class="n">trial_slope</span><span class="p">)</span>
+
+<span class="c1"># Compare your your model to the data with the plot function
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_data_and_model</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">xm</span><span class="p">,</span> <span class="n">ym</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Repeat the steps above until your slope and intercept guess makes the model line up with the data.
+</span><span class="n">final_slope</span> <span class="o">=</span> <span class="mf">1.2</span>
+<span class="n">final_intercept</span> <span class="o">=</span> <span class="mf">1.8</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture5-26.png?w=649" alt="Desktop View" /></p>
+
+<p>Notice that you did not have to get the best values,
+ <code class="language-plaintext highlighter-rouge">slope = 1</code>
+ and
+ <code class="language-plaintext highlighter-rouge">intercept = 2</code>
+ , just something close. Models almost NEVER match the data exactly, and a model created from slightly different model parameters might fit the data equally well. We’ll cover quantifying model performance and comparison in more detail later in this course!</p>
+
+<hr />
+
+<h2 id="13-quantifying-linear-relationships"><strong>1.3 Quantifying Linear Relationships</strong></h2>
+
+<p>####
+<strong>Mean, Deviation, &amp; Standard Deviation</strong></p>
+
+<p>The mean describes the center of the data. The standard deviation describes the spread of the data. But to compare two variables, it is convenient to normalize both. In this exercise, you are provided with two arrays of data, which are highly correlated, and you will compute and visualize the normalized deviations of each array.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/a3f411c02f22e364363813ddf15864f061b7774a/ch01_ex10_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the deviations by subtracting the mean offset
+</span><span class="n">dx</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">dy</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+<span class="c1"># Normalize the data by dividing the deviations by the standard deviation
+</span><span class="n">zx</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">/</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">zy</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">/</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+<span class="c1"># Plot comparisons of the raw data and the normalized data
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_cdfs</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">zx</span><span class="p">,</span> <span class="n">zy</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture6-24.png?w=1024" alt="Desktop View" /></p>
+
+<p>Notice how hard it is to compare dx and dy, versus comparing the normalized zx and zy.</p>
+
+<p>####
+<strong>Covariance vs Correlation</strong></p>
+
+<p>Covariance is a measure of whether two variables change (“vary”) together. It is calculated by computing the products, point-by-point, of the deviations seen in the previous exercise,
+ <code class="language-plaintext highlighter-rouge">dx[n]*dy[n]</code>
+ , and then finding the average of all those products.</p>
+
+<p>Correlation is in essence the normalized covariance. In this exercise, you are provided with two arrays of data, which are highly correlated, and you will visualize and compute
+ <strong>both</strong>
+ the
+ <code class="language-plaintext highlighter-rouge">covariance</code>
+ and the
+ <code class="language-plaintext highlighter-rouge">correlation</code>
+ .</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/a3f411c02f22e364363813ddf15864f061b7774a/ch01_ex10_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the covariance from the deviations.
+</span><span class="n">dx</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">dy</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="n">covariance</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dx</span> <span class="o">*</span> <span class="n">dy</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Covariance: "</span><span class="p">,</span> <span class="n">covariance</span><span class="p">)</span>
+<span class="c1"># Covariance:  69.6798182602
+</span>
+
+<span class="c1"># Compute the correlation from the normalized deviations.
+</span><span class="n">zx</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">/</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">zy</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">/</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="n">correlation</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">zx</span> <span class="o">*</span> <span class="n">zy</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Correlation: "</span><span class="p">,</span> <span class="n">correlation</span><span class="p">)</span>
+
+<span class="c1"># Plot the normalized deviations for visual inspection.
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_normalized_deviations</span><span class="p">(</span><span class="n">zx</span><span class="p">,</span> <span class="n">zy</span><span class="p">)</span>
+<span class="c1"># Correlation:  0.982433369757
+</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture7-20.png?w=1024" alt="Desktop View" /></p>
+
+<p>Notice that you’ve plotted the product of the normalized deviations, and labeled the plot with the correlation, a single value that is the mean of that product. The product is always positive and the mean is typical of how the two vary together.</p>
+
+<p>####
+<strong>Correlation Strength</strong></p>
+
+<p>Intuitively, we can look at the plots provided and “see” whether the two variables seem to “vary together”.</p>
+
+<ul>
+  <li>Data Set A: x and y change together and appear to have a strong relationship.</li>
+  <li>Data Set B: there is a rough upward trend; x and y appear only loosely related.</li>
+  <li>Data Set C: looks like random scatter; x an y do not appear to change together and are unrelated.</li>
+</ul>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/0b432ae4f447613dfef3143baa53fef637552cab/ch1_ex12_fig01.png" alt="Data Set A" /></p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/a826178cf3d5132dbd64ea346eaf1233d113102d/ch1_ex12_fig02.png" alt="Data Set B" /></p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/d07e0410be1912ba1bdbd3d091ea4f78f1a88cd9/ch1_ex12_fig03.png" alt="Data Set C" /></p>
+
+<p>Recall that deviations differ from the mean, and we normalized by dividing the deviations by standard deviation. In this exercise you will compare the 3 data sets by computing correlation, and determining which data set has the most strongly correlated variables x and y. Use the provided data table
+ <code class="language-plaintext highlighter-rouge">data_sets</code>
+ , a dictionary of records, each having keys ‘name’, ‘x’, ‘y’, and ‘correlation’.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Complete the function that will compute correlation.
+</span><span class="k">def</span> <span class="nf">correlation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="n">x_dev</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">y_dev</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="n">x_norm</span> <span class="o">=</span> <span class="n">x_dev</span> <span class="o">/</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">y_norm</span> <span class="o">=</span> <span class="n">y_dev</span> <span class="o">/</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x_norm</span> <span class="o">*</span> <span class="n">y_norm</span><span class="p">)</span>
+
+<span class="c1"># Compute and store the correlation for each data set in the list.
+</span><span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span> <span class="ow">in</span> <span class="n">data_sets</span><span class="p">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">data</span><span class="p">[</span><span class="s">'correlation'</span><span class="p">]</span> <span class="o">=</span> <span class="n">correlation</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s">'x'</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="s">'y'</span><span class="p">])</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'data set {} has correlation {:.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="p">[</span><span class="s">'correlation'</span><span class="p">]))</span>
+
+<span class="c1"># Assign the data set with the best correlation.
+</span><span class="n">best_data</span> <span class="o">=</span> <span class="n">data_sets</span><span class="p">[</span><span class="s">'A'</span><span class="p">]</span>
+
+<span class="c1"># data set A has correlation 1.00
+# data set B has correlation 0.54
+# data set C has correlation 0.09
+</span>
+</code></pre></div></div>
+
+<p>Note that the strongest relationship is in Dataset A, with correlation closest to 1.0 and the weakest is Datatset C with correlation value closest to zero.</p>
+
+<h1 id="2-building-linear-models"><strong>2. Building Linear Models</strong></h1>
+<hr />
+
+<h2 id="21-what-makes-a-model-linear"><strong>2.1 What makes a model linear</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture8-18.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture9-16.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture10-17.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Model Components</strong></p>
+
+<p>In this exercise, you will implement a model function that returns model values for
+ <code class="language-plaintext highlighter-rouge">y</code>
+ , computed from input
+ <code class="language-plaintext highlighter-rouge">x</code>
+ data, and any input coefficients for the “zero-th” order term
+ <code class="language-plaintext highlighter-rouge">a0</code>
+ , the “first-order” term
+ <code class="language-plaintext highlighter-rouge">a1</code>
+ , and a quadratic term
+ <code class="language-plaintext highlighter-rouge">a2</code>
+ of a model (see below).</p>
+
+<p>y=a0+a1x+a2x2y=a0+a1x+a2x^2</p>
+
+<p>Recall that “first order” is linear, so we’ll set the defaults for this general linear model with
+ <code class="language-plaintext highlighter-rouge">a2=0</code>
+ , but later, we will change this for comparison.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define the general model as a function
+</span><span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a0</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">a1</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">a2</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a0</span> <span class="o">+</span> <span class="p">(</span><span class="n">a1</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">a2</span><span class="o">*</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Generate array x, then predict y values for specific, non-default a0 and a1
+</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="c1"># Plot the results, y versus x
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_prediction</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture1-24.png?w=641" alt="Desktop View" /></p>
+
+<p>Notice that we used
+ <code class="language-plaintext highlighter-rouge">model()</code>
+ to compute predicted values of
+ <code class="language-plaintext highlighter-rouge">y</code>
+ for given possibly measured values of
+ <code class="language-plaintext highlighter-rouge">x</code>
+ . The model takes the independent data and uses it to generate a model for the dependent variables corresponding values.</p>
+
+<p>####
+<strong>Model Parameters</strong></p>
+
+<p>Now that you’ve built a
+ <strong><em>general</em></strong>
+ model, let’s “optimize” or “fit” it to a new (preloaded) measured data set,
+ <code class="language-plaintext highlighter-rouge">xd, yd</code>
+ , by finding the
+ <strong><em>specific</em></strong>
+ values for model parameters
+ <code class="language-plaintext highlighter-rouge">a0, a1</code>
+ for which the model data and the measured data line up on a plot.</p>
+
+<p>This is an iterative visualization strategy, where we start with a
+ <em>guess</em>
+ for model parameters, pass them into the
+ <code class="language-plaintext highlighter-rouge">model()</code>
+ , over-plot the resulting modeled data on the measured data, and visually check that the line passes through the points. If it doesn’t, we change the model parameters and try again.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/0e55d370f291374e0431de0caecb2a95e0186644/ch02_ex04_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Complete the plotting function definition
+</span><span class="k">def</span> <span class="nf">plot_data_with_model</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">ym</span><span class="p">):</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_data</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">)</span>  <span class="c1"># plot measured data
+</span>    <span class="n">fig</span><span class="p">.</span><span class="n">axes</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">plot</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">ym</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">)</span>  <span class="c1"># over-plot modeled data
+</span>    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fig</span>
+
+<span class="c1"># Select new model parameters a0, a1, and generate modeled `ym` from them.
+</span><span class="n">a0</span> <span class="o">=</span> <span class="mi">150</span>
+<span class="n">a1</span> <span class="o">=</span> <span class="mi">25</span>
+<span class="n">ym</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span>
+
+<span class="c1"># Plot the resulting model to see whether it fits the data
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_data_with_model</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">ym</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture2-27.png?w=651" alt="Desktop View" /></p>
+
+<p>Notice again that the measured x-axis data
+ <code class="language-plaintext highlighter-rouge">xd</code>
+ is used to generate the modeled y-axis data
+ <code class="language-plaintext highlighter-rouge">ym</code>
+ so to plot the model, you are plotting
+ <code class="language-plaintext highlighter-rouge">ym</code>
+ vs
+ <code class="language-plaintext highlighter-rouge">xd</code>
+ , which may seem counter-intuitive at first. But we are modeling the y response to a given x; we are not modeling x.</p>
+
+<hr />
+
+<h2 id="22-interpreting-slope-and-intercept"><strong>2.2 Interpreting Slope and Intercept</strong></h2>
+
+<p>####
+<strong>Linear Proportionality</strong></p>
+
+<p>The definition of temperature scales is related to the linear expansion of certain liquids, such as mercury and alcohol. Originally, these scales were literally rulers for measuring length of fluid in the narrow marked or “graduated” tube as a proxy for temperature. The alcohol starts in a bulb, and then expands linearly into the tube, in response to increasing temperature of the bulb or whatever surrounds it.</p>
+
+<p>In this exercise, we will explore the conversion between the Fahrenheit and Celsius temperature scales as a demonstration of interpreting slope and intercept of a linear relationship within a physical context.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/d2b4bffcd39b3b6034b4ed857f2b0dc8f47d936e/ch03_ex01_fig02.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Complete the function to convert C to F
+</span><span class="k">def</span> <span class="nf">convert_scale</span><span class="p">(</span><span class="n">temps_C</span><span class="p">):</span>
+    <span class="p">(</span><span class="n">freeze_C</span><span class="p">,</span> <span class="n">boil_C</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">freeze_F</span><span class="p">,</span> <span class="n">boil_F</span><span class="p">)</span> <span class="o">=</span> <span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">212</span><span class="p">)</span>
+    <span class="n">change_in_C</span> <span class="o">=</span> <span class="n">boil_C</span> <span class="o">-</span> <span class="n">freeze_C</span>
+    <span class="n">change_in_F</span> <span class="o">=</span> <span class="n">boil_F</span> <span class="o">-</span> <span class="n">freeze_F</span>
+    <span class="n">slope</span> <span class="o">=</span> <span class="n">change_in_F</span> <span class="o">/</span> <span class="n">change_in_C</span>
+    <span class="n">intercept</span> <span class="o">=</span> <span class="n">freeze_F</span> <span class="o">-</span> <span class="n">freeze_C</span>
+    <span class="n">temps_F</span> <span class="o">=</span> <span class="n">intercept</span> <span class="o">+</span> <span class="p">(</span><span class="n">slope</span> <span class="o">*</span> <span class="n">temps_C</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">temps_F</span>
+
+<span class="c1"># Use the convert function to compute values of F and plot them
+</span><span class="n">temps_C</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">101</span><span class="p">)</span>
+<span class="n">temps_F</span> <span class="o">=</span> <span class="n">convert_scale</span><span class="p">(</span><span class="n">temps_C</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_temperatures</span><span class="p">(</span><span class="n">temps_C</span><span class="p">,</span> <span class="n">temps_F</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture3-25.png?w=635" alt="Desktop View" /></p>
+
+<p>####
+<strong>Slope and Rates-of-Change</strong></p>
+
+<p>In this exercise, you will model the motion of a car driving (roughly) constant velocity by computing the average velocity over the entire trip. The linear relationship modeled is between the time elapsed and the distance traveled.</p>
+
+<p>In this case, the model parameter
+ <code class="language-plaintext highlighter-rouge">a1</code>
+ , or slope, is approximated or “estimated”, as the mean velocity, or put another way, the “rate-of-change” of the distance (“rise”) divided by the time (“run”).</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/417073ac3c8000457321f38f6deda3c0e16b7984/ch03_ex03_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute an array of velocities as the slope between each point
+</span><span class="n">diff_distances</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">diff</span><span class="p">(</span><span class="n">distances</span><span class="p">)</span>
+<span class="n">diff_times</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">diff</span><span class="p">(</span><span class="n">times</span><span class="p">)</span>
+<span class="n">velocities</span> <span class="o">=</span> <span class="n">diff_distances</span> <span class="o">/</span> <span class="n">diff_times</span>
+
+<span class="c1"># Chracterize the center and spread of the velocities
+</span><span class="n">v_avg</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">velocities</span><span class="p">)</span>
+<span class="n">v_max</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">velocities</span><span class="p">)</span>
+<span class="n">v_min</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">min</span><span class="p">(</span><span class="n">velocities</span><span class="p">)</span>
+<span class="n">v_range</span> <span class="o">=</span> <span class="n">v_max</span> <span class="o">-</span> <span class="n">v_min</span>
+
+<span class="c1"># Plot the distribution of velocities
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_velocity_timeseries</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">velocities</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture4-23.png?w=645" alt="Desktop View" /></p>
+
+<p>Generally we might use the average velocity as the slope in our model. But notice that there is some random variation in the instantaneous velocity values when plotted as a time series. The range of values
+ <code class="language-plaintext highlighter-rouge">v_max - v_min</code>
+ is one measure of the scale of that variation, and the standard deviation of velocity values is another measure. We see the implications of this variation in a model parameter in the next chapter of this course when discussing inference.</p>
+
+<p>####
+<strong>Intercept and Starting Points</strong></p>
+
+<p>In this exercise, you will see the intercept and slope parameters in the context of modeling measurements taken of the volume of a solution contained in a large glass jug. The solution is composed of water, grains, sugars, and yeast. The total mass of both the solution and the glass container was also recorded, but the empty container mass was not noted.</p>
+
+<p>Your job is to use the preloaded pandas DataFrame
+ <code class="language-plaintext highlighter-rouge">df</code>
+ , with data columns
+ <code class="language-plaintext highlighter-rouge">volumes</code>
+ and
+ <code class="language-plaintext highlighter-rouge">masses</code>
+ , to build a linear model that relates the
+ <code class="language-plaintext highlighter-rouge">masses</code>
+ (y-data) to the
+ <code class="language-plaintext highlighter-rouge">volumes</code>
+ (x-data). The slope will be an estimate of the density (change in mass / change in volume) of the solution, and the intercept will be an estimate of the empty container weight (mass when volume=0).</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/9937537805654245b5e6fccb309cfa0ac8ed516c/ch03_ex04_fig03.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import ols from statsmodels, and fit a model to the data
+</span><span class="kn">from</span> <span class="nn">statsmodels.formula.api</span> <span class="kn">import</span> <span class="n">ols</span>
+<span class="n">model_fit</span> <span class="o">=</span> <span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s">"masses ~ volumes"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+<span class="n">model_fit</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">fit</span><span class="p">()</span>
+
+<span class="c1"># Extract the model parameter values, and assign them to a0, a1
+</span><span class="n">a0</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">params</span><span class="p">[</span><span class="s">'Intercept'</span><span class="p">]</span>
+<span class="n">a1</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">params</span><span class="p">[</span><span class="s">'volumes'</span><span class="p">]</span>
+
+<span class="c1"># Print model parameter values with meaningful names, and compare to summary()
+</span><span class="k">print</span><span class="p">(</span> <span class="s">"container_mass   = {:0.4f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">a0</span><span class="p">)</span> <span class="p">)</span>
+<span class="k">print</span><span class="p">(</span> <span class="s">"solution_density = {:0.4f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">a1</span><span class="p">)</span> <span class="p">)</span>
+<span class="k">print</span><span class="p">(</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span> <span class="p">)</span>
+
+<span class="c1"># container_mass   = 5.4349
+# solution_density = 1.1029
+</span>
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                            OLS Regression Results
+==============================================================================
+Dep. Variable:                 masses   R-squared:                       0.999
+Model:                            OLS   Adj. R-squared:                  0.999
+Method:                 Least Squares   F-statistic:                 1.328e+05
+Date:                Wed, 25 Sep 2019   Prob (F-statistic):          1.19e-156
+Time:                        00:29:26   Log-Likelihood:                 102.39
+No. Observations:                 101   AIC:                            -200.8
+Df Residuals:                      99   BIC:                            -195.5
+Df Model:                           1
+Covariance Type:            nonrobust
+==============================================================================
+                 coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept      5.4349      0.023    236.805      0.000       5.389       5.480
+volumes        1.1029      0.003    364.408      0.000       1.097       1.109
+==============================================================================
+Omnibus:                        0.319   Durbin-Watson:                   2.072
+Prob(Omnibus):                  0.852   Jarque-Bera (JB):                0.169
+Skew:                           0.100   Prob(JB):                        0.919
+Kurtosis:                       3.019   Cond. No.                         20.0
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+
+</code></pre></div></div>
+
+<p>Don’t worry about everything in the summary output at first glance. We’ll see more of it later. For now, it’s good enough to try to find the slope and intercept values.</p>
+
+<hr />
+
+<h2 id="23-model-optimization"><strong>2.3 Model Optimization</strong></h2>
+
+<p>####
+<strong>Residual Sum of the Squares</strong></p>
+
+<p>In a previous exercise, we saw that the altitude along a hiking trail was roughly fit by a linear model, and we introduced the concept of
+ <strong><em>differences</em></strong>
+ between the model and the data as a
+ <strong><em>measure of model goodness</em></strong>
+ .</p>
+
+<p>In this exercise, you’ll work with the same measured data, and quantifying how well a model fits it by computing the sum of the square of the “differences”, also called “residuals”.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/2ab89e3586e143b07ffa8bc501f82c4450c36dfc/ch02_ex06_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Load the data
+</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">()</span>
+
+<span class="c1"># Model the data with specified values for parameters a0, a1
+</span><span class="n">y_model</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">a0</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">a1</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+
+<span class="c1"># Compute the RSS value for this parameterization of the model
+</span><span class="n">rss</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">square</span><span class="p">(</span><span class="n">y_data</span> <span class="o">-</span> <span class="n">y_model</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"RSS = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">rss</span><span class="p">))</span>
+<span class="c1"># RSS = 14444.484117694472
+</span>
+</code></pre></div></div>
+
+<p>The value we compute for RSS is not meaningful by itself, but later it becomes meaningful in context when we compare it to other values of RSS computed for other parameterizations of the model. More on that next!</p>
+
+<p>Some notes about code style; notice you could have done the RSS calculation in a single line of python code, but writing functions than can be re-used is good practice. Notice also that we could have defined a parameter dictionary
+ <code class="language-plaintext highlighter-rouge">dict(a0=150, a1=25)</code>
+ and passed it into the model as
+ <code class="language-plaintext highlighter-rouge">model(x, **parameters)</code>
+ which would make it easier to pass around all the parameters together if we needed them for other functions</p>
+
+<p>####
+<strong>Minimizing the Residuals</strong></p>
+
+<p>In this exercise, you will complete a function to visually compare model and data, and compute and print the RSS. You will call it more than once to see how RSS changes when you change values for
+ <code class="language-plaintext highlighter-rouge">a0</code>
+ and
+ <code class="language-plaintext highlighter-rouge">a1</code>
+ . We’ll see that the values for the parameters we found earlier are the ones needed to
+ <strong><em>minimize</em></strong>
+ the RSS.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Complete function to load data, build model, compute RSS, and plot
+</span><span class="k">def</span> <span class="nf">compute_rss_and_plot_fit</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">):</span>
+    <span class="n">xd</span><span class="p">,</span> <span class="n">yd</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">()</span>
+    <span class="n">ym</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span>
+    <span class="n">residuals</span> <span class="o">=</span> <span class="n">ym</span> <span class="o">-</span> <span class="n">yd</span>
+    <span class="n">rss</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">square</span><span class="p">(</span><span class="n">yd</span> <span class="o">-</span> <span class="n">ym</span><span class="p">))</span>
+    <span class="n">summary</span> <span class="o">=</span> <span class="s">"Parameters a0={}, a1={} yield RSS={:0.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">rss</span><span class="p">)</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_data_with_model</span><span class="p">(</span><span class="n">xd</span><span class="p">,</span> <span class="n">yd</span><span class="p">,</span> <span class="n">ym</span><span class="p">,</span> <span class="n">summary</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rss</span><span class="p">,</span> <span class="n">summary</span>
+
+<span class="c1"># Chose model parameter values and pass them into RSS function
+</span><span class="n">rss</span><span class="p">,</span> <span class="n">summary</span> <span class="o">=</span> <span class="n">compute_rss_and_plot_fit</span><span class="p">(</span><span class="n">a0</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">a1</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">summary</span><span class="p">)</span>
+
+<span class="c1"># Parameters a0=150, a1=25 yield RSS=14444.48
+</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture5-27.png?w=653" alt="Desktop View" /></p>
+
+<p>As stated earlier, the significance of RSS is in context of other values. More specifically, the minimum RSS is of value in identifying the specific set of parameter values for our model which yield the smallest residuals in an overall sense.</p>
+
+<h1 id="visualizing-the-rss-minima">Visualizing the RSS Minima</h1>
+
+<p>In this exercise you will compute and visualize how RSS varies for different values of model parameters. Start by holding the intercept constant, but vary the slope: and for each slope value, you’ll compute the model values, and the resulting RSS. Once you have an array of RSS values, you will determine minimal RSS value, in code, and from that minimum, determine the slope that resulted in that minimal RSS.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/f37d23c6c7997ef1daaa74b95cf3292fee6c324a/ch02_ex08_fig01.png" alt="" /></p>
+
+<p>Use pre-loaded data arrays
+ <code class="language-plaintext highlighter-rouge">x_data</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_data</code>
+ , and empty container
+ <code class="language-plaintext highlighter-rouge">rss_list</code>
+ to get started.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Loop over all trial values in a1_array, computing rss for each
+</span><span class="n">a1_array</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">101</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">a1_trial</span> <span class="ow">in</span> <span class="n">a1_array</span><span class="p">:</span>
+    <span class="n">y_model</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">a0</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span> <span class="n">a1</span><span class="o">=</span><span class="n">a1_trial</span><span class="p">)</span>
+    <span class="n">rss_value</span> <span class="o">=</span> <span class="n">compute_rss</span><span class="p">(</span><span class="n">y_data</span><span class="p">,</span> <span class="n">y_model</span><span class="p">)</span>
+    <span class="n">rss_list</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">rss_value</span><span class="p">)</span>
+
+<span class="c1"># Find the minimum RSS and the a1 value from whence it came
+</span><span class="n">rss_array</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">rss_list</span><span class="p">)</span>
+<span class="n">best_rss</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">min</span><span class="p">(</span><span class="n">rss_array</span><span class="p">)</span>
+<span class="n">best_a1</span> <span class="o">=</span> <span class="n">a1_array</span><span class="p">[</span><span class="n">np</span><span class="p">.</span><span class="n">where</span><span class="p">(</span><span class="n">rss_array</span><span class="o">==</span><span class="n">best_rss</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'The minimum RSS = {}, came from a1 = {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">best_rss</span><span class="p">,</span> <span class="n">best_a1</span><span class="p">))</span>
+
+<span class="c1"># The minimum RSS = 14411.193019771845, came from a1 = [ 24.8]
+</span>
+<span class="c1"># Plot your rss and a1 values to confirm answer
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_rss_vs_a1</span><span class="p">(</span><span class="n">a1_array</span><span class="p">,</span> <span class="n">rss_array</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture6-25.png?w=631" alt="Desktop View" /></p>
+
+<p>The best slope is the one out of an array of slopes than yielded the minimum RSS value out of an array of RSS values. Python tip: notice that we started with
+ <code class="language-plaintext highlighter-rouge">rss_list</code>
+ to make it easy to
+ <code class="language-plaintext highlighter-rouge">.append()</code>
+ but then later converted to
+ <code class="language-plaintext highlighter-rouge">numpy.array()</code>
+ to gain access to all the numpy methods.</p>
+
+<hr />
+
+<h2 id="24-least-squares-optimization"><strong>2.4 Least-Squares Optimization</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture7-21.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture8-19.png?w=884" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture9-17.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture10-18.png?w=890" alt="Desktop View" /></p>
+
+<p>####
+<strong>Least-Squares with <code class="language-plaintext highlighter-rouge">numpy</code></strong></p>
+
+<p>The formulae below are the result of working through the calculus discussed in the introduction. In this exercise, we’ll trust that the calculus correct, and implement these formulae in code.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># prepare the means and deviations of the two variables
+</span><span class="n">x_mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">y_mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+<span class="n">x_dev</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">x_mean</span>
+<span class="n">y_dev</span> <span class="o">=</span> <span class="n">y</span> <span class="o">-</span> <span class="n">y_mean</span>
+
+<span class="c1"># Complete least-squares formulae to find the optimal a0, a1
+</span><span class="n">a1</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">x_dev</span> <span class="o">*</span> <span class="n">y_dev</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span> <span class="n">np</span><span class="p">.</span><span class="n">square</span><span class="p">(</span><span class="n">x_dev</span><span class="p">)</span> <span class="p">)</span>
+<span class="n">a0</span> <span class="o">=</span> <span class="n">y_mean</span> <span class="o">-</span> <span class="p">(</span><span class="n">a1</span> <span class="o">*</span> <span class="n">x_mean</span><span class="p">)</span>
+
+<span class="c1"># Use the those optimal model parameters a0, a1 to build a model
+</span><span class="n">y_model</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span>
+
+<span class="c1"># plot to verify that the resulting y_model best fits the data y
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">rss</span> <span class="o">=</span> <span class="n">compute_rss_and_plot_fit</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture11-12.png?w=647" alt="Desktop View" /></p>
+
+<p>Notice that the optimal slope a1, according to least-squares, is a ratio of the covariance to the variance. Also, note that the values of the parameters obtained here are NOT exactly the ones used to generate the pre-loaded data (a1=25 and a0=150), but they are close to those. Least-squares does not guarantee zero error; there is no perfect solution, but in this case, least-squares is the best we can do.</p>
+
+<p>####
+<strong>Optimization with Scipy</strong></p>
+
+<p>It is possible to write a
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ implementation of the
+ <strong>analytic</strong>
+ solution to find the minimal RSS value. But for more complex models, finding analytic formulae is not possible, and so we turn to other methods.</p>
+
+<p>In this exercise you will use
+ <code class="language-plaintext highlighter-rouge">scipy.optimize</code>
+ to employ a more general approach to solve the same optimization problem.</p>
+
+<p>In so doing, you will see additional return values from the method that tell answer us “how good is best”. Here we will use the same measured data and parameters as seen in the last exercise for ease of comparison of the new
+ <code class="language-plaintext highlighter-rouge">scipy</code>
+ approach.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define a model function needed as input to scipy
+</span><span class="k">def</span> <span class="nf">model_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a0</span> <span class="o">+</span> <span class="p">(</span><span class="n">a1</span><span class="o">*</span><span class="n">x</span><span class="p">)</span>
+
+<span class="c1"># Load the measured data you want to model
+</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span>  <span class="o">=</span> <span class="n">load_data</span><span class="p">()</span>
+
+<span class="c1"># call curve_fit, passing in the model function and data; then unpack the results
+</span><span class="n">param_opt</span><span class="p">,</span> <span class="n">param_cov</span> <span class="o">=</span> <span class="n">optimize</span><span class="p">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="n">model_func</span><span class="p">,</span> <span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">)</span>
+<span class="n">a0</span> <span class="o">=</span> <span class="n">param_opt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># a0 is the intercept in y = a0 + a1*x
+</span><span class="n">a1</span> <span class="o">=</span> <span class="n">param_opt</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>  <span class="c1"># a1 is the slope     in y = a0 + a1*x
+</span>
+<span class="c1"># test that these parameters result in a model that fits the data
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">rss</span> <span class="o">=</span> <span class="n">compute_rss_and_plot_fit</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Notice that we passed the function object itself,
+ <code class="language-plaintext highlighter-rouge">model_func</code>
+ into
+ <code class="language-plaintext highlighter-rouge">curve_fit</code>
+ , rather than passing in the model data. The model function object was the input, because the optimization wants to know what form in general it’s solve for; had we passed in a model_func with more terms like an
+ <code class="language-plaintext highlighter-rouge">a2*x**2</code>
+ term, we would have seen different results for the parameters output</p>
+
+<p>####
+<strong>Least-Squares with <code class="language-plaintext highlighter-rouge">statsmodels</code></strong></p>
+
+<p>Several python libraries provide convenient abstracted interfaces so that you need not always be so explicit in handling the machinery of optimization of the model.</p>
+
+<p>As an example, in this exercise, you will use the
+ <code class="language-plaintext highlighter-rouge">statsmodels</code>
+ library in a more high-level, generalized work-flow for building a model using least-squares optimization (minimization of RSS).</p>
+
+<p>To help get you started, we’ve pre-loaded the data from
+ <code class="language-plaintext highlighter-rouge">x_data, y_data = load_data()</code>
+ and stored it in a pandas DataFrame with column names
+ <code class="language-plaintext highlighter-rouge">x_column</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y_column</code>
+ using
+ <code class="language-plaintext highlighter-rouge">df = pd.DataFrame(dict(x_column=x_data, y_column=y_data))</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Pass data and `formula` into ols(), use and `.fit()` the model to the data
+</span><span class="n">model_fit</span> <span class="o">=</span> <span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s">"y_column ~ x_column"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
+
+<span class="c1"># Use .predict(df) to get y_model values, then over-plot y_data with y_model
+</span><span class="n">y_model</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_data_with_model</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">,</span> <span class="n">y_model</span><span class="p">)</span>
+
+<span class="c1"># Extract the a0, a1 values from model_fit.params
+</span><span class="n">a0</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">params</span><span class="p">[</span><span class="s">'Intercept'</span><span class="p">]</span>
+<span class="n">a1</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">params</span><span class="p">[</span><span class="s">'x_column'</span><span class="p">]</span>
+
+<span class="c1"># Visually verify that these parameters a0, a1 give the minimum RSS
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">rss</span> <span class="o">=</span> <span class="n">compute_rss_and_plot_fit</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">a1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>Note that the
+ <code class="language-plaintext highlighter-rouge">params</code>
+ container always uses ‘Intercept’ for the a0 key, but all higher order terms will have keys that match the column name from the pandas DataFrame that you passed into ols().</p>
+
+<h1 id="3-making-model-predictions"><strong>3. Making Model Predictions</strong></h1>
+<hr />
+
+<h2 id="31-modeling-real-data"><strong>3.1 Modeling Real Data</strong></h2>
+
+<p>####
+<strong>Linear Model in Anthropology</strong></p>
+
+<p>If you found part of a skeleton, from an adult human that lived thousands of years ago, how could you estimate the height of the person that it came from? This exercise is in part inspired by the work of forensic anthropologist Mildred Trotter, who built a regression model for the calculation of stature estimates from human “long bones” or femurs that is commonly used today.</p>
+
+<p>In this exercise, you’ll use data from many living people, and the python library
+ <code class="language-plaintext highlighter-rouge">scikit-learn</code>
+ , to build a linear model relating the length of the femur (thigh bone) to the “stature” (overall height) of the person. Then, you’ll apply your model to make a prediction about the height of your ancient ancestor.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/24c5103a89f299f1518d5ca969a56211fca37857/ch02_ex14_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># import the sklearn class LinearRegression and initialize the model
+</span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># Prepare the measured data arrays and fit the model to them
+</span><span class="n">legs</span> <span class="o">=</span> <span class="n">legs</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">legs</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">heights</span> <span class="o">=</span> <span class="n">heights</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">legs</span><span class="p">),</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">legs</span><span class="p">,</span> <span class="n">heights</span><span class="p">)</span>
+
+<span class="c1"># Use the fitted model to make a prediction for the found femur
+</span><span class="n">fossil_leg</span> <span class="o">=</span> <span class="mf">50.7</span>
+<span class="n">fossil_height</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">fossil_leg</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Predicted fossil height = {:0.2f} cm"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">fossil_height</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="c1"># Predicted fossil height = 181.34 cm
+</span>
+</code></pre></div></div>
+
+<p>Notice that we used the pre-loaded data to fit or “train” the model, and then applied that model to make a prediction about newly collected data that was not part of the data used to fit the model. Also notice that
+ <code class="language-plaintext highlighter-rouge">model.predict()</code>
+ returns the answer as an array of
+ <code class="language-plaintext highlighter-rouge">shape</code>
+ =
+ <code class="language-plaintext highlighter-rouge">(1,1)</code>
+ , so we had to index into it with the
+ <code class="language-plaintext highlighter-rouge">[0,0]</code>
+ syntax when printing.</p>
+
+<p>This is an artifact of our overly simplified use of
+ <code class="language-plaintext highlighter-rouge">sklearn</code>
+ here: the details of this are beyond the scope of the current course, but relate to the number of samples and features that one might use in a more sophisticated, generalized model.</p>
+
+<p>####
+<strong>Linear Model in Oceanography</strong></p>
+
+<p>Time-series data provides a context in which the “slope” of the linear model represents a “rate-of-change”.</p>
+
+<p>In this exercise, you will use measurements of sea level change from 1970 to 2010, build a linear model of that changing sea level and use it to make a prediction about the future sea level rise.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/f225423a51edaca69ffe8383a8994063c3eb098b/ch02_ex15_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import LinearRegression class, build a model, fit to the data
+</span><span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LinearRegression</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">LinearRegression</span><span class="p">(</span><span class="n">fit_intercept</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">years</span><span class="p">,</span> <span class="n">levels</span><span class="p">)</span>
+
+<span class="c1"># Use model to make a prediction for one year, 2100
+</span><span class="n">future_year</span> <span class="o">=</span> <span class="mi">2100</span>
+<span class="n">future_level</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">future_year</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Prediction: year = {}, level = {:.02f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">future_year</span><span class="p">,</span> <span class="n">future_level</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="c1"># Use model to predict for many years, and over-plot with measured data
+</span><span class="n">years_forecast</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1970</span><span class="p">,</span> <span class="mi">2100</span><span class="p">,</span> <span class="mi">131</span><span class="p">).</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">levels_forecast</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">years_forecast</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_data_and_forecast</span><span class="p">(</span><span class="n">years</span><span class="p">,</span> <span class="n">levels</span><span class="p">,</span> <span class="n">years_forecast</span><span class="p">,</span> <span class="n">levels_forecast</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture12-12.png?w=634" alt="Desktop View" /></p>
+
+<p>Note that with
+ <code class="language-plaintext highlighter-rouge">scikit-learn</code>
+ , although we could extract
+ <code class="language-plaintext highlighter-rouge">a0 = model.intercept_[0]</code>
+ and
+ <code class="language-plaintext highlighter-rouge">a1 = model.coef_[0,0]</code>
+ , we do not need to do that in order to make predictions, we just call
+ <code class="language-plaintext highlighter-rouge">model.predict()</code>
+ . With more complex models, these parameters may not have easy physical interpretations.</p>
+
+<p>Notice also that although our model is linear, the actual data appears to have an up-turn that might be better modeled by adding a quadratic or even exponential term to our model. The linear model forecast may be underestimating the rate of increase in sea level.</p>
+
+<p>####
+<strong>Linear Model in Cosmology</strong></p>
+
+<p>Less than 100 years ago, the universe appeared to be composed of a single static galaxy, containing perhaps a million stars. Today we have observations of hundreds of billions of galaxies, each with hundreds of billions of stars, all moving.</p>
+
+<p>The beginnings of the modern physical science of cosmology came with the
+ <a href="http://www.pnas.org/content/15/3/168">publication in 1929 by Edwin Hubble</a>
+ that included use of a linear model.</p>
+
+<p>In this exercise, you will build a model whose slope will give Hubble’s Constant, which describes the velocity of galaxies as a linear function of distance from Earth.</p>
+
+<p><img src="https://i0.wp.com/www.pnas.org/content/15/3/168/F2.medium.gif" alt="Hubble's Plot" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Fit the model, based on the form of the formula
+</span><span class="n">model_fit</span> <span class="o">=</span> <span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s">"velocities ~ distances"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
+
+<span class="c1"># Extract the model parameters and associated "errors" or uncertainties
+</span><span class="n">a0</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">params</span><span class="p">[</span><span class="s">'Intercept'</span><span class="p">]</span>
+<span class="n">a1</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">params</span><span class="p">[</span><span class="s">'distances'</span><span class="p">]</span>
+<span class="n">e0</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">bse</span><span class="p">[</span><span class="s">'Intercept'</span><span class="p">]</span>
+<span class="n">e1</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">bse</span><span class="p">[</span><span class="s">'distances'</span><span class="p">]</span>
+
+<span class="c1"># Print the results
+</span><span class="k">print</span><span class="p">(</span><span class="s">'For slope a1={:.02f}, the uncertainty in a1 is {:.02f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">a1</span><span class="p">,</span> <span class="n">e1</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'For intercept a0={:.02f}, the uncertainty in a0 is {:.02f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">a0</span><span class="p">,</span> <span class="n">e0</span><span class="p">))</span>
+
+<span class="c1"># For slope a1=454.16, the uncertainty in a1 is 75.24
+# For intercept a0=-40.78, the uncertainty in a0 is 83.44
+</span>
+</code></pre></div></div>
+
+<p>Later in the course, we will spend more time with model uncertainty, and exploring how to compute it ourselves. Notice the
+ <code class="language-plaintext highlighter-rouge">~</code>
+ in the
+ <code class="language-plaintext highlighter-rouge">formula</code>
+ means “similar to” and is interpreted by
+ <code class="language-plaintext highlighter-rouge">statsmodels</code>
+ to mean that
+ <code class="language-plaintext highlighter-rouge">y ~ x</code>
+ have a linear relationship.</p>
+
+<p>More recently, observed astrophysical data extend the veritical scale of measured data out further by almost a factor of 50. Using this new data to model gives a very different value for the slope, Hubble’s Constant, of about 72. Modeling with new data revealed a different slope, and this has big implications in the physics of the Universe.</p>
+
+<hr />
+
+<h2 id="32-the-limits-of-prediction"><strong>3.2 The Limits of Prediction</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture13-11.png?w=841" alt="Desktop View" /></p>
+
+<p>####
+<strong>Interpolation: Inbetween Times</strong></p>
+
+<p>In this exercise, you will build a linear model by fitting monthly time-series data for the Dow Jones Industrial Average (DJIA) and then use that model to make predictions for daily data (in effect, an interpolation). Then you will compare that daily prediction to the real daily DJIA data.</p>
+
+<p>A few notes on the data. “OHLC” stands for “Open-High-Low-Close”, which is usually daily data, for example the opening and closing prices, and the highest and lowest prices, for a stock in a given day. “DayCount” is an integer number of days from start of the data collection.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/14df216faa874a9ea14c50bd3ca3dae800468add/ch03_ex06_fig01.png" alt="" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+df_monthly.head(3)
+                    Open          High           Low         Close  \
+Date
+2013-01-01  13104.299805  13969.990234  13104.299805  13860.580078
+2013-02-01  13860.580078  14149.150391  13784.009766  14054.490234
+2013-03-01  14054.490234  14585.099609  13937.599609  14578.540039
+
+               Adj Close      Volume       Jday  DayCount
+Date
+2013-01-01  13860.580078  2786680000  2456293.5    1827.0
+2013-02-01  14054.490234  2487580000  2456324.5    1858.0
+2013-03-01  14578.540039  2546320000  2456352.5    1886.0
+
+
+df_daily.head(3)
+                    Open          High           Low         Close  \
+Date
+2013-01-02  13104.299805  13412.709961  13104.299805  13412.549805
+2013-01-03  13413.009766  13430.599609  13358.299805  13391.360352
+2013-01-04  13391.049805  13447.110352  13376.230469  13435.209961
+
+               Adj Close     Volume       Jday  DayCount
+Date
+2013-01-02  13412.549805  161430000  2456294.5    1827.0
+2013-01-03  13391.360352  129630000  2456295.5    1828.0
+2013-01-04  13435.209961  107590000  2456296.5    1829.0
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># build and fit a model to the df_monthly data
+</span><span class="n">model_fit</span> <span class="o">=</span> <span class="n">ols</span><span class="p">(</span><span class="s">'Close ~ DayCount'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df_monthly</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
+
+<span class="c1"># Use the model FIT to the MONTHLY data to make a predictions for both monthly and daily data
+</span><span class="n">df_monthly</span><span class="p">[</span><span class="s">'Model'</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df_monthly</span><span class="p">.</span><span class="n">DayCount</span><span class="p">)</span>
+<span class="n">df_daily</span><span class="p">[</span><span class="s">'Model'</span><span class="p">]</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df_daily</span><span class="p">.</span><span class="n">DayCount</span><span class="p">)</span>
+
+<span class="c1"># Plot the monthly and daily data and model, compare the RSS values seen on the figures
+</span><span class="n">fig_monthly</span> <span class="o">=</span> <span class="n">plot_model_with_data</span><span class="p">(</span><span class="n">df_monthly</span><span class="p">)</span>
+<span class="n">fig_daily</span> <span class="o">=</span> <span class="n">plot_model_with_data</span><span class="p">(</span><span class="n">df_daily</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture1-25.png?w=636" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture2-28.png?w=623" alt="Desktop View" /></p>
+
+<p>Notice the monthly data looked linear, but the daily data clearly has additional, nonlinear trends. Under-sampled data often misses real-world features in the data on smaller time or spatial scales. Using the model from the under-sampled data to make interpolations to the daily data can result is large residuals. Notice that the RSS value for the daily plot is more than 30 times worse than the monthly plot</p>
+
+<p>####
+<strong>Extrapolation: Going Over the Edge</strong></p>
+
+<p>In this exercise, we consider the perils of extrapolation. Shown here is the profile of a hiking trail on a mountain. One portion of the trail, marked in black, looks linear, and was used to build a model. But we see that the best fit line, shown in red, does not fit outside the original “domain”, as it extends into this new outside data, marked in blue.</p>
+
+<p>If we want use the model to make predictions for the altitude, but still be accurate to within some tolerance, what are the smallest and largest values of independent variable
+ <code class="language-plaintext highlighter-rouge">x</code>
+ that we can allow ourselves to apply the model to?”</p>
+
+<p>Here, use the preloaded
+ <code class="language-plaintext highlighter-rouge">x_data</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_data</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_model</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">plot_data_model_tolerance()</code>
+ to complete your solution.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/6307576adc9dde93c10422e742c33d865f9fbc72/ch03_ex07_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the residuals, "data - model", and determine where [residuals &lt; tolerance]
+</span><span class="n">residuals</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">abs</span><span class="p">(</span><span class="n">y_data</span> <span class="o">-</span> <span class="n">y_model</span><span class="p">)</span>
+<span class="n">tolerance</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">x_good</span> <span class="o">=</span> <span class="n">x_data</span><span class="p">[</span><span class="n">residuals</span> <span class="o">&lt;</span> <span class="n">tolerance</span><span class="p">]</span>
+
+<span class="c1"># Find the min and max of the "good" values, and plot y_data, y_model, and the tolerance range
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Minimum good x value = {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">min</span><span class="p">(</span><span class="n">x_good</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Maximum good x value = {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">x_good</span><span class="p">)))</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_data_model_tolerance</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">,</span> <span class="n">y_model</span><span class="p">,</span> <span class="n">tolerance</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture3-26.png?w=1024" alt="Desktop View" /></p>
+
+<p>Notice the range of good values, which extends a little out into the new data, is marked in green on the plot. By comparing the residuals to a tolerance threshold, we can quantify how far out out extrapolation can go before the difference between model and data gets too large.</p>
+
+<hr />
+
+<h2 id="33-goodness-of-fit"><strong>3.3 Goodness-of-Fit</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture4-24.png?w=453" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture5-29.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture6-27.png?w=1024" alt="Desktop View" /></p>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture7-22.png?w=722" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture8-20.png?w=708" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture9-18.png?w=720" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture10-19.png?w=700" alt="Desktop View" /></p>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture11-13.png?w=698" alt="Desktop View" /></p>
+
+<p>####
+<strong>RMSE Step-by-step</strong></p>
+
+<p>In this exercise, you will quantify the over-all model “goodness-of-fit” of a pre-built model, by computing one of the most common quantitative measures of model quality, the RMSE, step-by-step.</p>
+
+<p>Start with the pre-loaded data
+ <code class="language-plaintext highlighter-rouge">x_data</code>
+ and
+ <code class="language-plaintext highlighter-rouge">y_data</code>
+ , and use it with a predefined modeling function
+ <code class="language-plaintext highlighter-rouge">model_fit_and_predict()</code>
+ .</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/d30dad2a3e5c1af4cfd0b123cfa7da69749d30b0/ch03_ex10_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build the model and compute the residuals "model - data"
+</span><span class="n">y_model</span> <span class="o">=</span> <span class="n">model_fit_and_predict</span><span class="p">(</span><span class="n">x_data</span><span class="p">,</span> <span class="n">y_data</span><span class="p">)</span>
+<span class="n">residuals</span> <span class="o">=</span> <span class="n">y_data</span> <span class="o">-</span> <span class="n">y_model</span>
+
+<span class="c1"># Compute the RSS, MSE, and RMSE and print the results
+</span><span class="n">RSS</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">square</span><span class="p">(</span><span class="n">residuals</span><span class="p">))</span>
+<span class="n">MSE</span> <span class="o">=</span> <span class="n">RSS</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">residuals</span><span class="p">)</span>
+<span class="n">RMSE</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">MSE</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'RMSE = {:0.2f}, MSE = {:0.2f}, RSS = {:0.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">RMSE</span><span class="p">,</span> <span class="n">MSE</span><span class="p">,</span> <span class="n">RSS</span><span class="p">))</span>
+
+<span class="c1"># RMSE = 26.23, MSE = 687.83, RSS = 14444.48
+</span>
+</code></pre></div></div>
+
+<p>Notice that instead of computing
+ <code class="language-plaintext highlighter-rouge">RSS</code>
+ and normalizing with division by
+ <code class="language-plaintext highlighter-rouge">len(residuals)</code>
+ to get the MSE, you could have just applied
+ <code class="language-plaintext highlighter-rouge">np.mean(np.square())</code>
+ to the
+ <code class="language-plaintext highlighter-rouge">residuals</code>
+ .</p>
+
+<p>Another useful point to help you remember; you can think of the MSE like a variance, but instead of differencing the data from its mean, you difference the data and the model. Similarly, think of RMSE as a standard deviation.</p>
+
+<p>####
+<strong>R-Squared</strong></p>
+
+<p>In this exercise you’ll compute another measure of goodness,
+ <strong>R-squared</strong>
+ . R-squared is the ratio of the variance of the residuals divided by the variance of the data we are modeling, and in so doing, is a measure of how much of the variance in your data is “explained” by your model, as expressed in the spread of the residuals.</p>
+
+<p>Here we have pre-loaded the data
+ <code class="language-plaintext highlighter-rouge">x_data</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_data</code>
+ and the model predictions
+ <code class="language-plaintext highlighter-rouge">y_model</code>
+ for the best fit model; you’re goal is to compute the R-squared measure to quantify how much this linear model accounts for variation in the data.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/d30dad2a3e5c1af4cfd0b123cfa7da69749d30b0/ch03_ex10_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the residuals and the deviations
+</span><span class="n">residuals</span> <span class="o">=</span> <span class="n">y_model</span> <span class="o">-</span> <span class="n">y_data</span>
+<span class="n">deviations</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_data</span><span class="p">)</span> <span class="o">-</span> <span class="n">y_data</span>
+
+<span class="c1"># Compute the variance of the residuals and deviations
+</span><span class="n">var_residuals</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">square</span><span class="p">(</span><span class="n">residuals</span><span class="p">))</span>
+<span class="n">var_deviations</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">square</span><span class="p">(</span><span class="n">deviations</span><span class="p">))</span>
+
+<span class="c1"># Compute r_squared as 1 - the ratio of RSS/Variance
+</span><span class="n">r_squared</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">var_residuals</span> <span class="o">/</span> <span class="n">var_deviations</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'R-squared is {:0.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">r_squared</span><span class="p">))</span>
+<span class="c1"># R-squared is 0.89
+</span>
+</code></pre></div></div>
+
+<p>Notice that R-squared varies from 0 to 1, where a value of 1 means that the model and the data are perfectly correlated and all variation in the data is predicted by the model. A value of zero would mean none of the variation in the data is predicted by the model. Here, the data points are close to the line, so R-squared is closer to 1.0</p>
+
+<hr />
+
+<h2 id="34-standard-error"><strong>3.4 Standard Error</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture12-13.png?w=783" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture13-12.png?w=793" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture14-10.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture15-11.png?w=812" alt="Desktop View" /></p>
+
+<p>####
+<strong>Variation Around the Trend</strong></p>
+
+<p>The data need not be perfectly linear, and there may be some random variation or “spread” in the measurements, and that does translate into variation of the model parameters. This variation is in the parameter is quantified by “standard error”, and interpreted as “uncertainty” in the estimate of the model parameter.</p>
+
+<p>In this exercise, you will use
+ <code class="language-plaintext highlighter-rouge">ols</code>
+ from
+ <code class="language-plaintext highlighter-rouge">statsmodels</code>
+ to build a model and extract the standard error for each parameter of that model.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/96008939a1bd6ca848acb59b2cc4d45fea356fc7/ch03_ex13_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Store x_data and y_data, as times and distances, in df, and use ols() to fit a model to it.
+</span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">times</span><span class="o">=</span><span class="n">x_data</span><span class="p">,</span> <span class="n">distances</span><span class="o">=</span><span class="n">y_data</span><span class="p">))</span>
+<span class="n">model_fit</span> <span class="o">=</span> <span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s">"distances ~ times"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
+
+<span class="c1"># Extact the model parameters and their uncertainties
+</span><span class="n">a0</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">params</span><span class="p">[</span><span class="s">'Intercept'</span><span class="p">]</span>
+<span class="n">e0</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">bse</span><span class="p">[</span><span class="s">'Intercept'</span><span class="p">]</span>
+<span class="n">a1</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">params</span><span class="p">[</span><span class="s">'times'</span><span class="p">]</span>
+<span class="n">e1</span> <span class="o">=</span> <span class="n">model_fit</span><span class="p">.</span><span class="n">bse</span><span class="p">[</span><span class="s">'times'</span><span class="p">]</span>
+
+<span class="c1"># Print the results with more meaningful names
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Estimate    of the intercept = {:0.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">a0</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Uncertainty of the intercept = {:0.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">e0</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Estimate    of the slope = {:0.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">a1</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Uncertainty of the slope = {:0.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">e1</span><span class="p">))</span>
+
+<span class="c1"># Estimate    of the intercept = -0.81
+# Uncertainty of the intercept = 1.29
+# Estimate    of the slope = 50.78
+# Uncertainty of the slope = 1.11
+</span>
+</code></pre></div></div>
+
+<p>The size of the parameters standard error only makes sense in comparison to the parameter value itself. In fact the units are the same! So a1 and e1 both have units of velocity (meters/second), and a0 and e0 both have units of distance (meters).</p>
+
+<p>####
+<strong>Variation in Two Parts</strong></p>
+
+<p>Given two data sets of distance-versus-time data, one with very small velocity and one with large velocity. Notice that both may have the same standard error of slope, but different R-squared for the model overall, depending on the size of the slope (“effect size”) as compared to the standard error (“uncertainty”).</p>
+
+<p>If we plot both data sets as scatter plots on the same axes, the contrast is clear. Variation due to the slope is different than variation due to the random scatter about the trend line. In this exercise, your goal is to compute the standard error and R-squared for two data sets and compare.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/2995eaec3d7e58c0dd64cad4c1f5ec3f30873e49/ch03_ex14_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build and fit two models, for columns distances1 and distances2 in df
+</span><span class="n">model_1</span> <span class="o">=</span> <span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s">"distances1 ~ times"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
+<span class="n">model_2</span> <span class="o">=</span> <span class="n">ols</span><span class="p">(</span><span class="n">formula</span><span class="o">=</span><span class="s">"distances2 ~ times"</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">).</span><span class="n">fit</span><span class="p">()</span>
+
+<span class="c1"># Extract R-squared for each model, and the standard error for each slope
+</span><span class="n">se_1</span> <span class="o">=</span> <span class="n">model_1</span><span class="p">.</span><span class="n">bse</span><span class="p">[</span><span class="s">'times'</span><span class="p">]</span>
+<span class="n">se_2</span> <span class="o">=</span> <span class="n">model_2</span><span class="p">.</span><span class="n">bse</span><span class="p">[</span><span class="s">'times'</span><span class="p">]</span>
+<span class="n">rsquared_1</span> <span class="o">=</span> <span class="n">model_1</span><span class="p">.</span><span class="n">rsquared</span>
+<span class="n">rsquared_2</span> <span class="o">=</span> <span class="n">model_2</span><span class="p">.</span><span class="n">rsquared</span>
+
+<span class="c1"># Print the results
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Model 1: SE = {:0.3f}, R-squared = {:0.3f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">se_1</span><span class="p">,</span> <span class="n">rsquared_1</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Model 2: SE = {:0.3f}, R-squared = {:0.3f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">se_2</span><span class="p">,</span> <span class="n">rsquared_2</span><span class="p">))</span>
+
+<span class="c1"># Model 1: SE = 3.694, R-squared = 0.898
+# Model 2: SE = 3.694, R-squared = 0.335
+</span>
+</code></pre></div></div>
+
+<p>Notice that the standard error is the same for both models, but the r-squared changes. The uncertainty in the estimates of the model parameters is indepedent from R-squred because that uncertainty is being driven not by the linear trend, but by the inherent randomness in the data. This serves as a transition into looking at statistical inference in linear models.</p>
+
+<h1 id="4-estimating-model-parameters"><strong>4. Estimating Model Parameters</strong></h1>
+<hr />
+
+<h2 id="41-inferential-statistics-concepts"><strong>4.1 Inferential Statistics Concepts</strong></h2>
+
+<p>####
+<strong>Sample Statistics versus Population</strong></p>
+
+<p>In this exercise you will work with a preloaded
+ <code class="language-plaintext highlighter-rouge">population</code>
+ . You will construct a
+ <code class="language-plaintext highlighter-rouge">sample</code>
+ by drawing points at random from the population. You will compute the mean standard deviation of the sample taken from that population to test whether the sample is representative of the population. Your goal is to see where the sample statistics are the same or very close to the population statistics.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/8f7dbbdc87c06bd5cdd3142de24ecbfff811b426/ch04_ex01_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the population statistics
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Population mean {:.1f}, stdev {:.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span> <span class="n">population</span><span class="p">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">population</span><span class="p">.</span><span class="n">std</span><span class="p">()</span> <span class="p">))</span>
+
+<span class="c1"># Set random seed for reproducibility
+</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+
+<span class="c1"># Construct a sample by randomly sampling 31 points from the population
+</span><span class="n">sample</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">31</span><span class="p">)</span>
+
+<span class="c1"># Compare sample statistics to the population statistics
+</span><span class="k">print</span><span class="p">(</span><span class="s">"    Sample mean {:.1f}, stdev {:.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span> <span class="n">sample</span><span class="p">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">sample</span><span class="p">.</span><span class="n">std</span><span class="p">()</span> <span class="p">))</span>
+
+<span class="c1"># Population mean 100.0, stdev 9.74
+#     Sample mean 102.1, stdev 9.34
+</span>
+</code></pre></div></div>
+
+<p>Notice that the sample statistics are similar to the population statistics, but not the identical. If you were to compute the
+ <code class="language-plaintext highlighter-rouge">len()</code>
+ of each array, it is very different, but the means are not that much different as you might expect.</p>
+
+<p>####
+<strong>Variation in Sample Statistics</strong></p>
+
+<p>If we create one sample of
+ <code class="language-plaintext highlighter-rouge">size=1000</code>
+ by drawing that many points from a population. Then compute a sample statistic, such as the mean, a single value that summarizes the sample itself.</p>
+
+<p>If you repeat that sampling process
+ <code class="language-plaintext highlighter-rouge">num_samples=100</code>
+ times, you get
+ <code class="language-plaintext highlighter-rouge">100</code>
+ samples. Computing the sample statistic, like the mean, for each of the different samples, will result in a distribution of values of the mean. The goal then is to compute the mean of the means and standard deviation of the means.</p>
+
+<p>Here you will use the preloaded
+ <code class="language-plaintext highlighter-rouge">population</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">num_samples</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">num_pts</code>
+ , and note that the
+ <code class="language-plaintext highlighter-rouge">means</code>
+ and
+ <code class="language-plaintext highlighter-rouge">deviations</code>
+ arrays have been initialized to zero to give you containers to use for the for loop.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Initialize two arrays of zeros to be used as containers
+</span><span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span>
+<span class="n">stdevs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_samples</span><span class="p">)</span>
+
+<span class="c1"># For each iteration, compute and store the sample mean and sample stdev
+</span><span class="k">for</span> <span class="n">ns</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_samples</span><span class="p">):</span>
+    <span class="n">sample</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">num_pts</span><span class="p">)</span>
+    <span class="n">means</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">stdevs</span><span class="p">[</span><span class="n">ns</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">.</span><span class="n">std</span><span class="p">()</span>
+
+<span class="c1"># Compute and print the mean() and std() for the sample statistic distributions
+</span><span class="k">print</span><span class="p">(</span><span class="s">"Means:  center={:&gt;6.2f}, spread={:&gt;6.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">means</span><span class="p">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">means</span><span class="p">.</span><span class="n">std</span><span class="p">()))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Stdevs: center={:&gt;6.2f}, spread={:&gt;6.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">stdevs</span><span class="p">.</span><span class="n">mean</span><span class="p">(),</span> <span class="n">stdevs</span><span class="p">.</span><span class="n">std</span><span class="p">()))</span>
+
+<span class="c1"># Means:  center=100.00, spread=  0.33
+# Stdevs: center= 10.01, spread=  0.22
+</span>
+</code></pre></div></div>
+
+<p>If we only took one sample, instead of 100, there could be only a single mean and the standard deviation of that single value is zero. But each sample is different because of the randomness of the draws. The mean of the means is our estimate for the population mean, the stdev of the means is our measure of the uncertainty in our estimate of the population mean. This is the same concept as the standard error of the slope seen in linear regression.</p>
+
+<p>####
+<strong>Visualizing Variation of a Statistic</strong></p>
+
+<p>Previously, you have computed the variation of sample statistics. Now you’ll visualize that variation.</p>
+
+<p>We’ll start with a preloaded
+ <code class="language-plaintext highlighter-rouge">population</code>
+ and a predefined function
+ <code class="language-plaintext highlighter-rouge">get_sample_statistics()</code>
+ to draw the samples, and return the sample statistics arrays.</p>
+
+<p>Here we will use a predefined
+ <code class="language-plaintext highlighter-rouge">plot_hist()</code>
+ function that wraps the
+ <code class="language-plaintext highlighter-rouge">matplotlib</code>
+ method
+ <code class="language-plaintext highlighter-rouge">axis.hist()</code>
+ , which both bins and plots the array passed in. In this way you can see how the sample statistics have a distribution of values, not just a single value.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Generate sample distribution and associated statistics
+</span><span class="n">means</span><span class="p">,</span> <span class="n">stdevs</span> <span class="o">=</span> <span class="n">get_sample_statistics</span><span class="p">(</span><span class="n">population</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">num_pts</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="c1"># Define the binning for the histograms
+</span><span class="n">mean_bins</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">97.5</span><span class="p">,</span> <span class="mf">102.5</span><span class="p">,</span> <span class="mi">51</span><span class="p">)</span>
+<span class="n">std_bins</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">7.5</span><span class="p">,</span> <span class="mf">12.5</span><span class="p">,</span> <span class="mi">51</span><span class="p">)</span>
+
+<span class="c1"># Plot the distribution of means, and the distribution of stdevs
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_hist</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">means</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">mean_bins</span><span class="p">,</span> <span class="n">data_name</span><span class="o">=</span><span class="s">"Means"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'green'</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_hist</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">stdevs</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">std_bins</span><span class="p">,</span> <span class="n">data_name</span><span class="o">=</span><span class="s">"Stdevs"</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/1.png?w=633" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/2.png?w=632" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="42-model-estimation-and-likelihood"><strong>4.2 Model Estimation and Likelihood</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture8-21.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture9-19.png?w=952" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture3-28.png?w=795" alt="Desktop View" /></p>
+
+<p>What is the probability that A occurs given B that occured</p>
+
+<p>Given the model, what is the probability that the model outputs any particular data point</p>
+
+<p>Given the data, what is the likelihood that a candidate model could output the particular data point
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture4-25.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture5-30.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture6-28.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/capture7-23.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Estimation of Population Parameters</strong></p>
+
+<p>Imagine a constellation (“population”) of satellites orbiting for a full year, and the distance traveled in each hour is measured in kilometers. There is variation in the distances measured from hour-to-hour, due to unknown complications of orbital dynamics. Assume we cannot measure all the data for the year, but we wish to build a population model for the variations in orbital distance per hour (speed) based on a sample of measurements.</p>
+
+<p>In this exercise, you will assume that the population of hourly distances are best modeled by a gaussian, and further assume that the parameters of that population model can be estimated from the sample statistics. Start with the preloaded
+ <code class="language-plaintext highlighter-rouge">sample_distances</code>
+ that was taken from a population of cars.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/0e4170a7a9a66aa2c35b9878643d6c6545393f41/ch04_ex06_fig01.png" alt="" /></p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/2737b392171c28443369515673254accef6f5b8e/ch04_ex06_fig02.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the mean and standard deviation of the sample_distances
+</span><span class="n">sample_mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sample_distances</span><span class="p">)</span>
+<span class="n">sample_stdev</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">sample_distances</span><span class="p">)</span>
+
+<span class="c1"># Use the sample mean and stdev as estimates of the population model parameters mu and sigma
+</span><span class="n">population_model</span> <span class="o">=</span> <span class="n">gaussian_model</span><span class="p">(</span><span class="n">sample_distances</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">sample_mean</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sample_stdev</span><span class="p">)</span>
+
+<span class="c1"># Plot the model and data to see how they compare
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_data_and_model</span><span class="p">(</span><span class="n">sample_distances</span><span class="p">,</span> <span class="n">population_model</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/1-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>Notice in the plot that the data and the model do not line up exactly. This is to be expected because the sample is just a subset of the population, and any model built from it cannot be a prefect representation of the population. Also notice the vertical axis: it shows the
+ <em>normalize</em>
+ data bin counts, and the probability density of the model. Think of that as probability-per-bin, so that if summed all the bins, the total would be 1.0.</p>
+
+<p>####
+<strong>Maximizing Likelihood, Part 1</strong></p>
+
+<p>Previously, we chose the sample
+ <code class="language-plaintext highlighter-rouge">mean</code>
+ as an estimate of the population model paramter
+ <code class="language-plaintext highlighter-rouge">mu</code>
+ . But how do we know that the sample mean is the best estimator? This is tricky, so let’s do it in two parts.</p>
+
+<p>In Part 1, you will use a computational approach to compute the log-likelihood of a given estimate. Then, in Part 2, we will see that when you compute the log-likelihood for many possible guess values of the estimate, one guess will result in the maximum likelihood.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/6f2eb8ae464cc971134bd30debaabfaca662c5ec/ch04_ex07_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute sample mean and stdev, for use as model parameter value guesses
+</span><span class="n">mu_guess</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">sample_distances</span><span class="p">)</span>
+<span class="n">sigma_guess</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">sample_distances</span><span class="p">)</span>
+
+<span class="c1"># For each sample distance, compute the probability modeled by the parameter guesses
+</span><span class="n">probs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sample_distances</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">distance</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sample_distances</span><span class="p">):</span>
+    <span class="n">probs</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">gaussian_model</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu_guess</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sigma_guess</span><span class="p">)</span>
+
+<span class="c1"># Compute and print the log-likelihood as the sum() of the log() of the probabilities
+</span><span class="n">loglikelihood</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">probs</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'For guesses mu={:0.2f} and sigma={:0.2f}, the loglikelihood={:0.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">mu_guess</span><span class="p">,</span> <span class="n">sigma_guess</span><span class="p">,</span> <span class="n">loglikelihood</span><span class="p">))</span>
+
+<span class="c1"># For guesses mu=26918.10 and sigma=224.88, the loglikelihood=-6834.53
+</span>
+</code></pre></div></div>
+
+<p>Although the likelihood (the product of the probabilities) is easier to interpret, the loglikelihood has better numerical properties. Products of small and large numbers can cause numerical artifacts, but sum of the logs usually doesnt suffer those same artifacts, and the “sum(log(things))” is closely related to the “product(things)”</p>
+
+<p>####
+<strong>Maximizing Likelihood, Part 2</strong></p>
+
+<p>In Part 1, you computed a single log-likelihood for a single
+ <code class="language-plaintext highlighter-rouge">mu</code>
+ . In this Part 2, you will apply the predefined function
+ <code class="language-plaintext highlighter-rouge">compute_loglikelihood()</code>
+ to compute an
+ <strong><em>array</em></strong>
+ of log-likelihood values, one for each element in an
+ <strong><em>array</em></strong>
+ of possible
+ <code class="language-plaintext highlighter-rouge">mu</code>
+ values.</p>
+
+<p>The goal then is to determine which single
+ <code class="language-plaintext highlighter-rouge">mu</code>
+ guess leads to the single
+ <strong><em>maximum</em></strong>
+ value of the loglikelihood array.</p>
+
+<p>To get started, use the preloaded data
+ <code class="language-plaintext highlighter-rouge">sample_distances</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">sample_mean</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">sample_stdev</code>
+ and a helper function
+ <code class="language-plaintext highlighter-rouge">compute_loglikelihood()</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create an array of mu guesses, centered on sample_mean, spread out +/- by sample_stdev
+</span><span class="n">low_guess</span> <span class="o">=</span> <span class="n">sample_mean</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">sample_stdev</span>
+<span class="n">high_guess</span> <span class="o">=</span> <span class="n">sample_mean</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">sample_stdev</span>
+<span class="n">mu_guesses</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">low_guess</span><span class="p">,</span> <span class="n">high_guess</span><span class="p">,</span> <span class="mi">101</span><span class="p">)</span>
+
+<span class="c1"># Compute the loglikelihood for each model created from each guess value
+</span><span class="n">loglikelihoods</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">mu_guesses</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">mu_guess</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mu_guesses</span><span class="p">):</span>
+    <span class="n">loglikelihoods</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="n">compute_loglikelihood</span><span class="p">(</span><span class="n">sample_distances</span><span class="p">,</span> <span class="n">mu</span><span class="o">=</span><span class="n">mu_guess</span><span class="p">,</span> <span class="n">sigma</span><span class="o">=</span><span class="n">sample_stdev</span><span class="p">)</span>
+
+<span class="c1"># Find the best guess by using logical indexing, the print and plot the result
+</span><span class="n">best_mu</span> <span class="o">=</span> <span class="n">mu_guesses</span><span class="p">[</span><span class="n">loglikelihoods</span><span class="o">==</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">loglikelihoods</span><span class="p">)]</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Maximum loglikelihood found for best mu guess={}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">best_mu</span><span class="p">))</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_loglikelihoods</span><span class="p">(</span><span class="n">mu_guesses</span><span class="p">,</span> <span class="n">loglikelihoods</span><span class="p">)</span>
+
+<span class="c1"># Maximum loglikelihood found for best mu guess=[ 26918.39241406]
+</span>
+</code></pre></div></div>
+
+<p>Notice that the guess for mu that gave the maximum likelihood is precisely the same value as the
+ <code class="language-plaintext highlighter-rouge">sample.mean()</code>
+ . The
+ <code class="language-plaintext highlighter-rouge">sample_mean</code>
+ is thus said to be the “Maximum Likelihood Estimator” of the population mean
+ <code class="language-plaintext highlighter-rouge">mu</code>
+ . We call that value of
+ <code class="language-plaintext highlighter-rouge">mu</code>
+ the “Maximum Likelihood Estimator” of the population
+ <code class="language-plaintext highlighter-rouge">mu</code>
+ because, of all the
+ <code class="language-plaintext highlighter-rouge">mu</code>
+ values tested, it results in a model population with the greatest likelihood of producing the sample data we have.</p>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/2-1.png?w=625" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="43-model-uncertainty-and-sample-distributions"><strong>4.3 Model Uncertainty and Sample Distributions</strong></h2>
+
+<p>####
+<strong>Bootstrap and Standard Error</strong></p>
+
+<p>Imagine a National Park where park rangers hike each day as part of maintaining the park trails. They don’t always take the same path, but they do record their final distance and time. We’d like to build a statistical model of the variations in daily distance traveled from a limited sample of data from one ranger.</p>
+
+<p>Your goal is to use bootstrap resampling, computing one mean for each resample, to create a distribution of means, and then compute standard error as a way to quantify the “uncertainty” in the
+ <em>sample statistic</em>
+ as an estimator for the
+ <em>population statistic</em>
+ .</p>
+
+<p>Use the preloaded
+ <code class="language-plaintext highlighter-rouge">sample_data</code>
+ array of 500 independent measurements of distance traveled. For now, we this is a simulated data set to simplify this lesson. Later, we’ll see more realistic data.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/fa83248d06fafa59e094a363fecbecaa84902fe6/ch04_ex10_fig03.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Use the sample_data as a model for the population
+</span><span class="n">population_model</span> <span class="o">=</span> <span class="n">sample_data</span>
+
+<span class="c1"># Resample the population_model 100 times, computing the mean each sample
+</span><span class="k">for</span> <span class="n">nr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_resamples</span><span class="p">):</span>
+    <span class="n">bootstrap_sample</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">population_model</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">resample_size</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">bootstrap_means</span><span class="p">[</span><span class="n">nr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bootstrap_sample</span><span class="p">)</span>
+
+<span class="c1"># Compute and print the mean, stdev of the resample distribution of means
+</span><span class="n">distribution_mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bootstrap_means</span><span class="p">)</span>
+<span class="n">standard_error</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">bootstrap_means</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Bootstrap Distribution: center={:0.1f}, spread={:0.1f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">distribution_mean</span><span class="p">,</span> <span class="n">standard_error</span><span class="p">))</span>
+
+<span class="c1"># Plot the bootstrap resample distribution of means
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_data_hist</span><span class="p">(</span><span class="n">bootstrap_means</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/3.png?w=640" alt="Desktop View" /></p>
+
+<p>Notice that
+ <code class="language-plaintext highlighter-rouge">standard_error</code>
+ is just one measure of spread of the distribution of bootstrap resample means. You could have computed the
+ <code class="language-plaintext highlighter-rouge">confidence_interval</code>
+ using
+ <code class="language-plaintext highlighter-rouge">np.percentile(bootstrap_means, 0.95)</code>
+ and
+ <code class="language-plaintext highlighter-rouge">np.percentile(bootstrap_means, 0.05)</code>
+ to find the range distance values containing the inner 90% of the distribution of means.</p>
+
+<p>####
+<strong>Estimating Speed and Confidence</strong></p>
+
+<p>Let’s continue looking at the National Park hiking data. Notice that some distances are negative because they walked in the opposite direction from the trail head; the data are messy so let’s just focus on the overall trend.</p>
+
+<p>In this exercise, you goal is to use boot-strap resampling to find the distribution of speed values for a linear model, and then from that distribution, compute the best estimate for the speed and the 90th percent confidence interval of that estimate. The speed here is the slope parameter from the linear regression model to fit distance as a function of time.</p>
+
+<p>To get you started, we’ve preloaded
+ <code class="language-plaintext highlighter-rouge">distance</code>
+ and
+ <code class="language-plaintext highlighter-rouge">time</code>
+ data, together with a pre-defined
+ <code class="language-plaintext highlighter-rouge">least_squares()</code>
+ function to compute the speed value for each resample.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/e62f81f8ffcc7daae7a1ceffd43ba2d0c79738b8/ch04_ex10_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Resample each preloaded population, and compute speed distribution
+</span><span class="n">population_inds</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">99</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">nr</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_resamples</span><span class="p">):</span>
+    <span class="n">sample_inds</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">population_inds</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">sample_inds</span><span class="p">.</span><span class="n">sort</span><span class="p">()</span>
+    <span class="n">sample_distances</span> <span class="o">=</span> <span class="n">distances</span><span class="p">[</span><span class="n">sample_inds</span><span class="p">]</span>
+    <span class="n">sample_times</span> <span class="o">=</span> <span class="n">times</span><span class="p">[</span><span class="n">sample_inds</span><span class="p">]</span>
+    <span class="n">a0</span><span class="p">,</span> <span class="n">a1</span> <span class="o">=</span> <span class="n">least_squares</span><span class="p">(</span><span class="n">sample_times</span><span class="p">,</span> <span class="n">sample_distances</span><span class="p">)</span>
+    <span class="n">resample_speeds</span><span class="p">[</span><span class="n">nr</span><span class="p">]</span> <span class="o">=</span> <span class="n">a1</span>
+
+<span class="c1"># Compute effect size and confidence interval, and print
+</span><span class="n">speed_estimate</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">resample_speeds</span><span class="p">)</span>
+<span class="n">ci_90</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">resample_speeds</span><span class="p">,</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">95</span><span class="p">])</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Speed Estimate = {:0.2f}, 90% Confidence Interval: {:0.2f}, {:0.2f} '</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">speed_estimate</span><span class="p">,</span> <span class="n">ci_90</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">ci_90</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="c1"># Speed Estimate = 2.29, 90% Confidence Interval: 1.23, 3.35
+</span>
+</code></pre></div></div>
+
+<p>Notice that the speed estimate (the mean) falls inside the confidence interval (the 5th and 95th percentiles). Moreover, notice if you computed the standard error, it would also fit inside the confidence interval. Think of the standard error here as the ‘one sigma’ confidence interval. Note that this should be very similar to the summary output of a statsmodels ols() linear regression model, but here you can compute arbitrary percentiles because you have the entire speeds distribution.</p>
+
+<p>####
+<strong>Visualize the Bootstrap</strong></p>
+
+<p>Continuing where we left off earlier in this lesson, let’s visualize the bootstrap distribution of speeds estimated using bootstrap resampling, where we computed a least-squares fit to the slope for every sample to test the variation or uncertainty in our slope estimation.</p>
+
+<p>To get you started, we’ve preloaded a function
+ <code class="language-plaintext highlighter-rouge">compute_resample_speeds(distances, times)</code>
+ to do the computation of generate the speed sample distribution.</p>
+
+<p><img src="https://assets.datacamp.com/production/repositories/1480/datasets/e62f81f8ffcc7daae7a1ceffd43ba2d0c79738b8/ch04_ex10_fig01.png" alt="" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create the bootstrap distribution of speeds
+</span><span class="n">resample_speeds</span> <span class="o">=</span> <span class="n">compute_resample_speeds</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">times</span><span class="p">)</span>
+<span class="n">speed_estimate</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">resample_speeds</span><span class="p">)</span>
+<span class="n">percentiles</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">resample_speeds</span><span class="p">,</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">95</span><span class="p">])</span>
+
+<span class="c1"># Plot the histogram with the estimate and confidence interval
+</span><span class="n">fig</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">subplots</span><span class="p">()</span>
+<span class="n">hist_bin_edges</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mi">21</span><span class="p">)</span>
+<span class="n">axis</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">resample_speeds</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="n">hist_bin_edges</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'green'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.35</span><span class="p">,</span> <span class="n">rwidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+<span class="n">axis</span><span class="p">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">speed_estimate</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Estimate'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'black'</span><span class="p">)</span>
+<span class="n">axis</span><span class="p">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">percentiles</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s">' 5th'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'blue'</span><span class="p">)</span>
+<span class="n">axis</span><span class="p">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">percentiles</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s">'95th'</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'blue'</span><span class="p">)</span>
+<span class="n">axis</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/4.png?w=1024" alt="Desktop View" /></p>
+
+<p>Notice that vertical lines marking the 5th (left) and 95th (right) percentiles mark the extent of the confidence interval, while the speed estimate (center line) is the mean of the distribution and falls between them. Note the speed estimate is the mean, not the median, which would be 50% percentile.</p>
+
+<hr />
+
+<h2 id="44-model-errors-and-randomness"><strong>4.4 Model Errors and Randomness</strong></h2>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/5.png?w=927" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/6.png?w=950" alt="Desktop View" /></p>
+
+<p>####
+<strong>Test Statistics and Effect Size</strong></p>
+
+<p>How can we explore linear relationships with bootstrap resampling? Back to the trail! For each hike plotted as one point, we can see that there is a linear relationship between total distance traveled and time elapsed. It we treat the distance traveled as an “effect” of time elapsed, then we can explore the underlying connection between linear regression and statistical inference.</p>
+
+<p>In this exercise, you will separate the data into two populations, or “categories”: early times and late times. Then you will look at the
+ <strong><em>differences</em></strong>
+ between the total distance traveled within each population. This
+ <strong><em>difference</em></strong>
+ will serve as a “test statistic”, and it’s distribution will test the effect of separating distances by times.</p>
+
+<p><img src="https://i0.wp.com/assets.datacamp.com/production/repositories/1480/datasets/9f46005f9dbef3c762a4a1a531488511a8d99833/ch04_ex11_fig03.png" alt="ch04_ex11_fig03.png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create two poulations, sample_distances for early and late sample_times.
+# Then resample with replacement, taking 500 random draws from each population.
+</span><span class="n">group_duration_short</span> <span class="o">=</span> <span class="n">sample_distances</span><span class="p">[</span><span class="n">sample_times</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">]</span>
+<span class="n">group_duration_long</span> <span class="o">=</span> <span class="n">sample_distances</span><span class="p">[</span><span class="n">sample_times</span> <span class="o">&gt;</span> <span class="mi">5</span><span class="p">]</span>
+<span class="n">resample_short</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">group_duration_short</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">resample_long</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">group_duration_long</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># Difference the resamples to compute a test statistic distribution, then compute its mean and stdev
+</span><span class="n">test_statistic</span> <span class="o">=</span> <span class="n">resample_long</span> <span class="o">-</span> <span class="n">resample_short</span>
+<span class="n">effect_size</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">)</span>
+<span class="n">standard_error</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">)</span>
+
+<span class="c1"># Print and plot the results
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Test Statistic: mean={:0.2f}, stdev={:0.2f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">effect_size</span><span class="p">,</span> <span class="n">standard_error</span><span class="p">))</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_test_statistic</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">)</span>
+
+<span class="c1"># Test Statistic: mean=10.01, stdev=4.62
+</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/7.png?w=643" alt="Desktop View" /></p>
+
+<p>Notice again, the test statistic is the difference between a distance drawn from short duration trips and one drawn from long duration trips. The distribution of difference values is built up from differencing each point in the early time range with one from the late time range. The mean of the test statistic is not zero and tells us that there is on average a difference in distance traveled when comparing short and long duration trips. Again, we call this the ‘effect size’. The time increase had an effect on distance traveled. The standard error of the test statistic distribution is not zero, so there is some spread in that distribution, or put another way, uncertainty in the size of the effect.</p>
+
+<p>####
+<strong>Null Hypothesis</strong></p>
+
+<p>In this exercise, we formulate the null hypothesis as</p>
+
+<blockquote>
+
+  <p><strong>short and long time durations have no effect on total distance traveled.</strong></p>
+
+</blockquote>
+
+<p>We interpret the “zero effect size” to mean that if we shuffled samples between short and long times, so that two new samples each have a mix of short and long duration trips, and then compute the test statistic, on average it will be zero.</p>
+
+<p>In this exercise, your goal is to perform the shuffling and resampling. Start with the predefined
+ <code class="language-plaintext highlighter-rouge">group_duration_short</code>
+ and
+ <code class="language-plaintext highlighter-rouge">group_duration_long</code>
+ which are the un-shuffled time duration groups.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Shuffle the time-ordered distances, then slice the result into two populations.
+</span><span class="n">shuffle_bucket</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">group_duration_short</span><span class="p">,</span> <span class="n">group_duration_long</span><span class="p">))</span>
+<span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">shuffle_bucket</span><span class="p">)</span>
+<span class="n">slice_index</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">shuffle_bucket</span><span class="p">)</span><span class="o">//</span><span class="mi">2</span>
+<span class="n">shuffled_half1</span> <span class="o">=</span> <span class="n">shuffle_bucket</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">slice_index</span><span class="p">]</span>
+<span class="n">shuffled_half2</span> <span class="o">=</span> <span class="n">shuffle_bucket</span><span class="p">[</span><span class="n">slice_index</span><span class="p">:]</span>
+
+<span class="c1"># Create new samples from each shuffled population, and compute the test statistic
+</span><span class="n">resample_half1</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">shuffled_half1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">resample_half2</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">shuffled_half2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">test_statistic</span> <span class="o">=</span> <span class="n">resample_half2</span> <span class="o">-</span> <span class="n">resample_half1</span>
+
+<span class="c1"># Compute and print the effect size
+</span><span class="n">effect_size</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">test_statistic</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Test Statistic, after shuffling, mean = {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">effect_size</span><span class="p">))</span>
+
+<span class="c1"># Test Statistic, after shuffling, mean = 0.09300205283002799
+</span>
+</code></pre></div></div>
+
+<p>Notice that your effect size is not exactly zero because there is noise in the data. But the effect size is much closer to zero than before shuffling. Notice that if you rerun your code, which will generate a new shuffle, you will get slightly different results each time for the effect size, but np.abs(test_statistic) should be less than about 1.0, due to the noise, as opposed to the slope, which was about 2.0</p>
+
+<p>####
+<strong>Visualizing Test Statistics</strong></p>
+
+<p>In this exercise, you will approach the null hypothesis by comparing the
+ <strong>distribution of a test statistic</strong>
+ arrived at from two different ways.</p>
+
+<p>First, you will examine two “populations”, grouped by early and late times, and computing the test statistic distribution. Second, shuffle the two populations, so the data is no longer time ordered, and each has a mix of early and late times, and then recompute the test statistic distribution.</p>
+
+<p>To get you started, we’ve pre-loaded the two time duration groups,
+ <code class="language-plaintext highlighter-rouge">group_duration_short</code>
+ and
+ <code class="language-plaintext highlighter-rouge">group_duration_long</code>
+ , and two functions,
+ <code class="language-plaintext highlighter-rouge">shuffle_and_split()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">plot_test_statistic()</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># From the unshuffled groups, compute the test statistic distribution
+</span><span class="n">resample_short</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">group_duration_short</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">resample_long</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">group_duration_long</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">test_statistic_unshuffled</span> <span class="o">=</span> <span class="n">resample_long</span> <span class="o">-</span> <span class="n">resample_short</span>
+
+<span class="c1"># Shuffle two populations, cut in half, and recompute the test statistic
+</span><span class="n">shuffled_half1</span><span class="p">,</span> <span class="n">shuffled_half2</span> <span class="o">=</span> <span class="n">shuffle_and_split</span><span class="p">(</span><span class="n">group_duration_short</span><span class="p">,</span> <span class="n">group_duration_long</span><span class="p">)</span>
+<span class="n">resample_half1</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">shuffled_half1</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">resample_half2</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">choice</span><span class="p">(</span><span class="n">shuffled_half2</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">test_statistic_shuffled</span> <span class="o">=</span> <span class="n">resample_half2</span> <span class="o">-</span> <span class="n">resample_half1</span>
+
+<span class="c1"># Plot both the unshuffled and shuffled results and compare
+</span><span class="n">fig</span> <span class="o">=</span> <span class="n">plot_test_statistic</span><span class="p">(</span><span class="n">test_statistic_unshuffled</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Unshuffled'</span><span class="p">)</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_test_statistic</span><span class="p">(</span><span class="n">test_statistic_shuffled</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Shuffled'</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/8.png?w=639" alt="Desktop View" />
+<img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/9.png?w=645" alt="Desktop View" /></p>
+
+<p>Notice that after you shuffle, the effect size went almost to zero and the spread increased, as measured by the standard deviation of the sample statistic, aka the ‘standard error’. So shuffling did indeed have an effect. The null hypothesis is disproven. Time ordering does in fact have a non-zero effect on distance traveled. Distance is correlated to time.</p>
+
+<p>####
+<strong>Visualizing the P-Value</strong></p>
+
+<p>In this exercise, you will visualize the p-value, the chance that the effect (or “speed”) we estimated, was the result of random variation in the sample. Your goal is to visualize this as the fraction of points in the shuffled test statistic distribution that fall to the right of the mean of the test statistic (“effect size”) computed from the unshuffled samples.</p>
+
+<p>To get you started, we’ve preloaded the
+ <code class="language-plaintext highlighter-rouge">group_duration_short</code>
+ and
+ <code class="language-plaintext highlighter-rouge">group_duration_long</code>
+ and functions
+ <code class="language-plaintext highlighter-rouge">compute_test_statistic()</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">shuffle_and_split()</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">plot_test_statistic_effect()</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the test stat distribution and effect size for two population groups
+</span><span class="n">test_statistic_unshuffled</span> <span class="o">=</span> <span class="n">compute_test_statistic</span><span class="p">(</span><span class="n">group_duration_short</span><span class="p">,</span> <span class="n">group_duration_long</span><span class="p">)</span>
+<span class="n">effect_size</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">test_statistic_unshuffled</span><span class="p">)</span>
+
+<span class="c1"># Randomize the two populations, and recompute the test stat distribution
+</span><span class="n">shuffled_half1</span><span class="p">,</span> <span class="n">shuffled_half2</span> <span class="o">=</span> <span class="n">shuffle_and_split</span><span class="p">(</span><span class="n">group_duration_short</span><span class="p">,</span> <span class="n">group_duration_long</span><span class="p">)</span>
+<span class="n">test_statistic_shuffled</span> <span class="o">=</span> <span class="n">compute_test_statistic</span><span class="p">(</span><span class="n">shuffled_half1</span><span class="p">,</span> <span class="n">shuffled_half2</span><span class="p">)</span>
+
+<span class="c1"># Compute the p-value as the proportion of shuffled test stat values &gt;= the effect size
+</span><span class="n">condition</span> <span class="o">=</span> <span class="n">test_statistic_shuffled</span> <span class="o">&gt;=</span> <span class="n">effect_size</span>
+<span class="n">p_value</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_statistic_shuffled</span><span class="p">[</span><span class="n">condition</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">test_statistic_shuffled</span><span class="p">)</span>
+
+<span class="c1"># Print p-value and overplot the shuffled and unshuffled test statistic distributions
+</span><span class="k">print</span><span class="p">(</span><span class="s">"The p-value is = {}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">p_value</span><span class="p">))</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_test_stats_and_pvalue</span><span class="p">(</span><span class="n">test_statistic_unshuffled</span><span class="p">,</span> <span class="n">test_statistic_shuffled</span><span class="p">)</span>
+
+<span class="c1"># The p-value is = 0.126
+</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/introduction-to-linear-modeling-in-python/10.png?w=1024" alt="Desktop View" /></p>
+
+<p>Note that the entire point of this is compute a p-value to quantify the chance that our estimate for speed could have been obtained by random chance. On the plot, the unshuffle test stats are the distribution of speed values estimated from time-ordered distances. The shuffled test stats are the distribution of speed values computed from randomizing unordered distances. Values of the shuffled stats to the right of the mean non-shuffled effect size line are those that both (1) could have both occured randomly and (2) are at least as big as the estimate you want to use for speed.</p>
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

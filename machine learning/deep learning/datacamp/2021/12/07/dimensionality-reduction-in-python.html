@@ -1,0 +1,1658 @@
+<h1 id="dimensionality-reduction-in-python">Dimensionality Reduction in Python</h1>
+
+<p>This is the memo of the 7th course (23 courses in all) of ‘Machine Learning Scientist with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/dimensionality-reduction-in-python">HERE</a></strong>
+ .</p>
+
+<p>###
+<strong>Course Description</strong></p>
+
+<p>High-dimensional datasets can be overwhelming and leave you not knowing where to start. Typically, you’d visually explore a new dataset first, but when you have too many dimensions the classical approaches will seem insufficient. Fortunately, there are visualization techniques designed specifically for high dimensional data and you’ll be introduced to these in this course. After exploring the data, you’ll often find that many features hold little information because they don’t show any variance or because they are duplicates of other features. You’ll learn how to detect these features and drop them from the dataset so that you can focus on the informative ones. In a next step, you might want to build a model on these features, and it may turn out that some don’t have any effect on the thing you’re trying to predict. You’ll learn how to detect and drop these irrelevant features too, in order to reduce dimensionality and thus complexity. Finally, you’ll learn how feature extraction techniques can reduce dimensionality for you through the calculation of uncorrelated principal components.</p>
+
+<p>###
+<strong>Table of contents</strong></p>
+
+<ol>
+  <li>Exploring high dimensional data</li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/12/16/dimensionality-reduction-in-python-from-datacamp/2/">Feature selection I, selecting for feature information</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/12/16/dimensionality-reduction-in-python-from-datacamp/3/">Feature selection II, selecting for model accuracy</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/12/16/dimensionality-reduction-in-python-from-datacamp/4/">Feature extraction</a></li>
+</ol>
+
+<h1 id="1-exploring-high-dimensional-data"><strong>1. Exploring high dimensional data</strong></h1>
+<hr />
+
+<p>You’ll be introduced to the concept of dimensionality reduction and will learn when an why this is important. You’ll learn the difference between feature selection and feature extraction and will apply both techniques for data exploration. The chapter ends with a lesson on t-SNE, a powerful feature extraction technique that will allow you to visualize a high-dimensional dataset.</p>
+
+<h2 id="11-introduction"><strong>1.1 Introduction</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/capture.png?w=689" alt="Desktop View" /></p>
+
+<h3 id="111-finding-the-number-of-dimensions-in-a-dataset"><strong>1.1.1 Finding the number of dimensions in a dataset</strong></h3>
+
+<p>A larger sample of the Pokemon dataset has been loaded for you as the Pandas dataframe
+ <code class="language-plaintext highlighter-rouge">pokemon_df</code>
+ .</p>
+
+<p>How many dimensions, or columns are in this dataset?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+pokemon_df.shape
+(160, 7)
+
+</code></pre></div></div>
+
+<h3 id="112-removing-features-without-variance"><strong>1.1.2 Removing features without variance</strong></h3>
+
+<p>A sample of the Pokemon dataset has been loaded as
+ <code class="language-plaintext highlighter-rouge">pokemon_df</code>
+ . To get an idea of which features have little variance you should use the IPython Shell to calculate summary statistics on this sample. Then adjust the code to create a smaller, easier to understand, dataset.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+pokemon_df.describe()
+              HP     Attack     Defense  Generation
+count  160.00000  160.00000  160.000000       160.0
+mean    64.61250   74.98125   70.175000         1.0
+std     27.92127   29.18009   28.883533         0.0
+min     10.00000    5.00000    5.000000         1.0
+25%     45.00000   52.00000   50.000000         1.0
+50%     60.00000   71.00000   65.000000         1.0
+75%     80.00000   95.00000   85.000000         1.0
+max    250.00000  155.00000  180.000000         1.0
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+pokemon_df.describe(exclude='number')
+              Name   Type Legendary
+count          160    160       160
+unique         160     15         1
+top     Weepinbell  Water     False
+freq             1     31       160
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Leave this list as is
+</span><span class="n">number_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s">'HP'</span><span class="p">,</span> <span class="s">'Attack'</span><span class="p">,</span> <span class="s">'Defense'</span><span class="p">]</span>
+
+<span class="c1"># Remove the feature without variance from this list
+</span><span class="n">non_number_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Name'</span><span class="p">,</span> <span class="s">'Type'</span><span class="p">]</span>
+
+<span class="c1"># Create a new dataframe by subselecting the chosen features
+</span><span class="n">df_selected</span> <span class="o">=</span> <span class="n">pokemon_df</span><span class="p">[</span><span class="n">number_cols</span> <span class="o">+</span> <span class="n">non_number_cols</span><span class="p">]</span>
+
+<span class="c1"># Prints the first 5 lines of the new dataframe
+</span><span class="k">print</span><span class="p">(</span><span class="n">df_selected</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+   HP  Attack  Defense                   Name   Type
+0  45      49       49              Bulbasaur  Grass
+1  60      62       63                Ivysaur  Grass
+2  80      82       83               Venusaur  Grass
+3  80     100      123  VenusaurMega Venusaur  Grass
+4  39      52       43             Charmander   Fire
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="12-feature-selection-vs-feature-extraction"><strong>1.2 Feature selection vs feature extraction</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/1-8.png?w=844" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/2-9.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/3-9.png?w=1016" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/4-9.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/5-9.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/6-9.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="121-visually-detecting-redundant-features"><strong>1.2.1 Visually detecting redundant features</strong></h3>
+
+<p>Data visualization is a crucial step in any data exploration. Let’s use Seaborn to explore some samples of the US Army ANSUR body measurement dataset.</p>
+
+<p>Two data samples have been pre-loaded as
+ <code class="language-plaintext highlighter-rouge">ansur_df_1</code>
+ and
+ <code class="language-plaintext highlighter-rouge">ansur_df_2</code>
+ .</p>
+
+<p>Seaborn has been imported as
+ <code class="language-plaintext highlighter-rouge">sns</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a pairplot and color the points using the 'Gender' feature
+</span><span class="n">sns</span><span class="p">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">ansur_df_1</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s">'Gender'</span><span class="p">,</span> <span class="n">diag_kind</span><span class="o">=</span><span class="s">'hist'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/7-9.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Remove one of the redundant features
+</span><span class="n">reduced_df</span> <span class="o">=</span> <span class="n">ansur_df_1</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="s">'stature_m'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Create a pairplot and color the points using the 'Gender' feature
+</span><span class="n">sns</span><span class="p">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">reduced_df</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s">'Gender'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/8-8.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a pairplot and color the points using the 'Gender' feature
+</span><span class="n">sns</span><span class="p">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">ansur_df_2</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s">'Gender'</span><span class="p">,</span> <span class="n">diag_kind</span><span class="o">=</span><span class="s">'hist'</span><span class="p">)</span>
+
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/9-8.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Remove the redundant feature
+</span><span class="n">reduced_df</span> <span class="o">=</span> <span class="n">ansur_df_2</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="s">'n_legs'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Create a pairplot and color the points using the 'Gender' feature
+</span><span class="n">sns</span><span class="p">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">reduced_df</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s">'Gender'</span><span class="p">,</span> <span class="n">diag_kind</span><span class="o">=</span><span class="s">'hist'</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/10-7.png?w=1024" alt="Desktop View" /></p>
+
+<p>The body height (inches) and stature (meters) hold the same information in a different unit + all the individuals in the second sample have two legs.</p>
+
+<h3 id="122-advantage-of-feature-selection"><strong>1.2.2 Advantage of feature selection</strong></h3>
+
+<p>What advantage does feature selection have over feature extraction?</p>
+
+<p>The selected features remain unchanged, and are therefore easy to interpret.</p>
+
+<hr />
+
+<h2 id="13-t-sne-visualization-of-high-dimensional-data"><strong>1.3 t-SNE visualization of high-dimensional data</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/11-7.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/12-7.png?w=963" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/13-7.png?w=863" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/14-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/15-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/16-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/capture-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/18-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/19-3.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="131-t-sne-intuition"><strong>1.3.1 t-SNE intuition</strong></h3>
+
+<p>t-SNE is super powerful, but do you know exactly when to use it?</p>
+
+<p>When you want to visually explore the patterns in a high dimensional dataset.</p>
+
+<h3 id="132-fitting-t-sne-to-the-ansur-data"><strong>1.3.2 Fitting t-SNE to the ANSUR data</strong></h3>
+
+<p>t-SNE is a great technique for visual exploration of high dimensional datasets. In this exercise, you’ll apply it to the ANSUR dataset. You’ll remove non-numeric columns from the pre-loaded dataset
+ <code class="language-plaintext highlighter-rouge">df</code>
+ and fit
+ <code class="language-plaintext highlighter-rouge">TSNE</code>
+ to his numeric dataset.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Non-numerical columns in the dataset
+</span><span class="n">non_numeric</span> <span class="o">=</span> <span class="p">[</span><span class="s">'Branch'</span><span class="p">,</span> <span class="s">'Gender'</span><span class="p">,</span> <span class="s">'Component'</span><span class="p">]</span>
+
+<span class="c1"># Drop the non-numerical columns from df
+</span><span class="n">df_numeric</span> <span class="o">=</span> <span class="n">df</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="n">non_numeric</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Create a t-SNE model with learning rate 50
+</span><span class="n">m</span> <span class="o">=</span> <span class="n">TSNE</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+
+<span class="c1"># Fit and transform the t-SNE model on the numeric dataset
+</span><span class="n">tsne_features</span> <span class="o">=</span> <span class="n">m</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">df_numeric</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">tsne_features</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="p">(</span><span class="mi">6068</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="n">df</span><span class="p">.</span><span class="n">shape</span>
+<span class="p">(</span><span class="mi">6068</span><span class="p">,</span> <span class="mi">94</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<h3 id="133-t-sne-visualisation-of-dimensionality"><strong>1.3.3 t-SNE visualisation of dimensionality</strong></h3>
+
+<p>Time to look at the results of your hard work. In this exercise, you will visualize the output of t-SNE dimensionality reduction on the combined male and female Ansur dataset. You’ll create 3 scatterplots of the 2 t-SNE features (
+ <code class="language-plaintext highlighter-rouge">'x'</code>
+ and
+ <code class="language-plaintext highlighter-rouge">'y'</code>
+ ) which were added to the dataset
+ <code class="language-plaintext highlighter-rouge">df</code>
+ . In each scatterplot you’ll color the points according to a different categorical variable.</p>
+
+<p><code class="language-plaintext highlighter-rouge">seaborn</code>
+ has already been imported as
+ <code class="language-plaintext highlighter-rouge">sns</code>
+ and
+ <code class="language-plaintext highlighter-rouge">matplotlib.pyplot</code>
+ as
+ <code class="language-plaintext highlighter-rouge">plt</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Color the points according to Army Component
+</span><span class="n">sns</span><span class="p">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"x"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">"y"</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s">'Component'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/20-3.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Color the points by Army Branch
+</span><span class="n">sns</span><span class="p">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"x"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">"y"</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s">'Branch'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/21-3.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Color the points by Gender
+</span><span class="n">sns</span><span class="p">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">"x"</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">"y"</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s">'Gender'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">df</span><span class="p">)</span>
+
+<span class="c1"># Show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/22-3.png?w=1024" alt="Desktop View" /></p>
+
+<p>There is a Male and a Female cluster. t-SNE found these gender differences in body shape without being told about them explicitly! From the second plot you learned there are more males in the Combat Arms Branch.</p>
+
+<h1 id="2-feature-selection-i-selecting-for-feature-information"><strong>2. Feature selection I, selecting for feature information</strong></h1>
+<hr />
+
+<h2 id="21-the-curse-of-dimensionality"><strong>2.1 The curse of dimensionality</strong></h2>
+
+<h3 id="211-train--test-split"><strong>2.1.1 Train – test split</strong></h3>
+
+<p>In this chapter, you will keep working with the ANSUR dataset. Before you can build a model on your dataset, you should first decide on which feature you want to predict. In this case, you’re trying to predict gender.</p>
+
+<p>You need to extract the column holding this feature from the dataset and then split the data into a training and test set. The training set will be used to train the model and the test set will be used to check its performance on unseen data.</p>
+
+<p><code class="language-plaintext highlighter-rouge">ansur_df</code>
+ has been pre-loaded for you.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import train_test_split()
+</span><span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="c1"># Select the Gender column as the feature to be predicted (y)
+</span><span class="n">y</span> <span class="o">=</span> <span class="n">ansur_df</span><span class="p">[</span><span class="s">'Gender'</span><span class="p">]</span>
+
+<span class="c1"># Remove the Gender column to create the training data
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">ansur_df</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="s">'Gender'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Perform a 70% train and 30% test data split
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"{} rows in test set vs. {} in training set. {} Features."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">X_test</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X_train</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">X_test</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="c1"># 300 rows in test set vs. 700 in training set. 91 Features.
+</span>
+</code></pre></div></div>
+
+<h3 id="212-fitting-and-testing-the-model"><strong>2.1.2 Fitting and testing the model</strong></h3>
+
+<p>In the previous exercise, you split the dataset into
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ . These datasets have been pre-loaded for you. You’ll now create a support vector machine classifier model (
+ <code class="language-plaintext highlighter-rouge">SVC()</code>
+ ) and fit that to the training data. You’ll then calculate the accuracy on both the test and training set to detect overfitting.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import SVC from sklearn.svm and accuracy_score from sklearn.metrics
+</span><span class="kn">from</span> <span class="nn">sklearn.svm</span> <span class="kn">import</span> <span class="n">SVC</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">accuracy_score</span>
+
+<span class="c1"># Create an instance of the Support Vector Classification class
+</span><span class="n">svc</span> <span class="o">=</span> <span class="n">SVC</span><span class="p">()</span>
+
+<span class="c1"># Fit the model to the training data
+</span><span class="n">svc</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Calculate accuracy scores on both train and test data
+</span><span class="n">accuracy_train</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">svc</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">))</span>
+<span class="n">accuracy_test</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">svc</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"{0:.1%} accuracy on test set vs. {1:.1%} on training set"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">accuracy_test</span><span class="p">,</span> <span class="n">accuracy_train</span><span class="p">))</span>
+<span class="c1"># 49.7% accuracy on test set vs. 100.0% on training set
+</span>
+</code></pre></div></div>
+
+<p>Looks like the model badly overfits on the training data. On unseen data it performs worse than a random selector would.</p>
+
+<h3 id="213-accuracy-after-dimensionality-reduction"><strong>2.1.3 Accuracy after dimensionality reduction</strong></h3>
+
+<p>You’ll reduce the overfit with the help of dimensionality reduction. In this case, you’ll apply a rather drastic form of dimensionality reduction by only selecting a single column that has some good information to distinguish between genders. You’ll repeat the train-test split, model fit and prediction steps to compare the accuracy on test vs. training data.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Assign just the 'neckcircumferencebase' column from ansur_df to X
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">ansur_df</span><span class="p">[[</span><span class="s">'neckcircumferencebase'</span><span class="p">]]</span>
+
+<span class="c1"># Split the data, instantiate a classifier and fit the data
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">svc</span> <span class="o">=</span> <span class="n">SVC</span><span class="p">()</span>
+<span class="n">svc</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Calculate accuracy scores on both train and test data
+</span><span class="n">accuracy_train</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">svc</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train</span><span class="p">))</span>
+<span class="n">accuracy_test</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">svc</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"{0:.1%} accuracy on test set vs. {1:.1%} on training set"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">accuracy_test</span><span class="p">,</span> <span class="n">accuracy_train</span><span class="p">))</span>
+<span class="c1"># 93.3% accuracy on test set vs. 94.9% on training set
+</span>
+</code></pre></div></div>
+
+<p>Wow, what just happened!? On the full dataset the model is rubbish but with a single feature we can make good predictions? This is an example of the curse of dimensionality! The model badly overfits when we feed it too many features. It overlooks that neck circumference by itself is pretty different for males and females.</p>
+
+<hr />
+
+<h2 id="22-features-with-missing-values-or-little-variance"><strong>2.2 Features with missing values or little variance</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/23-3.png?w=803" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/24-3.png?w=975" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/25-3.png?w=718" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/26-3.png?w=749" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/27-3.png?w=1016" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/28-3.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="221-finding-a-good-variance-threshold"><strong>2.2.1 Finding a good variance threshold</strong></h3>
+
+<p>You’ll be working on a slightly modified subsample of the ANSUR dataset with just head measurements pre-loaded as
+ <code class="language-plaintext highlighter-rouge">head_df</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create the boxplot
+</span><span class="n">head_df</span><span class="p">.</span><span class="n">boxplot</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/29-2.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Normalize the data
+</span><span class="n">normalized_df</span> <span class="o">=</span> <span class="n">head_df</span> <span class="o">/</span> <span class="n">head_df</span><span class="p">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="n">normalized_df</span><span class="p">.</span><span class="n">boxplot</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/30-2.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Normalize the data
+</span><span class="n">normalized_df</span> <span class="o">=</span> <span class="n">head_df</span> <span class="o">/</span> <span class="n">head_df</span><span class="p">.</span><span class="n">mean</span><span class="p">()</span>
+
+<span class="c1"># Print the variances of the normalized data
+</span><span class="k">print</span><span class="p">(</span><span class="n">normalized_df</span><span class="p">.</span><span class="n">var</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+headbreadth          1.678952e-03
+headcircumference    1.029623e-03
+headlength           1.867872e-03
+tragiontopofhead     2.639840e-03
+n_hairs              1.002552e-08
+measurement_error    3.231707e-27
+dtype: float64
+
+</code></pre></div></div>
+
+<p>Inspect the printed variances. If you want to remove the 2 very low variance features. What would be a good variance threshold?</p>
+
+<p>1.0e-03</p>
+
+<h3 id="222-features-with-low-variance"><strong>2.2.2 Features with low variance</strong></h3>
+
+<p>In the previous exercise you established that 0.001 is a good threshold to filter out low variance features in
+ <code class="language-plaintext highlighter-rouge">head_df</code>
+ after normalization. Now use the
+ <code class="language-plaintext highlighter-rouge">VarianceThreshold</code>
+ feature selector to remove these features.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.feature_selection import VarianceThreshold
+
+# Create a VarianceThreshold feature selector
+sel = VarianceThreshold(threshold=10**-3)
+
+# Fit the selector to normalized head_df
+sel.fit(head_df / head_df.mean())
+
+# Create a boolean mask
+mask = sel.get_support()
+
+# Apply the mask to create a reduced dataframe
+reduced_df = head_df.loc[:, mask]
+
+print("Dimensionality reduced from {} to {}.".format(head_df.shape[1], reduced_df.shape[1]))
+# Dimensionality reduced from 6 to 4.
+
+</code></pre></div></div>
+
+<h3 id="223-removing-features-with-many-missing-values"><strong>2.2.3 Removing features with many missing values</strong></h3>
+
+<p>You’ll apply feature selection on the Boston Public Schools dataset which has been pre-loaded as
+ <code class="language-plaintext highlighter-rouge">school_df</code>
+ . Calculate the missing value ratio per feature and then create a mask to remove features with many missing values.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+school_df.isna().sum() / len(school_df)
+x             0.000000
+y             0.000000
+objectid_1    0.000000
+objectid      0.000000
+bldg_id       0.000000
+bldg_name     0.000000
+address       0.000000
+city          0.000000
+zipcode       0.000000
+csp_sch_id    0.000000
+sch_id        0.000000
+sch_name      0.000000
+sch_label     0.000000
+sch_type      0.000000
+shared        0.877863
+complex       0.984733
+label         0.000000
+tlt           0.000000
+pl            0.000000
+point_x       0.000000
+point_y       0.000000
+dtype: float64
+
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a boolean mask on whether each feature less than 50% missing values.
+</span><span class="n">mask</span> <span class="o">=</span> <span class="n">school_df</span><span class="p">.</span><span class="n">isna</span><span class="p">().</span><span class="nb">sum</span><span class="p">()</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">school_df</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mf">0.5</span>
+
+<span class="c1"># Create a reduced dataset by applying the mask
+</span><span class="n">reduced_df</span> <span class="o">=</span> <span class="n">school_df</span><span class="p">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">mask</span><span class="p">]</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">school_df</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">reduced_df</span><span class="p">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="c1"># (131, 21)
+# (131, 19)
+</span>
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="23-pairwise-correlation"><strong>2.3 Pairwise correlation</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/1-9.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/2-10.png?w=996" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/3-10.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="231-correlation-intuition"><strong>2.3.1 Correlation intuition</strong></h3>
+
+<p>The correlation coefficient of A to B is equal to that of B to A.</p>
+
+<h3 id="232-inspecting-the-correlation-matrix"><strong>2.3.2 Inspecting the correlation matrix</strong></h3>
+
+<p>A sample of the ANSUR body measurements dataset has been pre-loaded as
+ <code class="language-plaintext highlighter-rouge">ansur_df</code>
+ . Use the terminal to create a correlation matrix for this dataset.</p>
+
+<p>What is the correlation coefficient between wrist and ankle circumference?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+ansur_df.corr()
+                     Elbow rest height  Wrist circumference  Ankle circumference  Buttock height  Crotch height
+Elbow rest height             1.000000             0.294753             0.301963       -0.007013      -0.026090
+Wrist circumference           0.294753             1.000000             0.702178        0.576679       0.606582
+Ankle circumference           0.301963             0.702178             1.000000        0.367548       0.386502
+Buttock height               -0.007013             0.576679             0.367548        1.000000       0.929411
+Crotch height                -0.026090             0.606582             0.386502        0.929411       1.000000
+
+</code></pre></div></div>
+
+<p>0.702178</p>
+
+<h3 id="233-visualizing-the-correlation-matrix"><strong>2.3.3 Visualizing the correlation matrix</strong></h3>
+
+<p>Reading the correlation matrix of
+ <code class="language-plaintext highlighter-rouge">ansur_df</code>
+ in its raw, numeric format doesn’t allow us to get a quick overview. Let’s improve this by removing redundant values and visualizing the matrix using seaborn.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create the correlation matrix
+</span><span class="n">corr</span> <span class="o">=</span> <span class="n">ansur_df</span><span class="p">.</span><span class="n">corr</span><span class="p">()</span>
+
+<span class="c1"># Draw the heatmap
+</span><span class="n">sns</span><span class="p">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span>  <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">".2f"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/4-10.png?w=989" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create the correlation matrix
+</span><span class="n">corr</span> <span class="o">=</span> <span class="n">ansur_df</span><span class="p">.</span><span class="n">corr</span><span class="p">()</span>
+
+<span class="c1"># Generate a mask for the upper triangle
+</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+
+<span class="c1"># Add the mask to the heatmap
+</span><span class="n">sns</span><span class="p">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">,</span> <span class="n">center</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">linewidths</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">annot</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s">".2f"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/5-10.png?w=992" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="24-removing-highly-correlated-features"><strong>2.4 Removing highly correlated features</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/6-10.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/7-10.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="241-filtering-out-highly-correlated-features"><strong>2.4.1 Filtering out highly correlated features</strong></h3>
+
+<p>You’re going to automate the removal of highly correlated features in the numeric ANSUR dataset. You’ll calculate the correlation matrix and filter out columns that have a correlation coefficient of more than 0.95 or less than -0.95.</p>
+
+<p>Since each correlation coefficient occurs twice in the matrix (correlation of A to B equals correlation of B to A) you’ll want to ignore half of the correlation matrix so that only one of the two correlated features is removed. Use a mask trick for this purpose.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate the correlation matrix and take the absolute value
+</span><span class="n">corr_matrix</span> <span class="o">=</span> <span class="n">ansur_df</span><span class="p">.</span><span class="n">corr</span><span class="p">().</span><span class="nb">abs</span><span class="p">()</span>
+
+<span class="c1"># Create a True/False mask and apply it
+</span><span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">triu</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">corr_matrix</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">bool</span><span class="p">))</span>
+<span class="n">tri_df</span> <span class="o">=</span> <span class="n">corr_matrix</span><span class="p">.</span><span class="n">mask</span><span class="p">(</span><span class="n">mask</span><span class="p">)</span>
+
+<span class="c1"># List column names of highly correlated features (r &gt; 0.95)
+</span><span class="n">to_drop</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">tri_df</span><span class="p">.</span><span class="n">columns</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">tri_df</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">&gt;</span>  <span class="mf">0.95</span><span class="p">)]</span>
+
+<span class="c1"># Drop the features in the to_drop list
+</span><span class="n">reduced_df</span> <span class="o">=</span> <span class="n">ansur_df</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="n">to_drop</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"The reduced dataframe has {} columns."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">reduced_df</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="c1"># The reduced dataframe has 88 columns.
+</span>
+</code></pre></div></div>
+
+<p>You’ve automated the removal of highly correlated features.</p>
+
+<h3 id="242-nuclear-energy-and-pool-drownings"><strong>2.4.2 Nuclear energy and pool drownings</strong></h3>
+
+<p>The dataset that has been pre-loaded for you as
+ <code class="language-plaintext highlighter-rouge">weird_df</code>
+ contains actual data provided by the US Centers for Disease Control &amp; Prevention and Department of Energy.</p>
+
+<p>Let’s see if we can find a pattern.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Put nuclear energy production on the x-axis and the number of pool drownings on the y-axis
+</span><span class="n">sns</span><span class="p">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'nuclear_energy'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'pool_drownings'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">weird_df</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/8-9.png?w=1022" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print out the correlation matrix of weird_df
+</span><span class="k">print</span><span class="p">(</span><span class="n">weird_df</span><span class="p">.</span><span class="n">corr</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+                pool_drownings  nuclear_energy
+pool_drownings        1.000000        0.901179
+nuclear_energy        0.901179        1.000000
+
+</code></pre></div></div>
+
+<p>What can you conclude from the strong correlation (r=0.9) between these features?</p>
+
+<p>Not much, correlation does not imply causation.</p>
+
+<h1 id="3-feature-selection-ii-selecting-for-model-accuracy"><strong>3. Feature selection II, selecting for model accuracy</strong></h1>
+<hr />
+
+<h2 id="31-selecting-features-for-model-performance"><strong>3.1 Selecting features for model performance</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/9-9.png?w=954" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/10-8.png?w=771" alt="Desktop View" /></p>
+
+<h3 id="311-building-a-diabetes-classifier"><strong>3.1.1 Building a diabetes classifier</strong></h3>
+
+<p>You’ll be using the Pima Indians diabetes dataset to predict whether a person has diabetes using logistic regression. There are 8 features and one target in this dataset. The data has been split into a training and test set and pre-loaded for you as
+ <code class="language-plaintext highlighter-rouge">X_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y_train</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">y_test</code>
+ .</p>
+
+<p>A
+ <code class="language-plaintext highlighter-rouge">StandardScaler()</code>
+ instance has been predefined as
+ <code class="language-plaintext highlighter-rouge">scaler</code>
+ and a
+ <code class="language-plaintext highlighter-rouge">LogisticRegression()</code>
+ one as
+ <code class="language-plaintext highlighter-rouge">lr</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Fit the scaler on the training features and transform these in one go
+</span><span class="n">X_train_std</span> <span class="o">=</span> <span class="n">scaler</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+<span class="c1"># Fit the logistic regression model on the scaled training data
+</span><span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_std</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Scale the test features
+</span><span class="n">X_test_std</span> <span class="o">=</span> <span class="n">scaler</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Predict diabetes presence on the scaled test set
+</span><span class="n">y_pred</span> <span class="o">=</span> <span class="n">lr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test_std</span><span class="p">)</span>
+
+<span class="c1"># Prints accuracy metrics and feature coefficients
+</span><span class="k">print</span><span class="p">(</span><span class="s">"{0:.1%} accuracy on test set."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">y_pred</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="n">columns</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]).</span><span class="nb">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+79.6% accuracy on test set.
+{'family': 0.34, 'diastolic': 0.03, 'glucose': 1.23, 'triceps': 0.24, 'age': 0.34, 'insulin': 0.19, 'bmi': 0.38, 'pregnant': 0.04}
+
+</code></pre></div></div>
+
+<h3 id="312-manual-recursive-feature-elimination"><strong>3.1.2 Manual Recursive Feature Elimination</strong></h3>
+
+<p>Now that we’ve created a diabetes classifier, let’s see if we can reduce the number of features without hurting the model accuracy too much.</p>
+
+<p>On the second line of code the features are selected from the original dataframe. Adjust this selection.</p>
+
+<p>A
+ <code class="language-plaintext highlighter-rouge">StandardScaler()</code>
+ instance has been predefined as
+ <code class="language-plaintext highlighter-rouge">scaler</code>
+ and a
+ <code class="language-plaintext highlighter-rouge">LogisticRegression()</code>
+ one as
+ <code class="language-plaintext highlighter-rouge">lr</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Remove the feature with the lowest model coefficient
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">diabetes_df</span><span class="p">[[</span><span class="s">'pregnant'</span><span class="p">,</span> <span class="s">'glucose'</span><span class="p">,</span> <span class="s">'triceps'</span><span class="p">,</span> <span class="s">'insulin'</span><span class="p">,</span> <span class="s">'bmi'</span><span class="p">,</span> <span class="s">'family'</span><span class="p">,</span> <span class="s">'age'</span><span class="p">]]</span>
+
+<span class="mf">80.6</span><span class="o">%</span> <span class="n">accuracy</span> <span class="n">on</span> <span class="n">test</span> <span class="nb">set</span><span class="p">.</span>
+<span class="p">{</span><span class="s">'family'</span><span class="p">:</span> <span class="mf">0.34</span><span class="p">,</span> <span class="s">'glucose'</span><span class="p">:</span> <span class="mf">1.23</span><span class="p">,</span> <span class="s">'triceps'</span><span class="p">:</span> <span class="mf">0.24</span><span class="p">,</span> <span class="s">'age'</span><span class="p">:</span> <span class="mf">0.35</span><span class="p">,</span> <span class="s">'insulin'</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span> <span class="s">'bmi'</span><span class="p">:</span> <span class="mf">0.39</span><span class="p">,</span> <span class="s">'pregnant'</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">}</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Remove the 2 features with the lowest model coefficients
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">diabetes_df</span><span class="p">[[</span><span class="s">'glucose'</span><span class="p">,</span> <span class="s">'triceps'</span><span class="p">,</span> <span class="s">'bmi'</span><span class="p">,</span> <span class="s">'family'</span><span class="p">,</span> <span class="s">'age'</span><span class="p">]]</span>
+
+<span class="mf">79.6</span><span class="o">%</span> <span class="n">accuracy</span> <span class="n">on</span> <span class="n">test</span> <span class="nb">set</span><span class="p">.</span>
+<span class="p">{</span><span class="s">'family'</span><span class="p">:</span> <span class="mf">0.34</span><span class="p">,</span> <span class="s">'age'</span><span class="p">:</span> <span class="mf">0.37</span><span class="p">,</span> <span class="s">'bmi'</span><span class="p">:</span> <span class="mf">0.34</span><span class="p">,</span> <span class="s">'glucose'</span><span class="p">:</span> <span class="mf">1.13</span><span class="p">,</span> <span class="s">'triceps'</span><span class="p">:</span> <span class="mf">0.25</span><span class="p">}</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Only keep the feature with the highest coefficient
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">diabetes_df</span><span class="p">[[</span><span class="s">'glucose'</span><span class="p">]]</span>
+
+<span class="mf">76.5</span><span class="o">%</span> <span class="n">accuracy</span> <span class="n">on</span> <span class="n">test</span> <span class="nb">set</span><span class="p">.</span>
+<span class="p">{</span><span class="s">'glucose'</span><span class="p">:</span> <span class="mf">1.27</span><span class="p">}</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Performs a 25-75% train test split
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Scales features and fits the logistic regression model to the data
+</span><span class="n">lr</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">scaler</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">),</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Calculates the accuracy on the test set and prints coefficients
+</span><span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">lr</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">scaler</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"{0:.1%} accuracy on test set."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">acc</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="n">columns</span><span class="p">,</span> <span class="nb">abs</span><span class="p">(</span><span class="n">lr</span><span class="p">.</span><span class="n">coef_</span><span class="p">[</span><span class="mi">0</span><span class="p">]).</span><span class="nb">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))))</span>
+
+</code></pre></div></div>
+
+<p>Removing all but one feature only reduced the accuracy by a few percent.</p>
+
+<h3 id="313-automatic-recursive-feature-elimination"><strong>3.1.3 Automatic Recursive Feature Elimination</strong></h3>
+
+<p>Now let’s automate this recursive process. Wrap a Recursive Feature Eliminator (RFE) around our logistic regression estimator and pass it the desired number of features.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create the RFE with a LogisticRegression estimator and 3 features to select
+</span><span class="n">rfe</span> <span class="o">=</span> <span class="n">RFE</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">LogisticRegression</span><span class="p">(),</span> <span class="n">n_features_to_select</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Fits the eliminator to the data
+</span><span class="n">rfe</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Print the features and their ranking (high = dropped early on)
+</span><span class="k">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">rfe</span><span class="p">.</span><span class="n">ranking_</span><span class="p">)))</span>
+
+<span class="c1"># Print the features that are not eliminated
+</span><span class="k">print</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="n">columns</span><span class="p">[</span><span class="n">rfe</span><span class="p">.</span><span class="n">support_</span><span class="p">])</span>
+
+<span class="c1"># Calculates the test set accuracy
+</span><span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">rfe</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"{0:.1%} accuracy on test set."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">acc</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Fitting estimator with 8 features.
+Fitting estimator with 7 features.
+Fitting estimator with 6 features.
+Fitting estimator with 5 features.
+Fitting estimator with 4 features.
+{'family': 2, 'diastolic': 6, 'glucose': 1, 'triceps': 3, 'age': 1, 'insulin': 4, 'bmi': 1, 'pregnant': 5}
+Index(['glucose', 'bmi', 'age'], dtype='object')
+80.6% accuracy on test set.
+
+</code></pre></div></div>
+
+<p>When we eliminate all but the 3 most relevant features we get a 80.6% accuracy on the test set.</p>
+
+<hr />
+
+<h2 id="32-tree-based-feature-selection"><strong>3.2 Tree-based feature selection</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/11-8.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="321-building-a-random-forest-model"><strong>3.2.1 Building a random forest model</strong></h3>
+
+<p>You’ll again work on the Pima Indians dataset to predict whether an individual has diabetes. This time using a random forest classifier. You’ll fit the model on the training data after performing the train-test split and consult the feature importance values.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Perform a 75% training and 25% test data split
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.25</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Fit the random forest model to the training data
+</span><span class="n">rf</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">rf</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Calculate the accuracy
+</span><span class="n">acc</span> <span class="o">=</span> <span class="n">accuracy_score</span><span class="p">(</span><span class="n">y_test</span><span class="p">,</span> <span class="n">rf</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_test</span><span class="p">))</span>
+
+<span class="c1"># Print the importances per feature
+</span><span class="k">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">X</span><span class="p">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">rf</span><span class="p">.</span><span class="n">feature_importances_</span><span class="p">.</span><span class="nb">round</span><span class="p">(</span><span class="mi">2</span><span class="p">))))</span>
+
+<span class="c1"># Print accuracy
+</span><span class="k">print</span><span class="p">(</span><span class="s">"{0:.1%} accuracy on test set."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">acc</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+{'family': 0.12, 'diastolic': 0.08, 'glucose': 0.21, 'triceps': 0.11, 'age': 0.16, 'insulin': 0.13, 'bmi': 0.09, 'pregnant': 0.09}
+77.6% accuracy on test set.
+
+</code></pre></div></div>
+
+<p>The random forest model gets 78% accuracy on the test set and
+ <code class="language-plaintext highlighter-rouge">'glucose'</code>
+ is the most important feature (
+ <code class="language-plaintext highlighter-rouge">0.21</code>
+ ).</p>
+
+<h3 id="322-random-forest-for-feature-selection"><strong>3.2.2 Random forest for feature selection</strong></h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a mask for features importances above the threshold
+</span><span class="n">mask</span> <span class="o">=</span> <span class="n">rf</span><span class="p">.</span><span class="n">feature_importances_</span> <span class="o">&gt;</span> <span class="mf">0.15</span>
+
+<span class="c1"># Apply the mask to the feature dataset X
+</span><span class="n">reduced_X</span> <span class="o">=</span> <span class="n">X</span><span class="p">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">mask</span><span class="p">]</span>
+
+<span class="c1"># prints out the selected column names
+</span><span class="k">print</span><span class="p">(</span><span class="n">reduced_X</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="c1"># Index(['glucose', 'age'], dtype='object')
+</span>
+</code></pre></div></div>
+
+<p>Only the features
+ <code class="language-plaintext highlighter-rouge">'glucose'</code>
+ and
+ <code class="language-plaintext highlighter-rouge">'age'</code>
+ were considered sufficiently important.</p>
+
+<h3 id="323-recursive-feature-elimination-with-random-forests"><strong>3.2.3 Recursive Feature Elimination with random forests</strong></h3>
+
+<p>You’ll wrap a Recursive Feature Eliminator around a random forest model to remove features step by step. This method is more conservative compared to selecting features after applying a single importance threshold. Since dropping one feature can influence the relative importances of the others.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Wrap the feature eliminator around the random forest model
+</span><span class="n">rfe</span> <span class="o">=</span> <span class="n">RFE</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">RandomForestClassifier</span><span class="p">(),</span> <span class="n">n_features_to_select</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Fit the model to the training data
+</span><span class="n">rfe</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Create a mask using an attribute of rfe
+</span><span class="n">mask</span> <span class="o">=</span> <span class="n">rfe</span><span class="p">.</span><span class="n">support_</span>
+
+<span class="c1"># Apply the mask to the feature dataset X and print the result
+</span><span class="n">reduced_X</span> <span class="o">=</span> <span class="n">X</span><span class="p">.</span><span class="n">loc</span><span class="p">[:,</span><span class="n">mask</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">reduced_X</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Fitting estimator with 8 features.
+Fitting estimator with 7 features.
+Fitting estimator with 6 features.
+Fitting estimator with 5 features.
+Fitting estimator with 4 features.
+Fitting estimator with 3 features.
+Index(['glucose', 'bmi'], dtype='object')
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Set the feature eliminator to remove 2 features on each step
+</span><span class="n">rfe</span> <span class="o">=</span> <span class="n">RFE</span><span class="p">(</span><span class="n">estimator</span><span class="o">=</span><span class="n">RandomForestClassifier</span><span class="p">(),</span> <span class="n">n_features_to_select</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">step</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Fit the model to the training data
+</span><span class="n">rfe</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Create a mask
+</span><span class="n">mask</span> <span class="o">=</span> <span class="n">rfe</span><span class="p">.</span><span class="n">support_</span>
+
+<span class="c1"># Apply the mask to the feature dataset X and print the result
+</span><span class="n">reduced_X</span> <span class="o">=</span> <span class="n">X</span><span class="p">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">mask</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">reduced_X</span><span class="p">.</span><span class="n">columns</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Fitting estimator with 8 features.
+Fitting estimator with 6 features.
+Fitting estimator with 4 features.
+Index(['glucose', 'insulin'], dtype='object')
+
+</code></pre></div></div>
+
+<p>Compared to the quick and dirty single threshold method from the previous exercise one of the selected features is different.</p>
+
+<hr />
+
+<h2 id="33-regularized-linear-regression"><strong>3.3 Regularized linear regression</strong></h2>
+
+<h3 id="331-creating-a-lasso-regressor"><strong>3.3.1 Creating a LASSO regressor</strong></h3>
+
+<p>You’ll be working on the numeric ANSUR body measurements dataset to predict a persons Body Mass Index (BMI) using the pre-imported
+ <code class="language-plaintext highlighter-rouge">Lasso()</code>
+ regressor. BMI is a metric derived from body height and weight but those two features have been removed from the dataset to give the model a challenge.</p>
+
+<p>You’ll standardize the data first using the
+ <code class="language-plaintext highlighter-rouge">StandardScaler()</code>
+ that has been instantiated for you as
+ <code class="language-plaintext highlighter-rouge">scaler</code>
+ to make sure all coefficients face a comparable regularizing force trying to bring them down.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Set the test size to 30% to get a 70-30% train test split
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Fit the scaler on the training features and transform these in one go
+</span><span class="n">X_train_std</span> <span class="o">=</span> <span class="n">scaler</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">)</span>
+
+<span class="c1"># Create the Lasso model
+</span><span class="n">la</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">()</span>
+
+<span class="c1"># Fit it to the standardized training data
+</span><span class="n">la</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_std</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<h3 id="332-lasso-model-results"><strong>3.3.2 Lasso model results</strong></h3>
+
+<p>Now that you’ve trained the Lasso model, you’ll score its predictive capacity (R2) on the test set and count how many features are ignored because their coefficient is reduced to zero.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Transform the test set with the pre-fitted scaler
+</span><span class="n">X_test_std</span> <span class="o">=</span> <span class="n">scaler</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Calculate the coefficient of determination (R squared) on X_test_std
+</span><span class="n">r_squared</span> <span class="o">=</span> <span class="n">la</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test_std</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The model can predict {0:.1%} of the variance in the test set."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">r_squared</span><span class="p">))</span>
+
+<span class="c1"># Create a list that has True values when coefficients equal 0
+</span><span class="n">zero_coef</span> <span class="o">=</span> <span class="n">la</span><span class="p">.</span><span class="n">coef_</span> <span class="o">==</span> <span class="mi">0</span>
+
+<span class="c1"># Calculate how many features have a zero coefficient
+</span><span class="n">n_ignored</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">zero_coef</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"The model has ignored {} out of {} features."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">n_ignored</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">la</span><span class="p">.</span><span class="n">coef_</span><span class="p">)))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+The model can predict 84.7% of the variance in the test set.
+The model has ignored 82 out of 91 features.
+
+</code></pre></div></div>
+
+<p>We can predict almost 85% of the variance in the BMI value using just 9 out of 91 of the features. The R^2 could be higher though.</p>
+
+<h3 id="333-adjusting-the-regularization-strength"><strong>3.3.3 Adjusting the regularization strength</strong></h3>
+
+<p>Your current Lasso model has an R2R2 score of 84.7%. When a model applies overly powerful regularization it can suffer from high bias, hurting its predictive power.</p>
+
+<p>Let’s improve the balance between predictive power and model simplicity by tweaking the
+ <code class="language-plaintext highlighter-rouge">alpha</code>
+ parameter.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Find the highest alpha value with R-squared above 98%
+</span><span class="n">la</span> <span class="o">=</span> <span class="n">Lasso</span><span class="p">(</span><span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Fits the model and calculates performance stats
+</span><span class="n">la</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train_std</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">r_squared</span> <span class="o">=</span> <span class="n">la</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test_std</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="n">n_ignored_features</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">la</span><span class="p">.</span><span class="n">coef_</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Print peformance stats
+</span><span class="k">print</span><span class="p">(</span><span class="s">"The model can predict {0:.1%} of the variance in the test set."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">r_squared</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"{} out of {} features were ignored."</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">n_ignored_features</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">la</span><span class="p">.</span><span class="n">coef_</span><span class="p">)))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+The model can predict 98.3% of the variance in the test set.
+64 out of 91 features were ignored.
+
+</code></pre></div></div>
+
+<p>With this more appropriate regularization strength we can predict 98% of the variance in the BMI value while ignoring 2/3 of the features.</p>
+
+<hr />
+
+<h2 id="34-combining-feature-selectors"><strong>3.4 Combining feature selectors</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/12-9.png?w=627" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/13-8.png?w=924" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/14-7.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/15-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/16-4.png?w=951" alt="Desktop View" /></p>
+
+<h3 id="341-creating-a-lassocv-regressor"><strong>3.4.1 Creating a LassoCV regressor</strong></h3>
+
+<p>You’ll be predicting biceps circumference on a subsample of the male ANSUR dataset using the
+ <code class="language-plaintext highlighter-rouge">LassoCV()</code>
+ regressor that automatically tunes the regularization strength (alpha value) using Cross-Validation.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.linear_model import LassoCV
+
+# Create and fit the LassoCV model on the training set
+lcv = LassoCV()
+lcv.fit(X_train, y_train)
+print('Optimal alpha = {0:.3f}'.format(lcv.alpha_))
+
+# Calculate R squared on the test set
+r_squared = lcv.score(X_test, y_test)
+print('The model explains {0:.1%} of the test set variance'.format(r_squared))
+
+# Create a mask for coefficients not equal to zero
+lcv_mask = lcv.coef_ != 0
+print('{} features out of {} selected'.format(sum(lcv_mask), len(lcv_mask)))
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Optimal alpha = 0.089
+The model explains 88.2% of the test set variance
+26 features out of 32 selected
+
+</code></pre></div></div>
+
+<p>We got a decent R squared and removed 6 features. We’ll save the
+ <code class="language-plaintext highlighter-rouge">lcv_mask</code>
+ for later on.</p>
+
+<h3 id="342-ensemble-models-for-extra-votes"><strong>3.4.2 Ensemble models for extra votes</strong></h3>
+
+<p>The
+ <code class="language-plaintext highlighter-rouge">LassoCV()</code>
+ model selected 26 out of 32 features. Not bad, but not a spectacular dimensionality reduction either. Let’s use two more models to select the 10 features they consider most important using the Recursive Feature Eliminator (RFE).</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.feature_selection import RFE
+from sklearn.ensemble import GradientBoostingRegressor
+
+# Select 10 features with RFE on a GradientBoostingRegressor, drop 3 features on each step
+rfe_gb = RFE(estimator=GradientBoostingRegressor(),
+             n_features_to_select=10, step=3, verbose=1)
+rfe_gb.fit(X_train, y_train)
+
+# Calculate the R squared on the test set
+r_squared = rfe_gb.score(X_test, y_test)
+print('The model can explain {0:.1%} of the variance in the test set'.format(r_squared))
+
+# Assign the support array to gb_mask
+gb_mask = rfe_gb.support_
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Fitting estimator with 32 features.
+Fitting estimator with 29 features.
+Fitting estimator with 26 features.
+Fitting estimator with 23 features.
+Fitting estimator with 20 features.
+Fitting estimator with 17 features.
+Fitting estimator with 14 features.
+Fitting estimator with 11 features.
+The model can explain 85.6% of the variance in the test set
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.feature_selection import RFE
+from sklearn.ensemble import RandomForestRegressor
+
+# Select 10 features with RFE on a RandomForestRegressor, drop 3 features on each step
+rfe_rf = RFE(estimator=RandomForestRegressor(),
+             n_features_to_select=10, step=3, verbose=1)
+rfe_rf.fit(X_train, y_train)
+
+# Calculate the R squared on the test set
+r_squared = rfe_rf.score(X_test, y_test)
+print('The model can explain {0:.1%} of the variance in the test set'.format(r_squared))
+
+# Assign the support array to gb_mask
+rf_mask = rfe_rf.support_
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+Fitting estimator with 32 features.
+Fitting estimator with 29 features.
+Fitting estimator with 26 features.
+Fitting estimator with 23 features.
+Fitting estimator with 20 features.
+Fitting estimator with 17 features.
+Fitting estimator with 14 features.
+Fitting estimator with 11 features.
+The model can explain 84.0% of the variance in the test set
+
+</code></pre></div></div>
+
+<p>Inluding the Lasso linear model from the previous exercise, we now have the votes from 3 models on which features are important.</p>
+
+<h3 id="343-combining-3-feature-selectors"><strong>3.4.3 Combining 3 feature selectors</strong></h3>
+
+<p>We’ll combine the votes of the 3 models you built in the previous exercises, to decide which features are important into a meta mask. We’ll then use this mask to reduce dimensionality and see how a simple linear regressor performs on the reduced dataset.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Sum the votes of the three models
+</span><span class="n">votes</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">([</span><span class="n">lcv_mask</span><span class="p">,</span> <span class="n">rf_mask</span><span class="p">,</span> <span class="n">gb_mask</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Create a mask for features selected by all 3 models
+</span><span class="n">meta_mask</span> <span class="o">=</span> <span class="n">votes</span> <span class="o">&gt;=</span> <span class="mi">3</span>
+
+<span class="c1"># Apply the dimensionality reduction on X
+</span><span class="n">X_reduced</span> <span class="o">=</span> <span class="n">X</span><span class="p">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">meta_mask</span><span class="p">]</span>
+
+<span class="c1"># Plug the reduced dataset into a linear regression pipeline
+</span><span class="n">X_train</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">X_reduced</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">lm</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">scaler</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">X_train</span><span class="p">),</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">r_squared</span> <span class="o">=</span> <span class="n">lm</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">scaler</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">),</span> <span class="n">y_test</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'The model can explain {0:.1%} of the variance in the test set using {1:} features.'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">r_squared</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">lm</span><span class="p">.</span><span class="n">coef_</span><span class="p">)))</span>
+<span class="c1"># The model can explain 86.8% of the variance in the test set using 7 features.
+</span>
+</code></pre></div></div>
+
+<p>Using the votes from 3 models you were able to select just 7 features that allowed a simple linear model to get a high accuracy!</p>
+
+<h1 id="4-feature-extraction"><strong>4. Feature extraction</strong></h1>
+<hr />
+
+<h2 id="41-feature-extraction"><strong>4.1 Feature extraction</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/1-10.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/2-11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/3-11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/4-11.png?w=1024" alt="Desktop View" /></p>
+
+<h2 id="411-manual-feature-extraction-i"><strong>4.1.1 Manual feature extraction I</strong></h2>
+
+<p>You want to compare prices for specific products between stores. The features in the pre-loaded dataset
+ <code class="language-plaintext highlighter-rouge">sales_df</code>
+ are:
+ <code class="language-plaintext highlighter-rouge">storeID</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">product</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">quantity</code>
+ and
+ <code class="language-plaintext highlighter-rouge">revenue</code>
+ . The
+ <code class="language-plaintext highlighter-rouge">quantity</code>
+ and
+ <code class="language-plaintext highlighter-rouge">revenue</code>
+ features tell you how many items of a particular product were sold in a store and what the total revenue was. For the purpose of your analysis it’s more interesting to know the average price per product.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+  storeID  product  quantity  revenue
+0       A   Apples      1811   9300.6
+1       A  Bananas      1003   3375.2
+2       A  Oranges      1604   8528.5
+3       B   Apples      1785   9181.0
+4       B  Bananas       944   3680.2
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate the price from the quantity sold and revenue
+</span><span class="n">sales_df</span><span class="p">[</span><span class="s">'price'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sales_df</span><span class="p">[</span><span class="s">'revenue'</span><span class="p">]</span> <span class="o">/</span> <span class="n">sales_df</span><span class="p">[</span><span class="s">'quantity'</span><span class="p">]</span>
+
+<span class="c1"># Drop the quantity and revenue features
+</span><span class="n">reduced_df</span> <span class="o">=</span> <span class="n">sales_df</span><span class="p">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'revenue'</span><span class="p">,</span> <span class="s">'quantity'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">reduced_df</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+  storeID  product     price
+0       A   Apples  5.135616
+1       A  Bananas  3.365105
+2       A  Oranges  5.317020
+3       B   Apples  5.143417
+4       B  Bananas  3.898517
+
+</code></pre></div></div>
+
+<p>When you understand the dataset well, always check if you can calculate relevant features and drop irrelevant ones.</p>
+
+<h3 id="412-manual-feature-extraction-ii"><strong>4.1.2 Manual feature extraction II</strong></h3>
+
+<p>You’re working on a variant of the ANSUR dataset,
+ <code class="language-plaintext highlighter-rouge">height_df</code>
+ , where a person’s height was measured 3 times. Add a feature with the mean height to the dataset and then drop the 3 original features.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+   weight_kg  height_1  height_2  height_3
+0       81.5      1.78      1.80      1.80
+1       72.6      1.70      1.70      1.69
+2       92.9      1.74      1.75      1.73
+3       79.4      1.66      1.68      1.67
+4       94.6      1.91      1.93      1.90
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate the mean height
+</span><span class="n">height_df</span><span class="p">[</span><span class="s">'height'</span><span class="p">]</span> <span class="o">=</span> <span class="n">height_df</span><span class="p">[[</span><span class="s">'height_1'</span><span class="p">,</span><span class="s">'height_2'</span><span class="p">,</span><span class="s">'height_3'</span><span class="p">]].</span><span class="n">mean</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Drop the 3 original height features
+</span><span class="n">reduced_df</span> <span class="o">=</span> <span class="n">height_df</span><span class="p">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'height_1'</span><span class="p">,</span><span class="s">'height_2'</span><span class="p">,</span><span class="s">'height_3'</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">reduced_df</span><span class="p">.</span><span class="n">head</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+   weight_kg    height
+0       81.5  1.793333
+1       72.6  1.696667
+2       92.9  1.740000
+3       79.4  1.670000
+4       94.6  1.913333
+
+</code></pre></div></div>
+
+<h3 id="413-principal-component-intuition"><strong>4.1.3 Principal component intuition</strong></h3>
+
+<p><img src="https://assets.datacamp.com/production/repositories/3515/datasets/e27f8bb70e835e93ebd24a18f65d1399b142184f/lower_vs_upper_arm_vectors_small.png" alt="Forearm vs upper arm lengths" /></p>
+
+<p>After standardizing the lower and upper arm lengths from the ANSUR dataset we’ve added two perpendicular vectors that are aligned with the main directions of variance. We can describe each point in the dataset as a combination of these two vectors multiplied with a value each. These values are then called principal components.</p>
+
+<p>People with a negative component for the yellow vector have long forearms relative to their upper arms.</p>
+
+<hr />
+
+<h2 id="42-principal-component-analysis"><strong>4.2 Principal component analysis</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/5-11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/6-11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/7-11.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/8-10.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/9-10.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/10-10.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="421-calculating-principal-components"><strong>4.2.1 Calculating Principal Components</strong></h3>
+
+<p>You’ll visually inspect a 4 feature sample of the ANSUR dataset before and after PCA using Seaborn’s
+ <code class="language-plaintext highlighter-rouge">pairplot()</code>
+ . This will allow you to inspect the pairwise correlations between the features.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Create a pairplot to inspect ansur_df
+</span><span class="n">sns</span><span class="p">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">ansur_df</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/11-9.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+# Create the scaler
+scaler = StandardScaler()
+ansur_std = scaler.fit_transform(ansur_df)
+
+# Create the PCA instance and fit and transform the data with pca
+pca = PCA()
+pc = pca.fit_transform(ansur_std)
+pc_df = pd.DataFrame(pc, columns=['PC 1', 'PC 2', 'PC 3', 'PC 4'])
+
+# Create a pairplot of the principal component dataframe
+sns.pairplot(pc_df)
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/12-10.png?w=1024" alt="Desktop View" /></p>
+
+<p>Notice how, in contrast to the input features, none of the principal components are correlated to one another.</p>
+
+<h3 id="422-pca-on-a-larger-dataset"><strong>4.2.2 PCA on a larger dataset</strong></h3>
+
+<p>You’ll now apply PCA on a somewhat larger ANSUR datasample with 13 dimensions, once again pre-loaded as
+ <code class="language-plaintext highlighter-rouge">ansur_df</code>
+ . The fitted model will be used in the next exercise. Since we are not using the principal components themselves there is no need to transform the data, instead, it is sufficient to fit
+ <code class="language-plaintext highlighter-rouge">pca</code>
+ to the data.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+# Scale the data
+scaler = StandardScaler()
+ansur_std = scaler.fit_transform(ansur_df)
+
+# Apply PCA
+pca = PCA()
+pca.fit(ansur_std)
+
+</code></pre></div></div>
+
+<p>You’ve fitted PCA on our 13 feature datasample. Now let’s see how the components explain the variance.</p>
+
+<h3 id="423-pca-explained-variance"><strong>4.2.3 PCA explained variance</strong></h3>
+
+<p>You’ll be inspecting the variance explained by the different principal components of the
+ <code class="language-plaintext highlighter-rouge">pca</code>
+ instance you created in the previous exercise.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Inspect the explained variance ratio per component
+</span><span class="k">print</span><span class="p">(</span><span class="n">pca</span><span class="p">.</span><span class="n">explained_variance_ratio_</span><span class="p">)</span>
+
+<span class="p">[</span><span class="mf">0.61449404</span> <span class="mf">0.19893965</span> <span class="mf">0.06803095</span> <span class="mf">0.03770499</span> <span class="mf">0.03031502</span> <span class="mf">0.0171759</span>
+ <span class="mf">0.01072762</span> <span class="mf">0.00656681</span> <span class="mf">0.00634743</span> <span class="mf">0.00436015</span> <span class="mf">0.0026586</span>  <span class="mf">0.00202617</span>
+ <span class="mf">0.00065268</span><span class="p">]</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Print the cumulative sum of the explained variance ratio
+</span><span class="k">print</span><span class="p">(</span><span class="n">pca</span><span class="p">.</span><span class="n">explained_variance_ratio_</span><span class="p">.</span><span class="n">cumsum</span><span class="p">())</span>
+
+<span class="p">[</span><span class="mf">0.61449404</span> <span class="mf">0.81343368</span> <span class="mf">0.88146463</span> <span class="mf">0.91916962</span> <span class="mf">0.94948464</span> <span class="mf">0.96666054</span>
+ <span class="mf">0.97738816</span> <span class="mf">0.98395496</span> <span class="mf">0.99030239</span> <span class="mf">0.99466254</span> <span class="mf">0.99732115</span> <span class="mf">0.99934732</span>
+ <span class="mf">1.</span>        <span class="p">]</span>
+
+</code></pre></div></div>
+
+<p>What’s the lowest number of principal components you should keep if you don’t want to lose more than 10% of explained variance during dimensionality reduction?</p>
+
+<p><strong>4 principal components</strong></p>
+
+<p>Using no more than 4 principal components we can explain more than 90% of the variance in the 13 feature dataset.</p>
+
+<hr />
+
+<h2 id="43-pca-applications"><strong>4.3 PCA applications</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/13-9.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/15-7.png?w=677" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/16-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/17-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/18-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/19-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/20-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/21-4.png?w=923" alt="Desktop View" /></p>
+
+<h2 id="431-understanding-the-components"><strong>4.3.1 Understanding the components</strong></h2>
+
+<p>You’ll apply PCA to the numeric features of the Pokemon dataset,
+ <code class="language-plaintext highlighter-rouge">poke_df</code>
+ , using a pipeline to combine the feature scaling and PCA in one go. You’ll then interpret the meanings of the first two components.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build the pipeline
+</span><span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s">'scaler'</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+        		 <span class="p">(</span><span class="s">'reducer'</span><span class="p">,</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">))])</span>
+
+<span class="c1"># Fit it to the dataset and extract the component vectors
+</span><span class="n">pipe</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">poke_df</span><span class="p">)</span>
+<span class="n">vectors</span> <span class="o">=</span> <span class="n">pipe</span><span class="p">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">].</span><span class="n">components_</span><span class="p">.</span><span class="nb">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># Print feature effects
+</span><span class="k">print</span><span class="p">(</span><span class="s">'PC 1 effects = '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">poke_df</span><span class="p">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">vectors</span><span class="p">[</span><span class="mi">0</span><span class="p">]))))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'PC 2 effects = '</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">poke_df</span><span class="p">.</span><span class="n">columns</span><span class="p">,</span> <span class="n">vectors</span><span class="p">[</span><span class="mi">1</span><span class="p">]))))</span>
+
+<span class="n">PC</span> <span class="mi">1</span> <span class="n">effects</span> <span class="o">=</span> <span class="p">{</span><span class="s">'Speed'</span><span class="p">:</span> <span class="mf">0.34</span><span class="p">,</span> <span class="s">'Sp. Def'</span><span class="p">:</span> <span class="mf">0.45</span><span class="p">,</span> <span class="s">'Defense'</span><span class="p">:</span> <span class="mf">0.36</span><span class="p">,</span> <span class="s">'Sp. Atk'</span><span class="p">:</span> <span class="mf">0.46</span><span class="p">,</span> <span class="s">'HP'</span><span class="p">:</span> <span class="mf">0.39</span><span class="p">,</span> <span class="s">'Attack'</span><span class="p">:</span> <span class="mf">0.44</span><span class="p">}</span>
+<span class="n">PC</span> <span class="mi">2</span> <span class="n">effects</span> <span class="o">=</span> <span class="p">{</span><span class="s">'Speed'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.67</span><span class="p">,</span> <span class="s">'Sp. Def'</span><span class="p">:</span> <span class="mf">0.24</span><span class="p">,</span> <span class="s">'Defense'</span><span class="p">:</span> <span class="mf">0.63</span><span class="p">,</span> <span class="s">'Sp. Atk'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.31</span><span class="p">,</span> <span class="s">'HP'</span><span class="p">:</span> <span class="mf">0.08</span><span class="p">,</span> <span class="s">'Attack'</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.01</span><span class="p">}</span>
+
+</code></pre></div></div>
+
+<ul>
+  <li>PC1: All features have a similar positive effect. PC 1 can be interpreted as a measure of overall quality (high stats).</li>
+  <li>PC2: Defense has a strong positive effect on the second component and speed a strong negative one. This component quantifies an agility vs. armor &amp; protection trade-off.</li>
+</ul>
+
+<p>You’ve used the pipeline for the first time and understand how the features relate to the components.</p>
+
+<h3 id="432-pca-for-feature-exploration"><strong>4.3.2 PCA for feature exploration</strong></h3>
+
+<p>You’ll use the PCA pipeline you’ve built in the previous exercise to visually explore how some categorical features relate to the variance in
+ <code class="language-plaintext highlighter-rouge">poke_df</code>
+ . These categorical features (
+ <code class="language-plaintext highlighter-rouge">Type</code>
+ &amp;
+ <code class="language-plaintext highlighter-rouge">Legendary</code>
+ ) can be found in a separate dataframe
+ <code class="language-plaintext highlighter-rouge">poke_cat_df</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+poke_df.head()
+   HP  Attack  Defense  Sp. Atk  Sp. Def  Speed
+0  45      49       49       65       65     45
+1  60      62       63       80       80     60
+2  80      82       83      100      100     80
+3  80     100      123      122      120     80
+4  39      52       43       60       50     65
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+pipe = Pipeline([('scaler', StandardScaler()),
+                 ('reducer', PCA(n_components=2))])
+
+# Fit the pipeline to poke_df and transform the data
+pc = pipe.fit_transform(poke_df)
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+pc
+[[-1.5563747  -0.02148212]
+ [-0.36286656 -0.05026854]
+ [ 1.28015158 -0.06272022]
+ ...
+ [ 2.45821626 -0.51588158]
+ [ 3.5303971  -0.95106516]
+ [ 2.23378629  0.53762985]]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Add the 2 components to poke_cat_df
+</span><span class="n">poke_cat_df</span><span class="p">[</span><span class="s">'PC 1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pc</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="n">poke_cat_df</span><span class="p">[</span><span class="s">'PC 2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">pc</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Use the Type feature to color the PC 1 vs PC 2 scatterplot
+</span><span class="n">sns</span><span class="p">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">poke_cat_df</span><span class="p">,</span>
+                <span class="n">x</span><span class="o">=</span><span class="s">'PC 1'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'PC 2'</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s">'Type'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/22-4.png?w=1024" alt="Desktop View" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Use the Legendary feature to color the PC 1 vs PC 2 scatterplot
+</span><span class="n">sns</span><span class="p">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">poke_cat_df</span><span class="p">,</span>
+                <span class="n">x</span><span class="o">=</span><span class="s">'PC 1'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'PC 2'</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s">'Legendary'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/23-4.png?w=1024" alt="Desktop View" /></p>
+
+<p>Looks like the different types are scattered all over the place while the legendary pokemon always score high for PC 1 meaning they have high stats overall. Their spread along the PC 2 axis tells us they aren’t consistently fast and vulnerable or slow and armored.</p>
+
+<h3 id="433-pca-in-a-model-pipeline"><strong>4.3.3 PCA in a model pipeline</strong></h3>
+
+<p>We just saw that legendary pokemon tend to have higher stats overall. Let’s see if we can add a classifier to our pipeline that detects legendary versus non-legendary pokemon based on the principal components.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Build the pipeline
+</span><span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([</span>
+        <span class="p">(</span><span class="s">'scaler'</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+        <span class="p">(</span><span class="s">'reducer'</span><span class="p">,</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">3</span><span class="p">)),</span>
+        <span class="p">(</span><span class="s">'classifier'</span><span class="p">,</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">))])</span>
+
+<span class="c1"># Fit the pipeline to the training data
+</span><span class="n">pipe</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+
+<span class="c1"># Score the accuracy on the test set
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">pipe</span><span class="p">.</span><span class="n">score</span><span class="p">(</span><span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">)</span>
+
+<span class="c1"># Prints the explained variance ratio and accuracy
+</span><span class="k">print</span><span class="p">(</span><span class="n">pipe</span><span class="p">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">].</span><span class="n">explained_variance_ratio_</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'{0:.1%} test set accuracy'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">accuracy</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+PCA(n_components=2)
+[0.45624044 0.17767414]
+95.8% test set accuracy
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+PCA(n_components=3)
+[0.45624044 0.17767414 0.12858833]
+95.0% test set accuracy
+
+</code></pre></div></div>
+
+<p>Looks like adding the third component does not increase the model accuracy, even though it adds information to the dataset.</p>
+
+<hr />
+
+<h2 id="44-principal-component-selection"><strong>4.4 Principal Component selection</strong></h2>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/24-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/25-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/26-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/27-4.png?w=618" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/28-4.png?w=790" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/29-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/dimensionality-reduction-in-python/30-3.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="441-selecting-the-proportion-of-variance-to-keep"><strong>4.4.1 Selecting the proportion of variance to keep</strong></h3>
+
+<p>You’ll let PCA determine the number of components to calculate based on an explained variance threshold that you decide.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Let PCA select 90% of the variance
+</span><span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s">'scaler'</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+        		 <span class="p">(</span><span class="s">'reducer'</span><span class="p">,</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mf">0.9</span><span class="p">))])</span>
+
+<span class="c1"># Fit the pipe to the data
+</span><span class="n">pipe</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ansur_df</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">'{} components selected'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">pipe</span><span class="p">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">].</span><span class="n">components_</span><span class="p">)))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+PCA(n_components=0.8)
+11 components selected
+
+PCA(n_components=0.9)
+23 components selected
+
+</code></pre></div></div>
+
+<p>We need to more than double the components to go from 80% to 90% explained variance.</p>
+
+<h3 id="442-choosing-the-number-of-components"><strong>4.4.2 Choosing the number of components</strong></h3>
+
+<p>You’ll now make a more informed decision on the number of principal components to reduce your data to using the “elbow in the plot” technique.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Pipeline a scaler and pca selecting 10 components
+</span><span class="n">pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s">'scaler'</span><span class="p">,</span> <span class="n">StandardScaler</span><span class="p">()),</span>
+        		 <span class="p">(</span><span class="s">'reducer'</span><span class="p">,</span> <span class="n">PCA</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">10</span><span class="p">))])</span>
+
+<span class="c1"># Fit the pipe to the data
+</span><span class="n">pipe</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">ansur_df</span><span class="p">)</span>
+
+<span class="c1"># Plot the explained variance ratio
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">pipe</span><span class="p">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">].</span><span class="n">explained_variance_ratio_</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Principal component index'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Explained variance ratio'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/31-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>To how many components can you reduce the dataset without compromising too much on explained variance? Note that the x-axis is zero indexed.</p>
+
+<p>The ‘elbow’ in the plot is at 3 components (the 3rd component has index 2).</p>
+
+<h3 id="443-pca-for-image-compression"><strong>4.4.3 PCA for image compression</strong></h3>
+
+<p>You’ll reduce the size of 16 images with hand written digits (MNIST dataset) using PCA.</p>
+
+<p>The samples are 28 by 28 pixel gray scale images that have been flattened to arrays with 784 elements each (28 x 28 = 784) and added to the 2D numpy array
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ . Each of the 784 pixels has a value between 0 and 255 and can be regarded as a feature.</p>
+
+<p>A pipeline with a scaler and PCA model to select 78 components has been pre-loaded for you as
+ <code class="language-plaintext highlighter-rouge">pipe</code>
+ . This pipeline has already been fitted to the entire MNIST dataset except for the 16 samples in
+ <code class="language-plaintext highlighter-rouge">X_test</code>
+ .</p>
+
+<p>Finally, a function
+ <code class="language-plaintext highlighter-rouge">plot_digits</code>
+ has been created for you that will plot 16 images in a grid.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the MNIST sample data
+</span><span class="n">plot_digits</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/32-1.png?w=998" alt="Desktop View" /></p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+pipe
+Pipeline(memory=None,
+     steps=[('scaler', StandardScaler(copy=True, with_mean=True, with_std=True)), ('reducer', PCA(copy=True, iterated_power='auto', n_components=78, random_state=None,
+  svd_solver='auto', tol=0.0, whiten=False))])
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Transform the input data to principal components
+</span><span class="n">pc</span> <span class="o">=</span> <span class="n">pipe</span><span class="p">.</span><span class="n">transform</span><span class="p">(</span><span class="n">X_test</span><span class="p">)</span>
+
+<span class="c1"># Prints the number of features per dataset
+</span><span class="k">print</span><span class="p">(</span><span class="s">"X_test has {} features"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">X_test</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"pc has {} features"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">pc</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+<span class="c1">#    X_test has 784 features
+#    pc has 78 features
+</span>
+<span class="c1"># Inverse transform the components to original feature space
+</span><span class="n">X_rebuilt</span> <span class="o">=</span> <span class="n">pipe</span><span class="p">.</span><span class="n">inverse_transform</span><span class="p">(</span><span class="n">pc</span><span class="p">)</span>
+
+<span class="c1"># Prints the number of features
+</span><span class="k">print</span><span class="p">(</span><span class="s">"X_rebuilt has {} features"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">X_rebuilt</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+<span class="c1"># X_rebuilt has 784 features
+</span>
+<span class="c1"># Plot the reconstructed data
+</span><span class="n">plot_digits</span><span class="p">(</span><span class="n">X_rebuilt</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/33-1.png?w=983" alt="Desktop View" /></p>
+
+<p>You’ve reduced the size of the data 10 fold but were able to reconstruct images with reasonable quality.</p>
+
+<hr />
+
+<p>###
+<strong>The End</strong></p>
+
+<p><img src="/blog/assets/datacamp/dimensionality-reduction-in-python/34.png?w=942" alt="Desktop View" /></p>
+
+<hr />
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

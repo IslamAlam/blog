@@ -1,0 +1,1445 @@
+<h1 id="network-analysis-in-python-part-1">Network Analysis in Python (Part 1)</h1>
+
+<p>This is the memo of the 26th course of ‘Data Scientist with Python’ track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/network-analysis-in-python-part-1">HERE</a></strong>
+ .</p>
+
+<hr />
+
+<h1 id="1-introduction-to-networks"><strong>1. Introduction to networks</strong></h1>
+<hr />
+
+<h2 id="11-introduction-to-networks"><strong>1.1 Introduction to networks</strong></h2>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture6-6.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Basics of NetworkX API, using Twitter network</strong></p>
+
+<p>To get you up and running with the NetworkX API, we will run through some basic functions that let you query a Twitter network that has been pre-loaded for you and is available in the IPython Shell as
+ <code class="language-plaintext highlighter-rouge">T</code>
+ . The Twitter network comes from
+ <a href="http://konect.uni-koblenz.de/">KONECT</a>
+ , and shows a snapshot of a subset of Twitter users. It is an anonymized Twitter network with metadata.</p>
+
+<p>You’re now going to use the NetworkX API to explore some basic properties of the network, and are encouraged to experiment with the data in the IPython Shell.</p>
+
+<p>Wait for the IPython shell to indicate that the graph that has been preloaded under the variable name
+ <code class="language-plaintext highlighter-rouge">T</code>
+ (representing a
+ <strong>T</strong>
+ witter network), and then answer the following question:</p>
+
+<p>What is the size of the graph
+ <code class="language-plaintext highlighter-rouge">T</code>
+ , the type of
+ <code class="language-plaintext highlighter-rouge">T.nodes()</code>
+ , and the data structure of the third element of the last edge listed in
+ <code class="language-plaintext highlighter-rouge">T.edges(data=True)</code>
+ ?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+T
+&lt;networkx.classes.digraph.DiGraph at 0x7f0c553c89b0&gt;
+
+
+T.nodes()
+NodeView((1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24,
+...
+23365, 23366, 23367, 23368, 23369, 23370))
+
+
+T.nodes(data=True)
+NodeDataView({1: {'category': 'I', 'occupation': 'politician'}, 3: {'category': 'D', 'occupation': 'celebrity'}, 4: {'category': 'I', 'occupation': 'politician'}, 5: {'category': 'I', 'occupation': 'scientist'},
+
+...
+
+
+
+T.edges(data=True)
+OutEdgeDataView([(1, 3, {'date': datetime.date(2012, 11, 16)}), (1, 4, {'date': datetime.date(2013, 6, 7)}), (1, 5, {'date': datetime.date(2009, 7, 27)}),
+...
+(23324, 23335, {'date': datetime.date(2012, 2, 1)}), (23324, 23336, {'date': datetime.date(2010, 9, 20)})])
+
+
+len(T)
+23369
+
+type(T.nodes())
+networkx.classes.reportviews.NodeView
+
+list(T.edges(data=True))[3]
+(1, 6, {'date': datetime.date(2014, 12, 18)})
+
+</code></pre></div></div>
+
+<p>####
+<strong>Basic drawing of a network using NetworkX</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import necessary modules
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="n">nx</span>
+
+<span class="c1"># Draw the graph to screen
+</span><span class="n">nx</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">T_sub</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="n">T_sub</span>
+<span class="c1"># &lt;networkx.classes.digraph.DiGraph at 0x7f0c4988bd68&gt;
+</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture7-4.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Queries on a graph</strong></p>
+
+<p>Now that you know some basic properties of the graph and have practiced using NetworkX’s drawing facilities to visualize components of it, it’s time to explore how you can query it for nodes and edges. Specifically, you’re going to look for “nodes of interest” and “edges of interest”.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Use a list comprehension to get the nodes of interest: noi
+</span><span class="n">noi</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">T</span><span class="p">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s">'occupation'</span><span class="p">]</span> <span class="o">==</span> <span class="s">'scientist'</span><span class="p">]</span>
+
+<span class="c1"># Use a list comprehension to get the edges of interest: eoi
+</span><span class="n">eoi</span> <span class="o">=</span> <span class="p">[(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">T</span><span class="p">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s">'date'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">date</span><span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+noi[:3]
+[5, 9, 13]
+
+eoi[:3]
+[(1, 5), (1, 9), (1, 13)]
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="12-types-of-graphs"><strong>1.2 Types of graphs</strong></h2>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture8-3.png?w=822" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture9-2.png?w=824" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture10-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture11-3.png?w=784" alt="Desktop View" /></p>
+
+<p>####
+<strong>Checking the un/directed status of a graph</strong></p>
+
+<p>Which type of graph do you think the Twitter network data you have been working with corresponds to?</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+type(T)
+networkx.classes.digraph.DiGraph
+
+</code></pre></div></div>
+
+<p>####
+<strong>Specifying a weight on edges</strong></p>
+
+<p>Weights can be added to edges in a graph, typically indicating the “strength” of an edge. In NetworkX, the weight is indicated by the
+ <code class="language-plaintext highlighter-rouge">'weight'</code>
+ key in the metadata dictionary.</p>
+
+<p>Before attempting the exercise, use the IPython Shell to access the dictionary metadata of
+ <code class="language-plaintext highlighter-rouge">T</code>
+ and explore it, for instance by running the commands
+ <code class="language-plaintext highlighter-rouge">T.edges[1, 10]</code>
+ and then
+ <code class="language-plaintext highlighter-rouge">T.edges[10, 1]</code>
+ . Note how there’s only one field, and now you’re going to add another field, called
+ <code class="language-plaintext highlighter-rouge">'weight'</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+T.edges[1, 10]
+# {'date': datetime.date(2012, 9, 8)}
+
+T.edges[10, 1]
+Traceback (most recent call last):
+  File "&lt;stdin&gt;", line 1, in &lt;module&gt;
+    T.edges[10, 1]
+  File "&lt;stdin&gt;", line 927, in __getitem__
+    return self._adjdict[u][v]
+KeyError: 1
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Set the weight of the edge
+</span><span class="n">T</span><span class="p">.</span><span class="n">edges</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">][</span><span class="s">'weight'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+
+<span class="c1"># Iterate over all the edges (with metadata)
+</span><span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">T</span><span class="p">.</span><span class="n">edges</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+
+    <span class="c1"># Check if node 293 is involved
+</span>    <span class="k">if</span> <span class="mi">293</span> <span class="ow">in</span> <span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]:</span>
+
+        <span class="c1"># Set the weight to 1.1
+</span>        <span class="n">T</span><span class="p">.</span><span class="n">edges</span><span class="p">[</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">][</span><span class="s">'weight'</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.1</span>
+
+<span class="n">T</span><span class="p">.</span><span class="n">edges</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">]</span>
+<span class="c1"># {'date': datetime.date(2012, 9, 8), 'weight': 2}
+</span>
+</code></pre></div></div>
+
+<p>####
+<strong>Checking whether there are self-loops in the graph</strong></p>
+
+<p>NetworkX also allows edges that begin and end on the same node; while this would be non-intuitive for a social network graph, it is useful to model data such as trip networks, in which individuals begin at one location and end in another.</p>
+
+<p>In this exercise as well as later ones, you’ll find the
+ <code class="language-plaintext highlighter-rouge">assert</code>
+ statement useful. An
+ <code class="language-plaintext highlighter-rouge">assert</code>
+ -ions checks whether the statement placed after it evaluates to True, otherwise it will throw an
+ <code class="language-plaintext highlighter-rouge">AssertionError</code>
+ .</p>
+
+<p>To begin, use the
+ <code class="language-plaintext highlighter-rouge">.number_of_selfloops()</code>
+ method on
+ <code class="language-plaintext highlighter-rouge">T</code>
+ in the IPython Shell to get the number of edges that begin and end on the same node. A number of self-loops have been synthetically added to the graph. Your job in this exercise is to write a function that returns these edges.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+T.number_of_selfloops()
+42
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define find_selfloop_nodes()
+</span><span class="k">def</span> <span class="nf">find_selfloop_nodes</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+    <span class="s">"""
+    Finds all nodes that have self-loops in the graph G.
+    """</span>
+    <span class="n">nodes_in_selfloops</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Iterate over all the edges of G
+</span>    <span class="k">for</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">G</span><span class="p">.</span><span class="n">edges</span><span class="p">():</span>
+
+    <span class="c1"># Check if node u and node v are the same
+</span>        <span class="k">if</span> <span class="n">u</span> <span class="o">==</span> <span class="n">v</span><span class="p">:</span>
+
+            <span class="c1"># Append node u to nodes_in_selfloops
+</span>            <span class="n">nodes_in_selfloops</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">u</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">nodes_in_selfloops</span>
+
+<span class="c1"># Check whether number of self loops equals the number of nodes in self loops
+</span><span class="k">assert</span> <span class="n">T</span><span class="p">.</span><span class="n">number_of_selfloops</span><span class="p">()</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">find_selfloop_nodes</span><span class="p">(</span><span class="n">T</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="13-network-visualization"><strong>1.3 Network visualization</strong></h2>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture12-3.png?w=749" alt="Desktop View" /></p>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture13-3.png?w=852" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture14-3.png?w=861" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture15-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture16-3.png?w=968" alt="Desktop View" /></p>
+
+<p>####
+<strong>Visualizing using Matrix plots</strong></p>
+
+<p>It is time to try your first “fancy” graph visualization method: a matrix plot. To do this,
+ <code class="language-plaintext highlighter-rouge">nxviz</code>
+ provides a
+ <code class="language-plaintext highlighter-rouge">MatrixPlot</code>
+ object.</p>
+
+<p><code class="language-plaintext highlighter-rouge">nxviz</code>
+ is a package for visualizing graphs in a rational fashion. Under the hood, the
+ <code class="language-plaintext highlighter-rouge">MatrixPlot</code>
+ utilizes
+ <code class="language-plaintext highlighter-rouge">nx.to_numpy_matrix(G)</code>
+ , which returns the matrix form of the graph. Here, each node is one column and one row, and an edge between the two nodes is indicated by the value 1. In doing so, however, only the
+ <code class="language-plaintext highlighter-rouge">weight</code>
+ metadata is preserved; all other metadata is lost, as you’ll verify using an
+ <code class="language-plaintext highlighter-rouge">assert</code>
+ statement.</p>
+
+<p>A corresponding
+ <code class="language-plaintext highlighter-rouge">nx.from_numpy_matrix(A)</code>
+ allows one to quickly create a graph from a NumPy matrix. The default graph type is
+ <code class="language-plaintext highlighter-rouge">Graph()</code>
+ ; if you want to make it a
+ <code class="language-plaintext highlighter-rouge">DiGraph()</code>
+ , that has to be specified using the
+ <code class="language-plaintext highlighter-rouge">create_using</code>
+ keyword argument, e.g. (
+ <code class="language-plaintext highlighter-rouge">nx.from_numpy_matrix(A, create_using=nx.DiGraph)</code>
+ ).</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+import matplotlib.pyplot as plt
+import networkx as nx
+# Import nxviz
+import nxviz as nv
+
+# Create the MatrixPlot object: m
+m = nv.MatrixPlot(T)
+
+# Draw m to the screen
+m.draw()
+
+# Display the plot
+plt.show()
+
+# Convert T to a matrix format: A
+A = nx.to_numpy_matrix(T)
+
+# Convert A back to the NetworkX form as a directed graph: T_conv
+T_conv = nx.from_numpy_matrix(A, create_using=nx.DiGraph())
+
+# Check that the `category` metadata field is lost from each node
+for n, d in T_conv.nodes(data=True):
+    assert 'category' not in d.keys()
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+m
+&lt;nxviz.plots.MatrixPlot at 0x7fdc9e02cf28&gt;
+
+A
+matrix([[ 0.,  0.,  0., ...,  0.,  0.,  0.],
+        [ 0.,  0.,  0., ...,  0.,  0.,  0.],
+        [ 0.,  0.,  0., ...,  0.,  0.,  0.],
+        ...,
+        [ 0.,  0.,  0., ...,  0.,  0.,  0.],
+        [ 0.,  0.,  0., ...,  0.,  0.,  0.],
+        [ 0.,  0.,  0., ...,  0.,  0.,  0.]])
+
+T_conv
+&lt;networkx.classes.digraph.DiGraph at 0x7fdc9cdfc438&gt;
+
+T_conv.nodes(data=True)
+NodeDataView({0: {}, 1: {}, 2: {}, 3: {}, 4: {}, 5: {}, 6: {}, 7: {}, 8: {}, 9: {}, 10: {}, 11: {},
+...
+
+T_conv.edges(data=True)
+OutEdgeDataView([(4, 73, {'weight': 1.0}), (5, 125, {'weight': 1.0}), (6, 7, {'weight': 1.0}),
+...
+
+
+T.nodes(data=True)
+NodeDataView({27: {'category': 'D', 'occupation': 'scientist'}, 35: {'category': 'P', 'occupation': 'scientist'},
+...
+
+T.edges(data=True)
+OutEdgeDataView([(151, 5071, {'date': datetime.date(2011, 2, 21)}), (180, 12678, {'date': datetime.date(2013, 6, 7)}),
+...
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture17-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Visualizing using Circos plots</strong></p>
+
+<p>Circos plots are a rational, non-cluttered way of visualizing graph data, in which nodes are ordered around the circumference in some fashion, and the edges are drawn within the circle that results, giving a beautiful as well as informative visualization about the structure of the network.</p>
+
+<p>In this exercise, you’ll continue getting practice with the nxviz API, this time with the
+ <code class="language-plaintext highlighter-rouge">CircosPlot</code>
+ object.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import necessary modules
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">nxviz</span> <span class="kn">import</span> <span class="n">CircosPlot</span>
+
+<span class="c1"># Create the CircosPlot object: c
+</span><span class="n">c</span> <span class="o">=</span> <span class="n">CircosPlot</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+
+<span class="c1"># Draw c to the screen
+</span><span class="n">c</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span>
+
+<span class="c1"># Display the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture18-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Visualizing using Arc plots</strong></p>
+
+<p>Following on what you’ve learned about the nxviz API, now try making an ArcPlot of the network. Two keyword arguments that you will try here are
+ <code class="language-plaintext highlighter-rouge">node_order='keyX'</code>
+ and
+ <code class="language-plaintext highlighter-rouge">node_color='keyX'</code>
+ , in which you specify a key in the node metadata dictionary to color and order the nodes by.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import necessary modules
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">nxviz</span> <span class="kn">import</span> <span class="n">ArcPlot</span>
+
+<span class="c1"># Create the un-customized ArcPlot object: a
+</span><span class="n">a</span> <span class="o">=</span> <span class="n">ArcPlot</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+
+<span class="c1"># Draw a to the screen
+</span><span class="n">a</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span>
+
+<span class="c1"># Display the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Create the customized ArcPlot object: a2
+</span><span class="n">a2</span> <span class="o">=</span> <span class="n">ArcPlot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">node_order</span><span class="o">=</span><span class="s">'category'</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s">'category'</span><span class="p">)</span>
+
+<span class="c1"># Draw a2 to the screen
+</span><span class="n">a2</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span>
+
+<span class="c1"># Display the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture19-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture20-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>Notice the node coloring in the customized ArcPlot compared to the uncustomized version. In the customized ArcPlot, the nodes in each of the categories –
+ <code class="language-plaintext highlighter-rouge">'I'</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">'D'</code>
+ , and
+ <code class="language-plaintext highlighter-rouge">'P'</code>
+ – have their own color.</p>
+
+<hr />
+
+<h1 id="2-important-nodes"><strong>2. Important nodes</strong></h1>
+<hr />
+
+<h2 id="21-degree-centrality"><strong>2.1 Degree centrality</strong></h2>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture21-1.png?w=622" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture22-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture24-1.png?w=959" alt="Desktop View" /></p>
+
+<p>####
+<strong>Compute number of neighbors for each node</strong></p>
+
+<p>How do you evaluate whether a node is an important one or not? There are a few ways to do so, and here, you’re going to look at one metric: the number of neighbors that a node has.</p>
+
+<p>Your job in this exercise is to write a function that returns all nodes that have
+ <code class="language-plaintext highlighter-rouge">m</code>
+ neighbors.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+T.neighbors(19)
+&lt;dict_keyiterator at 0x7f301617f458&gt;
+
+list(T.neighbors(19))
+[5,
+ 8,
+ 12035,
+
+...
+
+ 37,
+ 5485,
+ 48]
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define nodes_with_m_nbrs()
+</span><span class="k">def</span> <span class="nf">nodes_with_m_nbrs</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
+    <span class="s">"""
+    Returns all nodes in graph G that have m neighbors.
+    """</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="c1"># Iterate over all nodes in G
+</span>    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">G</span><span class="p">.</span><span class="n">nodes</span><span class="p">():</span>
+
+        <span class="c1"># Check if the number of neighbors of n matches m
+</span>        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">G</span><span class="p">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span> <span class="o">==</span> <span class="n">m</span><span class="p">:</span>
+
+            <span class="c1"># Add the node n to the set
+</span>            <span class="n">nodes</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="c1"># Return the nodes with m neighbors
+</span>    <span class="k">return</span> <span class="n">nodes</span>
+
+
+<span class="c1"># Compute and print all nodes in T that have 6 neighbors
+</span><span class="n">six_nbrs</span> <span class="o">=</span> <span class="n">nodes_with_m_nbrs</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">six_nbrs</span><span class="p">)</span>
+
+<span class="p">{</span><span class="mi">22533</span><span class="p">,</span> <span class="mi">1803</span><span class="p">,</span> <span class="mi">11276</span><span class="p">,</span> <span class="mi">11279</span><span class="p">,</span> <span class="mi">6161</span><span class="p">,</span> <span class="mi">4261</span><span class="p">,</span> <span class="mi">10149</span><span class="p">,</span> <span class="mi">3880</span><span class="p">,</span> <span class="mi">16681</span><span class="p">,</span> <span class="mi">5420</span><span class="p">,</span> <span class="mi">14898</span><span class="p">,</span> <span class="mi">64</span><span class="p">,</span> <span class="mi">14539</span><span class="p">,</span> <span class="mi">6862</span><span class="p">,</span> <span class="mi">20430</span><span class="p">,</span> <span class="mi">9689</span><span class="p">,</span> <span class="mi">475</span><span class="p">,</span> <span class="mi">1374</span><span class="p">,</span> <span class="mi">6112</span><span class="p">,</span> <span class="mi">9186</span><span class="p">,</span> <span class="mi">17762</span><span class="p">,</span> <span class="mi">14956</span><span class="p">,</span> <span class="mi">2927</span><span class="p">,</span> <span class="mi">11764</span><span class="p">,</span> <span class="mi">4725</span><span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>Great work! The number of neighbors a node has is one way to identify important nodes. It looks like 25 nodes in graph
+ <code class="language-plaintext highlighter-rouge">T</code>
+ have 6 neighbors.</p>
+
+<p>####
+<strong>Compute degree distribution</strong></p>
+
+<p>The number of neighbors that a node has is called its “degree”, and it’s possible to compute the degree distribution across the entire graph. In this exercise, your job is to compute the degree distribution across
+ <code class="language-plaintext highlighter-rouge">T</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the degree of every node: degrees
+</span><span class="n">degrees</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">T</span><span class="p">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">n</span><span class="p">)))</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">T</span><span class="p">.</span><span class="n">nodes</span><span class="p">()]</span>
+
+<span class="c1"># Print the degrees
+</span><span class="k">print</span><span class="p">(</span><span class="n">degrees</span><span class="p">)</span>
+
+<span class="p">[</span><span class="mi">47</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">56</span><span class="p">,</span> <span class="mi">53</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+<span class="p">...</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Degree centrality distribution</strong></p>
+
+<p>The degree of a node is the number of neighbors that it has. The degree centrality is the number of neighbors divided by all possible neighbors that it could have. Depending on whether self-loops are allowed, the set of possible neighbors a node could have could also include the node itself.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import matplotlib.pyplot
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Compute the degree centrality of the Twitter network: deg_cent
+</span><span class="n">deg_cent</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="n">degree_centrality</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+
+<span class="c1"># Plot a histogram of the degree centrality distribution of the graph.
+</span><span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">deg_cent</span><span class="p">.</span><span class="n">values</span><span class="p">()))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'centrality'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'count'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Plot a histogram of the degree distribution of the graph
+</span><span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">degrees</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'neighbors'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'count'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Plot a scatter plot of the centrality distribution and the degree distribution
+</span><span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">degrees</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">deg_cent</span><span class="p">.</span><span class="n">values</span><span class="p">()))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'degrees'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'centrality'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture1-5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture2-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture3-7.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="22-graph-algorithms"><strong>2.2 Graph algorithms</strong></h2>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture4-7.png?w=1019" alt="Desktop View" /></p>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture5-7.png?w=993" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture6-7.png?w=813" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture7-5.png?w=798" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture8-4.png?w=794" alt="Desktop View" /></p>
+
+<p>####
+<strong>Shortest Path I</strong></p>
+
+<p>You can leverage what you know about finding neighbors to try finding paths in a network. One algorithm for path-finding between two nodes is the “breadth-first search” (BFS) algorithm. In a BFS algorithm, you start from a particular node and iteratively search through its neighbors and neighbors’ neighbors until you find the destination node.</p>
+
+<p>Pathfinding algorithms are important because they provide another way of assessing node importance; you’ll see this in a later exercise.</p>
+
+<p>In this set of 3 exercises, you’re going to build up slowly to get to the final BFS algorithm. The problem has been broken into 3 parts that, if you complete in succession, will get you to a first pass implementation of the BFS algorithm.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define path_exists()
+</span><span class="k">def</span> <span class="nf">path_exists</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">node1</span><span class="p">,</span> <span class="n">node2</span><span class="p">):</span>
+    <span class="s">"""
+    This function checks whether a path exists between two nodes (node1, node2) in graph G.
+    """</span>
+    <span class="n">visited_nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="c1"># Initialize the queue of nodes to visit with the first node: queue
+</span>    <span class="n">queue</span> <span class="o">=</span> <span class="p">[</span><span class="n">node1</span><span class="p">]</span>
+
+    <span class="c1"># Iterate over the nodes in the queue
+</span>    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">queue</span><span class="p">:</span>
+
+        <span class="c1"># Get neighbors of the node
+</span>        <span class="n">neighbors</span> <span class="o">=</span> <span class="n">G</span><span class="p">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+
+        <span class="c1"># Check to see if the destination node is in the set of neighbors
+</span>        <span class="k">if</span> <span class="n">node2</span> <span class="ow">in</span> <span class="n">neighbors</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'Path exists between nodes {0} and {1}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">node1</span><span class="p">,</span> <span class="n">node2</span><span class="p">))</span>
+            <span class="k">return</span> <span class="bp">True</span>
+            <span class="k">break</span>
+
+
+</code></pre></div></div>
+
+<p>####
+<strong>Shortest Path II</strong></p>
+
+<p>Now that you’ve got the code for checking whether the destination node is present in neighbors, next up, you’re going to extend the same function to write the code for the condition where the destination node is
+ <strong>not</strong>
+ present in the neighbors.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def path_exists(G, node1, node2):
+    """
+    This function checks whether a path exists between two nodes (node1, node2) in graph G.
+    """
+    visited_nodes = set()
+    queue = [node1]
+
+    for node in queue:
+        neighbors = G.neighbors(node)
+        if node2 in neighbors:
+            print('Path exists between nodes {0} and {1}'.format(node1, node2))
+            return True
+
+        else:
+            # Add current node to visited nodes
+            visited_nodes.add(node)
+
+            # Add neighbors of current node that have not yet been visited
+            queue.extend([n for n in neighbors if n not in visited_nodes])
+
+</code></pre></div></div>
+
+<p>####
+<strong>Shortest Path III</strong></p>
+
+<p>This is the final exercise of this trio! You’re now going to complete the problem by writing the code that returns
+ <code class="language-plaintext highlighter-rouge">False</code>
+ if there’s no path between two nodes.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def path_exists(G, node1, node2):
+    """
+    This function checks whether a path exists between two nodes (node1, node2) in graph G.
+    """
+    visited_nodes = set()
+    queue = [node1]
+
+    for node in queue:
+        neighbors = G.neighbors(node)
+        if node2 in neighbors:
+            print('Path exists between nodes {0} and {1}'.format(node1, node2))
+            return True
+            break
+
+        else:
+            visited_nodes.add(node)
+            queue.extend([n for n in neighbors if n not in visited_nodes])
+
+        # Check to see if the final element of the queue has been reached
+        if node == queue[-1]:
+            print('Path does not exist between nodes {0} and {1}'.format(node1, node2))
+
+            # Place the appropriate return statement
+            return False
+
+</code></pre></div></div>
+
+<p>You’ve just written an implementation of the BFS algorithm!</p>
+
+<hr />
+
+<h2 id="23-betweenness-centrality"><strong>2.3 Betweenness centrality</strong></h2>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture9-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture10-5.png?w=878" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture11-4.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>NetworkX betweenness centrality on a social network</strong></p>
+
+<p>Betweenness centrality is a node importance metric that uses information about the shortest paths in a network. It is defined as the fraction of all possible shortest paths between any pair of nodes that pass through the node.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the betweenness centrality of T: bet_cen
+</span><span class="n">bet_cen</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="n">betweenness_centrality</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+
+<span class="c1"># Compute the degree centrality of T: deg_cen
+</span><span class="n">deg_cen</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="n">degree_centrality</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+
+<span class="c1"># Create a scatter plot of betweenness centrality and degree centrality
+</span><span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">bet_cen</span><span class="p">.</span><span class="n">values</span><span class="p">()),</span> <span class="nb">list</span><span class="p">(</span><span class="n">deg_cen</span><span class="p">.</span><span class="n">values</span><span class="p">()))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'betweenness_centrality'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'degree_centrality'</span><span class="p">)</span>
+
+<span class="c1"># Display the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture12-4.png?w=1024" alt="Desktop View" /></p>
+
+<p>Now that you know how to compute different metrics for node importance, you’re going to take a deep dive into the Twitter network.</p>
+
+<p>####
+<strong>Deep dive – Twitter network</strong></p>
+
+<p>You’re going to now take a deep dive into a Twitter network, which will help reinforce what you’ve learned earlier.</p>
+
+<p>First, you’re going to find the nodes that can broadcast messages very efficiently to lots of people one degree of separation away.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define find_nodes_with_highest_deg_cent()
+</span><span class="k">def</span> <span class="nf">find_nodes_with_highest_deg_cent</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+
+    <span class="c1"># Compute the degree centrality of G: deg_cent
+</span>    <span class="n">deg_cent</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="n">degree_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+    <span class="c1"># Compute the maximum degree centrality: max_dc
+</span>    <span class="n">max_dc</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">deg_cent</span><span class="p">.</span><span class="n">values</span><span class="p">()))</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="c1"># Iterate over the degree centrality dictionary
+</span>    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">deg_cent</span><span class="p">.</span><span class="n">items</span><span class="p">():</span>
+
+        <span class="c1"># Check if the current value has the maximum degree centrality
+</span>        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">max_dc</span><span class="p">:</span>
+
+            <span class="c1"># Add the current node to the set of nodes
+</span>            <span class="n">nodes</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">nodes</span>
+
+<span class="c1"># Find the node(s) that has the highest degree centrality in T: top_dc
+</span><span class="n">top_dc</span> <span class="o">=</span> <span class="n">find_nodes_with_highest_deg_cent</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">top_dc</span><span class="p">)</span>
+<span class="c1"># {11824}
+</span>
+<span class="c1"># Write the assertion statement
+</span><span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">top_dc</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">nx</span><span class="p">.</span><span class="n">degree_centrality</span><span class="p">(</span><span class="n">T</span><span class="p">)[</span><span class="n">node</span><span class="p">]</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">nx</span><span class="p">.</span><span class="n">degree_centrality</span><span class="p">(</span><span class="n">T</span><span class="p">).</span><span class="n">values</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<p>It looks like node 11824 has the highest degree centrality.</p>
+
+<p>####
+<strong>Deep dive – Twitter network part II</strong></p>
+
+<p>Next, you’re going to do an analogous deep dive on betweenness centrality!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define find_node_with_highest_bet_cent()
+</span><span class="k">def</span> <span class="nf">find_node_with_highest_bet_cent</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+
+    <span class="c1"># Compute betweenness centrality: bet_cent
+</span>    <span class="n">bet_cent</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="n">betweenness_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+    <span class="c1"># Compute maximum betweenness centrality: max_bc
+</span>    <span class="n">max_bc</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">bet_cent</span><span class="p">.</span><span class="n">values</span><span class="p">()))</span>
+
+    <span class="n">nodes</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+
+    <span class="c1"># Iterate over the betweenness centrality dictionary
+</span>    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">bet_cent</span><span class="p">.</span><span class="n">items</span><span class="p">():</span>
+
+        <span class="c1"># Check if the current value has the maximum betweenness centrality
+</span>        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">max_bc</span><span class="p">:</span>
+
+            <span class="c1"># Add the current node to the set of nodes
+</span>            <span class="n">nodes</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">nodes</span>
+
+<span class="c1"># Use that function to find the node(s) that has the highest betweenness centrality in the network: top_bc
+</span><span class="n">top_bc</span> <span class="o">=</span> <span class="n">find_node_with_highest_bet_cent</span><span class="p">(</span><span class="n">T</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">top_bc</span><span class="p">)</span>
+<span class="c1"># {1}
+</span>
+<span class="c1"># Write an assertion statement that checks that the node(s) is/are correctly identified.
+</span><span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">top_bc</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">nx</span><span class="p">.</span><span class="n">betweenness_centrality</span><span class="p">(</span><span class="n">T</span><span class="p">)[</span><span class="n">node</span><span class="p">]</span> <span class="o">==</span> <span class="nb">max</span><span class="p">(</span><span class="n">nx</span><span class="p">.</span><span class="n">betweenness_centrality</span><span class="p">(</span><span class="n">T</span><span class="p">).</span><span class="n">values</span><span class="p">())</span>
+
+</code></pre></div></div>
+
+<p>You have correctly identified that node 1 has the highest betweenness centrality!</p>
+
+<hr />
+
+<h1 id="3-structures"><strong>3. Structures</strong></h1>
+<hr />
+
+<h2 id="31-cliques--communities"><strong>3.1 Cliques &amp; communities</strong></h2>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture13-4.png?w=922" alt="Desktop View" /></p>
+
+<p>####
+<strong>Identifying triangle relationships</strong></p>
+
+<p>Now that you’ve learned about cliques, it’s time to try leveraging what you know to find structures in a network. Triangles are what you’ll go for first. We may be interested in triangles because they’re the simplest complex clique. Let’s write a few functions; these exercises will bring you through the fundamental logic behind network algorithms.</p>
+
+<p>In the Twitter network, each node has an
+ <code class="language-plaintext highlighter-rouge">'occupation'</code>
+ label associated with it, in which the Twitter user’s work occupation is divided into
+ <code class="language-plaintext highlighter-rouge">celebrity</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">politician</code>
+ and
+ <code class="language-plaintext highlighter-rouge">scientist</code>
+ . One potential application of triangle-finding algorithms is to find out whether users that have similar occupations are more likely to be in a clique with one another.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># check if node 3 is connect with node 4
+</span><span class="n">T</span><span class="p">.</span><span class="n">has_edge</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+<span class="bp">False</span>
+
+<span class="n">T</span><span class="p">.</span><span class="n">has_edge</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="bp">True</span>
+
+<span class="c1"># create a iterator contains all combinations of 2 neighbors of node 1.
+</span><span class="n">combinations</span><span class="p">(</span><span class="n">T</span><span class="p">.</span><span class="n">neighbors</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="n">itertools</span><span class="p">.</span><span class="n">combinations</span> <span class="n">at</span> <span class="mh">0x7f8450bebe58</span><span class="o">&gt;</span>
+
+<span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="n">T</span><span class="p">.</span><span class="n">neighbors</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="mi">2</span><span class="p">)]</span>
+<span class="p">[(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+ <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
+<span class="p">...</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from itertools import combinations
+
+# Define is_in_triangle()
+def is_in_triangle(G, n):
+    """
+    Checks whether a node `n` in graph `G` is in a triangle relationship or not.
+
+    Returns a boolean.
+    """
+    in_triangle = False
+
+    # Iterate over all possible triangle relationship combinations
+    for n1, n2 in combinations(G.neighbors(n), 2):
+
+        # Check if an edge exists between n1 and n2
+        if G.has_edge(n1, n2):
+            in_triangle = True
+            break
+    return in_triangle
+
+</code></pre></div></div>
+
+<p>####
+<strong>Finding nodes involved in triangles</strong></p>
+
+<p>NetworkX provides an API for counting the number of triangles that every node is involved in:
+ <code class="language-plaintext highlighter-rouge">nx.triangles(G)</code>
+ . It returns a dictionary of nodes as the keys and number of triangles as the values.</p>
+
+<p>Your job in this exercise is to modify the function defined earlier to extract all of the nodes involved in a triangle relationship with a given node.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from itertools import combinations
+
+# Write a function that identifies all nodes in a triangle relationship with a given node.
+def nodes_in_triangle(G, n):
+    """
+    Returns the nodes in a graph `G` that are involved in a triangle relationship with the node `n`.
+    """
+    triangle_nodes = set([n])
+
+    # Iterate over all possible triangle relationship combinations
+    for n1, n2 in combinations(G.neighbors(n), 2):
+
+        # Check if n1 and n2 have an edge between them
+        if G.has_edge(n1, n2):
+
+            # Add n1 to triangle_nodes
+            triangle_nodes.add(n1)
+
+            # Add n2 to triangle_nodes
+            triangle_nodes.add(n2)
+
+    return triangle_nodes
+
+# Write the assertion statement
+assert len(nodes_in_triangle(T, 1)) == 35
+
+</code></pre></div></div>
+
+<p>Your function correctly identified that node 1 is in a triangle relationship with 35 other nodes.</p>
+
+<p>####
+<strong>Finding open triangles</strong></p>
+
+<p>Let us now move on to finding open triangles! Recall that they form the basis of friend recommendation systems; if “A” knows “B” and “A” knows “C”, then it’s probable that “B” also knows “C”.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+from itertools import combinations
+
+# Define node_in_open_triangle()
+def node_in_open_triangle(G, n):
+    """
+    Checks whether pairs of neighbors of node `n` in graph `G` are in an 'open triangle' relationship with node `n`.
+    """
+    in_open_triangle = False
+
+    # Iterate over all possible triangle relationship combinations
+    for n1, n2 in combinations(G.neighbors(n), 2):
+
+        # Check if n1 and n2 do NOT have an edge between them
+        if not G.has_edge(n1, n2):
+
+            in_open_triangle = True
+
+            break
+
+    return in_open_triangle
+
+# Compute the number of open triangles in T
+num_open_triangles = 0
+
+# Iterate over all the nodes in T
+for n in T.nodes():
+
+    # Check if the current node is in an open triangle
+    if node_in_open_triangle(T, n):
+
+        # Increment num_open_triangles
+        num_open_triangles += 1
+
+print(num_open_triangles)
+
+# 22
+
+</code></pre></div></div>
+
+<p>It looks like 22 nodes in graph
+ <code class="language-plaintext highlighter-rouge">T</code>
+ are in open triangles!</p>
+
+<hr />
+
+<h2 id="32-maximal-cliques"><strong>3.2 Maximal cliques</strong></h2>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture15-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture16-4.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Finding all maximal cliques of size “n”</strong></p>
+
+<p>Now that you’ve explored triangles (and open triangles), let’s move on to the concept of maximal cliques. Maximal cliques are cliques that cannot be extended by adding an adjacent edge, and are a useful property of the graph when finding communities. NetworkX provides a function that allows you to identify the nodes involved in each maximal clique in a graph:
+ <code class="language-plaintext highlighter-rouge">nx.find_cliques(G)</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Define maximal_cliques()
+</span><span class="k">def</span> <span class="nf">maximal_cliques</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="s">"""
+    Finds all maximal cliques in graph `G` that are of size `size`.
+    """</span>
+    <span class="n">mcs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">clique</span> <span class="ow">in</span> <span class="n">nx</span><span class="p">.</span><span class="n">find_cliques</span><span class="p">(</span><span class="n">G</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">clique</span><span class="p">)</span> <span class="o">==</span> <span class="n">size</span><span class="p">:</span>
+            <span class="n">mcs</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">clique</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">mcs</span>
+
+<span class="c1"># Check that there are 33 maximal cliques of size 3 in the graph T
+</span><span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">maximal_cliques</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span> <span class="o">==</span> <span class="mi">33</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+nx.find_cliques(T)
+&lt;generator object find_cliques at 0x7f3fb875f938&gt;
+
+maximal_cliques(T, 3)
+[[1, 13, 19],
+ [1, 16, 48],
+ [1, 19, 8],
+...
+
+</code></pre></div></div>
+
+<hr />
+
+<h2 id="33-subgraphs"><strong>3.3 Subgraphs</strong></h2>
+
+<p>####
+<strong>Subgraphs I</strong></p>
+
+<p>There may be times when you just want to analyze a subset of nodes in a network. To do so, you can copy them out into another graph object using
+ <code class="language-plaintext highlighter-rouge">G.subgraph(nodes)</code>
+ , which returns a new
+ <code class="language-plaintext highlighter-rouge">graph</code>
+ object (of the same type as the original graph) that is comprised of the iterable of
+ <code class="language-plaintext highlighter-rouge">nodes</code>
+ that was passed in.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+nodes_of_interest = [29, 38, 42]
+
+# Define get_nodes_and_nbrs()
+def get_nodes_and_nbrs(G, nodes_of_interest):
+    """
+    Returns a subgraph of the graph `G` with only the `nodes_of_interest` and their neighbors.
+    """
+    nodes_to_draw = []
+
+    # Iterate over the nodes of interest
+    for n in nodes_of_interest:
+
+        # Append the nodes of interest to nodes_to_draw
+        nodes_to_draw.append(n)
+
+        # Iterate over all the neighbors of node n
+        for nbr in G.neighbors(n):
+
+            # Append the neighbors of n to nodes_to_draw
+            nodes_to_draw.append(nbr)
+
+    return G.subgraph(nodes_to_draw)
+
+# Extract the subgraph with the nodes of interest: T_draw
+T_draw = get_nodes_and_nbrs(T, nodes_of_interest)
+
+# Draw the subgraph to the screen
+nx.draw(T_draw)
+plt.show()
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture18-2.png?w=626" alt="Desktop View" /></p>
+
+<p>The subgraph consisting of the nodes of interest and their neighbors has 7 nodes.</p>
+
+<p>####
+<strong>Subgraphs II</strong></p>
+
+<p>Using a list comprehension, extract nodes that have the metadata
+ <code class="language-plaintext highlighter-rouge">'occupation'</code>
+ as
+ <code class="language-plaintext highlighter-rouge">'celebrity'</code>
+ alongside their neighbors:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Extract the nodes of interest: nodes
+</span><span class="n">nodes</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">T</span><span class="p">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span> <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s">'occupation'</span><span class="p">]</span> <span class="o">==</span> <span class="s">'celebrity'</span><span class="p">]</span>
+
+<span class="c1"># Create the set of nodes: nodeset
+</span><span class="n">nodeset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">nodes</span><span class="p">)</span>
+
+<span class="c1"># Iterate over nodes
+</span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">nodes</span><span class="p">:</span>
+
+    <span class="c1"># Compute the neighbors of n: nbrs
+</span>    <span class="n">nbrs</span> <span class="o">=</span> <span class="n">T</span><span class="p">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="c1"># Compute the union of nodeset and nbrs: nodeset
+</span>    <span class="n">nodeset</span> <span class="o">=</span> <span class="n">nodeset</span><span class="p">.</span><span class="n">union</span><span class="p">(</span><span class="n">nbrs</span><span class="p">)</span>
+
+<span class="c1"># Compute the subgraph using nodeset: T_sub
+</span><span class="n">T_sub</span> <span class="o">=</span> <span class="n">T</span><span class="p">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">nodeset</span><span class="p">)</span>
+
+<span class="c1"># Draw T_sub to the screen
+</span><span class="n">nx</span><span class="p">.</span><span class="n">draw</span><span class="p">(</span><span class="n">T_sub</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture19-2.png?w=617" alt="Desktop View" /></p>
+
+<p>You’re now ready to bring together all of the concepts you’ve learned and apply them to a case study!</p>
+
+<hr />
+
+<h1 id="4-bringing-it-all-together"><strong>4. Bringing it all together</strong></h1>
+<hr />
+
+<h2 id="41-case-study"><strong>4.1 Case study</strong></h2>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture20-3.png?w=905" alt="Desktop View" /></p>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture21-2.png?w=737" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture22-2.png?w=622" alt="Desktop View" /></p>
+
+<p>####
+<strong>Characterizing the network (I)</strong></p>
+
+<p>To start out, let’s do some basic characterization of the network, by looking at the number of nodes and number of edges in a network.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+G.nodes(data=True)
+NodeDataView({'u41': {'bipartite': 'users', 'grouping': 0}, 'u69': {'bipartite': 'users', 'grouping': 0},
+...
+, 'u14964': {'bipartite': 'users', 'grouping': 1}})
+
+
+G.edges(data=True)
+EdgeDataView([('u41', 'u2022', {}), ('u41', 'u69', {}), ('u41', 'u5082', {}), ('u41', 'u298', {}),
+...
+ ('u9866', 'u10603', {}), ('u9866', 'u10340', {}), ('u9997', 'u10500', {}), ('u10340', 'u10603', {})])
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+len(G.nodes())
+56519
+
+len(G.edges())
+72900
+
+</code></pre></div></div>
+
+<p>####
+<strong>Characterizing the network (II)</strong></p>
+
+<p>Let’s continue recalling what you’ve learned before about node importances, by plotting the degree distribution of a network. This is the distribution of node degrees computed across all nodes in a network.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import necessary modules
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="n">nx</span>
+
+<span class="c1"># Plot the degree distribution of the GitHub collaboration network
+</span><span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">nx</span><span class="p">.</span><span class="n">degree_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">).</span><span class="n">values</span><span class="p">()))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'degree_centrality'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'count'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture23-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Characterizing the network (III)</strong></p>
+
+<p>The last exercise was on degree centrality; this time round, let’s recall betweenness centrality!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import necessary modules
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="n">nx</span>
+
+<span class="c1"># Plot the degree distribution of the GitHub collaboration network
+</span><span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">nx</span><span class="p">.</span><span class="n">betweenness_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">).</span><span class="n">values</span><span class="p">()))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'betweenness_centrality'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'count'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture24-2.png?w=1024" alt="Desktop View" /></p>
+
+<hr />
+
+<h2 id="42-case-study-part-ii-visualization"><strong>4.2 Case study part II: Visualization</strong></h2>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture26-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>MatrixPlot</strong></p>
+
+<p>Let’s now practice making some visualizations. The first one will be the MatrixPlot. In a MatrixPlot, the matrix is the representation of the edges.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import necessary modules
+</span><span class="kn">from</span> <span class="nn">nxviz</span> <span class="kn">import</span> <span class="n">MatrixPlot</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Calculate the largest connected component subgraph: largest_ccs
+</span><span class="n">largest_ccs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">nx</span><span class="p">.</span><span class="n">connected_component_subgraphs</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Create the customized MatrixPlot object: h
+</span><span class="n">h</span> <span class="o">=</span> <span class="n">MatrixPlot</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">largest_ccs</span><span class="p">,</span> <span class="n">node_grouping</span><span class="o">=</span><span class="s">'grouping'</span><span class="p">)</span>
+
+<span class="c1"># Draw the MatrixPlot to the screen
+</span><span class="n">h</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+nx.connected_component_subgraphs(G)
+&lt;generator object connected_component_subgraphs at 0x7f758c7e4eb8&gt;
+
+
+list(nx.connected_component_subgraphs(G))
+[&lt;networkx.classes.graph.Graph at 0x7f758c81bfd0&gt;,
+ &lt;networkx.classes.graph.Graph at 0x7f758c81bef0&gt;]
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture27.png?w=1024" alt="Desktop View" /></p>
+
+<p>Recall that in a MatrixPlot, nodes are the rows and columns of the matrix, and cells are filled in according to whether an edge exists between the pairs of nodes.</p>
+
+<p>####
+<strong>ArcPlot</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import necessary modules
+</span><span class="kn">from</span> <span class="nn">nxviz.plots</span> <span class="kn">import</span> <span class="n">ArcPlot</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Iterate over all the nodes in G, including the metadata
+</span><span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">G</span><span class="p">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+
+    <span class="c1"># Calculate the degree of each node: G.node[n]['degree']
+</span>    <span class="n">G</span><span class="p">.</span><span class="n">node</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="s">'degree'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="n">degree</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+<span class="c1"># Create the ArcPlot object: a
+</span><span class="n">a</span> <span class="o">=</span> <span class="n">ArcPlot</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">node_order</span><span class="o">=</span><span class="s">'degree'</span><span class="p">)</span>
+
+<span class="c1"># Draw the ArcPlot to the screen
+</span><span class="n">a</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+G.node['u41']
+{'bipartite': 'users', 'grouping': 0}
+
+# get the value of degree
+nx.degree(G, 'u41')
+5
+
+# set the value 'degree' to 5
+G.node['u41']['degree'] = nx.degree(G, 'u41')
+
+# show the value
+G.node['u41']
+{'bipartite': 'users', 'degree': 5, 'grouping': 0}
+
+G.node['u41']['degree']
+5
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture28.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>CircosPlot</strong></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import necessary modules
+</span><span class="kn">from</span> <span class="nn">nxviz</span> <span class="kn">import</span> <span class="n">CircosPlot</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Iterate over all the nodes, including the metadata
+</span><span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">G</span><span class="p">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+
+    <span class="c1"># Calculate the degree of each node: G.node[n]['degree']
+</span>    <span class="n">G</span><span class="p">.</span><span class="n">node</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="s">'degree'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="n">degree</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+<span class="c1"># Create the CircosPlot object: c
+</span><span class="n">c</span> <span class="o">=</span> <span class="n">CircosPlot</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">G</span><span class="p">,</span> <span class="n">node_order</span><span class="o">=</span><span class="s">'degree'</span><span class="p">,</span> <span class="n">node_grouping</span><span class="o">=</span><span class="s">'grouping'</span><span class="p">,</span> <span class="n">node_color</span><span class="o">=</span><span class="s">'grouping'</span><span class="p">)</span>
+
+<span class="c1"># Draw the CircosPlot object to the screen
+</span><span class="n">c</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture29.png?w=1024" alt="Desktop View" /></p>
+
+<p>This CircosPlot provides a compact alternative to the ArcPlot. It is easy to see in this plot that most users belong to one group.</p>
+
+<hr />
+
+<h2 id="43-case-study-part-iii-cliques"><strong>4.3 Case study part III: Cliques</strong></h2>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture30.png?w=680" alt="Desktop View" />
+<img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture31.png?w=807" alt="Desktop View" /></p>
+
+<p>####
+<strong>Finding cliques (I)</strong></p>
+
+<p>You’re now going to practice finding cliques in
+ <code class="language-plaintext highlighter-rouge">G</code>
+ . Recall that cliques are “groups of nodes that are fully connected to one another”, while a maximal clique is a clique that cannot be extended by adding another node in the graph.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Calculate the maximal cliques in G: cliques
+</span><span class="n">cliques</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="n">find_cliques</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+<span class="c1"># Count and print the number of maximal cliques in G
+</span><span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">cliques</span><span class="p">)))</span>
+<span class="c1"># 19
+</span>
+
+<span class="nb">list</span><span class="p">(</span><span class="n">cliques</span><span class="p">)</span>
+<span class="p">[</span> <span class="p">[</span><span class="s">'u4761'</span><span class="p">,</span> <span class="s">'u2643'</span><span class="p">,</span> <span class="s">'u4329'</span><span class="p">,</span> <span class="s">'u1254'</span><span class="p">,</span> <span class="s">'u2737'</span><span class="p">,</span> <span class="s">'u2289'</span><span class="p">],</span>
+ <span class="p">[</span><span class="s">'u2022'</span><span class="p">,</span> <span class="s">'u9866'</span><span class="p">,</span> <span class="s">'u435'</span><span class="p">,</span> <span class="s">'u10340'</span><span class="p">,</span> <span class="s">'u7623'</span><span class="p">,</span> <span class="s">'u322'</span><span class="p">,</span> <span class="s">'u8135'</span><span class="p">,</span> <span class="s">'u10603'</span><span class="p">],</span>
+<span class="p">...</span>
+ <span class="p">[</span><span class="s">'u655'</span><span class="p">,</span> <span class="s">'u2906'</span><span class="p">],</span>
+ <span class="p">[</span><span class="s">'u655'</span><span class="p">,</span> <span class="s">'u914'</span><span class="p">]]</span>
+
+</code></pre></div></div>
+
+<p>####
+<strong>Finding cliques (II)</strong></p>
+
+<p>Let’s continue by finding a particular maximal clique, and then plotting that clique.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import necessary modules
+</span><span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="n">nx</span>
+<span class="kn">from</span> <span class="nn">nxviz</span> <span class="kn">import</span> <span class="n">CircosPlot</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Find the author(s) that are part of the largest maximal clique: largest_clique
+</span><span class="n">largest_clique</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">nx</span><span class="p">.</span><span class="n">find_cliques</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># Create the subgraph of the largest_clique: G_lc
+</span><span class="n">G_lc</span> <span class="o">=</span> <span class="n">G</span><span class="p">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">largest_clique</span><span class="p">)</span>
+
+<span class="c1"># Create the CircosPlot object: c
+</span><span class="n">c</span> <span class="o">=</span> <span class="n">CircosPlot</span><span class="p">(</span><span class="n">G_lc</span><span class="p">)</span>
+
+<span class="c1"># Draw the CircosPlot to the screen
+</span><span class="n">c</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture32.png?w=1024" alt="Desktop View" /></p>
+
+<p>The subgraph consisting of the largest maximal clique has 14 users.</p>
+
+<hr />
+
+<h2 id="44-case-study-part-iv-final-tasks"><strong>4.4 Case study part IV: Final tasks</strong></h2>
+
+<p>####
+<strong>Finding important collaborators</strong></p>
+
+<p>You’ll now look at important nodes once more. Here, you’ll make use of the
+ <code class="language-plaintext highlighter-rouge">degree_centrality()</code>
+ and
+ <code class="language-plaintext highlighter-rouge">betweenness_centrality()</code>
+ functions in NetworkX to compute each of the respective centrality scores, and then use that information to find the “important nodes”. In other words, your job in this exercise is to find the user(s) that have collaborated with the most number of users.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the degree centralities of G: deg_cent
+</span><span class="n">deg_cent</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="n">degree_centrality</span><span class="p">(</span><span class="n">G</span><span class="p">)</span>
+
+<span class="c1"># Compute the maximum degree centrality: max_dc
+</span><span class="n">max_dc</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">deg_cent</span><span class="p">.</span><span class="n">values</span><span class="p">())</span>
+
+<span class="c1"># Find the user(s) that have collaborated the most: prolific_collaborators
+</span><span class="n">prolific_collaborators</span> <span class="o">=</span> <span class="p">[</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">dc</span> <span class="ow">in</span> <span class="n">deg_cent</span><span class="p">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">dc</span> <span class="o">==</span> <span class="n">max_dc</span><span class="p">]</span>
+
+<span class="c1"># Print the most prolific collaborator(s)
+</span><span class="k">print</span><span class="p">(</span><span class="n">prolific_collaborators</span><span class="p">)</span>
+<span class="c1"># ['u741']
+</span>
+</code></pre></div></div>
+
+<p>It looks like
+ <code class="language-plaintext highlighter-rouge">'u741'</code>
+ is the most prolific collaborator.</p>
+
+<p>####
+<strong>Characterizing editing communities</strong></p>
+
+<p>You’re now going to combine what you’ve learned about the BFS algorithm and concept of maximal cliques to visualize the network with an ArcPlot.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import necessary modules
+</span><span class="kn">from</span> <span class="nn">nxviz</span> <span class="kn">import</span> <span class="n">ArcPlot</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># Identify the largest maximal clique: largest_max_clique
+</span><span class="n">largest_max_clique</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">nx</span><span class="p">.</span><span class="n">find_cliques</span><span class="p">(</span><span class="n">G</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c1"># Create a subgraph from the largest_max_clique: G_lmc
+</span><span class="n">G_lmc</span> <span class="o">=</span> <span class="n">G</span><span class="p">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">largest_max_clique</span><span class="p">).</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="c1"># Go out 1 degree of separation
+</span><span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">G_lmc</span><span class="p">.</span><span class="n">nodes</span><span class="p">()):</span>
+    <span class="n">G_lmc</span><span class="p">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="n">G</span><span class="p">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+    <span class="n">G_lmc</span><span class="p">.</span><span class="n">add_edges_from</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="n">node</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">G</span><span class="p">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">node</span><span class="p">))),</span> <span class="n">G</span><span class="p">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">node</span><span class="p">)))</span>
+
+<span class="c1"># Record each node's degree centrality score
+</span><span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">G_lmc</span><span class="p">.</span><span class="n">nodes</span><span class="p">():</span>
+    <span class="n">G_lmc</span><span class="p">.</span><span class="n">node</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="s">'degree centrality'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nx</span><span class="p">.</span><span class="n">degree_centrality</span><span class="p">(</span><span class="n">G_lmc</span><span class="p">)[</span><span class="n">n</span><span class="p">]</span>
+
+<span class="c1"># Create the ArcPlot object: a
+</span><span class="n">a</span> <span class="o">=</span> <span class="n">ArcPlot</span><span class="p">(</span><span class="n">graph</span><span class="o">=</span><span class="n">G_lmc</span><span class="p">,</span> <span class="n">node_order</span><span class="o">=</span><span class="s">'degree centrality'</span><span class="p">)</span>
+
+<span class="c1"># Draw the ArcPlot to the screen
+</span><span class="n">a</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/network-analysis-in-python-(part-1)/capture34.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Recommending co-editors who have yet to edit together</strong></p>
+
+<p>Finally, you’re going to leverage the concept of open triangles to recommend users on GitHub to collaborate!</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import necessary modules
+</span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">combinations</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+
+<span class="c1"># Initialize the defaultdict: recommended
+</span><span class="n">recommended</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="c1"># Iterate over all the nodes in G
+</span><span class="k">for</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">G</span><span class="p">.</span><span class="n">nodes</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+
+    <span class="c1"># Iterate over all possible triangle relationship combinations
+</span>    <span class="k">for</span> <span class="n">n1</span><span class="p">,</span> <span class="n">n2</span> <span class="ow">in</span> <span class="n">combinations</span><span class="p">(</span><span class="n">G</span><span class="p">.</span><span class="n">neighbors</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+
+        <span class="c1"># Check whether n1 and n2 do not have an edge
+</span>        <span class="k">if</span> <span class="ow">not</span> <span class="n">G</span><span class="p">.</span><span class="n">has_edge</span><span class="p">(</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">):</span>
+
+            <span class="c1"># Increment recommended
+</span>            <span class="n">recommended</span><span class="p">[(</span><span class="n">n1</span><span class="p">,</span> <span class="n">n2</span><span class="p">)]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="c1"># Identify the top 10 pairs of users
+</span><span class="n">all_counts</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">recommended</span><span class="p">.</span><span class="n">values</span><span class="p">())</span>
+<span class="n">top10_pairs</span> <span class="o">=</span> <span class="p">[</span><span class="n">pair</span> <span class="k">for</span> <span class="n">pair</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">recommended</span><span class="p">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="n">all_counts</span><span class="p">[</span><span class="o">-</span><span class="mi">10</span><span class="p">]]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">top10_pairs</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+recommended
+defaultdict(int,
+            {('u10090', 'u2737'): 1,
+             ('u10090', 'u3243'): 1,
+             ('u10090', 'u3658'): 1,
+             ('u10090', 'u4329'): 1,
+...
+
+</code></pre></div></div>
+
+<p>You’ve identified pairs of users who should collaborate together, and in doing so, built your very own recommendation system!</p>
+
+<p>The End.</p>
+
+<p>Thank you for reading.</p>
+

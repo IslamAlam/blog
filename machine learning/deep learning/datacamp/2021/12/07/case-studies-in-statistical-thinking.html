@@ -1,0 +1,1659 @@
+<h1 id="case-studies-in-statistical-thinking">Case Studies in Statistical Thinking</h1>
+
+<p>This is the memo of the 5th course (5 courses in all) of ‘Statistics Fundamentals with Python’ skill track.</p>
+
+<p><strong>You can find the original course
+ <a href="https://www.datacamp.com/courses/case-studies-in-statistical-thinking">HERE</a></strong>
+ .</p>
+
+<p>###
+<strong>Table of contents</strong></p>
+
+<ol>
+  <li>Fish sleep and bacteria growth: A review of Statistical Thinking I and II</li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/09/29/case-studies-in-statistical-thinking-from-datacamp/2/">Analysis of results of the 2015 FINA World Swimming Championships</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/09/29/case-studies-in-statistical-thinking-from-datacamp/3/">The “Current Controversy” of the 2013 World Championships</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/09/29/case-studies-in-statistical-thinking-from-datacamp/4/">Statistical seismology and the Parkfield region</a></li>
+  <li><a href="https://datascience103579984.wordpress.com/2019/09/29/case-studies-in-statistical-thinking-from-datacamp/5/">Earthquakes and oil mining in Oklahoma</a></li>
+</ol>
+
+<hr />
+
+<h1 id="1-fish-sleep-and-bacteria-growth-a-review-of-statistical-thinking-i-and-ii"><strong>1. Fish sleep and bacteria growth: A review of Statistical Thinking I and II</strong></h1>
+<hr />
+
+<h2 id="11-activity-of-zebrafish-and-melatonin"><strong>1.1 Activity of zebrafish and melatonin</strong></h2>
+
+<p>####
+<strong>EDA: Plot ECDFs of active bout length</strong></p>
+
+<p>An active bout is a stretch of time where a fish is constantly moving. Plot an ECDF of active bout length for the mutant and wild type fish for the seventh night of their lives. The data sets are in the
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ arrays
+ <code class="language-plaintext highlighter-rouge">bout_lengths_wt</code>
+ and
+ <code class="language-plaintext highlighter-rouge">bout_lengths_mut</code>
+ . The bout lengths are in units of minutes.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Import the dc_stat_think module as dcst
+</span><span class="kn">import</span> <span class="nn">dc_stat_think</span> <span class="k">as</span> <span class="n">dcst</span>
+
+<span class="c1"># Generate x and y values for plotting ECDFs
+</span><span class="n">x_wt</span><span class="p">,</span> <span class="n">y_wt</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">bout_lengths_wt</span><span class="p">)</span>
+<span class="n">x_mut</span><span class="p">,</span> <span class="n">y_mut</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">bout_lengths_mut</span><span class="p">)</span>
+
+<span class="c1"># Plot the ECDFs
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_wt</span><span class="p">,</span> <span class="n">y_wt</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_mut</span><span class="p">,</span> <span class="n">y_mut</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+
+<span class="c1"># Make a legend, label axes, and show plot
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">((</span><span class="s">'wt'</span><span class="p">,</span> <span class="s">'mut'</span><span class="p">))</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'active bout length (min)'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'ECDF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/1-8.png?w=1024" alt="Desktop View" /></p>
+
+<p>There is an outlier of one active bout for a mutant fish, and the ECDF exposes this clearly. It is important to know about, but we will not focus on it going forward, though.</p>
+
+<p>####
+<strong>Interpreting ECDFs and the story</strong></p>
+
+<p>While a more detailed analysis of distributions is often warranted for careful analyses, you can already get a feel for the distributions and the story behind the data by eyeballing the ECDFs. Which of the following would be the most reasonable statement to make about how the active bout lengths are distributed and what kind of process might be behind exiting the active bout to rest?</p>
+
+<p>If you need a refresher, here are videos from Statistical Thinking I about stories behind probability distributions.</p>
+
+<ul>
+  <li><a href="https://campus.datacamp.com/courses/statistical-thinking-in-python-part-1/thinking-probabilistically-discrete-variables?ex=9">Discrete Uniform and Binomial</a></li>
+  <li><a href="https://campus.datacamp.com/courses/statistical-thinking-in-python-part-1/thinking-probabilistically-discrete-variables?ex=12">Poisson processes and Poisson distribution</a></li>
+  <li><a href="https://campus.datacamp.com/courses/statistical-thinking-in-python-part-1/thinking-probabilistically-continuous-variables?ex=4">Normal distribution</a></li>
+  <li><a href="https://campus.datacamp.com/courses/statistical-thinking-in-python-part-1/thinking-probabilistically-continuous-variables?ex=11">Exponential Distribution</a></li>
+</ul>
+
+<p>The bout lengths appear Exponentially distributed, which implies that exiting an active bout to rest is a Poisson process; the fish have no apparent memory about when they became active.</p>
+
+<p>While not
+ <em>exactly</em>
+ Exponentially distributed, the ECDF has no left tail, and no discernible inflection point, which is very much like the Exponential CDF.</p>
+
+<hr />
+
+<h2 id="12-bootstrap-confidence-intervals"><strong>1.2 Bootstrap confidence intervals</strong></h2>
+
+<p>####
+<strong>Parameter estimation: active bout length</strong></p>
+
+<p>Compute the mean active bout length for wild type and mutant, with 95% bootstrap confidence interval. The data sets are again available in the
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ arrays
+ <code class="language-plaintext highlighter-rouge">bout_lengths_wt</code>
+ and
+ <code class="language-plaintext highlighter-rouge">bout_lengths_mut</code>
+ . The
+ <code class="language-plaintext highlighter-rouge">dc_stat_think</code>
+ module has been imported as
+ <code class="language-plaintext highlighter-rouge">dcst</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute mean active bout length
+</span><span class="n">mean_wt</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bout_lengths_wt</span><span class="p">)</span>
+<span class="n">mean_mut</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bout_lengths_mut</span><span class="p">)</span>
+
+<span class="c1"># Draw bootstrap replicates
+</span><span class="n">bs_reps_wt</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">bout_lengths_wt</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">bs_reps_mut</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">bout_lengths_mut</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute 95% confidence intervals
+</span><span class="n">conf_int_wt</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bs_reps_wt</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+<span class="n">conf_int_mut</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bs_reps_mut</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+
+<span class="c1"># Print the results
+</span><span class="k">print</span><span class="p">(</span><span class="s">"""
+wt:  mean = {0:.3f} min., conf. int. = [{1:.1f}, {2:.1f}] min.
+mut: mean = {3:.3f} min., conf. int. = [{4:.1f}, {5:.1f}] min.
+"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">mean_wt</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int_wt</span><span class="p">,</span> <span class="n">mean_mut</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int_mut</span><span class="p">))</span>
+
+<span class="c1"># wt:  mean = 3.874 min., conf. int. = [3.6, 4.1] min.
+# mut: mean = 6.543 min., conf. int. = [6.1, 7.0] min.
+</span>
+</code></pre></div></div>
+
+<p>The confidence intervals are quite separated. Nonetheless, we will proceed to perform hypothesis tests.</p>
+
+<hr />
+
+<h2 id="13-permutation-and-bootstrap-hypothesis-tests"><strong>1.3 Permutation and bootstrap hypothesis tests</strong></h2>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/3-7.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/4-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/5-6.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/6-6.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>Permutation test: wild type versus heterozygote</strong></p>
+
+<p>Test the hypothesis that the heterozygote and wild type bout lengths are identically distributed using a permutation test.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the difference of means: diff_means_exp
+</span><span class="n">diff_means_exp</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bout_lengths_het</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bout_lengths_wt</span><span class="p">)</span>
+
+<span class="c1"># Draw permutation replicates: perm_reps
+</span><span class="n">perm_reps</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_perm_reps</span><span class="p">(</span><span class="n">bout_lengths_het</span><span class="p">,</span> <span class="n">bout_lengths_wt</span><span class="p">,</span>
+                               <span class="n">dcst</span><span class="p">.</span><span class="n">diff_of_means</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute the p-value: p-val
+</span><span class="n">p_val</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">perm_reps</span> <span class="o">&gt;=</span> <span class="n">diff_means_exp</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">perm_reps</span><span class="p">)</span>
+
+<span class="c1"># Print the result
+</span><span class="k">print</span><span class="p">(</span><span class="s">'p ='</span><span class="p">,</span> <span class="n">p_val</span><span class="p">)</span>
+
+<span class="c1"># p = 0.001
+</span>
+</code></pre></div></div>
+
+<p>A p-value of 0.001 suggests that the observed difference in means is unlikely to occur if heterozygotic and wild type fish have active bout lengths that are identically distributed.</p>
+
+<p>####
+<strong>Bootstrap hypothesis test</strong></p>
+
+<p>The permutation test has a pretty restrictive hypothesis, that the heterozygotic and wild type bout lengths are identically distributed. Now, use a bootstrap hypothesis test to test the hypothesis that the means are equal, making no assumptions about the distributions.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Concatenate arrays: bout_lengths_concat
+</span><span class="n">bout_lengths_concat</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">bout_lengths_wt</span><span class="p">,</span> <span class="n">bout_lengths_het</span><span class="p">))</span>
+
+<span class="c1"># Compute mean of all bout_lengths: mean_bout_length
+</span><span class="n">mean_bout_length</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bout_lengths_concat</span><span class="p">)</span>
+
+<span class="c1"># Generate shifted arrays
+</span><span class="n">wt_shifted</span> <span class="o">=</span> <span class="n">bout_lengths_wt</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bout_lengths_wt</span><span class="p">)</span> <span class="o">+</span> <span class="n">mean_bout_length</span>
+<span class="n">het_shifted</span> <span class="o">=</span> <span class="n">bout_lengths_het</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">bout_lengths_het</span><span class="p">)</span> <span class="o">+</span> <span class="n">mean_bout_length</span>
+
+<span class="c1"># Compute 10,000 bootstrap replicates from shifted arrays
+</span><span class="n">bs_reps_wt</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">wt_shifted</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">bs_reps_het</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">het_shifted</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Get replicates of difference of means: bs_replicates
+</span><span class="n">bs_reps</span> <span class="o">=</span> <span class="n">bs_reps_het</span> <span class="o">-</span> <span class="n">bs_reps_wt</span>
+
+<span class="c1"># Compute and print p-value: p
+</span><span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">bs_reps</span> <span class="o">&gt;=</span> <span class="n">diff_means_exp</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">bs_reps</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'p-value ='</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+<span class="c1"># p-value = 0.0004
+</span>
+</code></pre></div></div>
+
+<p>We get a result of similar magnitude as the permutation test, though slightly smaller, probably because the heterozygote bout length distribution has a heavier tail to the right.</p>
+
+<hr />
+
+<h2 id="14-linear-regressions-and-pairs-bootstrap"><strong>1.4 Linear regressions and pairs bootstrap</strong></h2>
+
+<p>####
+<strong>Assessing the growth rate</strong></p>
+
+<p>To compute the growth rate, you can do a linear regression of the logarithm of the total bacterial area versus time. Compute the growth rate and get a 95% confidence interval using pairs bootstrap. The time points, in units of hours, are stored in the
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ array
+ <code class="language-plaintext highlighter-rouge">t</code>
+ and the bacterial area, in units of square micrometers, is stored in
+ <code class="language-plaintext highlighter-rouge">bac_area</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute logarithm of the bacterial area: log_bac_area
+</span><span class="n">log_bac_area</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">bac_area</span><span class="p">)</span>
+
+<span class="c1"># Compute the slope and intercept: growth_rate, log_a0
+</span><span class="n">growth_rate</span><span class="p">,</span> <span class="n">log_a0</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">log_bac_area</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Draw 10,000 pairs bootstrap replicates: growth_rate_bs_reps, log_a0_bs_reps
+</span><span class="n">growth_rate_bs_reps</span><span class="p">,</span> <span class="n">log_a0_bs_reps</span> <span class="o">=</span> \
+            <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_pairs_linreg</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">log_bac_area</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute confidence intervals: growth_rate_conf_int
+</span><span class="n">growth_rate_conf_int</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">growth_rate_bs_reps</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+
+<span class="c1"># Print the result to the screen
+</span><span class="k">print</span><span class="p">(</span><span class="s">"""
+Growth rate: {0:.4f} sq. µm/hour
+95% conf int: [{1:.4f}, {2:.4f}] sq. µm/hour
+"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">growth_rate</span><span class="p">,</span> <span class="o">*</span><span class="n">growth_rate_conf_int</span><span class="p">))</span>
+
+<span class="c1"># Growth rate: 0.2301 sq. µm/hour
+# 95% conf int: [0.2266, 0.2336] sq. µm/hour
+</span>
+</code></pre></div></div>
+
+<p>Under these conditions, the bacteria add about 0.23 square micrometers worth of mass each hour. The error bar is very tight, which we will see graphically in the next exercise.</p>
+
+<p>####
+<strong>Plotting the growth curve</strong></p>
+
+<p>You saw in the previous exercise that the confidence interval on the growth curve is very tight. You will explore this graphically here by plotting several bootstrap lines along with the growth curve. You will use the
+ <code class="language-plaintext highlighter-rouge">plt.semilogy()</code>
+ function to make the plot with the y-axis on a log scale. This means that you will need to transform your theoretical linear regression curve for plotting by exponentiating it.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot data points in a semilog-y plot with axis labeles
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">bac_area</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+
+<span class="c1"># Generate x-values for the bootstrap lines: t_bs
+</span><span class="n">t_bs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">14</span><span class="p">])</span>
+
+<span class="c1"># Plot the first 100 bootstrap lines
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">exp</span><span class="p">(</span><span class="n">growth_rate_bs_reps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">t_bs</span> <span class="o">+</span> <span class="n">log_a0_bs_reps</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">semilogy</span><span class="p">(</span><span class="n">t_bs</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">)</span>
+
+<span class="c1"># Label axes and show plot
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'time (hr)'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'area (sq. µm)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/7-7.png?w=1024" alt="Desktop View" /></p>
+
+<p>You can see that the bootstrap replicates do not stray much. This is due to the exquisitly exponential nature of the bacterial growth under these experimental conditions.</p>
+
+<h1 id="2-analysis-of-results-of-the-2015-fina-world-swimming-championships"><strong>2. Analysis of results of the 2015 FINA World Swimming Championships</strong></h1>
+<hr />
+
+<h2 id="21-introduction-to-swimming-data"><strong>2.1 Introduction to swimming data</strong></h2>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/1.png?w=905" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/2.png?w=828" alt="Desktop View" /></p>
+
+<p>####
+<strong>Graphical EDA of men’s 200 free heats</strong></p>
+
+<p>In the heats, all contestants swim, the very fast and the very slow. To explore how the swim times are distributed, plot an ECDF of the men’s 200 freestyle.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Generate x and y values for ECDF: x, y
+</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">mens_200_free_heats</span><span class="p">)</span>
+
+<span class="c1"># Plot the ECDF as dots
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+
+<span class="c1"># Label axes and show plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'time (s)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'ECDF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/3.png?w=1024" alt="Desktop View" /></p>
+
+<p>Graphical EDA is always a great start. We see that fast swimmers are below 115 seconds, with a smattering of slow swimmers past that, including one very slow swimmer.</p>
+
+<p>####
+<strong>200 m free time with confidence interval</strong></p>
+
+<p>Now, you will practice parameter estimation and computation of confidence intervals by computing the mean and median swim time for the men’s 200 freestyle heats. The median is useful because it is immune to heavy tails in the distribution of swim times, such as the slow swimmers in the heats.
+ <code class="language-plaintext highlighter-rouge">mens_200_free_heats</code>
+ is still in your namespace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute mean and median swim times
+</span><span class="n">mean_time</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mens_200_free_heats</span><span class="p">)</span>
+<span class="n">median_time</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">median</span><span class="p">(</span><span class="n">mens_200_free_heats</span><span class="p">)</span>
+
+<span class="c1"># Draw 10,000 bootstrap replicates of the mean and median
+</span><span class="n">bs_reps_mean</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">mens_200_free_heats</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">bs_reps_median</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">mens_200_free_heats</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">median</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+
+<span class="c1"># Compute the 95% confidence intervals
+</span><span class="n">conf_int_mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bs_reps_mean</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+<span class="n">conf_int_median</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bs_reps_median</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+
+<span class="c1"># Print the result to the screen
+</span><span class="k">print</span><span class="p">(</span><span class="s">"""
+mean time: {0:.2f} sec.
+95% conf int of mean: [{1:.2f}, {2:.2f}] sec.
+
+median time: {3:.2f} sec.
+95% conf int of median: [{4:.2f}, {5:.2f}] sec.
+"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">mean_time</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int_mean</span><span class="p">,</span> <span class="n">median_time</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int_median</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<p>Indeed, the mean swim time is longer than the median because of the effect of the very slow swimmers.</p>
+
+<hr />
+
+<h2 id="22-do-swimmers-go-faster-in-the-finals"><strong>2.2 Do swimmers go faster in the finals?</strong></h2>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/5.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/6.png?w=830" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/7.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>EDA: finals versus semifinals</strong></p>
+
+<p>First, you will get an understanding of how athletes’ performance changes from the semifinals to the finals by computing the fractional improvement from the semifinals to finals and plotting an ECDF of all of these values.</p>
+
+<p>The arrays
+ <code class="language-plaintext highlighter-rouge">final_times</code>
+ and
+ <code class="language-plaintext highlighter-rouge">semi_times</code>
+ contain the swim times of the respective rounds. The arrays are aligned such that
+ <code class="language-plaintext highlighter-rouge">final_times[i]</code>
+ and
+ <code class="language-plaintext highlighter-rouge">semi_times[i]</code>
+ are for the same swimmer/event. If you are interested in the strokes/events, you can check out the data frame
+ <code class="language-plaintext highlighter-rouge">df</code>
+ in your namespace, which has more detailed information, but is not used in the analysis.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+df.head()
+   athleteid stroke  distance  final_swimtime  lastname  semi_swimtime
+0     100537   FREE       100           52.52  CAMPBELL          53.00
+1     100537   FREE        50           24.12  CAMPBELL          24.32
+2     100631   FREE       100           52.82  CAMPBELL          52.84
+3     100631   FREE        50           24.36  CAMPBELL          24.22
+4     100650    FLY       100           57.67    MCKEON          57.59
+
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute fractional difference in time between finals and semis
+</span><span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">semi_times</span> <span class="o">-</span> <span class="n">final_times</span><span class="p">)</span> <span class="o">/</span> <span class="n">semi_times</span>
+
+<span class="c1"># Generate x and y values for the ECDF: x, y
+</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="c1"># Make a plot of the ECDF
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+
+<span class="c1"># Label axes and show plot
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'f'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'ECDF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/8.png?w=642" alt="Desktop View" /></p>
+
+<p>The median of the ECDF is just above zero. But at first glance, it does not look like there is much of any difference between semifinals and finals. We’ll check this carefully in the next exercises.</p>
+
+<p>####
+<strong>Parameter estimates of difference between finals and semifinals</strong></p>
+
+<p>Compute the mean fractional improvement from the semifinals to finals, along with a 95% confidence interval of the mean. The Numpy array
+ <code class="language-plaintext highlighter-rouge">f</code>
+ that you computed in the last exercise is in your namespace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Mean fractional time difference: f_mean
+</span><span class="n">f_mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="c1"># Get bootstrap reps of mean: bs_reps
+</span><span class="n">bs_reps</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute confidence intervals: conf_int
+</span><span class="n">conf_int</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bs_reps</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+
+<span class="c1"># Report
+</span><span class="k">print</span><span class="p">(</span><span class="s">"""
+mean frac. diff.: {0:.5f}
+95% conf int of mean frac. diff.: [{1:.5f}, {2:.5f}]"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">f_mean</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int</span><span class="p">))</span>
+
+<span class="c1"># mean frac. diff.: 0.00040
+# 95% conf int of mean frac. diff.: [-0.00092, 0.00176]
+</span>
+</code></pre></div></div>
+
+<p>It looks like the mean finals time is just faster than the mean semifinal time, and they very well may be the same. We’ll test this hypothesis next.</p>
+
+<p>####
+<strong>How to do the permutation test</strong></p>
+
+<p>Based on our EDA and parameter estimates, it is tough to discern improvement from the semifinals to finals. In the next exercise, you will test the hypothesis that there is no difference in performance between the semifinals and finals. A permutation test is fitting for this. We will use the mean value of
+ <em>f</em>
+ as the test statistic.</p>
+
+<p>Step of the permutation test:</p>
+
+<ul>
+  <li>Take an array of semifinal times and an array of final times for each swimmer for each stroke/distance pair.</li>
+  <li>Go through each array, and for each index, swap the entry in the respective final and semifinal array with a 50% probability.</li>
+  <li>Use the resulting final and semifinal arrays to compute
+ <code class="language-plaintext highlighter-rouge">f</code>
+ and then the mean of
+ <code class="language-plaintext highlighter-rouge">f</code>
+ .</li>
+</ul>
+
+<p>####
+<strong>Generating permutation samples</strong></p>
+
+<p>As you worked out in the last exercise, we need to generate a permutation sample by randomly swapping corresponding entries in the
+ <code class="language-plaintext highlighter-rouge">semi_times</code>
+ and
+ <code class="language-plaintext highlighter-rouge">final_times</code>
+ array. Write a function with signature
+ <code class="language-plaintext highlighter-rouge">swap_random(a, b)</code>
+ that returns arrays where random indices have the entries in
+ <code class="language-plaintext highlighter-rouge">a</code>
+ and
+ <code class="language-plaintext highlighter-rouge">b</code>
+ swapped.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def swap_random(a, b):
+    """Randomly swap entries in two arrays."""
+    # Indices to swap
+    swap_inds = np.random.random(size=len(a)) &lt; 0.5
+
+    # Make copies of arrays a and b for output
+    a_out = np.copy(a)
+    b_out = np.copy(b)
+
+    # Swap values
+    a_out[swap_inds] = b[swap_inds]
+    b_out[swap_inds] = a[swap_inds]
+
+    return a_out, b_out
+
+</code></pre></div></div>
+
+<p>Now you have this function in hand to do the permutation test.</p>
+
+<p>####
+<strong>Hypothesis test: Do women swim the same way in semis and finals?</strong></p>
+
+<p>Test the hypothesis that performance in the finals and semifinals are identical using the mean of the fractional improvement as your test statistic. The test statistic under the null hypothesis is considered to be at least as extreme as what was observed if it is greater than or equal to
+ <code class="language-plaintext highlighter-rouge">f_mean</code>
+ , which is already in your namespace.</p>
+
+<p>The semifinal and final times are contained in the
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ arrays
+ <code class="language-plaintext highlighter-rouge">semi_times</code>
+ and
+ <code class="language-plaintext highlighter-rouge">final_times</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Set up array of permutation replicates
+</span><span class="n">perm_reps</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">1000</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+    <span class="c1"># Generate a permutation sample
+</span>    <span class="n">semi_perm</span><span class="p">,</span> <span class="n">final_perm</span> <span class="o">=</span> <span class="n">swap_random</span><span class="p">(</span><span class="n">semi_times</span><span class="p">,</span> <span class="n">final_times</span><span class="p">)</span>
+
+    <span class="c1"># Compute f from the permutation sample
+</span>    <span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">semi_perm</span> <span class="o">-</span> <span class="n">final_perm</span><span class="p">)</span> <span class="o">/</span> <span class="n">semi_perm</span>
+
+    <span class="c1"># Compute and store permutation replicate
+</span>    <span class="n">perm_reps</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="c1"># Compute and print p-value
+</span><span class="k">print</span><span class="p">(</span><span class="s">'p ='</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">perm_reps</span> <span class="o">&gt;=</span> <span class="n">f_mean</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>That was a little tricky… Nice work! The p-value is large, about 0.27, which suggests that the results of the 2015 World Championships are consistent with there being no difference in performance between the finals and semifinals.</p>
+
+<hr />
+
+<h2 id="23-how-does-the-performance-of-swimmers-decline-over-long-events"><strong>2.3 How does the performance of swimmers decline over long events?</strong></h2>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/2-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>EDA: Plot all your data</strong></p>
+
+<p>To get a graphical overview of a data set, it is often useful to plot all of your data. In this exercise, plot all of the splits for all female swimmers in the 800 meter heats.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the splits for each swimmer
+</span><span class="k">for</span> <span class="n">splitset</span> <span class="ow">in</span> <span class="n">splits</span><span class="p">:</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">split_number</span><span class="p">,</span> <span class="n">splitset</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">'lightgray'</span><span class="p">)</span>
+
+<span class="c1"># Compute the mean split times
+</span><span class="n">mean_splits</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">splits</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Plot the mean split times
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">split_number</span><span class="p">,</span> <span class="n">mean_splits</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+<span class="c1"># Label axes and show plot
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'split number'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'split time (s)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/3-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>You can see that there is wide variability in the splits among the swimmers, and what appears to be a slight trend toward slower split times.</p>
+
+<p>####
+<strong>Linear regression of average split time</strong></p>
+
+<p>We will assume that the swimmers slow down in a linear fashion over the course of the 800 m event. The slowdown per split is then the slope of the mean split time versus split number plot. Perform a linear regression to estimate the slowdown per split and compute a pairs bootstrap 95% confidence interval on the slowdown. Also show a plot of the best fit line.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Perform regression
+</span><span class="n">slowdown</span><span class="p">,</span> <span class="n">split_3</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">split_number</span><span class="p">,</span> <span class="n">mean_splits</span><span class="p">,</span> <span class="n">deg</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Compute pairs bootstrap
+</span><span class="n">bs_reps</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_pairs_linreg</span><span class="p">(</span><span class="n">split_number</span><span class="p">,</span> <span class="n">mean_splits</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute confidence interval
+</span><span class="n">conf_int</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bs_reps</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+
+<span class="c1"># Plot the data with regressions line
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">split_number</span><span class="p">,</span> <span class="n">mean_splits</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">split_number</span><span class="p">,</span> <span class="n">slowdown</span> <span class="o">*</span> <span class="n">split_number</span> <span class="o">+</span> <span class="n">split_3</span><span class="p">,</span> <span class="s">'-'</span><span class="p">)</span>
+
+<span class="c1"># Label axes and show plot
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'split number'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'split time (s)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Print the slowdown per split
+</span><span class="k">print</span><span class="p">(</span><span class="s">"""
+mean slowdown: {0:.3f} sec./split
+95% conf int of mean slowdown: [{1:.3f}, {2:.3f}] sec./split"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span>
+    <span class="n">slowdown</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int</span><span class="p">))</span>
+
+<span class="c1">#    mean slowdown: 0.065 sec./split
+#    95% conf int of mean slowdown: [0.051, 0.078] sec./split
+</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/4-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>There is a small (about 6 hundreths of a second), but discernible, slowdown per split. We’ll do a hypothesis test next.</p>
+
+<p>####
+<strong>Hypothesis test: are they slowing down?</strong></p>
+
+<p>Now we will test the null hypothesis that the swimmer’s split time is not at all correlated with the distance they are at in the swim. We will use the Pearson correlation coefficient (computed using
+ <code class="language-plaintext highlighter-rouge">dcst.pearson_r()</code>
+ ) as the test statistic.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Observed correlation
+</span><span class="n">rho</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">pearson_r</span><span class="p">(</span><span class="n">split_number</span><span class="p">,</span> <span class="n">mean_splits</span><span class="p">)</span>
+
+<span class="c1"># Initialize permutation reps
+</span><span class="n">perm_reps_rho</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Make permutation reps
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+    <span class="c1"># Scramble the split number array
+</span>    <span class="n">scrambled_split_number</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">split_number</span><span class="p">)</span>
+
+    <span class="c1"># Compute the Pearson correlation coefficient
+</span>    <span class="n">perm_reps_rho</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">pearson_r</span><span class="p">(</span><span class="n">scrambled_split_number</span><span class="p">,</span> <span class="n">mean_splits</span><span class="p">)</span>
+
+<span class="c1"># Compute and print p-value
+</span><span class="n">p_val</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">perm_reps_rho</span> <span class="o">&gt;=</span> <span class="n">rho</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">perm_reps_rho</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'p ='</span><span class="p">,</span> <span class="n">p_val</span><span class="p">)</span>
+
+
+</code></pre></div></div>
+
+<p>The tiny effect is very real! With 10,000 replicates, we never got a correlation as big as observed under the hypothesis that the swimmers do not change speed as the race progresses.</p>
+
+<h1 id="3-the-current-controversy-of-the-2013-world-championships"><strong>3. The “Current Controversy” of the 2013 World Championships</strong></h1>
+<hr />
+
+<h2 id="31-introduction-to-the-current-controversy"><strong>3.1 Introduction to the current controversy</strong></h2>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/5-1.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/6-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>####
+<strong>A metric for improvement</strong></p>
+
+<p>In your first analysis, you will investigate how times of swimmers in 50 m events change as they move between low numbered lanes (1-3) to high numbered lanes (6-8) in the semifinals and finals. We showed in the previous chapter that there is little difference between semifinal and final performance, so you will neglect any differences due to it being the final versus the semifinal.</p>
+
+<p>You want to use as much data as you can, so use all four strokes for both the men’s and women’s competitions. As such, what would be a good metric for improvement from one round to the next for an individual swimmer, where
+ <em>t
+ a</em>
+ is the swim time in a low numbered lane and
+ <em>t
+ b</em>
+ is the swim time in a high numbered lane?</p>
+
+<p>The fractional improvement of swim time, (
+ <em>t
+ a</em>
+ –
+ <em>t
+ b</em>
+ ) /
+ <em>t
+ a</em>
+ .</p>
+
+<p>This is a good metric; it is the fractional improvement, and therefore independent of the basal speed (which is itself dependent on stroke and gender).</p>
+
+<p>####
+<strong>ECDF of improvement from low to high lanes</strong></p>
+
+<p>Now that you have a metric for improvement going from low- to high-numbered lanes, plot an ECDF of this metric.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the fractional improvement of being in high lane: f
+</span><span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">swimtime_low_lanes</span> <span class="o">-</span> <span class="n">swimtime_high_lanes</span><span class="p">)</span> <span class="o">/</span> <span class="n">swimtime_low_lanes</span>
+
+<span class="c1"># Make x and y values for ECDF: x, y
+</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="c1"># Plot the ECDFs as dots
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+
+<span class="c1"># Label the axes and show the plot
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'f'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'ECDF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/1-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>This is starting to paint a picture of lane bias. The ECDF demonstrates that all but three of the 26 swimmers swam faster in the high numbered lanes.</p>
+
+<p>####
+<strong>Estimation of mean improvement</strong></p>
+
+<p>You will now estimate how big this current effect is. Compute the mean fractional improvement for being in a high-numbered lane versus a low-numbered lane, along with a 95% confidence interval of the mean.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the mean difference: f_mean
+</span><span class="n">f_mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="c1"># Draw 10,000 bootstrap replicates: bs_reps
+</span><span class="n">bs_reps</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute 95% confidence interval: conf_int
+</span><span class="n">conf_int</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bs_reps</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+
+<span class="c1"># Print the result
+</span><span class="k">print</span><span class="p">(</span><span class="s">"""
+mean frac. diff.: {0:.5f}
+95% conf int of mean frac. diff.: [{1:.5f}, {2:.5f}]"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">f_mean</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int</span><span class="p">))</span>
+
+<span class="c1">#    mean frac. diff.: 0.01051
+#    95% conf int of mean frac. diff.: [0.00612, 0.01591]
+</span>
+</code></pre></div></div>
+
+<p>It sure looks like swimmers are faster in lanes 6-8.</p>
+
+<p>####
+<strong>How should we test the hypothesis?</strong></p>
+
+<p>You are interested in the presence of lane bias toward higher lanes, presumably due to a slight current in the pool.
+ <strong>A natural null hypothesis to test, then, is that the mean fractional improvement going from low to high lane numbers is zero.</strong>
+ Which of the following is a good way to simulate this null hypothesis?</p>
+
+<p>As a reminder, the arrays
+ <code class="language-plaintext highlighter-rouge">swimtime_low_lanes</code>
+ and
+ <code class="language-plaintext highlighter-rouge">swimtime_high_lanes</code>
+ contain the swim times for lanes 1-3 and 6-8, respectively, and we define the fractional improvement as
+ <code class="language-plaintext highlighter-rouge">f = (swimtime_low_lanes - swimtime_high_lanes) / swimtime_low_lanes</code>
+ .</p>
+
+<p><strong>Subtract the mean of
+ <code class="language-plaintext highlighter-rouge">f</code>
+ from
+ <code class="language-plaintext highlighter-rouge">f</code>
+ to generate
+ <code class="language-plaintext highlighter-rouge">f_shift</code>
+ . Then, take bootstrap replicate of the mean from this
+ <code class="language-plaintext highlighter-rouge">f_shift</code>
+ .</strong></p>
+
+<p>####
+<strong>Hypothesis test: Does lane assignment affect performance?</strong></p>
+
+<p>Perform a bootstrap hypothesis test of the null hypothesis that the mean fractional improvement going from low-numbered lanes to high-numbered lanes is zero. Take the fractional improvement as your test statistic, and “at least as extreme as” to mean that the test statistic under the null hypothesis is greater than or equal to what was observed.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Shift f: f_shift
+</span><span class="n">f_shift</span> <span class="o">=</span> <span class="n">f</span> <span class="o">-</span> <span class="n">f_mean</span>
+
+<span class="c1"># Draw 100,000 bootstrap replicates of the mean: bs_reps
+</span><span class="n">bs_reps</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">f_shift</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+
+<span class="c1"># Compute and report the p-value
+</span><span class="n">p_val</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">bs_reps</span> <span class="o">&gt;=</span> <span class="n">f_mean</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100000</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'p ='</span><span class="p">,</span> <span class="n">p_val</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>A p-value of 0.0003 is quite small and suggests that the mean fractional improvment is greater than zero.</p>
+
+<p>####
+<strong>Did the 2015 event have this problem?</strong></p>
+
+<p>You would like to know if this is a typical problem with pools in competitive swimming. To address this question, perform a similar analysis for the results of the 2015 FINA World Championships. That is, compute the mean fractional improvement for going from lanes 1-3 to lanes 6-8 for the 2015 competition, along with a 95% confidence interval on the mean. Also test the hypothesis that the mean fractional improvement is zero.</p>
+
+<p>The arrays
+ <code class="language-plaintext highlighter-rouge">swimtime_low_lanes_15</code>
+ and
+ <code class="language-plaintext highlighter-rouge">swimtime_high_lanes_15</code>
+ have the pertinent data.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute f and its mean
+</span><span class="n">f</span> <span class="o">=</span> <span class="p">(</span><span class="n">swimtime_low_lanes_15</span> <span class="o">-</span> <span class="n">swimtime_high_lanes_15</span><span class="p">)</span> <span class="o">/</span> <span class="n">swimtime_low_lanes_15</span>
+<span class="n">f_mean</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+<span class="c1"># Draw 10,000 bootstrap replicates
+</span><span class="n">bs_reps</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute 95% confidence interval
+</span><span class="n">conf_int</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bs_reps</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+
+<span class="c1"># Shift f
+</span><span class="n">f_shift</span> <span class="o">=</span> <span class="n">f</span> <span class="o">-</span> <span class="n">f_mean</span>
+
+<span class="c1"># Draw 100,000 bootstrap replicates of the mean
+</span><span class="n">bs_reps</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">f_shift</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+
+<span class="c1"># Compute the p-value
+</span><span class="n">p_val</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">bs_reps</span> <span class="o">&gt;=</span> <span class="n">f_mean</span><span class="p">)</span> <span class="o">/</span> <span class="mi">100000</span>
+
+<span class="c1"># Print the results
+</span><span class="k">print</span><span class="p">(</span><span class="s">"""
+mean frac. diff.: {0:.5f}
+95% conf int of mean frac. diff.: [{1:.5f}, {2:.5f}]
+p-value: {3:.5f}"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">f_mean</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int</span><span class="p">,</span> <span class="n">p_val</span><span class="p">))</span>
+
+<span class="c1">#    mean frac. diff.: 0.00079
+#    95% conf int of mean frac. diff.: [-0.00198, 0.00341]
+#    p-value: 0.28179
+</span>
+</code></pre></div></div>
+
+<p>Both the confidence interval an the p-value suggest that there was no lane bias in 2015.</p>
+
+<hr />
+
+<h2 id="32-the-zigzag-effect"><strong>3.2 The zigzag effect</strong></h2>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/2-2.png?w=976" alt="Desktop View" /></p>
+
+<p>####
+<strong>Which splits should we consider?</strong></p>
+
+<p>As you proceed to quantitatively analyze the zigzag effect in the 1500 m, which splits should you include in our analysis? For reference, the plot of the zigzag effect from the video is shown to the right.</p>
+
+<p><strong>You should include all splits except the first two and the last two.</strong>
+ You should neglect the last two because swimmers stop pacing themselves and “kick” for the final stretch. The first two are different because they involve jumping off the starting blocks and more underwater swimming than others.</p>
+
+<p>You want to use splits where the swimmers are swimming as consistently as they can.</p>
+
+<p>####
+<strong>EDA: mean differences between odd and even splits</strong></p>
+
+<p>To investigate the differences between odd and even splits, you first need to define a difference metric. In previous exercises, you investigated the
+ <em>improvement</em>
+ of moving from a low-numbered lane to a high-numbered lane, defining
+ <em>f</em>
+ = (
+ <em>t
+ a</em>
+ –
+ <em>t
+ b</em>
+ ) /
+ <em>t
+ a</em>
+ . There, the
+ <em>t
+ a</em>
+ in the denominator served as our reference time for improvement. Here, you are considering both improvement and decline in performance depending on the direction of swimming, so you want the reference to be an average. So, we will define the
+ <strong>fractional difference</strong>
+ as
+ <em>f</em>
+ = 2(
+ <em>t
+ a</em>
+ –
+ <em>t
+ b</em>
+ ) / (
+ <em>t
+ a</em>
+ +
+ <em>t
+ b</em>
+ ).</p>
+
+<p>Your task here is to plot the mean fractional difference between odd and even splits versus lane number. I have already calculated the mean fractional differences for the 2013 and 2015 Worlds for you, and they are stored in
+ <code class="language-plaintext highlighter-rouge">f_13</code>
+ and
+ <code class="language-plaintext highlighter-rouge">f_15</code>
+ . The corresponding lane numbers are in the array
+ <code class="language-plaintext highlighter-rouge">lanes</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot the the fractional difference for 2013 and 2015
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lanes</span><span class="p">,</span> <span class="n">f_13</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lanes</span><span class="p">,</span> <span class="n">f_15</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+
+<span class="c1"># Add a legend
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">((</span><span class="mi">2013</span><span class="p">,</span> <span class="mi">2015</span><span class="p">))</span>
+
+<span class="c1"># Label axes and show plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'lane'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'frac. diff. (odd - even)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/3-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>EDA has exposed a strong slope in 2013 compared to 2015!</p>
+
+<p>####
+<strong>How does the current effect depend on lane position?</strong></p>
+
+<p>To quantify the effect of lane number on performance, perform a linear regression on the
+ <code class="language-plaintext highlighter-rouge">f_13</code>
+ versus
+ <code class="language-plaintext highlighter-rouge">lanes</code>
+ data. Do a pairs bootstrap calculation to get a 95% confidence interval. Finally, make a plot of the regression. The arrays
+ <code class="language-plaintext highlighter-rouge">lanes</code>
+ and
+ <code class="language-plaintext highlighter-rouge">f_13</code>
+ are in your namespace.</p>
+
+<p>Note that we could compute error bars on the mean fractional differences and use them in the regression, but that is beyond the scope of this course.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the slope and intercept of the frac diff/lane curve
+</span><span class="n">slope</span><span class="p">,</span> <span class="n">intercept</span>  <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">lanes</span><span class="p">,</span> <span class="n">f_13</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># Compute bootstrap replicates
+</span><span class="n">bs_reps_slope</span><span class="p">,</span> <span class="n">bs_reps_int</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_pairs_linreg</span><span class="p">(</span><span class="n">lanes</span><span class="p">,</span> <span class="n">f_13</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute 95% confidence interval of slope
+</span><span class="n">conf_int</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bs_reps_slope</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+
+<span class="c1"># Print slope and confidence interval
+</span><span class="k">print</span><span class="p">(</span><span class="s">"""
+slope: {0:.5f} per lane
+95% conf int: [{1:.5f}, {2:.5f}] per lane"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">slope</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int</span><span class="p">))</span>
+
+<span class="c1"># x-values for plotting regression lines
+</span><span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">])</span>
+
+<span class="c1"># Plot 100 bootstrap replicate lines
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">100</span><span class="p">):</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">bs_reps_slope</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="n">bs_reps_int</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                 <span class="n">color</span><span class="o">=</span><span class="s">'red'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+<span class="c1"># Update the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1">#    slope: 0.00447 per lane
+#    95% conf int: [0.00394, 0.00501] per lane
+</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/4-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>The slope is a fractional difference of about 0.4% per lane. This is quite a substantial difference at this elite level of swimming where races can be decided by tiny differences.</p>
+
+<p>####
+<strong>Hypothesis test: can this be by chance?</strong></p>
+
+<p>The EDA and linear regression analysis is pretty conclusive. Nonetheless, you will top off the analysis of the zigzag effect by testing the hypothesis that lane assignment has nothing to do with the mean fractional difference between even and odd lanes using a permutation test. You will use the Pearson correlation coefficient, which you can compute with
+ <code class="language-plaintext highlighter-rouge">dcst.pearson_r()</code>
+ as the test statistic. The variables
+ <code class="language-plaintext highlighter-rouge">lanes</code>
+ and
+ <code class="language-plaintext highlighter-rouge">f_13</code>
+ are already in your namespace.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute observed correlation: rho
+</span><span class="n">rho</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">pearson_r</span><span class="p">(</span><span class="n">lanes</span><span class="p">,</span> <span class="n">f_13</span><span class="p">)</span>
+
+<span class="c1"># Initialize permutation reps: perm_reps_rho
+</span><span class="n">perm_reps_rho</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">empty</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Make permutation reps
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10000</span><span class="p">):</span>
+    <span class="c1"># Scramble the lanes array: scrambled_lanes
+</span>    <span class="n">scrambled_lanes</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">lanes</span><span class="p">)</span>
+
+    <span class="c1"># Compute the Pearson correlation coefficient
+</span>    <span class="n">perm_reps_rho</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">pearson_r</span><span class="p">(</span><span class="n">scrambled_lanes</span><span class="p">,</span> <span class="n">f_13</span><span class="p">)</span>
+
+<span class="c1"># Compute and print p-value
+</span><span class="n">p_val</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">perm_reps_rho</span> <span class="o">&gt;=</span> <span class="n">rho</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10000</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'p ='</span><span class="p">,</span> <span class="n">p_val</span><span class="p">)</span>
+
+<span class="c1">#    p = 0.0
+</span>
+</code></pre></div></div>
+
+<p>The p-value is very small, as you would expect from the confidence interval of the last exercise.</p>
+
+<hr />
+
+<h2 id="33-recap-of-swimming-analysis"><strong>3.3 Recap of swimming analysis</strong></h2>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/5-2.png?w=931" alt="Desktop View" /></p>
+<h1 id="4-statistical-seismology-and-the-parkfield-region"><strong>4. Statistical seismology and the Parkfield region</strong></h1>
+<hr />
+
+<h2 id="41-introduction-to-statistical-seismology-and-the-parkfield-experiment"><strong>4.1 Introduction to statistical seismology and the Parkfield experiment</strong></h2>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/1-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/2-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/3-3.png?w=953" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/4-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/5-3.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/6-2.png?w=1024" alt="Desktop View" /></p>
+
+<p><a href="https://en.wikipedia.org/wiki/Gutenberg%E2%80%93Richter_law">Gutenberg–Richter law</a></p>
+
+<h3 id="411-parkfield-earthquake-magnitudes"><strong>4.1.1 Parkfield earthquake magnitudes</strong></h3>
+
+<p>As usual, you will start with EDA and plot the ECDF of the magnitudes of earthquakes detected in the Parkfield region from 1950 to 2016. The magnitudes of all earthquakes in the region from the ANSS ComCat are stored in the Numpy array
+ <code class="language-plaintext highlighter-rouge">mags</code>
+ .</p>
+
+<p>When you do it this time, though, take a shortcut in generating the ECDF. You may recall that putting an asterisk before an argument in a function splits what follows into separate arguments. Since
+ <code class="language-plaintext highlighter-rouge">dcst.ecdf()</code>
+ returns two values, we can pass them as the
+ <code class="language-plaintext highlighter-rouge">x</code>
+ ,
+ <code class="language-plaintext highlighter-rouge">y</code>
+ positional arguments to
+ <code class="language-plaintext highlighter-rouge">plt.plot()</code>
+ as
+ <code class="language-plaintext highlighter-rouge">plt.plot(*dcst.ecdf(data_you_want_to_plot))</code>
+ .</p>
+
+<p>You will use this shortcut in this exercise and going forward.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Make the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">mags</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+
+<span class="c1"># Label axes and show plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'magnitude'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'ECDF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/7-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>Note the distinctive roll-off at magnitudes below 1.0.</p>
+
+<h3 id="412-computing-the-b-value"><strong>4.1.2 Computing the b-value</strong></h3>
+
+<p>The
+ <em>b</em>
+ -value is a common metric for the seismicity of a region. You can imagine you would like to calculate it often when working with earthquake data. For tasks like this that you will do often, it is best to write a function! So, write a function with signature
+ <code class="language-plaintext highlighter-rouge">b_value(mags, mt, perc=[2.5, 97.5], n_reps=None)</code>
+ that returns the
+ <em>b</em>
+ -value and (optionally, if
+ <code class="language-plaintext highlighter-rouge">n_reps</code>
+ is not
+ <code class="language-plaintext highlighter-rouge">None</code>
+ ) its confidence interval for a set of magnitudes,
+ <code class="language-plaintext highlighter-rouge">mags</code>
+ . The completeness threshold is given by
+ <code class="language-plaintext highlighter-rouge">mt</code>
+ . The
+ <code class="language-plaintext highlighter-rouge">perc</code>
+ keyword argument gives the percentiles for the lower and upper bounds of the confidence interval, and
+ <code class="language-plaintext highlighter-rouge">n_reps</code>
+ is the number of bootstrap replicates to use in computing the confidence interval.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def b_value(mags, mt, perc=[2.5, 97.5], n_reps=None):
+    """Compute the b-value and optionally its confidence interval."""
+    # Extract magnitudes above completeness threshold: m
+    m = mags[mags &gt;= mt]
+
+    # Compute b-value: b
+    b = (np.mean(m) - mt) * np.log(10)
+
+    # Draw bootstrap replicates
+    if n_reps is None:
+        return b
+    else:
+        m_bs_reps = dcst.draw_bs_reps(m, np.mean, size=n_reps)
+
+        # Compute b-value from replicates: b_bs_reps
+        b_bs_reps = (m_bs_reps - mt) * np.log(10)
+
+        # Compute confidence interval: conf_int
+        conf_int = np.percentile(b_bs_reps, perc)
+
+        return b, conf_int
+
+</code></pre></div></div>
+
+<p>You now have a very handy function for computing b-values. You’ll use it in this and the next chapter.</p>
+
+<h3 id="413-the-b-value-for-parkfield"><strong>4.1.3 The b-value for Parkfield</strong></h3>
+
+<p>The ECDF is effective at exposing roll-off, as you could see below magnitude 1. Because there are plenty of earthquakes above magnitude 3, you can use
+ <em>m
+ t
+ = 3</em>
+ as your completeness threshold. With this completeness threshold, compute the
+ <em>b</em>
+ -value for the Parkfield region from 1950 to 2016, along with the 95% confidence interval. Print the results to the screen. The variable
+ <code class="language-plaintext highlighter-rouge">mags</code>
+ with all the magnitudes is in your namespace.</p>
+
+<p>Overlay the theoretical Exponential CDF to verify that the Parkfield region follows the Gutenberg-Richter Law.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute b-value and confidence interval
+</span><span class="n">b</span><span class="p">,</span> <span class="n">conf_int</span> <span class="o">=</span> <span class="n">b_value</span><span class="p">(</span><span class="n">mags</span><span class="p">,</span> <span class="n">mt</span><span class="p">,</span> <span class="n">perc</span><span class="o">=</span><span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">],</span> <span class="n">n_reps</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Generate samples to for theoretical ECDF
+</span><span class="n">m_theor</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">b</span><span class="o">/</span><span class="n">np</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">size</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span> <span class="o">+</span> <span class="n">mt</span>
+
+<span class="c1"># Plot the theoretical CDF
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">m_theor</span><span class="p">))</span>
+
+<span class="c1"># Plot the ECDF (slicing mags &gt;= mt)
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">mags</span><span class="p">[</span><span class="n">mags</span> <span class="o">&gt;=</span> <span class="n">mt</span><span class="p">]),</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+
+<span class="c1"># Pretty up and show the plot
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'magnitude'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'ECDF'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlim</span><span class="p">(</span><span class="mf">2.8</span><span class="p">,</span> <span class="mf">6.2</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># Report the results
+</span><span class="k">print</span><span class="p">(</span><span class="s">"""
+b-value: {0:.2f}
+95% conf int: [{1:.2f}, {2:.2f}]"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int</span><span class="p">))</span>
+
+<span class="c1">#    b-value: 1.08
+#    95% conf int: [0.94, 1.24]
+</span>
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/8-1.png?w=1024" alt="Desktop View" /></p>
+
+<p>Parkfield seems to follow the Gutenberg-Richter law very well. The b-value of about 1 is typical for regions along fault zones.</p>
+
+<hr />
+
+<h2 id="42-timing-of-major-earthquakes-and-the-parkfield-sequence"><strong>4.2 Timing of major earthquakes and the Parkfield sequence</strong></h2>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/1-4.png?w=961" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/2-4.png?w=942" alt="Desktop View" /></p>
+
+<h3 id="421-interearthquake-time-estimates-for-parkfield"><strong>4.2.1 Interearthquake time estimates for Parkfield</strong></h3>
+
+<p>In this exercise, you will first compute the best estimates for the parameters for the Exponential and Gaussian models for interearthquake times. You will then plot the theoretical CDFs for the respective models along with the formal ECDF of the actual Parkfield interearthquake times.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the mean time gap: mean_time_gap
+</span><span class="n">mean_time_gap</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">time_gap</span><span class="p">)</span>
+
+<span class="c1"># Standard deviation of the time gap: std_time_gap
+</span><span class="n">std_time_gap</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">std</span><span class="p">(</span><span class="n">time_gap</span><span class="p">)</span>
+
+<span class="c1"># Generate theoretical Exponential distribution of timings: time_gap_exp
+</span><span class="n">time_gap_exp</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">mean_time_gap</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Generate theoretical Normal distribution of timings: time_gap_norm
+</span><span class="n">time_gap_norm</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">mean_time_gap</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">std_time_gap</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Plot theoretical CDFs
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">time_gap_exp</span><span class="p">))</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">time_gap_norm</span><span class="p">))</span>
+
+<span class="c1"># Plot Parkfield ECDF
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">time_gap</span><span class="p">,</span> <span class="n">formal</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">min_x</span><span class="o">=-</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_x</span><span class="o">=</span><span class="mi">50</span><span class="p">))</span>
+
+<span class="c1"># Add legend
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">((</span><span class="s">'Exp.'</span><span class="p">,</span> <span class="s">'Norm.'</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s">'upper left'</span><span class="p">)</span>
+
+<span class="c1"># Label axes, set limits and show plot
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'time gap (years)'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'ECDF'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlim</span><span class="p">(</span><span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/3-4.png?w=873" alt="Desktop View" /></p>
+
+<p>By eye, the Gaussian model seems to describe the observed data best. We will investigate the consequences of this in the next exercise, and see if we can reject the Exponential model in coming exercises.</p>
+
+<h3 id="422-when-will-the-next-big-parkfield-quake-be"><strong>4.2.2 When will the next big Parkfield quake be?</strong></h3>
+
+<p>The last big earthquake in the Parkfield region was on the evening of September 27, 2004 local time. Your task is to get an estimate as to when the next Parkfield quake will be, assuming the Exponential model and also the Gaussian model. In both cases, the best estimate is given by the mean time gap, which you computed in the last exercise to be 24.62 years, meaning that the next earthquake would be in 2029. Compute 95% confidence intervals on when the next earthquake will be assuming an Exponential distribution parametrized by
+ <code class="language-plaintext highlighter-rouge">mean_time_gap</code>
+ you computed in the last exercise. Do the same assuming a Normal distribution parametrized by
+ <code class="language-plaintext highlighter-rouge">mean_time_gap</code>
+ and
+ <code class="language-plaintext highlighter-rouge">std_time_gap</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Draw samples from the Exponential distribution: exp_samples
+</span><span class="n">exp_samples</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">mean_time_gap</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+
+<span class="c1"># Draw samples from the Normal distribution: norm_samples
+</span><span class="n">norm_samples</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">normal</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">mean_time_gap</span><span class="p">,</span> <span class="n">scale</span><span class="o">=</span><span class="n">std_time_gap</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">100000</span><span class="p">)</span>
+
+<span class="c1"># No earthquake as of today, so only keep samples that are long enough
+</span><span class="n">exp_samples</span> <span class="o">=</span> <span class="n">exp_samples</span><span class="p">[</span><span class="n">exp_samples</span> <span class="o">&gt;</span> <span class="n">today</span> <span class="o">-</span> <span class="n">last_quake</span><span class="p">]</span>
+<span class="n">norm_samples</span> <span class="o">=</span> <span class="n">norm_samples</span><span class="p">[</span><span class="n">norm_samples</span> <span class="o">&gt;</span> <span class="n">today</span> <span class="o">-</span> <span class="n">last_quake</span><span class="p">]</span>
+
+<span class="c1"># Compute the confidence intervals with medians
+</span><span class="n">conf_int_exp</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">exp_samples</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span> <span class="o">+</span> <span class="n">last_quake</span>
+<span class="n">conf_int_norm</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">norm_samples</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span> <span class="o">+</span> <span class="n">last_quake</span>
+
+<span class="c1"># Print the results
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Exponential:'</span><span class="p">,</span> <span class="n">conf_int_exp</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'     Normal:'</span><span class="p">,</span> <span class="n">conf_int_norm</span><span class="p">)</span>
+
+<span class="c1">#    Exponential: [2020.43020248 2036.77538201 2110.14809932]
+#           Normal: [2020.64362947 2030.72447973 2046.46834012]
+</span>
+</code></pre></div></div>
+
+<p>Great work! The models given decidedly different predictions. The Gaussian model says the next earthquake is almost sure to be in the next few decades, but the Exponential model says we may very well have to wait longer.</p>
+
+<hr />
+
+<h2 id="43-how-are-the-parkfield-interearthquake-times-distributed"><strong>4.3 How are the Parkfield interearthquake times distributed?</strong></h2>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/4-4.png?w=1024" alt="Desktop View" />
+<img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/5-4.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="431-computing-the-value-of-a-formal-ecdf"><strong>4.3.1 Computing the value of a formal ECDF</strong></h3>
+
+<p>To be able to do the Kolmogorov-Smirnov test, we need to compute the value of a formal ECDF at arbitrary points. In other words, we need a function,
+ <code class="language-plaintext highlighter-rouge">ecdf_formal(x, data)</code>
+ that returns the value of the formal ECDF derived from the data set
+ <code class="language-plaintext highlighter-rouge">data</code>
+ for each value in the array
+ <code class="language-plaintext highlighter-rouge">x</code>
+ . Two of the functions accomplish this. One will not. Of the two that do the calculation correctly, one is faster. Label each.</p>
+
+<p>As a reminder, the ECDF is formally defined as ECDF(
+ <em>x</em>
+ ) = (number of samples ≤
+ <em>x</em>
+ ) / (total number of samples). You also might want to check out the doc string of
+ <code class="language-plaintext highlighter-rouge">np.searchsorted()</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># a)
+</span><span class="k">def</span> <span class="nf">ecdf_formal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">sort</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">x</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># b)
+</span><span class="k">def</span> <span class="nf">ecdf_formal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">sort</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">x</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s">'right'</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># c)
+</span><span class="k">def</span> <span class="nf">ecdf_formal</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">empty</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">sort</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x_val</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+        <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="ow">and</span> <span class="n">x_val</span> <span class="o">&gt;=</span> <span class="n">data</span><span class="p">[</span><span class="n">j</span><span class="p">]:</span>
+            <span class="n">j</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">j</span>
+
+    <span class="k">return</span> <span class="n">output</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<p>(a) Incorrect; (b) Correct, fast; (c) Correct, slow.</p>
+
+<h3 id="432-computing-the-k-s-statistic"><strong>4.3.2 Computing the K-S statistic</strong></h3>
+
+<p>Write a function to compute the Kolmogorov-Smirnov statistic from two datasets,
+ <code class="language-plaintext highlighter-rouge">data1</code>
+ and
+ <code class="language-plaintext highlighter-rouge">data2</code>
+ , in which
+ <code class="language-plaintext highlighter-rouge">data2</code>
+ consists of samples from the theoretical distribution you are comparing your data to. Note that this means we are using hacker stats to compute the K-S statistic for a dataset and a theoretical distribution,
+ <em>not</em>
+ the K-S statistic for two empirical datasets. Conveniently, the function you just selected for computing values of the formal ECDF is given as
+ <code class="language-plaintext highlighter-rouge">dcst.ecdf_formal()</code>
+ .</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def ks_stat(data1, data2):
+    # Compute ECDF from data: x, y
+    x, y = dcst.ecdf(data1)
+
+    # Compute corresponding values of the target CDF
+    cdf = dcst.ecdf_formal(x, data2)
+
+    # Compute distances between concave corners and CDF
+    D_top = y - cdf
+
+    # Compute distance between convex corners and CDF
+    D_bottom = cdf - y + 1/len(data1)
+
+    return np.max((D_top, D_bottom))
+
+</code></pre></div></div>
+
+<h3 id="433-drawing-k-s-replicates"><strong>4.3.3 Drawing K-S replicates</strong></h3>
+
+<p>Now, you need a function to draw Kolmogorov-Smirnov replicates out of a target distribution,
+ <code class="language-plaintext highlighter-rouge">f</code>
+ . Construct a function with signature
+ <code class="language-plaintext highlighter-rouge">draw_ks_reps(n, f, args=(), size=10000, n_reps=10000)</code>
+ to do so. Here,
+ <code class="language-plaintext highlighter-rouge">n</code>
+ is the number of data points, and
+ <code class="language-plaintext highlighter-rouge">f</code>
+ is the function you will use to generate samples from the target CDF. For example, to test against an Exponential distribution, you would pass
+ <code class="language-plaintext highlighter-rouge">np.random.exponential</code>
+ as
+ <code class="language-plaintext highlighter-rouge">f</code>
+ . This function usually takes arguments, which must be passed as a tuple. So, if you wanted to take samples from an Exponential distribution with mean
+ <code class="language-plaintext highlighter-rouge">x_mean</code>
+ , you would use the
+ <code class="language-plaintext highlighter-rouge">args=(x_mean,)</code>
+ keyword. The keyword arguments
+ <code class="language-plaintext highlighter-rouge">size</code>
+ and
+ <code class="language-plaintext highlighter-rouge">n_reps</code>
+ respectively represent the number of samples to take from the target distribution and the number of replicates to draw.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+def draw_ks_reps(n, f, args=(), size=10000, n_reps=10000):
+    # Generate samples from target distribution
+    x_f = f(*args, size=size)
+
+    # Initialize K-S replicates
+    reps = np.empty(n_reps)
+
+    # Draw replicates
+    for i in range(n_reps):
+        # Draw samples for comparison
+        x_samp = f(*args, size=n)
+
+        # Compute K-S statistic
+        reps[i] = dcst.ks_stat(x_samp, x_f)
+
+    return reps
+
+</code></pre></div></div>
+
+<h3 id="434-the-k-s-test-for-exponentiality"><strong>4.3.4 The K-S test for Exponentiality</strong></h3>
+
+<dl>
+  <dt>Test the null hypothesis that the interearthquake times of the Parkfield sequence are Exponentially distributed. That is, earthquakes happen at random with no memory of when the last one was.</dt>
+  <dt> <em>Note</em></dt>
+  <dd>This calculation is computationally intensive (you will draw more than 10
+ 8
+ random numbers), so it will take about 10 seconds to complete.</dd>
+</dl>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Draw target distribution: x_f
+</span><span class="n">x_f</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">exponential</span><span class="p">(</span><span class="n">scale</span><span class="o">=</span><span class="n">mean_time_gap</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute K-S stat: d
+</span><span class="n">d</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">ks_stat</span><span class="p">(</span><span class="n">x_f</span><span class="p">,</span> <span class="n">time_gap</span><span class="p">)</span>
+
+<span class="c1"># Draw K-S replicates: reps
+</span><span class="n">reps</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_ks_reps</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time_gap</span><span class="p">),</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">exponential</span><span class="p">,</span>
+                         <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">mean_time_gap</span><span class="p">,),</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">,</span> <span class="n">n_reps</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute and print p-value
+</span><span class="n">p_val</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">reps</span> <span class="o">&gt;=</span> <span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10000</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'p ='</span><span class="p">,</span> <span class="n">p_val</span><span class="p">)</span>
+
+<span class="c1"># p = 0.2199
+</span>
+</code></pre></div></div>
+
+<p>That’s a p-value above 0.2. This means that the Parkfield sequence is not outside the realm of possibility if earthquakes there are a Poisson process. This does
+ <em>not</em>
+ mean that they are generated by a Poisson process, but that the observed sequence is not incongruous with that model. The upshot is that it is really hard to say when the next Parkfield quake will be.</p>
+
+<h1 id="5-earthquakes-and-oil-mining-in-oklahoma"><strong>5. Earthquakes and oil mining in Oklahoma</strong></h1>
+<hr />
+
+<h2 id="51-variations-in-earthquake-frequency-and-seismicity"><strong>5.1 Variations in earthquake frequency and seismicity</strong></h2>
+
+<h3 id="511-eda-plotting-earthquakes-over-time"><strong>5.1.1 EDA: Plotting earthquakes over time</strong></h3>
+
+<p>Make a plot where the
+ <em>y</em>
+ -axis is the magnitude and the
+ <em>x</em>
+ -axis is the time of all earthquakes in Oklahoma between 1980 and the first half of 2017. Each dot in the plot represents a single earthquake. The time of the earthquakes, as decimal years, is stored in the Numpy array
+ <code class="language-plaintext highlighter-rouge">time</code>
+ , and the magnitudes in the Numpy array
+ <code class="language-plaintext highlighter-rouge">mags</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Plot time vs. magnitude
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">mags</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+<span class="c1"># Label axes and show the plot
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'time (year)'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'magnitude'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/6-3.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="512-estimates-of-the-mean-interearthquake-times"><strong>5.1.2 Estimates of the mean interearthquake times</strong></h3>
+
+<p>The graphical EDA in the last exercise shows an obvious change in earthquake frequency around 2010. To compare, compute the mean time between earthquakes of magnitude 3 and larger from 1980 through 2009 and also from 2010 through mid-2017. Also include 95% confidence intervals of the mean. The variables
+ <code class="language-plaintext highlighter-rouge">dt_pre</code>
+ and
+ <code class="language-plaintext highlighter-rouge">dt_post</code>
+ respectively contain the time gap between all earthquakes of magnitude at least 3 from pre-2010 and post-2010 in units of days.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute mean interearthquake time
+</span><span class="n">mean_dt_pre</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dt_pre</span><span class="p">)</span>
+<span class="n">mean_dt_post</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dt_post</span><span class="p">)</span>
+
+<span class="c1"># Draw 10,000 bootstrap replicates of the mean
+</span><span class="n">bs_reps_pre</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">dt_pre</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">bs_reps_post</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">dt_post</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute the confidence interval
+</span><span class="n">conf_int_pre</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bs_reps_pre</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+<span class="n">conf_int_post</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">bs_reps_post</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">])</span>
+
+<span class="c1"># Print the results
+</span><span class="k">print</span><span class="p">(</span><span class="s">"""1980 through 2009
+mean time gap: {0:.2f} days
+95% conf int: [{1:.2f}, {2:.2f}] days"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">mean_dt_pre</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int_pre</span><span class="p">))</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">"""
+2010 through mid-2017
+mean time gap: {0:.2f} days
+95% conf int: [{1:.2f}, {2:.2f}] days"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">mean_dt_post</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int_post</span><span class="p">))</span>
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+    1980 through 2009
+    mean time gap: 204.61 days
+    95% conf int: [140.30, 276.13] days
+
+    2010 through mid-2017
+    mean time gap: 1.12 days
+    95% conf int: [0.97, 1.29] days
+
+</code></pre></div></div>
+
+<p>There is almost a 200-fold increase in earthquake frequency after 2010.</p>
+
+<h3 id="513-hypothesis-test-did-earthquake-frequency-change"><strong>5.1.3 Hypothesis test: did earthquake frequency change?</strong></h3>
+
+<p>Obviously, there was a massive increase in earthquake frequency once wastewater injection began. Nonetheless, you will still do a hypothesis test for practice. You will not test the hypothesis that the interearthquake times have the same distribution before and after 2010, since wastewater injection may affect the distribution. Instead, you will assume that they have the same mean. So, compute the p-value associated with the hypothesis that the pre- and post-2010 interearthquake times have the same mean, using the mean of pre-2010 time gaps minus the mean of post-2010 time gaps as your test statistic.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute the observed test statistic
+</span><span class="n">mean_dt_diff</span> <span class="o">=</span> <span class="n">mean_dt_pre</span> <span class="o">-</span> <span class="n">mean_dt_post</span>
+
+<span class="c1"># Shift the post-2010 data to have the same mean as the pre-2010 data
+</span><span class="n">dt_post_shift</span> <span class="o">=</span> <span class="n">dt_post</span> <span class="o">-</span> <span class="n">mean_dt_post</span> <span class="o">+</span> <span class="n">mean_dt_pre</span>
+
+<span class="c1"># Compute 10,000 bootstrap replicates from arrays
+</span><span class="n">bs_reps_pre</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">dt_pre</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+<span class="n">bs_reps_post</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_bs_reps</span><span class="p">(</span><span class="n">dt_post_shift</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Get replicates of difference of means
+</span><span class="n">bs_reps</span> <span class="o">=</span> <span class="n">bs_reps_pre</span> <span class="o">-</span> <span class="n">bs_reps_post</span>
+
+<span class="c1"># Compute and print the p-value
+</span><span class="n">p_val</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">bs_reps</span> <span class="o">&gt;=</span> <span class="n">mean_dt_diff</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10000</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'p ='</span><span class="p">,</span> <span class="n">p_val</span><span class="p">)</span>
+
+<span class="c1"># p = 0.0
+</span>
+</code></pre></div></div>
+
+<p>In 10,000 samples, not one had a test statistic greater than was was observed. The p-value is, predictably based on what we have done so far, is tiny!</p>
+
+<h3 id="514-how-to-display-your-analysis"><strong>5.1.4 How to display your analysis</strong></h3>
+
+<p>In the last three exercises, you generated a plot, computed means/confidence intervals, and did a hypothesis test. If you were to present your results to others, which of the following is the most effective order of emphasis, from greatest-to-least, you should put on the respective results?</p>
+
+<p>plot, mean/confidence interval, hypothesis test</p>
+
+<p>The plot graphically shows all data, and the scale of the effect is evident. The mean and confidence interval quantify how big the effect is. The hypothesis test, by this point, is so obvious it is useless.</p>
+
+<hr />
+
+<h2 id="52-earthquake-magnitudes-in-oklahoma"><strong>5.2 Earthquake magnitudes in Oklahoma</strong></h2>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/7-2.png?w=1024" alt="Desktop View" /></p>
+
+<h3 id="521-eda-comparing-magnitudes-before-and-after-2010"><strong>5.2.1 EDA: Comparing magnitudes before and after 2010</strong></h3>
+
+<p>Make an ECDF of earthquake magnitudes from 1980 through 2009. On the same plot, show an ECDF of magnitudes of earthquakes from 2010 through mid-2017. The time of the earthquakes, as decimal years, are stored in the Numpy array
+ <code class="language-plaintext highlighter-rouge">time</code>
+ and the magnitudes in the Numpy array
+ <code class="language-plaintext highlighter-rouge">mags</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Get magnitudes before and after 2010
+</span><span class="n">mags_pre</span> <span class="o">=</span> <span class="n">mags</span><span class="p">[</span><span class="n">time</span> <span class="o">&lt;</span> <span class="mi">2010</span><span class="p">]</span>
+<span class="n">mags_post</span> <span class="o">=</span> <span class="n">mags</span><span class="p">[</span><span class="n">time</span> <span class="o">&gt;=</span> <span class="mi">2010</span><span class="p">]</span>
+
+<span class="c1"># Generate ECDFs
+</span><span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">mags_pre</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="o">*</span><span class="n">dcst</span><span class="p">.</span><span class="n">ecdf</span><span class="p">(</span><span class="n">mags_post</span><span class="p">),</span> <span class="n">marker</span><span class="o">=</span><span class="s">'.'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s">'none'</span><span class="p">)</span>
+
+
+<span class="c1"># Label axes and show plot
+</span><span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'magnitude'</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'ECDF'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">((</span><span class="s">'1980 though 2009'</span><span class="p">,</span> <span class="s">'2010 through mid-2017'</span><span class="p">),</span> <span class="n">loc</span><span class="o">=</span><span class="s">'upper left'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+</code></pre></div></div>
+
+<p><img src="/blog/assets/datacamp/case-studies-in-statistical-thinking/8-2.png?w=1024" alt="Desktop View" /></p>
+
+<p>Both curves seem to follow the Gutenberg-Richter Law, but with different completeness thresholds, probably due to improvements in sensing capabilities in more recent years.</p>
+
+<h3 id="522-quantification-of-the-b-values"><strong>5.2.2 Quantification of the b-values</strong></h3>
+
+<p>Based on the plot you generated in the previous exercise, you can safely use a completeness threshold of
+ <code class="language-plaintext highlighter-rouge">mt = 3</code>
+ . Using this threshold, compute
+ <em>b</em>
+ -values for the period between 1980 and 2009 and for 2010 through mid-2017. The function
+ <code class="language-plaintext highlighter-rouge">b_value()</code>
+ you wrote last chapter, which computes the
+ <em>b</em>
+ -value and confidence interval from a set of magnitudes and completeness threshold, is available in your namespace, as are the
+ <code class="language-plaintext highlighter-rouge">numpy</code>
+ arrays
+ <code class="language-plaintext highlighter-rouge">mags_pre</code>
+ and
+ <code class="language-plaintext highlighter-rouge">mags_post</code>
+ from the last exercise, and
+ <code class="language-plaintext highlighter-rouge">mt</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Compute b-value and confidence interval for pre-2010
+</span><span class="n">b_pre</span><span class="p">,</span> <span class="n">conf_int_pre</span> <span class="o">=</span> <span class="n">b_value</span><span class="p">(</span><span class="n">mags_pre</span><span class="p">,</span> <span class="n">mt</span><span class="p">,</span> <span class="n">perc</span><span class="o">=</span><span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">],</span> <span class="n">n_reps</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute b-value and confidence interval for post-2010
+</span><span class="n">b_post</span><span class="p">,</span> <span class="n">conf_int_post</span> <span class="o">=</span> <span class="n">b_value</span><span class="p">(</span><span class="n">mags_post</span><span class="p">,</span> <span class="n">mt</span><span class="p">,</span> <span class="n">perc</span><span class="o">=</span><span class="p">[</span><span class="mf">2.5</span><span class="p">,</span> <span class="mf">97.5</span><span class="p">],</span> <span class="n">n_reps</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Report the results
+</span><span class="k">print</span><span class="p">(</span><span class="s">"""
+1980 through 2009
+b-value: {0:.2f}
+95% conf int: [{1:.2f}, {2:.2f}]
+
+2010 through mid-2017
+b-value: {3:.2f}
+95% conf int: [{4:.2f}, {5:.2f}]
+"""</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">b_pre</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int_pre</span><span class="p">,</span> <span class="n">b_post</span><span class="p">,</span> <span class="o">*</span><span class="n">conf_int_post</span><span class="p">))</span>
+
+
+</code></pre></div></div>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+    1980 through 2009
+    b-value: 0.74
+    95% conf int: [0.54, 0.96]
+
+    2010 through mid-2017
+    b-value: 0.62
+    95% conf int: [0.60, 0.65]
+
+</code></pre></div></div>
+
+<p>The confidence interval for the
+ <em>b</em>
+ -value for recent earthquakes is tighter than for earlier ones because there are many more recent ones. Still, the confidence intervals overlap, and we can perform a hypothesis test to see if we might get these results if the
+ <em>b</em>
+ -values are actually the same.</p>
+
+<h3 id="523-how-should-we-do-a-hypothesis-test-on-differences-of-the-b-value"><strong>5.2.3 How should we do a hypothesis test on differences of the b-value?</strong></h3>
+
+<p>We wish to test the hypothesis that the
+ <em>b</em>
+ -value in Oklahoma from 1980 through 2009 is the same as that from 2010 through mid-2017. Which of the first five statements is false? If none of them are false, select the last choice.</p>
+
+<ul>
+  <li>You should only include earthquakes that have magnitudes above the completeness threshold. A value of 3 is reasonable.</li>
+  <li>You should perform a permutation test because asserting a null hypothesis that the
+ <em>b</em>
+ -values are the same implicitly assumes that the magnitudes are identically distributed, specifically Exponentially, by the Gutenberg-Richter Law.</li>
+  <li>A reasonable test statistic is the difference between the mean post-2010 magnitude and the mean pre-2010 magnitude.</li>
+  <li>You do not need to worry about the fact that there were far fewer earthquakes before 2010 than there were after. That is to say, there are fewer earthquakes before 2010, but sufficiently many to do a permutation test.</li>
+  <li>You do not need to worry about the fact that the two time intervals are of different length.</li>
+  <li><strong>None of the above statements are false.</strong></li>
+</ul>
+
+<p>For instructional purposes, here are reasons why each is true: Option 1 is true because below the completeness threshold, we are not comparing earthquakes before and after 2010, but
+ <em>observed</em>
+ earthquakes before and after 2010. We do not have a complete data set below the completeness threshold.</p>
+
+<p>Option 2 is true because we really are assuming the Gutenberg-Richter law holds, in part because we are only considering earthquakes above the completeness threshold. We are using a model (the G-R law) to deal with missing data. So, since both sets of quakes follow the same statistical model, and that model has a single parameter, a permutation test is appropriate.</p>
+
+<p>Option 3 is true, even though you may be thinking that the mean values are not the
+ <em>b</em>
+ -values, and that you should be using the difference in
+ <em>b</em>
+ -value as your test statistic. However, the difference in mean magnitude is directly proportional to the difference in
+ <em>b</em>
+ -value, so the result of the hypothesis test will be identical if we use
+ <em>b</em>
+ -values of mean magnitudes.</p>
+
+<p>Option 4 is true because even though they have different numbers of earthquakes, you are only interested in summary statistics about their magnitude. There were 53 earthquakes between 1980 and 2009 with magnitude 3 or greater, so we have enough to compute a reliable mean.</p>
+
+<p>Option 5 is true because, provided the time interval is long enough, the
+ <em>b</em>
+ -value is independent of the time interval, just like the mean of Exponentially distributed values is independent of how many there are, provided there are not too few.</p>
+
+<h3 id="524-hypothesis-test-are-the-b-values-different"><strong>5.2.4 Hypothesis test: are the b-values different?</strong></h3>
+
+<p>Perform the hypothesis test sketched out on the previous exercise. The variables
+ <code class="language-plaintext highlighter-rouge">mags_pre</code>
+ and
+ <code class="language-plaintext highlighter-rouge">mags_post</code>
+ are already loaded into your namespace, as is
+ <code class="language-plaintext highlighter-rouge">mt = 3</code>
+ .</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1"># Only magnitudes above completeness threshold
+</span><span class="n">mags_pre</span> <span class="o">=</span> <span class="n">mags_pre</span><span class="p">[</span><span class="n">mags_pre</span> <span class="o">&gt;=</span> <span class="n">mt</span><span class="p">]</span>
+<span class="n">mags_post</span> <span class="o">=</span> <span class="n">mags_post</span><span class="p">[</span><span class="n">mags_post</span> <span class="o">&gt;=</span> <span class="n">mt</span><span class="p">]</span>
+
+<span class="c1"># Observed difference in mean magnitudes: diff_obs
+</span><span class="n">diff_obs</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mags_post</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="p">.</span><span class="n">mean</span><span class="p">(</span><span class="n">mags_pre</span><span class="p">)</span>
+
+<span class="c1"># Generate permutation replicates: perm_reps
+</span><span class="n">perm_reps</span> <span class="o">=</span> <span class="n">dcst</span><span class="p">.</span><span class="n">draw_perm_reps</span><span class="p">(</span><span class="n">mags_post</span><span class="p">,</span> <span class="n">mags_pre</span><span class="p">,</span> <span class="n">dcst</span><span class="p">.</span><span class="n">diff_of_means</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10000</span><span class="p">)</span>
+
+<span class="c1"># Compute and print p-value
+</span><span class="n">p_val</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">perm_reps</span> <span class="o">&lt;</span> <span class="n">diff_obs</span><span class="p">)</span> <span class="o">/</span> <span class="mi">10000</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'p ='</span><span class="p">,</span> <span class="n">p_val</span><span class="p">)</span>
+
+<span class="c1">#     p = 0.0993
+</span>
+</code></pre></div></div>
+
+<p>A p-value around 0.1 suggests that the observed magnitudes are commensurate with there being no change in
+ <em>b</em>
+ -value after wastewater injection began.</p>
+
+<h3 id="525-what-can-you-conclude-from-this-analysis"><strong>5.2.5 What can you conclude from this analysis?</strong></h3>
+
+<p>All but one of the following constitute reasonable conclusions from our analysis of earthquakes. Which one does not?</p>
+
+<ul>
+  <li>The seismicity, as measured by the
+ <em>b</em>
+ -value, is comparable before and after wastewater injection.</li>
+  <li>Earthquakes are over 100 times more frequent in Oklahoma after widespread wastewater injection began.</li>
+  <li><strong>Oklahoma has a smaller
+ <em>b</em>
+ -value than the Parkfield region, so the Parkfield region has more earthquakes.</strong></li>
+  <li>Oklahoma has a
+ <em>b</em>
+ -value smaller than the Parkfield region, so a randomly selected earthquake above magnitude 3 in Oklahoma more likely than not has a smaller magnitude than one above magnitude 3 randomly selected from the Parkfield region.</li>
+</ul>
+
+<p>One cannot conclude information about frequency of earthquakes from the
+ <em>b</em>
+ -value alone. It is also true that from 2010-mid 2017, Oklahoma had twice as many earthquakes of magnitude 3 and higher than the entire state of California!</p>
+
+<hr />
+
+<p>Thank you for reading and hope you’ve learned a lot.</p>
+

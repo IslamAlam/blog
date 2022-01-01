@@ -1,0 +1,542 @@
+<h1 id="cluster-analysis-in-python">Cluster Analysis in Python</h1>
+
+<p>This is the memo of the 6th course (23 courses in all) of ‘Machine Learning Scientist with Python’ skill track.
+<strong>You can find the original course</strong> <a href="https://www.datacamp.com/courses/clustering-methods-with-scipy"><strong>HERE</strong></a>.</p>
+
+<h3 id="course-description"><strong>Course Description</strong></h3>
+
+<p>You have probably come across Google News, which automatically groups similar news articles under a topic. Have you ever wondered what process runs in the background to arrive at these groups? In this course, you will be introduced to unsupervised learning through clustering using the SciPy library in Python. This course covers pre-processing of data and application of hierarchical and k-means clustering. Through the course, you will explore player statistics from a popular football video game, FIFA 18. After completing the course, you will be able to quickly apply various clustering algorithms on data, visualize the clusters formed and analyze results.</p>
+
+<h3 id="table-of-contents"><strong>Table of contents</strong></h3>
+
+<ol>
+  <li>Introduction to Clustering</li>
+  <li>Hierarchical Clustering</li>
+  <li>K-Means Clustering</li>
+  <li>Clustering in Real World</li>
+</ol>
+
+<h2 id="1-introduction-to-clustering"><strong>1. Introduction to Clustering</strong></h2>
+
+<h3 id="11-unsupervised-learning-basics"><strong>1.1 Unsupervised learning: basics</strong></h3>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/1-1.png?w=1024" alt="" /></p>
+
+<p><strong>1.1.1 Unsupervised learning in real world</strong></p>
+
+<p>Which of the following examples can be solved with unsupervised learning?</p>
+
+<ul>
+  <li>A list of tweets to be classified based on their sentiment, the data has tweets associated with a positive or negative sentiment.</li>
+  <li>A spam recognition system that marks incoming emails as spam, the data has emails marked as spam and not spam.</li>
+  <li><strong>Segmentation of learners at DataCamp based on courses they complete. The training data has no labels.press</strong></li>
+</ul>
+
+<p><strong>1.1.2 Pokémon sightings</strong></p>
+
+<p>There have been reports of sightings of rare, legendary Pokémon. You have been asked to investigate! Plot the coordinates of sightings to find out where the Pokémon might be. The X and Y coordinates of the points are stored in list <code class="language-plaintext highlighter-rouge">x</code> and <code class="language-plaintext highlighter-rouge">y</code>, respectively.</p>
+
+<p>| 12345678 | <code class="language-plaintext highlighter-rouge"># Import plotting class from matplotlib libraryfrom</code> <code class="language-plaintext highlighter-rouge">matplotlib</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">pyplot as plt</code> <code class="language-plaintext highlighter-rouge"># Create a scatter plotplt.scatter(x, y)</code> <code class="language-plaintext highlighter-rouge"># Display the scatter plotplt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/2-1.png?w=1024" alt="" /></p>
+
+<p>Notice the areas where the sightings are dense. This indicates that there is not one, but two legendary Pokémon out there!</p>
+
+<h3 id="12-basics-of-cluster-analysis"><strong>1.2 Basics of cluster analysis</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/3-1.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/4-1.png?w=876" alt="" /></li>
+</ul>
+
+<p><strong>Hierarchical clustering algorithms</strong></p>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/5-1.png?w=596" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/6-1.png?w=589" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/7-1.png?w=591" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/8.png?w=589" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/9.png?w=908" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/10.png?w=965" alt="" /></li>
+</ul>
+
+<p><strong>K-means clustering algorithms</strong></p>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/11.png?w=561" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/12.png?w=551" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/13.png?w=540" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/14.png?w=813" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/15.png?w=982" alt="" /></li>
+</ul>
+
+<p><strong>1.2.1 Pokémon sightings: hierarchical clustering</strong></p>
+
+<p>We are going to continue the investigation into the sightings of legendary Pokémon from the previous exercise. Remember that in the scatter plot of the previous exercise, you identified two areas where Pokémon sightings were dense. This means that the points seem to separate into two clusters. In this exercise, you will form two clusters of the sightings using hierarchical clustering.</p>
+
+<p>| 1234567 | <code class="language-plaintext highlighter-rouge">df.head()   x   y0</code>  <code class="language-plaintext highlighter-rouge">9</code>   <code class="language-plaintext highlighter-rouge">81</code>  <code class="language-plaintext highlighter-rouge">6</code>   <code class="language-plaintext highlighter-rouge">42</code>  <code class="language-plaintext highlighter-rouge">2</code>  <code class="language-plaintext highlighter-rouge">103</code>  <code class="language-plaintext highlighter-rouge">3</code>   <code class="language-plaintext highlighter-rouge">64</code>  <code class="language-plaintext highlighter-rouge">1</code>   <code class="language-plaintext highlighter-rouge">0</code> |
+| :— | :— |</p>
+
+<p>| 123456789101112 | <code class="language-plaintext highlighter-rouge"># Import linkage and fcluster functionsfrom</code> <code class="language-plaintext highlighter-rouge">scipy.cluster.hierarchy</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">linkage, fcluster</code> <code class="language-plaintext highlighter-rouge"># Use the linkage() function to compute distanceZ</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">linkage(df,</code> <code class="language-plaintext highlighter-rouge">'ward')</code> <code class="language-plaintext highlighter-rouge"># Generate cluster labelsdf['cluster_labels']</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">fcluster(Z,</code> <code class="language-plaintext highlighter-rouge">2, criterion='maxclust')</code> <code class="language-plaintext highlighter-rouge"># Plot the points with seabornsns.scatterplot(x='x', y='y', hue='cluster_labels', data=df)plt.show()</code> |
+| :— | :— |</p>
+
+<p>| 123456789101112131415161718 | <code class="language-plaintext highlighter-rouge">type(Z)numpy.ndarray</code> <code class="language-plaintext highlighter-rouge">Z[:3]array([[10.,</code> <code class="language-plaintext highlighter-rouge">13.,</code>  <code class="language-plaintext highlighter-rouge">0.,</code>  <code class="language-plaintext highlighter-rouge">2.],       [15.,</code> <code class="language-plaintext highlighter-rouge">19.,</code>  <code class="language-plaintext highlighter-rouge">0.,</code>  <code class="language-plaintext highlighter-rouge">2.],       [</code> <code class="language-plaintext highlighter-rouge">1.,</code>  <code class="language-plaintext highlighter-rouge">5.,</code>  <code class="language-plaintext highlighter-rouge">1.,</code>  <code class="language-plaintext highlighter-rouge">2.]])</code> <code class="language-plaintext highlighter-rouge">df     x   y  cluster_labels0</code>    <code class="language-plaintext highlighter-rouge">9</code>   <code class="language-plaintext highlighter-rouge">8</code>               <code class="language-plaintext highlighter-rouge">21</code>    <code class="language-plaintext highlighter-rouge">6</code>   <code class="language-plaintext highlighter-rouge">4</code>               <code class="language-plaintext highlighter-rouge">2...8</code>    <code class="language-plaintext highlighter-rouge">1</code>   <code class="language-plaintext highlighter-rouge">6</code>               <code class="language-plaintext highlighter-rouge">29</code>    <code class="language-plaintext highlighter-rouge">7</code>   <code class="language-plaintext highlighter-rouge">1</code>               <code class="language-plaintext highlighter-rouge">210</code>  <code class="language-plaintext highlighter-rouge">23</code>  <code class="language-plaintext highlighter-rouge">29</code>               <code class="language-plaintext highlighter-rouge">111</code>  <code class="language-plaintext highlighter-rouge">26</code>  <code class="language-plaintext highlighter-rouge">25</code>               <code class="language-plaintext highlighter-rouge">1...</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/image.png?w=1024" alt="" /></p>
+
+<p>Notice that the cluster labels are plotted with different colors. You will notice that the resulting plot has an extra cluster labelled 0 in the legend. This will be explained later in the course.</p>
+
+<p><strong>1.2.2 Pokémon sightings: k-means clustering</strong></p>
+
+<p>We are going to continue the investigation into the sightings of legendary Pokémon from the previous exercise. Just like the previous exercise, we will use the same example of Pokémon sightings. In this exercise, you will form clusters of the sightings using k-means clustering.</p>
+
+<p>| 123456789101112 | <code class="language-plaintext highlighter-rouge"># Import kmeans and vq functionsfrom</code> <code class="language-plaintext highlighter-rouge">scipy.cluster.vq</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">kmeans, vq</code> <code class="language-plaintext highlighter-rouge"># Compute cluster centerscentroids,_</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">kmeans(df,</code> <code class="language-plaintext highlighter-rouge">2)</code> <code class="language-plaintext highlighter-rouge"># Assign cluster labelsdf['cluster_labels'], _</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">vq(df, centroids)</code> <code class="language-plaintext highlighter-rouge"># Plot the points with seabornsns.scatterplot(x='x', y='y', hue='cluster_labels', data=df)plt.show()</code> |
+| :— | :— |</p>
+
+<p>| 123 | <code class="language-plaintext highlighter-rouge">centroidsarray([[23.7,</code> <code class="language-plaintext highlighter-rouge">28.</code> <code class="language-plaintext highlighter-rouge">],       [</code> <code class="language-plaintext highlighter-rouge">4.3,</code>  <code class="language-plaintext highlighter-rouge">5.9]])</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/2-2.png?w=1024" alt="" /></p>
+
+<p>Notice that in this case, the results of both types of clustering are similar. We will look at distinctly different results later in the course.</p>
+
+<h3 id="13-data-preparation-for-cluster-analysis"><strong>1.3 Data preparation for cluster analysis</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/3-2.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/4-2.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/5-2.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>1.3.1 Normalize basic list data</strong></p>
+
+<p>Now that you are aware of normalization, let us try to normalize some data. <code class="language-plaintext highlighter-rouge">goals_for</code> is a list of goals scored by a football team in their last ten matches. Let us standardize the data using the <code class="language-plaintext highlighter-rouge">whiten()</code> function.</p>
+
+<p>| 12345678910 | <code class="language-plaintext highlighter-rouge"># Import the whiten functionfrom</code> <code class="language-plaintext highlighter-rouge">scipy.cluster.vq</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">whiten</code> <code class="language-plaintext highlighter-rouge">goals_for</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">[4,3,2,3,1,1,2,0,1,4]</code> <code class="language-plaintext highlighter-rouge"># Use the whiten() function to standardize the datascaled_data</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">whiten(goals_for)print(scaled_data)# [3.07692308 2.30769231 1.53846154 2.30769231 0.76923077 0.76923077 1.53846154</code> <code class="language-plaintext highlighter-rouge">0.</code>         <code class="language-plaintext highlighter-rouge">0.76923077</code> <code class="language-plaintext highlighter-rouge">3.07692308]</code> |
+| :— | :— |</p>
+
+<p><strong>1.3.2 Visualize normalized data</strong></p>
+
+<p>After normalizing your data, you can compare the scaled data to the original data to see the difference. The variables from the last exercise, <code class="language-plaintext highlighter-rouge">goals_for</code> and <code class="language-plaintext highlighter-rouge">scaled_data</code> are already available to you.</p>
+
+<p>| 1234567891011 | <code class="language-plaintext highlighter-rouge"># Plot original dataplt.plot(goals_for, label='original')</code> <code class="language-plaintext highlighter-rouge"># Plot scaled dataplt.plot(scaled_data, label='scaled')</code> <code class="language-plaintext highlighter-rouge"># Show the legend in the plotplt.legend()</code> <code class="language-plaintext highlighter-rouge"># Display the plotplt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/6-2.png?w=1024" alt="" /></p>
+
+<p><strong>1.3.3 Normalization of small numbers</strong></p>
+
+<p>In earlier examples, you have normalization of whole numbers. In this exercise, you will look at the treatment of fractional numbers – the change of interest rates in the country of Bangalla over the years.</p>
+
+<p>| 1234567891011121314 | <code class="language-plaintext highlighter-rouge"># Prepare datarate_cuts</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">[0.0025,</code> <code class="language-plaintext highlighter-rouge">0.001,</code> <code class="language-plaintext highlighter-rouge">-0.0005,</code> <code class="language-plaintext highlighter-rouge">-0.001,</code> <code class="language-plaintext highlighter-rouge">-0.0005,</code> <code class="language-plaintext highlighter-rouge">0.0025,</code> <code class="language-plaintext highlighter-rouge">-0.001,</code> <code class="language-plaintext highlighter-rouge">-0.0015,</code> <code class="language-plaintext highlighter-rouge">-0.001,</code> <code class="language-plaintext highlighter-rouge">0.0005]</code> <code class="language-plaintext highlighter-rouge"># Use the whiten() function to standardize the datascaled_data</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">whiten(rate_cuts)</code> <code class="language-plaintext highlighter-rouge"># Plot original dataplt.plot(rate_cuts, label='original')</code> <code class="language-plaintext highlighter-rouge"># Plot scaled dataplt.plot(scaled_data, label='scaled')</code> <code class="language-plaintext highlighter-rouge">plt.legend()plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/7-2.png?w=1024" alt="" /></p>
+
+<p>Notice how the changes in the original data are negligible as compared to the scaled data</p>
+
+<p><strong>1.3.4 FIFA 18: Normalize data</strong></p>
+
+<p>FIFA 18 is a football video game that was released in 2017 for PC and consoles. The dataset that you are about to work on contains data on the 1000 top individual players in the game. You will explore various features of the data as we move ahead in the course. In this exercise, you will work with two columns, <code class="language-plaintext highlighter-rouge">eur_wage</code>, the wage of a player in Euros and <code class="language-plaintext highlighter-rouge">eur_value</code>, their current transfer market value.</p>
+
+<p>The data for this exercise is stored in a Pandas dataframe, <code class="language-plaintext highlighter-rouge">fifa</code>. <code class="language-plaintext highlighter-rouge">whiten</code> from <code class="language-plaintext highlighter-rouge">scipy.cluster.vq</code> and <code class="language-plaintext highlighter-rouge">matplotlib.pyplot</code> as <code class="language-plaintext highlighter-rouge">plt</code> have been pre-loaded.</p>
+
+<p>| 12345678910 | <code class="language-plaintext highlighter-rouge"># Scale wage and valuefifa['scaled_wage']</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">whiten(fifa['eur_wage'])fifa['scaled_value']</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">whiten(fifa['eur_value'])</code> <code class="language-plaintext highlighter-rouge"># Plot the two columns in a scatter plotfifa.plot(x='scaled_wage', y='scaled_value', kind</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">'scatter')plt.show()</code> <code class="language-plaintext highlighter-rouge"># Check mean and standard deviation of scaled valuesprint(fifa[['scaled_wage',</code> <code class="language-plaintext highlighter-rouge">'scaled_value']].describe())</code> |
+| :— | :— |</p>
+
+<p>| 123456789 | <code class="language-plaintext highlighter-rouge">scaled_wage  scaled_valuecount</code>      <code class="language-plaintext highlighter-rouge">1000.00</code>       <code class="language-plaintext highlighter-rouge">1000.00mean</code>          <code class="language-plaintext highlighter-rouge">1.12</code>          <code class="language-plaintext highlighter-rouge">1.31std</code>           <code class="language-plaintext highlighter-rouge">1.00</code>          <code class="language-plaintext highlighter-rouge">1.00min</code>           <code class="language-plaintext highlighter-rouge">0.00</code>          <code class="language-plaintext highlighter-rouge">0.0025%</code>           <code class="language-plaintext highlighter-rouge">0.47</code>          <code class="language-plaintext highlighter-rouge">0.7350%</code>           <code class="language-plaintext highlighter-rouge">0.85</code>          <code class="language-plaintext highlighter-rouge">1.0275%</code>           <code class="language-plaintext highlighter-rouge">1.41</code>          <code class="language-plaintext highlighter-rouge">1.54max</code>           <code class="language-plaintext highlighter-rouge">9.11</code>          <code class="language-plaintext highlighter-rouge">8.98</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/8-1.png?w=1024" alt="" /></p>
+
+<p>As you can see the scaled values have a standard deviation of 1.</p>
+
+<h2 id="2-hierarchical-clustering"><strong>2. Hierarchical Clustering</strong></h2>
+
+<h3 id="21-basics-of-hierarchical-clustering"><strong>2.1 Basics of hierarchical clustering</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/9-1.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/10-1.png?w=806" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/11-1.png?w=1022" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/15-1.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/12-1.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/13-1.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/14-1.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>2.1.1 Hierarchical clustering: ward method</strong></p>
+
+<p>It is time for Comic-Con! Comic-Con is an annual comic-based convention held in major cities in the world. You have the data of last year’s footfall, the number of people at the convention ground at a given time.</p>
+
+<p>You would like to decide the location of your stall to maximize sales. Using the ward method, apply hierarchical clustering to find the two points of attraction in the area.</p>
+
+<p>| 123456789 | <code class="language-plaintext highlighter-rouge">comic_con    x_coordinate  y_coordinate  x_scaled  y_scaled0</code>             <code class="language-plaintext highlighter-rouge">17</code>             <code class="language-plaintext highlighter-rouge">4</code>  <code class="language-plaintext highlighter-rouge">0.509349</code>  <code class="language-plaintext highlighter-rouge">0.0900101</code>             <code class="language-plaintext highlighter-rouge">20</code>             <code class="language-plaintext highlighter-rouge">6</code>  <code class="language-plaintext highlighter-rouge">0.599234</code>  <code class="language-plaintext highlighter-rouge">0.1350152</code>             <code class="language-plaintext highlighter-rouge">35</code>             <code class="language-plaintext highlighter-rouge">0</code>  <code class="language-plaintext highlighter-rouge">1.048660</code>  <code class="language-plaintext highlighter-rouge">0.0000003</code>             <code class="language-plaintext highlighter-rouge">14</code>             <code class="language-plaintext highlighter-rouge">0</code>  <code class="language-plaintext highlighter-rouge">0.419464</code>  <code class="language-plaintext highlighter-rouge">0.0000004</code>             <code class="language-plaintext highlighter-rouge">37</code>             <code class="language-plaintext highlighter-rouge">4</code>  <code class="language-plaintext highlighter-rouge">1.108583</code>  <code class="language-plaintext highlighter-rouge">0.0900105</code>             <code class="language-plaintext highlighter-rouge">33</code>             <code class="language-plaintext highlighter-rouge">3</code>  <code class="language-plaintext highlighter-rouge">0.988736</code>  <code class="language-plaintext highlighter-rouge">0.0675076</code>             <code class="language-plaintext highlighter-rouge">14</code>             <code class="language-plaintext highlighter-rouge">1</code>  <code class="language-plaintext highlighter-rouge">0.419464</code>  <code class="language-plaintext highlighter-rouge">0.022502</code> |
+| :— | :— |</p>
+
+<p>| 12345678910111213 | <code class="language-plaintext highlighter-rouge"># Import the fcluster and linkage functionsfrom</code> <code class="language-plaintext highlighter-rouge">scipy.cluster.hierarchy</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">linkage, fcluster</code> <code class="language-plaintext highlighter-rouge"># Use the linkage() functiondistance_matrix</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">linkage(comic_con[['x_scaled',</code> <code class="language-plaintext highlighter-rouge">'y_scaled']], method</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">'ward', metric</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">'euclidean')</code> <code class="language-plaintext highlighter-rouge"># Assign cluster labelscomic_con['cluster_labels']</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">fcluster(distance_matrix,</code> <code class="language-plaintext highlighter-rouge">2, criterion='maxclust')</code> <code class="language-plaintext highlighter-rouge"># Plot clusterssns.scatterplot(x='x_scaled', y='y_scaled',                hue='cluster_labels', data</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">comic_con)plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/1-2.png?w=1024" alt="" /></p>
+
+<p>Notice the two clusters correspond to the points of attractions in the figure towards the bottom (a stage) and the top right (an interesting stall).</p>
+
+<p><strong>2.1.2 Hierarchical clustering: single method</strong></p>
+
+<p>Let us use the same footfall dataset and check if any changes are seen if we use a different method for clustering.</p>
+
+<p>| 12345678910111213 | <code class="language-plaintext highlighter-rouge"># Import the fcluster and linkage functionsfrom</code> <code class="language-plaintext highlighter-rouge">scipy.cluster.hierarchy</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">fcluster, linkage</code> <code class="language-plaintext highlighter-rouge"># Use the linkage() functiondistance_matrix</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">linkage(comic_con[['x_scaled',</code> <code class="language-plaintext highlighter-rouge">'y_scaled']], method</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">'single', metric</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">'euclidean')</code> <code class="language-plaintext highlighter-rouge"># Assign cluster labelscomic_con['cluster_labels']</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">fcluster(distance_matrix,</code> <code class="language-plaintext highlighter-rouge">2, criterion='maxclust')</code> <code class="language-plaintext highlighter-rouge"># Plot clusterssns.scatterplot(x='x_scaled', y='y_scaled',                hue='cluster_labels', data</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">comic_con)plt.show()</code> |
+| :— | :— |</p>
+
+<p>Notice that in this example, the clusters formed are not different from the ones created using the ward method.</p>
+
+<p><strong>2.1.3 Hierarchical clustering: complete method</strong></p>
+
+<p>For the third and final time, let us use the same footfall dataset and check if any changes are seen if we use a different method for clustering.</p>
+
+<p>| 12345678910111213 | <code class="language-plaintext highlighter-rouge"># Import the fcluster and linkage functionsfrom</code> <code class="language-plaintext highlighter-rouge">scipy.cluster.hierarchy</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">linkage, fcluster</code> <code class="language-plaintext highlighter-rouge"># Use the linkage() functiondistance_matrix</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">linkage(comic_con[['x_scaled',</code> <code class="language-plaintext highlighter-rouge">'y_scaled']], method='complete', metric='euclidean')</code> <code class="language-plaintext highlighter-rouge"># Assign cluster labelscomic_con['cluster_labels']</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">fcluster(distance_matrix,2,criterion='maxclust')</code> <code class="language-plaintext highlighter-rouge"># Plot clusterssns.scatterplot(x='x_scaled', y='y_scaled',                hue='cluster_labels', data</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">comic_con)plt.show()</code> |
+| :— | :— |</p>
+
+<p>Coincidentally, the clusters formed are not different from the ward or single methods. Next, let us learn how to visualize clusters.</p>
+
+<h3 id="22-visualize-clusters"><strong>2.2 Visualize clusters</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/3-3.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/4-3.png?w=1000" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/5-3.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>2.2.1 Visualize clusters with matplotlib</strong></p>
+
+<p>We have discussed that visualizations are necessary to assess the clusters that are formed and spot trends in your data. Let us now focus on visualizing the footfall dataset from Comic-Con using the <code class="language-plaintext highlighter-rouge">matplotlib</code> module.</p>
+
+<p>| 1234567891011 | <code class="language-plaintext highlighter-rouge"># Import the pyplot classfrom</code> <code class="language-plaintext highlighter-rouge">matplotlib</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">pyplot as plt</code> <code class="language-plaintext highlighter-rouge"># Define a colors dictionary for clusterscolors</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">{1:'red',</code> <code class="language-plaintext highlighter-rouge">2:'blue'}</code> <code class="language-plaintext highlighter-rouge"># Plot a scatter plotcomic_con.plot.scatter(x</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">'x_scaled',                       y</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">'y_scaled',                       c</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">comic_con['cluster_labels'].apply(lambda</code> <code class="language-plaintext highlighter-rouge">x: colors[x]))plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/6-3.png?w=1024" alt="" /></p>
+
+<p><strong>2.2.2 Visualize clusters with seaborn</strong></p>
+
+<p>Let us now visualize the footfall dataset from Comic Con using the <code class="language-plaintext highlighter-rouge">seaborn</code> module. Visualizing clusters using <code class="language-plaintext highlighter-rouge">seaborn</code> is easier with the inbuild <code class="language-plaintext highlighter-rouge">hue</code> function for cluster labels.</p>
+
+<p>| 123456789 | <code class="language-plaintext highlighter-rouge"># Import the seaborn moduleimport</code> <code class="language-plaintext highlighter-rouge">seaborn as sns</code> <code class="language-plaintext highlighter-rouge"># Plot a scatter plot using seabornsns.scatterplot(x='x_scaled',                y='y_scaled',                hue='cluster_labels',                data</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">comic_con)plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/7-3.png?w=1024" alt="" /></p>
+
+<p>Notice the legend is automatically shown when using the <code class="language-plaintext highlighter-rouge">hue</code> argument.</p>
+
+<h3 id="23-how-many-clusters"><strong>2.3 How many clusters?</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/8-2.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/9-2.png?w=869" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/10-2.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>2.3.1 Create a dendrogram</strong></p>
+
+<p>Dendrograms are branching diagrams that show the merging of clusters as we move through the distance matrix. Let us use the Comic Con footfall data to create a dendrogram.</p>
+
+<p>| 12345678 | <code class="language-plaintext highlighter-rouge"># Import the dendrogram functionfrom</code> <code class="language-plaintext highlighter-rouge">scipy.cluster.hierarchy</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">dendrogram</code> <code class="language-plaintext highlighter-rouge"># Create a dendrogramdn</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">dendrogram(distance_matrix)</code> <code class="language-plaintext highlighter-rouge"># Display the dendogramplt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/11-2.png?w=1024" alt="" /></p>
+
+<h3 id="24-limitations-of-hierarchical-clustering"><strong>2.4 Limitations of hierarchical clustering</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/12-2.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/13-2.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>2.4.1 FIFA 18: exploring defenders</strong></p>
+
+<p>In the FIFA 18 dataset, various attributes of players are present. Two such attributes are:</p>
+
+<ul>
+  <li><em>sliding tackle</em>: a number between 0-99 which signifies how accurate a player is able to perform sliding tackles</li>
+  <li><em>aggression</em>: a number between 0-99 which signifies the commitment and will of a player</li>
+</ul>
+
+<p>These are typically high in defense-minded players. In this exercise, you will perform clustering based on these attributes in the data.</p>
+
+<p>| 123456789 | <code class="language-plaintext highlighter-rouge">fifa.head()   sliding_tackle  aggression  ...  scaled_aggression  cluster_labels0</code>              <code class="language-plaintext highlighter-rouge">23</code>          <code class="language-plaintext highlighter-rouge">63</code>  <code class="language-plaintext highlighter-rouge">...</code>               <code class="language-plaintext highlighter-rouge">3.72</code>               <code class="language-plaintext highlighter-rouge">31</code>              <code class="language-plaintext highlighter-rouge">26</code>          <code class="language-plaintext highlighter-rouge">48</code>  <code class="language-plaintext highlighter-rouge">...</code>               <code class="language-plaintext highlighter-rouge">2.84</code>               <code class="language-plaintext highlighter-rouge">32</code>              <code class="language-plaintext highlighter-rouge">33</code>          <code class="language-plaintext highlighter-rouge">56</code>  <code class="language-plaintext highlighter-rouge">...</code>               <code class="language-plaintext highlighter-rouge">3.31</code>               <code class="language-plaintext highlighter-rouge">33</code>              <code class="language-plaintext highlighter-rouge">38</code>          <code class="language-plaintext highlighter-rouge">78</code>  <code class="language-plaintext highlighter-rouge">...</code>               <code class="language-plaintext highlighter-rouge">4.61</code>               <code class="language-plaintext highlighter-rouge">34</code>              <code class="language-plaintext highlighter-rouge">11</code>          <code class="language-plaintext highlighter-rouge">29</code>  <code class="language-plaintext highlighter-rouge">...</code>               <code class="language-plaintext highlighter-rouge">1.71</code>               <code class="language-plaintext highlighter-rouge">2</code> <code class="language-plaintext highlighter-rouge">[5</code> <code class="language-plaintext highlighter-rouge">rows x</code> <code class="language-plaintext highlighter-rouge">5</code> <code class="language-plaintext highlighter-rouge">columns]</code> |
+| :— | :— |</p>
+
+<p>| 123456789101112 | <code class="language-plaintext highlighter-rouge"># Fit the data into a hierarchical clustering algorithmdistance_matrix</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">linkage(fifa[['scaled_sliding_tackle',</code> <code class="language-plaintext highlighter-rouge">'scaled_aggression']],</code> <code class="language-plaintext highlighter-rouge">'ward')</code> <code class="language-plaintext highlighter-rouge"># Assign cluster labels to each row of datafifa['cluster_labels']</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">fcluster(distance_matrix,</code> <code class="language-plaintext highlighter-rouge">3, criterion='maxclust')</code> <code class="language-plaintext highlighter-rouge"># Display cluster centers of each clusterprint(fifa[['scaled_sliding_tackle',</code> <code class="language-plaintext highlighter-rouge">'scaled_aggression',</code> <code class="language-plaintext highlighter-rouge">'cluster_labels']].groupby('cluster_labels').mean())</code> <code class="language-plaintext highlighter-rouge"># Create a scatter plot through seabornsns.scatterplot(x='scaled_sliding_tackle', y='scaled_aggression', hue='cluster_labels', data=fifa)plt.show()</code> |
+| :— | :— |</p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge">scaled_sliding_tackle  scaled_aggressioncluster_labels                                         1</code>                                <code class="language-plaintext highlighter-rouge">2.99</code>               <code class="language-plaintext highlighter-rouge">4.352</code>                                <code class="language-plaintext highlighter-rouge">0.74</code>               <code class="language-plaintext highlighter-rouge">1.943</code>                                <code class="language-plaintext highlighter-rouge">1.34</code>               <code class="language-plaintext highlighter-rouge">3.62</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/14-2.png?w=1024" alt="" /></p>
+
+<h2 id="3-k-means-clustering"><strong>3. K-Means Clustering</strong></h2>
+
+<h3 id="31-basics-of-k-means-clustering"><strong>3.1 Basics of k-means clustering</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/1-3.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/2-4.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/3-4.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/4-4.png?w=723" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/5-4.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/6-4.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>3.1.1 K-means clustering: first exercise</strong></p>
+
+<p>This exercise will familiarize you with the usage of k-means clustering on a dataset. Let us use the Comic Con dataset and check how k-means clustering works on it.</p>
+
+<p>Recall the two steps of k-means clustering:</p>
+
+<ul>
+  <li>Define cluster centers through <code class="language-plaintext highlighter-rouge">kmeans()</code> function. It has two required arguments: observations and number of clusters.</li>
+  <li>Assign cluster labels through the <code class="language-plaintext highlighter-rouge">vq()</code> function. It has two required arguments: observations and cluster centers.</li>
+</ul>
+
+<p>| 12345678910111213 | <code class="language-plaintext highlighter-rouge"># Import the kmeans and vq functionsfrom</code> <code class="language-plaintext highlighter-rouge">scipy.cluster.vq</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">kmeans, vq</code> <code class="language-plaintext highlighter-rouge"># Generate cluster centerscluster_centers, distortion</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">kmeans(comic_con[['x_scaled','y_scaled']],</code> <code class="language-plaintext highlighter-rouge">2)</code> <code class="language-plaintext highlighter-rouge"># Assign cluster labelscomic_con['cluster_labels'], distortion_list</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">vq(comic_con[['x_scaled','y_scaled']],cluster_centers)</code> <code class="language-plaintext highlighter-rouge"># Plot clusterssns.scatterplot(x='x_scaled', y='y_scaled',                hue='cluster_labels', data</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">comic_con)plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/7-4.png?w=1024" alt="" /></p>
+
+<p>Notice that the clusters formed are exactly the same as hierarchical clustering that you did in the previous chapter.</p>
+
+<p><strong>3.1.2 Runtime of k-means clustering</strong></p>
+
+<p>Recall that it took a significantly long time to run hierarchical clustering. How long does it take to run the <code class="language-plaintext highlighter-rouge">kmeans()</code> function on the FIFA dataset?</p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge">%timeit kmeans(fifa[['scaled_sliding_tackle','scaled_aggression']],3)# 10 loops, best of 3: 69.7 ms per loop</code> <code class="language-plaintext highlighter-rouge">%timeit linkage(fifa[['scaled_sliding_tackle','scaled_aggression']], method</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">'ward', metric</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">'euclidean')# 1 loop, best of 3: 703 ms per loop</code> |
+| :— | :— |</p>
+
+<h3 id="32-how-many-clusters"><strong>3.2 How many clusters?</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/8-3.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/9-3.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/10-3.png?w=900" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/11-3.png?w=779" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/12-3.png?w=980" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/13-3.png?w=1024" alt="" /></li>
+</ul>
+
+<p><strong>3.2.1 Elbow method on distinct clusters</strong></p>
+
+<p>Let us use the comic con data set to see how the elbow plot looks on a data set with distinct, well-defined clusters. You may want to display the data points before proceeding with the exercise.</p>
+
+<p>| 123456789101112131415 | <code class="language-plaintext highlighter-rouge">distortions</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">[]num_clusters</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">range(1,</code> <code class="language-plaintext highlighter-rouge">7)</code> <code class="language-plaintext highlighter-rouge"># Create a list of distortions from the kmeans functionfor</code> <code class="language-plaintext highlighter-rouge">i</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">num_clusters:    cluster_centers, distortion</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">kmeans(comic_con[['x_scaled','y_scaled']],i)    distortions.append(distortion)</code> <code class="language-plaintext highlighter-rouge"># Create a data frame with two lists - num_clusters, distortionselbow_plot</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">pd.DataFrame({'num_clusters': num_clusters,</code> <code class="language-plaintext highlighter-rouge">'distortions': distortions})</code> <code class="language-plaintext highlighter-rouge"># Creat a line plot of num_clusters and distortionssns.lineplot(x='num_clusters', y='distortions', data</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">elbow_plot)plt.xticks(num_clusters)plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/14-3.png?w=1024" alt="" /></p>
+
+<p>From the elbow plot, there are 2 clusters in the data.</p>
+
+<p><strong>3.2.2 Elbow method on uniform data</strong></p>
+
+<p>In the earlier exercise, you constructed an elbow plot on data with well-defined clusters. Let us now see how the elbow plot looks on a data set with uniformly distributed points. You may want to display the data points on the console before proceeding with the exercise.</p>
+
+<p>| 123456789101112131415 | <code class="language-plaintext highlighter-rouge">distortions</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">[]num_clusters</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">range(2,</code> <code class="language-plaintext highlighter-rouge">7)</code> <code class="language-plaintext highlighter-rouge"># Create a list of distortions from the kmeans functionfor</code> <code class="language-plaintext highlighter-rouge">i</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">num_clusters:    cluster_centers, distortion</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">kmeans(uniform_data[['x_scaled','y_scaled']],i)    distortions.append(distortion)</code> <code class="language-plaintext highlighter-rouge"># Create a data frame with two lists - number of clusters and distortionselbow_plot</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">pd.DataFrame({'num_clusters': num_clusters,</code> <code class="language-plaintext highlighter-rouge">'distortions': distortions})</code> <code class="language-plaintext highlighter-rouge"># Creat a line plot of num_clusters and distortionssns.lineplot(x='num_clusters', y='distortions', data</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">elbow_plot)plt.xticks(num_clusters)plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/15-2.png?w=1024" alt="" /></p>
+
+<p>From the elbow plot, we can not determine how many clusters in the data.</p>
+
+<h3 id="33-limitations-of-k-means-clustering"><strong>3.3 Limitations of k-means clustering</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/16.png?w=973" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/17.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/18.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/19.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/20.png?w=983" alt="" /></li>
+</ul>
+
+<p><strong>3.3.1 Impact of seeds on distinct clusters</strong></p>
+
+<p>You noticed the impact of seeds on a dataset that did not have well-defined groups of clusters. In this exercise, you will explore whether seeds impact the clusters in the Comic Con data, where the clusters are well-defined.</p>
+
+<p>| 123456789101112131415 | <code class="language-plaintext highlighter-rouge"># Import random classfrom</code> <code class="language-plaintext highlighter-rouge">numpy</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">random</code> <code class="language-plaintext highlighter-rouge"># Initialize seedrandom.seed(0)random.seed([1,</code> <code class="language-plaintext highlighter-rouge">2,</code> <code class="language-plaintext highlighter-rouge">1000])</code> <code class="language-plaintext highlighter-rouge"># Run kmeans clusteringcluster_centers, distortion</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">kmeans(comic_con[['x_scaled',</code> <code class="language-plaintext highlighter-rouge">'y_scaled']],</code> <code class="language-plaintext highlighter-rouge">2)comic_con['cluster_labels'], distortion_list</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">vq(comic_con[['x_scaled',</code> <code class="language-plaintext highlighter-rouge">'y_scaled']], cluster_centers)</code> <code class="language-plaintext highlighter-rouge"># Plot the scatterplotsns.scatterplot(x='x_scaled', y='y_scaled',                hue='cluster_labels', data</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">comic_con)plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/21.png?w=1024" alt="" /></p>
+
+<p>Notice that the plots have not changed after changing the seed as the clusters are well-defined.</p>
+
+<p><strong>3.3.2 Uniform clustering patterns</strong></p>
+
+<p>Now that you are familiar with the impact of seeds, let us look at the bias in k-means clustering towards the formation of uniform clusters.</p>
+
+<p>Let us use a mouse-like dataset for our next exercise. A mouse-like dataset is a group of points that resemble the head of a mouse: it has three clusters of points arranged in circles, one each for the face and two ears of a mouse.</p>
+
+<p>Here is how a typical mouse-like dataset looks like (<a href="https://www.researchgate.net/figure/Clustering-results-for-the-Mouse-data-set-where-the-black-boxes-represent-the-centroids_fig3_256378655">Source</a>).<img src="https://assets.datacamp.com/production/repositories/3842/datasets/fa03a65258018a0c945528a987cdd250010de1ee/Clustering-results-for-the-Mouse-data-set-where-the-black-boxes-represent-the-centroids.ppm" alt="" /></p>
+
+<p>| 12345678910111213 | <code class="language-plaintext highlighter-rouge"># Import the kmeans and vq functionsfrom</code> <code class="language-plaintext highlighter-rouge">scipy.cluster.vq</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">kmeans, vq</code> <code class="language-plaintext highlighter-rouge"># Generate cluster centerscluster_centers, distortion</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">kmeans(mouse[['x_scaled','y_scaled']],3)</code> <code class="language-plaintext highlighter-rouge"># Assign cluster labelsmouse['cluster_labels'], distortion_list</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">vq(mouse[['x_scaled','y_scaled']],cluster_centers)</code> <code class="language-plaintext highlighter-rouge"># Plot clusterssns.scatterplot(x='x_scaled', y='y_scaled',                hue='cluster_labels', data</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">mouse)plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/22.png?w=1024" alt="" /></p>
+
+<p>Notice that kmeans is unable to capture the three visible clusters clearly, and the two clusters towards the top have taken in some points along the boundary. This happens due to the underlying assumption in kmeans algorithm to minimize distortions which leads to clusters that are similar in terms of area.</p>
+
+<p><strong>3.3.3 FIFA 18: defenders revisited</strong></p>
+
+<p>In the FIFA 18 dataset, various attributes of players are present. Two such attributes are:</p>
+
+<ul>
+  <li><em>defending</em>: a number which signifies the defending attributes of a player</li>
+  <li><em>physical</em>: a number which signifies the physical attributes of a player</li>
+</ul>
+
+<p>These are typically defense-minded players. In this exercise, you will perform clustering based on these attributes in the data.</p>
+
+<p>| 123456789101112131415 | <code class="language-plaintext highlighter-rouge"># Set up a random seed in numpyrandom.seed([1000,2000])</code> <code class="language-plaintext highlighter-rouge"># Fit the data into a k-means algorithmcluster_centers,_</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">kmeans(fifa[['scaled_def',</code> <code class="language-plaintext highlighter-rouge">'scaled_phy']],</code> <code class="language-plaintext highlighter-rouge">3)</code> <code class="language-plaintext highlighter-rouge"># Assign cluster labelsfifa['cluster_labels'], _</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">vq(fifa[['scaled_def',</code> <code class="language-plaintext highlighter-rouge">'scaled_phy']], cluster_centers)</code> <code class="language-plaintext highlighter-rouge"># Display cluster centersprint(fifa[['scaled_def',</code> <code class="language-plaintext highlighter-rouge">'scaled_phy',</code> <code class="language-plaintext highlighter-rouge">'cluster_labels']].groupby('cluster_labels').mean())</code> <code class="language-plaintext highlighter-rouge"># Create a scatter plot through seabornsns.scatterplot(x='scaled_def', y='scaled_phy', hue='cluster_labels', data=fifa)plt.show()</code> |
+| :— | :— |</p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge">scaled_def  scaled_phycluster_labels                       0</code>                     <code class="language-plaintext highlighter-rouge">3.74</code>        <code class="language-plaintext highlighter-rouge">8.871</code>                     <code class="language-plaintext highlighter-rouge">1.87</code>        <code class="language-plaintext highlighter-rouge">7.082</code>                     <code class="language-plaintext highlighter-rouge">2.10</code>        <code class="language-plaintext highlighter-rouge">8.94</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/23.png?w=1024" alt="" /></p>
+
+<p>Notice that the seed has an impact on clustering as the data is uniformly distributed.</p>
+
+<h2 id="4-clustering-in-real-world"><strong>4. Clustering in Real World</strong></h2>
+
+<h3 id="41-dominant-colors-in-images"><strong>4.1 Dominant colors in images</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/24.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/25.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/26.png?w=968" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/27.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/28.png?w=854" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/29.png?w=841" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/30.png?w=906" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/31.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/32.png?w=797" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/33.png?w=1010" alt="" /></li>
+</ul>
+
+<p><strong>4.1.1 Extract RGB values from image</strong></p>
+
+<p>There are broadly three steps to find the dominant colors in an image:</p>
+
+<ul>
+  <li>Extract RGB values into three lists.</li>
+  <li>Perform k-means clustering on scaled RGB values.</li>
+  <li>Display the colors of cluster centers.</li>
+</ul>
+
+<p>To extract RGB values, we use the <code class="language-plaintext highlighter-rouge">imread()</code> function of the <code class="language-plaintext highlighter-rouge">image</code> class of <code class="language-plaintext highlighter-rouge">matplotlib</code>. Empty lists, <code class="language-plaintext highlighter-rouge">r</code>, <code class="language-plaintext highlighter-rouge">g</code> and <code class="language-plaintext highlighter-rouge">b</code> have been initialized.</p>
+
+<p>For the purpose of finding dominant colors, we will be using the following image.<img src="https://assets.datacamp.com/production/repositories/3842/datasets/57d0d6d409bfd543e86c7f7398239fa0722e9b48/batman.jpg" alt="" /></p>
+
+<p>| 1234567891011121314 | <code class="language-plaintext highlighter-rouge"># Import image class of matplotlibfrom</code> <code class="language-plaintext highlighter-rouge">matplotlib</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">image as img</code> <code class="language-plaintext highlighter-rouge"># Read batman image and print dimensionsbatman_image</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">img.imread('batman.jpg')print(batman_image.shape)# (57, 90, 3)</code> <code class="language-plaintext highlighter-rouge"># Store RGB values of all pixels in lists r, g and bfor</code> <code class="language-plaintext highlighter-rouge">rows</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">batman_image:    for</code> <code class="language-plaintext highlighter-rouge">temp_r, temp_g, temp_b</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">rows:        r.append(temp_r)        g.append(temp_g)        b.append(temp_b)</code> |
+| :— | :— |</p>
+
+<p>You have successfully extracted the RGB values of the image into three lists, one for each color channel.</p>
+
+<p><strong>4.1.2 How many dominant colors?</strong></p>
+
+<p>The RGB values are stored in a data frame, <code class="language-plaintext highlighter-rouge">batman_df</code>. The RGB values have been standardized used the <code class="language-plaintext highlighter-rouge">whiten()</code> function, stored in columns, <code class="language-plaintext highlighter-rouge">scaled_red</code>, <code class="language-plaintext highlighter-rouge">scaled_blue</code> and <code class="language-plaintext highlighter-rouge">scaled_green</code>.</p>
+
+<p>Construct an elbow plot with the data frame. How many dominant colors are present?</p>
+
+<p>| 123456789101112131415 | <code class="language-plaintext highlighter-rouge">distortions</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">[]num_clusters</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">range(1,</code> <code class="language-plaintext highlighter-rouge">7)</code> <code class="language-plaintext highlighter-rouge"># Create a list of distortions from the kmeans functionfor</code> <code class="language-plaintext highlighter-rouge">i</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">num_clusters:    cluster_centers, distortion</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">kmeans(batman_df[['scaled_red',</code> <code class="language-plaintext highlighter-rouge">'scaled_blue',</code> <code class="language-plaintext highlighter-rouge">'scaled_green']], i)    distortions.append(distortion)</code> <code class="language-plaintext highlighter-rouge"># Create a data frame with two lists, num_clusters and distortionselbow_plot</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">pd.DataFrame({'num_clusters':num_clusters,'distortions':distortions})</code> <code class="language-plaintext highlighter-rouge"># Create a line plot of num_clusters and distortionssns.lineplot(x='num_clusters', y='distortions', data</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">elbow_plot)plt.xticks(num_clusters)plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/1-4.png?w=1024" alt="" /></p>
+
+<p>Notice that there are three distinct colors present in the image, which is supported by the elbow plot.</p>
+
+<p><strong>4.1.3 Display dominant colors</strong></p>
+
+<p>To display the dominant colors, convert the colors of the cluster centers to their raw values and then converted them to the range of 0-1, using the following formula: <code class="language-plaintext highlighter-rouge">converted_pixel = standardized_pixel * pixel_std / 255</code></p>
+
+<p>| 123456789101112131415 | <code class="language-plaintext highlighter-rouge"># Get standard deviations of each colorr_std, g_std, b_std</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">batman_df[['red',</code> <code class="language-plaintext highlighter-rouge">'green',</code> <code class="language-plaintext highlighter-rouge">'blue']].std()</code> <code class="language-plaintext highlighter-rouge">for</code> <code class="language-plaintext highlighter-rouge">cluster_center</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">cluster_centers:    scaled_r, scaled_g, scaled_b</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">cluster_center    # Convert each standardized value to scaled value    colors.append((        scaled_r</code> <code class="language-plaintext highlighter-rouge">*</code> <code class="language-plaintext highlighter-rouge">r_std</code> <code class="language-plaintext highlighter-rouge">/</code> <code class="language-plaintext highlighter-rouge">255,        scaled_g</code> <code class="language-plaintext highlighter-rouge">*</code> <code class="language-plaintext highlighter-rouge">g_std</code> <code class="language-plaintext highlighter-rouge">/</code> <code class="language-plaintext highlighter-rouge">255,        scaled_b</code> <code class="language-plaintext highlighter-rouge">*</code> <code class="language-plaintext highlighter-rouge">b_std</code> <code class="language-plaintext highlighter-rouge">/</code> <code class="language-plaintext highlighter-rouge">255    ))</code> <code class="language-plaintext highlighter-rouge"># Display colors of cluster centersplt.imshow([colors])plt.show()</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/2-5.png?w=1024" alt="" /></p>
+
+<p>Notice the three colors resemble the three that are indicative from visual inspection of the image.</p>
+
+<h3 id="42-document-clustering"><strong>4.2 Document clustering</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/5-5.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/6-5.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/3-5.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/4-5.png?w=753" alt="" /></li>
+</ul>
+
+<p><strong>4.2.1 TF-IDF(term frequency–inverse document frequency) of movie plots</strong></p>
+
+<p>Let us use the plots of randomly selected movies to perform document clustering on. Before performing clustering on documents, they need to be cleaned of any unwanted noise (such as special characters and stop words) and converted into a sparse matrix through TF-IDF of the documents.</p>
+
+<p>Use the <code class="language-plaintext highlighter-rouge">TfidfVectorizer</code> class to perform the TF-IDF of movie plots stored in the list <code class="language-plaintext highlighter-rouge">plots</code>. The <code class="language-plaintext highlighter-rouge">remove_noise()</code> function is available to use as a <code class="language-plaintext highlighter-rouge">tokenizer</code> in the <code class="language-plaintext highlighter-rouge">TfidfVectorizer</code> class. The <code class="language-plaintext highlighter-rouge">.fit_transform()</code> method fits the data into the <code class="language-plaintext highlighter-rouge">TfidfVectorizer</code> objects and then generates the TF-IDF sparse matrix.</p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge">plots[:1]['Cable Hogue</code> <code class="language-plaintext highlighter-rouge">is</code> <code class="language-plaintext highlighter-rouge">isolated</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">the desert, awaiting his partners, Taggart</code> <code class="language-plaintext highlighter-rouge">and</code> <code class="language-plaintext highlighter-rouge">Bowen,......A coyote wanders into the abandoned Cable Springs. But the coyote has a collar – possibly symbolising the taming of the wilderness.']</code> |
+| :— | :— |</p>
+
+<p>| 12345678 | <code class="language-plaintext highlighter-rouge"># Import TfidfVectorizer class from sklearnfrom</code> <code class="language-plaintext highlighter-rouge">sklearn.feature_extraction.text</code> <code class="language-plaintext highlighter-rouge">import</code> <code class="language-plaintext highlighter-rouge">TfidfVectorizer</code> <code class="language-plaintext highlighter-rouge"># Initialize TfidfVectorizertfidf_vectorizer</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">TfidfVectorizer(min_df=0.1, max_df=0.75, max_features=50, tokenizer=remove_noise)</code> <code class="language-plaintext highlighter-rouge"># Use the .fit_transform() method on the list plotstfidf_matrix</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">tfidf_vectorizer.fit_transform(plots)</code> |
+| :— | :— |</p>
+
+<p><strong>4.2.2 Top terms in movie clusters</strong></p>
+
+<p>Now that you have created a sparse matrix, generate cluster centers and print the top three terms in each cluster. Use the <code class="language-plaintext highlighter-rouge">.todense()</code> method to convert the sparse matrix, <code class="language-plaintext highlighter-rouge">tfidf_matrix</code> to a normal matrix for the <code class="language-plaintext highlighter-rouge">kmeans()</code> function to process. Then, use the <code class="language-plaintext highlighter-rouge">.get_feature_names()</code> method to get a list of terms in the <code class="language-plaintext highlighter-rouge">tfidf_vectorizer</code> object. The <code class="language-plaintext highlighter-rouge">zip()</code> function in Python joins two lists.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">tfidf_vectorizer</code> object and sparse matrix, <code class="language-plaintext highlighter-rouge">tfidf_matrix</code>, from the previous have been retained in this exercise. <code class="language-plaintext highlighter-rouge">kmeans</code> has been imported from SciPy.</p>
+
+<p>With a higher number of data points, the clusters formed would be defined more clearly. However, this requires some computational power, making it difficult to accomplish in an exercise here.</p>
+
+<p>| 12345678910111213141516 | <code class="language-plaintext highlighter-rouge">num_clusters</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">2</code> <code class="language-plaintext highlighter-rouge"># Generate cluster centers through the kmeans functioncluster_centers, distortion</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">kmeans(tfidf_matrix.todense(),num_clusters)</code> <code class="language-plaintext highlighter-rouge"># Generate terms from the tfidf_vectorizer objectterms</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">tfidf_vectorizer.get_feature_names()</code> <code class="language-plaintext highlighter-rouge">for</code> <code class="language-plaintext highlighter-rouge">i</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">range(num_clusters):    # Sort the terms and print top 3 terms    center_terms</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">dict(zip(terms, cluster_centers[i]))    sorted_terms</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">sorted(center_terms, key=center_terms.get, reverse=True)    print(sorted_terms[:3])</code> <code class="language-plaintext highlighter-rouge"># ['back', 'father', 'one']# ['man', 'police', 'killed']</code> |
+| :— | :— |</p>
+
+<p>Notice positive, warm words in the first cluster and words referring to action in the second cluster.</p>
+
+<h3 id="43-clustering-with-multiple-features"><strong>4.3 Clustering with multiple features</strong></h3>
+
+<ul>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/7-5.png?w=1024" alt="" /></li>
+  <li><img src="https://datascience103579984.files.wordpress.com/2019/12/8-4.png?w=553" alt="" /></li>
+</ul>
+
+<p><strong>4.3.1 Clustering with many features</strong></p>
+
+<p>What should you do if you have too many features for clustering?</p>
+
+<p>Reduce features using a technique like Factor Analysis</p>
+
+<p><strong>4.3.2 Basic checks on clusters</strong></p>
+
+<p>In the FIFA 18 dataset, we have concentrated on defenders in previous exercises. Let us try to focus on attacking attributes of a player. Pace (<code class="language-plaintext highlighter-rouge">pac</code>), Dribbling (<code class="language-plaintext highlighter-rouge">dri</code>) and Shooting (<code class="language-plaintext highlighter-rouge">sho</code>) are features that are present in attack minded players. In this exercise, k-means clustering has already been applied on the data using the scaled values of these three attributes. Try some basic checks on the clusters so formed.</p>
+
+<p>The data is stored in a Pandas data frame, <code class="language-plaintext highlighter-rouge">fifa</code>. The scaled column names are present in a list <code class="language-plaintext highlighter-rouge">scaled_features</code>. The cluster labels are stored in the <code class="language-plaintext highlighter-rouge">cluster_labels</code> column. Recall the <code class="language-plaintext highlighter-rouge">.count()</code> and <code class="language-plaintext highlighter-rouge">.mean()</code> methods in Pandas help you find the number of observations and mean of observations in a data frame.</p>
+
+<p>| 12345 | <code class="language-plaintext highlighter-rouge"># Print the size of the clustersprint(fifa.groupby('cluster_labels')['ID'].count())</code> <code class="language-plaintext highlighter-rouge"># Print the mean value of wages in each clusterprint(fifa.groupby('cluster_labels')['eur_wage'].mean())</code> |
+| :— | :— |</p>
+
+<p>| 1234567891011 | <code class="language-plaintext highlighter-rouge">cluster_labels0</code>     <code class="language-plaintext highlighter-rouge">831</code>    <code class="language-plaintext highlighter-rouge">1072</code>     <code class="language-plaintext highlighter-rouge">60Name:</code> <code class="language-plaintext highlighter-rouge">ID, dtype: int64</code> <code class="language-plaintext highlighter-rouge">cluster_labels0</code>   <code class="language-plaintext highlighter-rouge">132108.431</code>   <code class="language-plaintext highlighter-rouge">130308.412</code>   <code class="language-plaintext highlighter-rouge">117583.33Name: eur_wage, dtype: float64</code> |
+| :— | :— |</p>
+
+<p>In this example, the cluster sizes are not very different, and there are no significant differences that can be seen in the wages. Further analysis is required to validate these clusters.</p>
+
+<p><strong>4.3.3 FIFA 18: what makes a complete player?</strong></p>
+
+<p>The overall level of a player in FIFA 18 is defined by six characteristics: pace (<code class="language-plaintext highlighter-rouge">pac</code>), shooting (<code class="language-plaintext highlighter-rouge">sho</code>), passing (<code class="language-plaintext highlighter-rouge">pas</code>), dribbling (<code class="language-plaintext highlighter-rouge">dri</code>), defending (<code class="language-plaintext highlighter-rouge">def</code>), physical (<code class="language-plaintext highlighter-rouge">phy</code>).</p>
+
+<p>| 1234567891011121314 | <code class="language-plaintext highlighter-rouge"># Create centroids with kmeans for 2 clusterscluster_centers,_</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">kmeans(fifa[scaled_features],</code> <code class="language-plaintext highlighter-rouge">2)</code> <code class="language-plaintext highlighter-rouge"># Assign cluster labels and print cluster centersfifa['cluster_labels'], _</code> <code class="language-plaintext highlighter-rouge">=</code> <code class="language-plaintext highlighter-rouge">vq(fifa[scaled_features], cluster_centers)print(fifa.groupby('cluster_labels')[scaled_features].mean())</code> <code class="language-plaintext highlighter-rouge"># Plot cluster centers to visualize clustersfifa.groupby('cluster_labels')[scaled_features].mean().plot(legend=True, kind='bar')plt.show()</code> <code class="language-plaintext highlighter-rouge"># Get the name column of top 5 players in each clusterfor</code> <code class="language-plaintext highlighter-rouge">cluster</code> <code class="language-plaintext highlighter-rouge">in</code> <code class="language-plaintext highlighter-rouge">fifa['cluster_labels'].unique():    print(cluster, fifa[fifa['cluster_labels']</code> <code class="language-plaintext highlighter-rouge">==</code> <code class="language-plaintext highlighter-rouge">cluster]['name'].values[:5])</code> |
+| :— | :— |</p>
+
+<p>| 12345678910111213 | <code class="language-plaintext highlighter-rouge">scaled_pac  scaled_sho  scaled_pas  scaled_dri  scaled_def  \cluster_labels                                                              0</code>                     <code class="language-plaintext highlighter-rouge">6.68</code>        <code class="language-plaintext highlighter-rouge">5.43</code>        <code class="language-plaintext highlighter-rouge">8.46</code>        <code class="language-plaintext highlighter-rouge">8.51</code>        <code class="language-plaintext highlighter-rouge">2.50</code>  <code class="language-plaintext highlighter-rouge">1</code>                     <code class="language-plaintext highlighter-rouge">5.44</code>        <code class="language-plaintext highlighter-rouge">3.66</code>        <code class="language-plaintext highlighter-rouge">7.17</code>        <code class="language-plaintext highlighter-rouge">6.76</code>        <code class="language-plaintext highlighter-rouge">3.97</code>                   <code class="language-plaintext highlighter-rouge">scaled_phy cluster_labels             0</code>                     <code class="language-plaintext highlighter-rouge">8.34</code> <code class="language-plaintext highlighter-rouge">1</code>                     <code class="language-plaintext highlighter-rouge">9.21</code>   <code class="language-plaintext highlighter-rouge">0</code> <code class="language-plaintext highlighter-rouge">['Cristiano Ronaldo'</code> <code class="language-plaintext highlighter-rouge">'L. Messi'</code> <code class="language-plaintext highlighter-rouge">'Neymar'</code> <code class="language-plaintext highlighter-rouge">'L. Suárez'</code> <code class="language-plaintext highlighter-rouge">'M. Neuer']1</code> <code class="language-plaintext highlighter-rouge">['Sergio Ramos'</code> <code class="language-plaintext highlighter-rouge">'G. Chiellini'</code> <code class="language-plaintext highlighter-rouge">'D. Godín'</code> <code class="language-plaintext highlighter-rouge">'Thiago Silva'</code> <code class="language-plaintext highlighter-rouge">'M. Hummels']</code> |
+| :— | :— |</p>
+
+<p><img src="https://datascience103579984.files.wordpress.com/2019/12/9-4.png?w=1024" alt="" /></p>
+
+<p>Notice the top players in each cluster are representative of the overall characteristics of the cluster – one of the clusters primarily represents attackers, whereas the other represents defenders.</p>
+
+<p>Surprisingly, a top goalkeeper Manuel Neuer is seen in the attackers group, but he is known for going out of the box and participating in open play, which are reflected in his FIFA 18 attributes.</p>
+
